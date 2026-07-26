@@ -7,6 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./i18n": "./src/i18n.tsx",
+    "./site-renderer": "./src/site-renderer.tsx",
     "./sections/*": "./src/sections/*.tsx",
     "./*": "./src/*.ts"
   },

@@ -1,14 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import {
-  LanguageProvider,
-  resolveComponent,
-  resolveTheme,
-  type CoupleInfo,
-  type SectionKey,
-  type Theme,
-} from "@mongkolka/templates";
+import { LanguageProvider, SiteRenderer, type CoupleInfo, type SectionKey, type Theme } from "@mongkolka/templates";
 import type { SiteTemplate, WebsiteSection } from "../data/schema";
 
 interface PreviewProfile {
@@ -58,8 +50,6 @@ export function WebsitePreview({
   themeOverride: Partial<Theme> | null;
   profile: PreviewProfile;
 }) {
-  const [openingDismissed, setOpeningDismissed] = useState(false);
-
   if (!template) {
     return (
       <div className="flex h-96 items-center justify-center rounded-lg border text-muted-foreground">
@@ -74,13 +64,6 @@ export function WebsitePreview({
     weddingDate: profile.wedding_date ?? undefined,
   };
 
-  const ordered = [...sections]
-    .filter((s) => s.enabled)
-    .sort((a, b) => a.display_order - b.display_order);
-
-  const opening = ordered.find((s) => s.section_key === "opening");
-  const rest = ordered.filter((s) => s.section_key !== "opening");
-
   return (
     <LanguageProvider>
       <div
@@ -88,41 +71,17 @@ export function WebsitePreview({
         style={{ transform: "translateZ(0)" }}
       >
         <div className="h-full overflow-y-auto">
-          {opening && !openingDismissed
-            ? (() => {
-                const theme = resolveTheme(
-                  template.default_theme,
-                  themeOverride,
-                  opening.color_override,
-                );
-                const Component = resolveComponent(
-                  "opening",
-                  opening.component_id,
-                  template.default_components.opening,
-                );
-                if (!Component) return null;
-                return (
-                  <Component
-                    couple={couple}
-                    theme={theme}
-                    guestGreeting="Guest"
-                    onOpen={() => setOpeningDismissed(true)}
-                  />
-                );
-              })()
-            : rest.map((section) => {
-                const theme = resolveTheme(template.default_theme, themeOverride, section.color_override);
-                const Component = resolveComponent(
-                  section.section_key,
-                  section.component_id,
-                  template.default_components[section.section_key],
-                );
-                if (!Component) return null;
-                const content = buildContent(section.section_key, profile);
-                return (
-                  <Component key={section.section_id} couple={couple} theme={theme} content={content} />
-                );
-              })}
+          <SiteRenderer
+            template={template}
+            sections={sections}
+            themeOverride={themeOverride}
+            couple={couple}
+            buildContent={(sectionKey) => buildContent(sectionKey, profile)}
+            guestGreeting="Guest"
+            extraProps={(sectionKey) =>
+              sectionKey === "rsvp" ? { onSubmit: async () => {} } : {}
+            }
+          />
         </div>
       </div>
     </LanguageProvider>

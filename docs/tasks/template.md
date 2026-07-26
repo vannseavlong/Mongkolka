@@ -38,15 +38,15 @@ eight as `WebsiteBuilder.tsx`. A couple enables a subset and orders them
 ### Where each section's content comes from
 
 Not every section needs its own stored content — some just render the couple's
-canonical facts (already in `couples`/`profile`) through whichever template is
+canonical facts (already in `couples`/`couple_profile`) through whichever template is
 chosen; only sections with no other canonical home need
 `website_sections.content` json:
 
 | Section | Content source |
 |---|---|
-| `hero` | `couples.partner1_name/partner2_name/wedding_date` + `profile.cover_photo_url` — no separate content needed. |
-| `story` | `profile.love_story` — no separate content needed. |
-| `details` | `profile.ceremony_*` / `profile.reception_*` / `dress_code` — no separate content needed. |
+| `hero` | `couples.partner1_name/partner2_name/wedding_date` + `couple_profile.cover_photo_url` — no separate content needed. |
+| `story` | `couple_profile.love_story` — no separate content needed. |
+| `details` | `couple_profile.ceremony_*` / `couple_profile.reception_*` / `dress_code` — no separate content needed. |
 | `gallery` | `content: { photos: string[] }` — no canonical home for a photo list elsewhere. |
 | `rsvp` | `content: { customMessage?: string, deadline?: string }` — the actual RSVP submissions are a separate concern (see below), this is just the section's own copy. |
 | `registry` | `content: { links: { label: string, url: string }[] }` |
@@ -127,7 +127,7 @@ instead of Clone-UI's `alert()`.
   see [docs/tasks/landing.md](landing.md) for the host-based routing setup).
 - Server-side: call `GET /public/sites/:slug` on `apps/api` (new, unauthenticated).
   This endpoint does the admin-sheet `couples` lookup by slug, then reads that
-  couple's own sheet (`profile`, `website_sections` ordered by `display_order` where
+  couple's own sheet (`couple_profile`, `website_sections` ordered by `display_order` where
   `enabled = true`) — `apps/web` never touches `longcelot-sheet-db` or holds Google
   credentials directly (see [overview.md](../../overview.md)).
 - Render each enabled section by looking up

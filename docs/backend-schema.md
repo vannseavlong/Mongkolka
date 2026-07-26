@@ -72,7 +72,7 @@ because `slug` uniqueness has to be checked against every couple, not just one.
 | `slug` | string, unique, required | Subdomain: `{slug}.mongkolka.com`. |
 | `custom_domain` | string, nullable, unique | Couple's own domain, once verified. |
 | `wedding_date` | date, nullable | |
-| `status` | enum(pending, active, suspended) | Tenant-level status — an admin can suspend the whole wedding account. Independent of an individual `users.status` (one partner's login could be deactivated without suspending the other partner or the site). |
+| `status` | enum(pending, active, suspended, rejected) | Tenant-level status — an admin can suspend the whole wedding account, or reject it before it's ever approved. Independent of an individual `users.status` (one partner's login could be deactivated without suspending the other partner or the site). |
 | `website_status` | enum(draft, published) | Whether the public site is live. Separate axis from `status` — a couple can be `active` with a `draft` site. |
 
 ### `couple_members`
@@ -197,10 +197,13 @@ this one is not per-section, it's a whole-invitation property), preview color fi
 Everything here is implicitly scoped to one wedding by virtue of living in that
 couple's own spreadsheet — no `couple_id`/`tenant_id` column needed on any of these.
 
-### `profile`
+### `couple_profile`
 
 Singleton-ish (one real row per couple) — the long-form content
-`PublicCouplePage.tsx` hardcodes today, made real.
+`PublicCouplePage.tsx` hardcodes today, made real. Named `couple_profile` rather than
+just `profile` — table names turned out to need to be globally unique across every
+actor, not just unique within one actor's sheet (the vendor sheet has its own
+`vendor_profile` below, same reason).
 
 | Column | Type | Notes |
 |---|---|---|
@@ -302,7 +305,7 @@ columns instead of one json blob is an open call to make when this phase starts.
 
 ## Vendor sheet (per vendor, `actor: 'vendor'`)
 
-### `profile`
+### `vendor_profile`
 
 The vendor's own day-to-day content — separate from `vendors` in the admin sheet,
 which holds only what admin needs to review/approve (name, category, status).
@@ -358,5 +361,5 @@ erDiagram
 ```
 
 The second diagram is deliberately tiny — it's the *only* real foreign key inside a
-couple's own sheet. Everything else in a couple's sheet (`profile`, `website_sections`,
+couple's own sheet. Everything else in a couple's sheet (`couple_profile`, `website_sections`,
 `guests`, `milestones`) stands alone; nothing there references another table.

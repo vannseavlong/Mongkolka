@@ -1,7 +1,10 @@
+import { Suspense } from "react";
+import { LoginGate } from "@/components/login-gate";
+
 export default function Home() {
   return (
-    <main>
-      <div>Hello world!</div>
-    </main>
+    <Suspense>
+      <LoginGate />
+    </Suspense>
   );
 }

@@ -1,11 +1,12 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import { adminAuth } from "./auth/admin.js";
-import { coupleAuth } from "./auth/couple.js";
-import { vendorAuth } from "./auth/vendor.js";
-import { adminRouter } from "./routes/admin.js";
-import { env } from "./env.js";
+import { adminAuth } from "./modules/auth/admin-auth.router.js";
+import { coupleAuth } from "./modules/auth/couple-auth.router.js";
+import { vendorAuth } from "./modules/auth/vendor-auth.router.js";
+import { adminApiRouter } from "./routes/admin-api.routes.js";
+import { vendorApiRouter } from "./routes/vendor-api.routes.js";
+import { env } from "./config/env.js";
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.use(adminAuth.handler);
 app.use(coupleAuth.handler);
 app.use(vendorAuth.handler);
 
-app.use("/admin/api", adminRouter);
+app.use("/admin/api", adminApiRouter);
+app.use("/vendor/api", vendorApiRouter);
 
 app.listen(env.PORT, () => {
   console.log(`api listening on port ${env.PORT}`);

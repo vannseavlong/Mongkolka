@@ -1,1 +1,4 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "@mongkolka/ui/theme.css";
+@source "../../../../packages/ui/src/components/**/*.{ts,tsx}";

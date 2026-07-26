@@ -14,7 +14,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.3",
-    "longcelot-sheet-db": "^0.1.39"
+    "longcelot-sheet-db": "^0.1.40"
   },
   "devDependencies": {
     "@mongkolka/eslint-config": "workspace:*",

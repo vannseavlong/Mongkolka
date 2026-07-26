@@ -1,4 +1,4 @@
-import { adapter, adminContext } from "../../config/database.js";
+import { adminContext } from "../../config/database.js";
 
 export const UsersModel = {
   findMany(where?: Record<string, unknown>) {
@@ -16,6 +16,15 @@ export const UsersModel = {
   },
 
   createActorSheet(userId: string, role: string, email: string) {
-    return adapter.createUserSheet(userId, role, email);
+    // createUserSheet() internally does `this.table('users')`, which needs a
+    // permission context — must be called on a withContext()-scoped instance,
+    // not the raw adapter.
+    return adminContext().createUserSheet(userId, role, email);
+  },
+
+  delete(userId: string) {
+    return adminContext()
+      .table("users")
+      .delete({ where: { user_id: userId } });
   },
 };

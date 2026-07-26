@@ -13,6 +13,10 @@ export const UsersService = {
     if (!user) return null;
     if (user.status === "active") return user;
 
+    // createUserSheet() inserts a brand-new `users` row itself (it's designed for
+    // one-shot user+sheet creation), which would collide on the still-pending row's
+    // user_id — remove that row first so it can re-insert cleanly.
+    await UsersModel.delete(userId);
     const actorSheetId = await UsersModel.createActorSheet(
       user.user_id as string,
       user.role as string,

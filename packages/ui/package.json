@@ -6,6 +6,7 @@
   "type": "module",
   "exports": {
     "./theme.css": "./src/styles/theme.css",
+    "./utils": "./src/components/ui/utils.ts",
     "./data-table": "./src/components/data-table/index.ts",
     "./long-text": "./src/components/long-text.tsx",
     "./layout/nav-group": "./src/components/layout/nav-group.tsx",

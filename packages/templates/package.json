@@ -6,6 +6,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./i18n": "./src/i18n.tsx",
+    "./sections/*": "./src/sections/*.tsx",
     "./*": "./src/*.ts"
   },
   "scripts": {

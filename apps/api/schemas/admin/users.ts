@@ -6,9 +6,9 @@ export default defineTable({
   timestamps: true,
   columns: {
     user_id: string().required().unique(),
-    role: string().required(),
+    role: string().enum(['admin', 'couple', 'vendor']).required(),
     email: string().required().unique(),
     actor_sheet_id: string(),
-    status: string().enum(['active', 'inactive']).default('active'),
+    status: string().enum(['pending', 'active', 'inactive']).default('pending'),
   },
 });

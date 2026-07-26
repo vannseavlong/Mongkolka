@@ -88,8 +88,8 @@ See [docs/tasks/vendor.md](docs/tasks/vendor.md).
       `vendor_profile` row), portfolio CRUD, services CRUD.
 - [x] Bookings list, scoped read of the admin-sheet `bookings` table.
 - [ ] Public vendor profile page — build alongside
-      [Phase 6's marketplace](#phase-6--landing--marketing-appsweb), they link to
-      each other.
+      [Phase 6's marketplace](#phase-6--landing--marketing-appsweb--landing-page-done-marketplace-not-started),
+      they link to each other.
 - [ ] Messaging — still deferred, see Phase 7.
 
 ## Phase 4 — couple portal — done

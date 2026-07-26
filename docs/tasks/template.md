@@ -1,4 +1,4 @@
-# Template System
+# Template System — built
 
 Read [overview.md](../../overview.md) and
 [docs/backend-schema.md](../backend-schema.md) first — this doc covers the template
@@ -66,10 +66,24 @@ chosen; only sections with no other canonical home need
 
 RSVP submissions are guest responses, not template content — they write into the
 couple's own `guests` table (matching `status`/`plus_one` fields already in
-[docs/backend-schema.md](../backend-schema.md#guests)), via a public, unauthenticated
-endpoint scoped to that couple's site only. Don't design a separate "rsvp_responses"
-table — it's the same `guests` row being updated by the guest themselves instead of by
-the couple.
+[docs/backend-schema.md](../backend-schema.md#guests)), via
+`POST /public/api/site/:slug/rsvp` (public, unauthenticated, scoped to that couple's
+site only — finds a guest by name or creates one). It's the same `guests` row being
+updated by the guest themselves instead of by the couple; there's no separate
+`rsvp_responses` table.
+
+Each consumer (the couple-portal preview, the public renderer) supplies its own
+`buildContent(sectionKey)` function to `SiteRenderer` mapping the canonical-fields
+rows above (`hero`/`story`/`details`) into each section's content shape — this
+mapping is deliberately *not* inside `packages/templates`, since it's about how each
+app's own fetched data (couple profile, in both cases) gets reshaped, not about
+rendering. **Not built**: any UI for editing `website_sections.content` itself —
+`gallery`'s `photos`, `registry`'s `links`, `timeline`'s `chapters`, `rsvp`'s
+`customMessage`/`deadline`, and `music`'s `playlistUrl` have no couple-facing editor
+yet, so those sections render empty (most of them return `null` when their content
+is empty, by design — see `resolveComponent()`'s never-throw contract above) unless a
+row's `content` is populated directly. This is real, open work, not an oversight to
+silently work around.
 
 ## The `opening` section
 
@@ -98,115 +112,153 @@ If a couple disables the `opening` section entirely, the public site just starts
 `hero` with no gate — don't force every couple through an interstitial they didn't
 choose.
 
-## `packages/templates` (new shared package)
+## `packages/templates` (shared package)
 
 ```
 packages/templates/
   src/
-    types.ts        — Theme, SectionKey, per-section content prop types
-    theme.ts         — resolveTheme(templateDefault, coupleOverride, sectionOverride)
-    registry.ts       — sectionRenderers[sectionKey][componentId] -> Component
+    index.ts          — barrel export of everything below
+    types.ts           — Theme, PartialTheme, SectionKey, CoupleInfo, per-section
+                         content prop interfaces
+    theme.ts            — resolveTheme(templateDefault, coupleOverride, sectionOverride)
+    format.ts            — formatCoupleNames(), formatWeddingDate()
+    registry.ts            — sectionRegistry[sectionKey][componentId] -> Component,
+                             resolveComponent() (never throws, see below)
+    i18n.tsx                 — LanguageProvider, useLanguage(), LanguageToggle,
+                             en/kh dictionary (UI chrome only)
+    site-renderer.tsx         — SiteRenderer: resolves + renders a couple's sections
+                             in order, gated by the opening component if enabled —
+                             the actual shared render loop, used by both consumers
+                             below
     sections/
-      opening/{curtain,door,book,envelope}.tsx
-      hero/classic.tsx
-      story/classic.tsx
-      gallery/grid.tsx
-      details/classic.tsx
-      rsvp/classic.tsx
-      registry/classic.tsx
-      timeline/classic.tsx
-      music/classic.tsx
+      opening/{Curtain,Door,Book,Envelope}.tsx
+      hero/Classic.tsx
+      story/Classic.tsx
+      gallery/Grid.tsx
+      details/Classic.tsx
+      rsvp/Classic.tsx
+      registry/Classic.tsx
+      timeline/Classic.tsx
+      music/Classic.tsx
   package.json
 ```
 
-- `registry.ts` exports one lookup map, imported identically by `apps/couple` (builder
-  preview) and `apps/web` (public render) — one source of truth for what
-  "opening_door" looks like.
-- Looking up an unknown/retired `component_id` (e.g. admin deactivated it after a
-  couple already picked it) must fall back to that section's *template default*
-  component rather than throwing — a public wedding site should never hard-crash
-  because of a catalog change.
-- v1 ships **one** component per section other than `opening` (`hero/classic`,
-  `gallery/grid`, etc.) — the registry and schema already support adding more variants
+Package exports are explicit per file (`package.json`'s `exports` map) since Node/
+bundler resolution needs an exact entry per extension — `.`/`i18n`/`site-renderer` are
+each their own entry, `sections/*` is a wildcard, and everything else flat under
+`src/*.ts` falls through a generic wildcard. Two real gaps here were only caught once
+something outside the package actually tried to import `i18n`/`site-renderer`/`cn`
+(from `packages/ui`) for the first time — if you add a new top-level `.tsx` file to
+either shared package, it needs its own `exports` entry, the existing wildcards won't
+pick it up.
+
+- `SiteRenderer` (not each consumer re-deriving its own render loop) is what makes the
+  couple-portal preview and the public site pixel-identical by construction — it takes
+  `template`, `sections`, `themeOverride`, `couple`, a `buildContent(sectionKey)`
+  callback (each consumer supplies its own — see below), an optional `guestGreeting`,
+  and an optional `extraProps(sectionKey)` escape hatch for the one section whose
+  component doesn't fit the generic `{couple, theme, content}` shape (`rsvp`, which
+  needs an `onSubmit` callback instead).
+- `resolveComponent()` falls back to that section's *template default* component, then
+  to whatever's first registered for that section, rather than throwing — a public
+  wedding site should never hard-crash because a catalog row was retired or a
+  `component_id` was mistyped.
+- Ships **one** component per section other than `opening` (`hero/Classic`,
+  `gallery/Grid`, etc.) — the registry and schema already support adding more variants
   to any section later (exactly like `opening`'s four) without a migration; it's just
-  more components + more `section_components` catalog rows. Don't build variety
-  everywhere up front without a concrete need — `opening` needed it explicitly, the
-  rest didn't.
+  more components + more `section_components` catalog rows.
 
 ## Couple portal: website builder (`apps/couple`)
 
-Adapts `WebsiteBuilder.tsx`'s three-step flow, restructured for the two-axis model:
+Lives at `/website`, restructured for the two-axis model rather than adapted from
+`WebsiteBuilder.tsx`'s single-theme three-step flow (see `apps/couple`'s
+`features/website/`):
 
-1. **Select a site template** — picks `couple_profile.site_template_id`, which sets
-   every section's default component + the base color theme in one action. Changing
-   this later doesn't touch any section's explicit `component_id`/`color_override` —
-   those still win over the new template's defaults.
-2. **Select sections** — multi-select + reorder, backed by real `website_sections`
-   rows (`enabled`/`display_order`, not local `useState`).
-3. **Customize** — per section: optionally override its component (pick from that
-   section's available `section_components`, scoped to `where: { section, status:
-   'active' }`), optionally override its colors (a color picker writing into
-   `color_override`, defaulting to whatever the cascade currently resolves to so the
-   picker starts from a sensible value, not blank), and edit content for sections that
-   have their own (per the table above). A separate whole-site theme editor writes to
-   `couple_profile.theme_override`.
-4. **Preview + publish** — live preview renders through `packages/templates`'
-   registry directly, so the builder preview and the public site are pixel-identical
-   by construction. "Publish" flips `couples.website_status` to `published` — no
-   payment gate exists yet (Clone-UI's ABA QR-code flow is 100% fake; real payment
-   integration is separate future work, flag before assuming publish should be gated).
-
-Rewrite, don't port, from `WebsiteBuilder.tsx`: every form → `react-hook-form` + `zod`;
-`window.confirm()`/`alert()` → shadcn `AlertDialog`/`Sonner`. Drag-and-drop section
-reordering doesn't exist in Clone-UI despite `react-dnd` being an unused dependency
-there — since `display_order` already supports it, build real reordering rather than
-copying nothing.
+1. **Select a site template** (`TemplatePicker`) — picks
+   `couple_profile.site_template_id` via `POST /couple/api/website/template`, which
+   also bootstraps one `website_sections` row per section key the first time (so the
+   builder always has something to list). Changing the template later doesn't touch
+   any section's explicit `component_id`/`color_override` — those still win over the
+   new template's defaults.
+2. **Whole-site theme** (`ThemeEditor`) — four color inputs + font-style select,
+   `PATCH /couple/api/website/theme`, writing the *whole* resolved theme (not a
+   sparse diff) into `couple_profile.theme_override`.
+3. **Sections** (`SectionsList`) — per section: an enabled `Switch` (inline, no
+   dialog), a component `<Select>` scoped to that section's active
+   `section_components` (or "Template default"), and up/down buttons that
+   POST the full reordered id list to `/couple/api/website/sections/reorder`
+   (no drag-and-drop library — up/down buttons cover the same ground more simply).
+   **Not built**: a color override per section (the schema/cascade supports
+   `website_sections.color_override`, but the builder UI only exposes the
+   whole-site theme editor) and any editor for `content` (see the content-source
+   table above — this is the same open gap).
+4. **Preview + publish** (`WebsitePreview`, `PublishPanel`) — the preview renders
+   through `packages/templates`' `SiteRenderer` directly (boxed in a fixed-height,
+   `overflow: hidden` container with a `transform` on it, so the `opening` gate's
+   `position: fixed` is contained to the preview box instead of covering the whole
+   builder page), so it's pixel-identical to the real public site by construction.
+   "Publish" (`POST /couple/api/website/publish`) requires a template to already be
+   selected and flips `couples.website_status` to `published` — no payment gate
+   exists (Clone-UI's ABA QR-code flow was 100% fake; real payment integration is
+   separate, unscoped future work).
 
 ## Public site renderer (`apps/web`)
 
-- Route: `app/[slug]/page.tsx` (or a middleware rewrite target for custom domains —
-  see [docs/tasks/landing.md](landing.md) for the host-based routing setup).
-- Server-side: call `GET /public/sites/:slug` on `apps/api` (new, unauthenticated).
-  This endpoint does the admin-sheet `couples` lookup by slug (plus its
-  `site_templates` row), then reads that couple's own sheet (`couple_profile`,
-  `website_sections` ordered by `display_order` where `enabled = true`) — `apps/web`
-  never touches `longcelot-sheet-db` or holds Google credentials directly (see
-  [overview.md](../../overview.md)).
-- Resolve each section's component + theme via `packages/templates`' `resolveTheme()`
-  and registry lookup (server-side is fine — these are pure functions, no
-  client-only APIs involved).
-- 404 (a real Next.js not-found page, not a client-side alert) if the slug doesn't
-  resolve to a `couples` row, or if `website_status !== 'published'`.
+- Route: `app/[slug]/page.tsx` — **path-based**, not a custom-domain/subdomain
+  rewrite target. No domain-routing middleware exists (see
+  [docs/tasks/landing.md](landing.md)); `couples.custom_domain` is schema-only.
+- Server-side (an `async` Server Component, reading `params`/`searchParams` per
+  Next's async-props convention): calls `GET /public/api/site/:slug` on `apps/api`
+  (unauthenticated). That endpoint does the admin-sheet `couples` lookup by slug
+  (must be `status: 'active'` and `website_status: 'published'`, else it 404s),
+  plus its `site_templates` row, then reads that couple's own sheet
+  (`couple_profile`, all `website_sections`) — `apps/web` never touches
+  `longcelot-sheet-db` or holds Google credentials directly (see
+  [overview.md](../../overview.md)). The page calls Next's `notFound()` on a 404
+  response.
+- The actual rendering (`site-view.tsx`, a client component) hands the fetched data
+  to the same `SiteRenderer` used by the couple-portal preview, plus a visible
+  `LanguageToggle` and the real RSVP `onSubmit` wired to
+  `POST /public/api/site/:slug/rsvp`.
 
 ### Guest personalization via query params
 
 A couple shares a personalized link per guest/family, e.g.
-`https://{slug}.mongkolka.com/?to=Mr.+John+%26+Mrs.+Bopha&lang=kh`:
+`https://mongkolka.com/{slug}?to=Mr.+John+%26+Mrs.+Bopha&lang=kh`:
 
-- `to` — free text greeting name, read server-side from `searchParams`, passed into
-  the `opening`/`hero` component as a `guestGreeting` prop (e.g. rendered as "Dear Mr.
-  John & Mrs. Bopha,"). Not persisted anywhere — purely a per-visit render input, not
-  couple data.
+- `to` — free text greeting name, read server-side from `searchParams`, passed as
+  `SiteRenderer`'s `guestGreeting` prop — currently only the **`opening`** component
+  actually uses it (rendered as "Dear Mr. John & Mrs. Bopha,"); `hero` and the other
+  sections don't take a guest-greeting prop today. Not persisted anywhere — purely a
+  per-visit render input, not couple data.
 - `lang` (`en` or `kh`) — sets the **initial** language only. The page still has a
   visible language toggle button (see i18n below) — a guest can override it after
   landing; the param just picks where they start.
 
 ### i18n on the public site
 
-Two languages (`en`/`kh`), a visible toggle, and a query-param initial value — this
-doesn't need a routing-based i18n library (`next-intl` et al. want locale-prefixed
-routes like `/en/...`, which is more machinery than "one URL, a client-side toggle").
-Build a small shared `LanguageProvider` React context (client component) in
-`packages/templates` (or `apps/web` if it turns out nothing else needs it):
-initialized from the `lang` searchParam, exposing `language`/`setLanguage` to every
-section component, with translation strings organized as one dictionary keyed by
-language — not copy-pasted per component like every Clone-UI page does today (see
-[overview.md](../../overview.md#i18n)). If the couple portal or other apps need i18n
-later, revisit whether to graduate to a real library then — don't build for that need
-speculatively now.
+Two languages (`en`/`kh`), a visible toggle, and a query-param initial value — built
+as a small shared `LanguageProvider` React context in
+`packages/templates/src/i18n.tsx` (`useLanguage()`, `LanguageToggle`), rather than a
+routing-based i18n library (`next-intl` et al. want locale-prefixed routes like
+`/en/...`, which is more machinery than "one URL, a client-side toggle" needs).
+`apps/web`'s page initializes it from the `lang` searchParam; every section
+component that needs UI-chrome strings (headings, button labels) calls
+`useLanguage()` directly — translation strings live in one dictionary keyed by
+language, not copy-pasted per component (see
+[overview.md](../../overview.md#i18n)). Only UI chrome is translated — a couple's own
+free-text content (love story, RSVP custom message, etc.) is shown as-is regardless
+of language. The admin/couple/vendor portals don't use this — not needed there yet.
 
-## Open calls to make before/while building this
+## Open calls / known gaps
 
+- **Per-section content editor** — `gallery`/`registry`/`timeline`/`rsvp`/`music`'s
+  free-form `content` (photos, registry links, timeline chapters, RSVP custom
+  message, playlist URL) has no couple-facing editor yet (see "Where each section's
+  content comes from" above). This is the biggest open gap in the builder.
+- **Per-section color override UI** — the cascade and schema support it
+  (`website_sections.color_override`), but the builder only exposes the whole-site
+  theme editor today.
 - Payment gate on publish: still none. If publish should be gated on payment, that's
   new scope to size separately.
 - `usage_count` / template popularity reporting: not resolved, see

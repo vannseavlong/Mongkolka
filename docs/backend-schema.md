@@ -68,9 +68,9 @@ because `slug` uniqueness has to be checked against every couple, not just one.
 | `partner1_name` | string | |
 | `partner1_email` | string | Mirrors the `users` row that registered first. |
 | `partner2_name` | string, nullable | |
-| `partner2_email` | string, nullable | Filled in once partner 2 joins — see [docs/tasks/couple.md](tasks/couple.md#invite-partner-flow-new--required-for-the-multi-user-model). |
-| `slug` | string, unique, required | Subdomain: `{slug}.mongkolka.com`. |
-| `custom_domain` | string, nullable, unique | Couple's own domain, once verified. |
+| `partner2_email` | string, nullable | Filled in once partner 2 joins — see [docs/tasks/couple.md](tasks/couple.md#invite-partner-flow). |
+| `slug` | string, unique, required | The public site's path: `apps/web`'s `/{slug}` (path-based, not subdomain — see below). |
+| `custom_domain` | string, nullable, unique | Reserved for a couple's own domain. Column exists but nothing resolves it yet — no domain-routing middleware is built (see [TODO.md](../TODO.md) Phase 6). |
 | `wedding_date` | date, nullable | |
 | `status` | enum(pending, active, suspended, rejected) | Tenant-level status — an admin can suspend the whole wedding account, or reject it before it's ever approved. Independent of an individual `users.status` (one partner's login could be deactivated without suspending the other partner or the site). |
 | `website_status` | enum(draft, published) | Whether the public site is live. Separate axis from `status` — a couple can be `active` with a `draft` site. |

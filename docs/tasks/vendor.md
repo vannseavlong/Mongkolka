@@ -1,83 +1,75 @@
-# Vendor Portal (`apps/vendor`)
+# Vendor Portal (`apps/vendor`) — built
 
 Read [overview.md](../../overview.md) and [docs/backend-schema.md](../backend-schema.md)
 first.
 
-## What's already built
+## Structure
 
-`apps/api`'s vendor auth (`open` registration → `pending` → admin-approved,
-provisioning the vendor's sheet) already exists — see git history. This doc covers
-the actual vendor UI, which doesn't exist yet.
+Same feature-folder pattern as `apps/admin`/`apps/couple` (see
+[overview.md](../../overview.md#frontend-structure-feature-folder-pattern-shadcn-admin-adapted)):
+`overview`, `profile`, `portfolio`, `services`, `bookings`, each its own page under
+`src/app/(dashboard)/`.
 
-## Reference: `ServiceProviderDashboard.tsx`
+Built against real data from the start — the reference, `ServiceProviderDashboard.tsx`
+in `/Clone-UI`, was the least data-modeled of the three prototype dashboards (no
+declared interfaces, uncontrolled `defaultValue=...` inputs, and its stats/bookings/
+messages were 100% static hardcoded strings, not even fake local mutation) — used for
+tab layout/visual structure only, not for any data shape or form pattern.
 
-The least data-modeled of the three dashboards in Clone-UI — no TypeScript
-interfaces declared anywhere (everything inferred from inline object literals), and
-notably its Profile tab uses **uncontrolled inputs** (`defaultValue=...`), which is
-inconsistent with every other form in the app and would silently break a "Save
-Changes" wire-up even if one existed (there's no state to read the current values
-from). Do not copy that pattern — every form here should be a controlled
-`react-hook-form` instance like everywhere else.
+## Overview (`/dashboard`)
 
-Stats (`views: 2847, leads: 156, bookings: 23, earnings: 12500`), recent bookings, and
-messages are all 100% static hardcoded data — not even fake local mutation like
-`GuestManager`/`PlanningManager` have. Treat the whole data layer as needing to be
-built from scratch against real tables, using this file only for the tab layout and
-visual structure (Overview / Bookings / Messages / Profile).
+Stat cards: total bookings, pending bookings (`status` in `pending`/`inquiry`),
+portfolio photo count, services listed — all real counts from
+`GET /vendor/api/bookings`, `/vendor/api/portfolio`, `/vendor/api/services`. Clone-UI's
+"views"/"leads" stats implied analytics tracking that doesn't exist anywhere in this
+plan — dropped, not faked.
 
-## Pages/tabs to build
+## Profile (`/profile`)
 
-### Overview
-Real stat cards once there's real data to aggregate: booking count/status breakdown
-from `bookings` ([docs/backend-schema.md](../backend-schema.md#bookings)) filtered to
-this vendor. "Views"/"leads" imply analytics tracking that doesn't exist anywhere in
-this plan yet — don't fake these numbers; either scope real view-tracking as its own
-task or drop these specific stats for v1.
+One form, split across two tables per
+[docs/backend-schema.md](../backend-schema.md#vendors): `business_name`/
+`category_id`/`location`/`description` live on the admin-sheet `vendors` row;
+`bio`/`service_area` live on the vendor's own `vendor_profile` row. Merged into one
+`GET`/`PATCH /vendor/api/profile` response so the form doesn't need to know which
+table each field actually lives in. No re-review-on-edit gate exists — editing
+`business_name`/`category_id` doesn't re-flag the vendor for admin review; unrestricted
+for now.
 
-Portfolio gallery preview — reads `portfolio_items`
-([docs/backend-schema.md](../backend-schema.md#portfolio_items)), replacing Clone-UI's
-8 placeholder camera-icon tiles with real uploaded images.
+## Portfolio (`/portfolio`)
 
-### Bookings
-Table over `bookings` where `vendor_id` = this vendor
-([docs/backend-schema.md](../backend-schema.md#bookings)) — this is the cross-actor
-admin-sheet table, read through a scoped backend endpoint
-(`GET /vendor/api/bookings`), not a table in the vendor's own sheet. Status update
-(confirm/complete/cancel) → `PATCH` on the same table, scoped so a vendor can only
-touch their own rows.
+CRUD over `portfolio_items`, rendered as an image **grid**, not the shared
+`DataTable` — a photo gallery doesn't fit a table UX. Create/delete via dialogs;
+`display_order` set on creation, not manually reorderable yet.
 
-### Messages
-**Not designed in this plan** — see
-[docs/backend-schema.md](../backend-schema.md#services) on why: Clone-UI's version is
-entirely fake (static previews, no send, no thread view), and there's no requirement
-yet for what a real couple↔vendor messaging feature needs (real-time? notifications?
-tied to a specific booking?). Flag as its own design task before building rather than
-reusing the fake UI as if the hard part (data model + delivery) were solved.
+## Services (`/services`)
 
-### Profile
-Editable business profile — split across two tables per
-[docs/backend-schema.md](../backend-schema.md#vendors): `business_name`/`category_id`
-are admin-reviewed fields on the admin-sheet `vendors` row (changing them might
-reasonably need admin awareness — decide whether an edit here re-flags for review,
-or is unrestricted; not decided here) — everything else (`bio`, `service_area`,
-`portfolio_items`, `services`) is the vendor's own sheet, freely editable, no admin
-involvement.
+CRUD over `services` (`name`, `description`, `price`, `unit`:
+per_event/per_hour/package) via the shared `DataTable`. Clone-UI had no equivalent of
+this at all — new UI, not an adaptation.
 
-Service/pricing list → CRUD over `services`
-([docs/backend-schema.md](../backend-schema.md#services)) — Clone-UI has no
-equivalent of this at all (no pricing/package management exists in
-`ServiceProviderDashboard.tsx`), this is new UI, not an adaptation.
+## Bookings (`/bookings`)
 
-## Public vendor profile
+**Read-only.** `GET /vendor/api/bookings` scopes `bookings`
+([docs/backend-schema.md](../backend-schema.md#bookings)) to the caller's own
+`vendor_id` — the cross-actor admin-sheet table, read through a backend endpoint, not
+a table in the vendor's own sheet. No status-update action (confirm/complete/cancel)
+is built, because nothing creates a booking yet either — there's no couple-facing
+"request this vendor" flow. Both are open (see [TODO.md](../../TODO.md)).
 
-`ServiceProviderDashboard.tsx`'s header has a "View Public Profile" button that does
-nothing. A vendor's public-facing profile (what a couple sees when browsing the
-marketplace) is part of [docs/tasks/landing.md](landing.md)'s marketplace/browse
-surface, not this app — this portal only edits the data, `apps/web` renders the
-public view.
+## Not built
+
+- **Public vendor profile page** — what a couple would see browsing the
+  marketplace. Part of `apps/web`'s marketplace/browse surface (see
+  [docs/tasks/landing.md](landing.md)), not this app; this portal only edits the
+  data.
+- **Booking creation** — no couple-facing flow requests a vendor yet, so
+  `bookings` only has whatever an admin/dev inserts directly today.
+- **Messaging** — Clone-UI's version was entirely fake (static previews, no send,
+  no thread view); no real design exists for what couple↔vendor messaging needs
+  (real-time? notifications? tied to a booking?). Flag as its own design task
+  before building.
 
 ## UI
 
-shadcn `Tabs` for the dashboard shell, `Table` for bookings, `Card` for
-portfolio/services grids, `react-hook-form` + `zod` for profile/service forms,
-`Sonner` for save feedback.
+The shared `DataTable` for services/bookings, a plain grid for portfolio,
+`react-hook-form` + `zod` for profile/service forms, `sonner` for save feedback.

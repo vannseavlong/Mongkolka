@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm -v)",
+      "Bash(pnpm dlx *)",
+      "Bash(pnpm approve-builds *)",
+      "Bash(pnpm --filter api build)",
+      "Bash(find /Users/suntel/personal/Mongkolka/node_modules/.pnpm/longcelot-sheet-db@0.1.39_@types+node@20.19.43/node_modules/longcelot-sheet-db -iname *init*)",
+      "Bash(pnpm turbo *)",
+      "Bash(git init *)",
+      "Bash(git status *)",
+      "Bash(grep -E \"\\\\.env$|\\\\.env\\\\.|lsdb-tokens\")",
+      "Bash(git add *)"
+    ]
+  }
+}

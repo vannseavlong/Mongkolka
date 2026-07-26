@@ -1,0 +1,21 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+allowBuilds:
+  esbuild: true
+  sharp: false
+  unrs-resolver: false
+
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+
+minimumReleaseAgeExclude:
+  - '@turbo/darwin-64@2.10.7'
+  - '@turbo/darwin-arm64@2.10.7'
+  - '@turbo/linux-64@2.10.7'
+  - '@turbo/linux-arm64@2.10.7'
+  - '@turbo/windows-64@2.10.7'
+  - '@turbo/windows-arm64@2.10.7'
+  - turbo@2.10.7

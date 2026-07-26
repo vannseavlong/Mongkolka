@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build outputs
+.next/
+dist/
+out/
+build/
+
+# turbo
+.turbo/
+
+# env
+.env
+.env*.local
+
+# longcelot-sheet-db
+.lsdb-tokens.json
+
+# misc
+.DS_Store
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

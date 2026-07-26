@@ -1,5 +1,6 @@
 import { Heart, PenLine, Palette, Send } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
+import { BrandThemeSwitcher } from "@mongkolka/ui/brand-theme-switcher";
 
 const COUPLE_URL = process.env.NEXT_PUBLIC_COUPLE_URL ?? "http://localhost:3002";
 const VENDOR_URL = process.env.NEXT_PUBLIC_VENDOR_URL ?? "http://localhost:3003";
@@ -31,6 +32,7 @@ export default function Home() {
           <span className="text-lg font-medium">Mongkolka</span>
         </div>
         <nav className="flex items-center gap-2">
+          <BrandThemeSwitcher />
           <Button variant="ghost" asChild>
             <a href={VENDOR_URL}>For vendors</a>
           </Button>

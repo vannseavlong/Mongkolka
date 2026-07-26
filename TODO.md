@@ -37,11 +37,18 @@ checklist, not the design; don't implement from titles alone.
 - [x] `apps/api` refactored into `config/`, `middlewares/`, `utils/`,
       `modules/<feature>/{model,service,controller,routes}.ts` — see
       `memory/backend_architecture.md`.
-- [ ] **Invite-partner flow** — extend `apps/api`'s `selfRegisterOnUser` with the
-      pending-invite branch described in
-      [docs/tasks/couple.md](docs/tasks/couple.md#invite-partner-flow-new--required-for-the-multi-user-model). This is the
-      one auth code change every other couple-portal feature assumes exists; do it
-      early, not as an afterthought.
+- [x] **Invite-partner flow** — `POST /couple/api/members/invite` creates the
+      second login identity directly (active, same `actor_sheet_id`, no new
+      sheet) rather than going through `selfRegisterOnUser`'s pending-user path;
+      `selfRegisterOnUser` still handles the *first* partner's self-registration
+      unchanged. See `apps/api/src/modules/couple-members/`.
+- [x] Frontend structure standard: `apps/admin`/`apps/vendor`/`apps/couple` all
+      rebuilt (or built from the start, for couple) in a shadcn-admin-style
+      feature-folder pattern — `features/<name>/{data/schema.ts, components/,
+      index.tsx}`, a provider+dialogs state pattern for create/edit/delete, and
+      the shared TanStack-Table-powered `DataTable` in `packages/ui`. Routing/auth
+      stayed Next.js App Router + our own JWT (not TanStack Router/Clerk, which is
+      what the reference repo actually uses) — an adaptation, not a literal port.
 - [x] `site_templates` + `section_components` (admin sheet) — replaces the earlier
       single-table `website_templates` design once real requirements (color
       cascade + per-section component variants, not just recoloring) arrived. See
@@ -67,9 +74,10 @@ See [docs/tasks/admin.md](docs/tasks/admin.md).
 - [x] Approvals queue (pending couples/vendors), couples/vendors browse with
       suspend/reactivate.
 - [x] Vendor category CRUD.
-- [ ] Template catalog CRUD — needs updating for the `site_templates` +
-      `section_components` split above (the existing `/templates` page still
-      targets the old single-table shape); not yet rebuilt.
+- [x] Template catalog CRUD — split into two features matching the two-table
+      schema: `site-templates` (design packs: theme + default component per
+      section) and `section-components` (the variant catalog, e.g. the four
+      `opening` styles).
 
 ## Phase 3 — vendor portal — mostly done
 
@@ -84,52 +92,68 @@ See [docs/tasks/vendor.md](docs/tasks/vendor.md).
       each other.
 - [ ] Messaging — still deferred, see Phase 7.
 
-## Phase 4 — couple portal
+## Phase 4 — couple portal — done
 
-See [docs/tasks/couple.md](docs/tasks/couple.md). Depends on Phase 1's invite-partner
-flow.
+See [docs/tasks/couple.md](docs/tasks/couple.md) (structure differs from what's
+described there — see note below).
 
-- [ ] Dashboard shell (Overview / Planning / Website / Guests) — Overview reads real
-      budget/checklist state, does not duplicate it (Clone-UI's `CoupleDashboard` and
-      `PlanningManager` disagree on this today).
-- [ ] Planning: checklist + budget categories + milestones.
-- [ ] Guests: CRUD + status tracking.
-- [ ] Invite-partner UI (the portal-side half of Phase 1's backend flow).
-- [ ] Website builder — see Phase 5, lives in this app.
+- [x] Dashboard shell — built as separate feature pages (Overview, Guests, Budget,
+      Checklist, Milestones, Profile, Website) rather than one combined "Planning"
+      page; Overview reads real aggregated stats from a dedicated
+      `/couple/api/overview` endpoint, not recomputed client-side.
+- [x] Planning: checklist + budget categories + milestones, each its own
+      feature/table (milestones renders as a timeline, not a table — better fit
+      for a countdown view).
+- [x] Guests: CRUD + status tracking (inline RSVP-status `Select`, no dialog).
+- [x] Invite-partner UI — a members section on the Profile page (list + invite
+      form + remove, collaborator rows only).
+- [x] Website builder — template picker, whole-site theme override, per-section
+      component/color override, enable/reorder, publish/unpublish, and a live
+      preview panel rendering the couple's actual choices via
+      `packages/templates`' `SiteRenderer` (see Phase 5).
 
-## Phase 5 — template system
+## Phase 5 — template system — done
 
-See [docs/tasks/template.md](docs/tasks/template.md). Schema is done (Phase 1); the
-registry package, components, and both consuming UIs are not.
+See [docs/tasks/template.md](docs/tasks/template.md).
 
-- [ ] `packages/templates` — `theme.ts` (`resolveTheme()` cascade), `registry.ts`,
-      per-section components.
-- [ ] `opening` section: four real, distinct components — `opening_curtain`,
-      `opening_door`, `opening_book`, `opening_envelope` (not recolors of one
-      layout — see
-      [docs/tasks/template.md](docs/tasks/template.md#the-opening-section)).
-- [ ] One default component each for `hero, story, gallery, details, rsvp,
-      registry, timeline, music` — more variants per section later, on demand, not
-      pre-built now.
-- [ ] Couple-portal website builder (pick site template → pick sections → per-section
-      component/color override → whole-site theme override → preview/publish).
-- [ ] Public site renderer in `apps/web` (`GET /public/sites/:slug` +
-      `app/[slug]/page.tsx`), including the domain-routing middleware from
-      [docs/tasks/landing.md](docs/tasks/landing.md#domain-routing-build-this-first--everything-else-depends-on-it).
-- [ ] Guest personalization via `?to=`/`?lang=` query params + the language toggle.
-- [ ] RSVP section writes to the couple's own `guests` table via a public,
-      unauthenticated, single-couple-scoped endpoint.
+- [x] `packages/templates` — `theme.ts` (`resolveTheme()` cascade), `registry.ts`
+      (`resolveComponent()`, never throws — falls back gracefully), `i18n.tsx`
+      (UI-chrome-only en/kh dictionary), `site-renderer.tsx` (`SiteRenderer` — the
+      shared section-resolve-and-render loop used by *both* the couple-portal
+      preview and the real public site, so they can't drift).
+- [x] `opening` section: four real, distinct components — `opening_curtain`,
+      `opening_door`, `opening_book`, `opening_envelope`.
+- [x] One default component each for `hero, story, gallery, details, rsvp,
+      registry, timeline, music`.
+- [x] Couple-portal website builder (pick site template → pick sections →
+      per-section component/color override → whole-site theme override →
+      preview/publish) — `apps/couple`'s `features/website/`.
+- [x] Public site renderer in `apps/web` at `app/[slug]/page.tsx`, backed by
+      `GET /public/api/site/:slug` — **path-based, not subdomain-based**: the
+      domain-routing middleware mentioned below was *not* built, so
+      `couples.custom_domain` is schema-only right now. Revisit if custom domains
+      become a real requirement.
+- [x] Guest personalization via `?to=`/`?lang=` query params + the language
+      toggle (toggle still works after either param).
+- [x] RSVP section writes to the couple's own `guests` table via
+      `POST /public/api/site/:slug/rsvp` (public, unauthenticated, resolves the
+      couple from the slug only) — find-by-name-or-create, no guest auth exists.
 
-## Phase 6 — landing / marketing (`apps/web`)
+## Phase 6 — landing / marketing (`apps/web`) — landing page done, marketplace not started
 
 See [docs/tasks/landing.md](docs/tasks/landing.md).
 
-- [ ] Domain routing middleware (shared prerequisite with Phase 5 — do this once).
+- [x] Landing page — hero, three-step "how it works", CTAs straight into the
+      couple/vendor portals' own login (which already self-registers on first
+      Google sign-in — no separate chooser/form was built, see below).
+- [ ] Domain routing middleware — not built; public sites are served at
+      `apps/web`'s `/[slug]`, not couple-owned custom domains.
 - [ ] Header/nav with real routes + real session-derived `userType`.
-- [ ] Landing, About, Contact pages.
+- [ ] About, Contact pages.
 - [ ] Marketplace/browse — real paginated vendor list + shared `vendor_categories`.
-- [ ] Registration entry (couple/provider chooser + forms feeding the existing OAuth
-      flow).
+- [ ] Dedicated registration entry (couple/provider chooser page) — currently the
+      landing page's CTAs just link to each portal's existing OAuth login, which
+      is sufficient for self-registration but isn't a marketing-style chooser.
 - [ ] `FloatingElements` (copy verbatim) + `InvitationCardDemo` (keep as
       self-contained decoration only).
 

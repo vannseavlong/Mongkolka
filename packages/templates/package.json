@@ -1,0 +1,31 @@
+{
+  "name": "@mongkolka/templates",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@mongkolka/ui": "workspace:*",
+    "lucide-react": "^0.487.0",
+    "motion": "^12.42.2"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@mongkolka/eslint-config": "workspace:*",
+    "@mongkolka/typescript-config": "workspace:*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9.15.0",
+    "typescript": "^5.6.3"
+  }
+}

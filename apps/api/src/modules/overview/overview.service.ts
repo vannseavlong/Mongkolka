@@ -13,7 +13,7 @@ export const OverviewService = {
         ctx.table("vendors").count(),
         ctx.table("users").count({ where: { role: "couple", status: "pending" } }),
         ctx.table("users").count({ where: { role: "vendor", status: "pending" } }),
-        ctx.table("website_templates").count({ where: { status: "active" } }),
+        ctx.table("site_templates").count({ where: { status: "active" } }),
       ]);
 
     return { totalCouples, totalVendors, pendingCouples, pendingVendors, activeTemplates };

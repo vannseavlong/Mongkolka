@@ -6,6 +6,13 @@
   "type": "module",
   "exports": {
     "./theme.css": "./src/styles/theme.css",
+    "./data-table": "./src/components/data-table/index.ts",
+    "./long-text": "./src/components/long-text.tsx",
+    "./layout/nav-group": "./src/components/layout/nav-group.tsx",
+    "./layout/nav-types": "./src/components/layout/nav-types.ts",
+    "./layout/header": "./src/components/layout/header.tsx",
+    "./layout/main": "./src/components/layout/main.tsx",
+    "./hooks/use-dialog-state": "./src/hooks/use-dialog-state.ts",
     "./*": "./src/components/ui/*.tsx",
     "./figma/*": "./src/components/figma/*.tsx"
   },
@@ -39,6 +46,7 @@
     "@radix-ui/react-toggle": "^1.1.2",
     "@radix-ui/react-toggle-group": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -56,6 +64,7 @@
     "vaul": "^1.1.2"
   },
   "peerDependencies": {
+    "next": "^16",
     "react": "^19",
     "react-dom": "^19"
   },
@@ -65,6 +74,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9.15.0",
+    "next": "16.2.11",
     "typescript": "^5.6.3"
   }
 }

@@ -5,7 +5,8 @@ import { usersRouter } from "../modules/users/users.routes.js";
 import { couplesRouter } from "../modules/couples/couples.routes.js";
 import { vendorsRouter } from "../modules/vendors/vendors.routes.js";
 import { vendorCategoriesRouter } from "../modules/vendor-categories/vendor-categories.routes.js";
-import { websiteTemplatesRouter } from "../modules/website-templates/website-templates.routes.js";
+import { siteTemplatesRouter } from "../modules/site-templates/site-templates.routes.js";
+import { sectionComponentsRouter } from "../modules/section-components/section-components.routes.js";
 
 export const adminApiRouter = Router();
 
@@ -16,4 +17,5 @@ adminApiRouter.use(usersRouter);
 adminApiRouter.use(couplesRouter);
 adminApiRouter.use(vendorsRouter);
 adminApiRouter.use(vendorCategoriesRouter);
-adminApiRouter.use(websiteTemplatesRouter);
+adminApiRouter.use(siteTemplatesRouter);
+adminApiRouter.use(sectionComponentsRouter);

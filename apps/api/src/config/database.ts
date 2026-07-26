@@ -10,7 +10,8 @@ import couplesSchema from "../../schemas/admin/couples.js";
 import coupleMembersSchema from "../../schemas/admin/couple_members.js";
 import vendorsSchema from "../../schemas/admin/vendors.js";
 import vendorCategoriesSchema from "../../schemas/admin/vendor_categories.js";
-import websiteTemplatesSchema from "../../schemas/admin/website_templates.js";
+import siteTemplatesSchema from "../../schemas/admin/site_templates.js";
+import sectionComponentsSchema from "../../schemas/admin/section_components.js";
 import bookingsSchema from "../../schemas/admin/bookings.js";
 
 import coupleProfileSchema from "../../schemas/couple/profile.js";
@@ -49,7 +50,8 @@ adapter.registerSchemas([
   coupleMembersSchema,
   vendorsSchema,
   vendorCategoriesSchema,
-  websiteTemplatesSchema,
+  siteTemplatesSchema,
+  sectionComponentsSchema,
   bookingsSchema,
   coupleProfileSchema,
   websiteSectionsSchema,

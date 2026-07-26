@@ -63,12 +63,20 @@ matching `couples`/`vendors` catalog row (see
 approve/reject color-coding (orange/green/red) as the visual reference.
 
 ### Manage templates
-CRUD over `website_templates`
-([docs/backend-schema.md](../backend-schema.md#website_templates)) — name, section,
-preview colors, active/inactive toggle. This is metadata-only management; admin is
-not editing template layout code here (that's a code change, done by a developer, not
-a portal feature) — make sure the UI doesn't imply otherwise (no "edit template
-design" button that has nowhere real to go).
+Two catalogs now, not one — see
+[docs/tasks/template.md](template.md#the-two-axes-component-and-color) for why they
+split:
+- CRUD over `site_templates`
+  ([docs/backend-schema.md](../backend-schema.md#site_templates)) — name, default
+  theme colors, default component-per-section map, active/inactive toggle.
+- CRUD over `section_components`
+  ([docs/backend-schema.md](../backend-schema.md#section_components)) — name,
+  section, preview colors, active/inactive toggle.
+
+Both are metadata-only management; admin is not editing component implementation code
+here (that's a code change, done by a developer, not a portal feature) — make sure the
+UI doesn't imply otherwise (no "edit component design" button that has nowhere real to
+go).
 
 ### Manage vendor categories
 CRUD over `vendor_categories` — not in `SuperAdminDashboard.tsx` at all (Clone-UI

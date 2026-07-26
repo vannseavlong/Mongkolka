@@ -124,21 +124,36 @@ as a visual/UX reference. Important to understand before touching it:
 ### i18n
 
 Clone-UI hand-rolls a `translations = { en: {...}, kh: {...} }` object inside every
-single component. We don't repeat that — use a real i18n library (`next-intl`
-recommended, since it's the standard choice for the Next.js App Router) with shared
-message catalogs, not copy-pasted dictionaries per component.
+single component. We don't repeat that pattern, but we also don't need a full
+routing-based i18n library (`next-intl` et al., which want locale-prefixed routes) —
+the actual requirement on the public couple site is one URL, a client-side language
+toggle, and a `?lang=` query param that just picks the initial value. A small shared
+`LanguageProvider` context + one dictionary (not copy-pasted per component) covers
+that; see [docs/tasks/template.md](./docs/tasks/template.md#i18n-on-the-public-site).
+Revisit a real library if/when the couple/admin/vendor portals need i18n too — not
+built speculatively now.
 
 ### Template system: code owns rendering, sheets own selection + content only
 
 Per explicit requirement: **template content is never stored as data in a Sheet
-row.** What's stored is a `template_id` (a stable string key) plus the couple's own
-content (text, photos, which sections are enabled, what order). The actual
-layout/markup for a given `template_id` lives in code, in a small
-registry — this is exactly what `WebsiteBuilder.tsx`'s
-`sectionTemplates: {[sectionId]: templateId}` shape already models, now made real and
-persisted. Full design in [docs/tasks/template.md](./docs/tasks/template.md) and the
-`website_templates` table in
-[docs/backend-schema.md](./docs/backend-schema.md#website_templates).
+row**, and a couple gets real freedom over both *what renders* and *what color it is*
+— two independent axes:
+
+- **Component** — which section renders is a `component_id` (a stable string key)
+  resolved per section, falling back to the couple's chosen `site_templates` row's
+  default if not explicitly picked. The `opening` section (the entrance
+  animation — sliding curtain, swinging door, book cover, envelope) is the clearest
+  case: these are genuinely different components, not recolors of one layout.
+- **Color** — a `Theme` (bg/text/accent/font) resolved by cascade: per-section
+  override → couple's whole-site override → the template's default. Each override is
+  *partial*, so changing one section's accent color doesn't require respecifying
+  everything else.
+
+Both axes are resolved by one shared function in `packages/templates`, used
+identically by the couple-portal builder preview and the public site renderer. Full
+design in [docs/tasks/template.md](./docs/tasks/template.md) and the `site_templates`
+/ `section_components` tables in
+[docs/backend-schema.md](./docs/backend-schema.md#site_templates).
 
 ### Cross-actor data (bookings, and anything couple↔vendor)
 

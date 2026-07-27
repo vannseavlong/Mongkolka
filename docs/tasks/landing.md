@@ -1,8 +1,9 @@
-# Landing / Marketing (`apps/web`) — landing page built, rest not started
+# Landing / Marketing (`apps/web`) — mostly built
 
 Read [overview.md](../../overview.md) first — this doc covers `apps/web`'s
-marketing/public surfaces (landing, about, contact, marketplace browse, registration
-entry, nav/footer). The public per-couple wedding site renderer is a separate,
+marketing/public surfaces (landing, about, contact, marketplace browse, template
+preview, registration entry, nav/footer). The public per-couple wedding site renderer
+is a separate,
 **built** concern covered in [docs/tasks/template.md](template.md) — it shares this
 app but not the domain-routing setup below, since that was never built (the public
 site is path-based, `/[slug]`, not hostname-routed).
@@ -23,6 +24,49 @@ exist yet either. CTAs link straight to the couple/vendor portals' own login
 ports), which already self-registers on first Google sign-in — there's no dedicated
 registration-chooser page (see "Registration entry" below, still not built).
 
+The landing page also links to two new teaser sections built alongside the
+marketplace/template work below: "Explore vendors" → `/marketplace` and "Browse
+templates" → `/templates`.
+
+## What's built: header/nav, marketplace, template preview, About/Contact
+
+A shared `SiteHeader`/`SiteFooter` (`apps/web/src/components/`) with real routes —
+Marketplace, Templates, About, Contact — plus the existing "For vendors"/"Start
+planning" CTAs and a mobile `Sheet` menu. No session-derived `userType`: `apps/web`
+has no auth session at all (no JWT, no login) to derive one from, so this is a plain
+static nav, not the session-aware version originally sketched below.
+
+**Marketplace** (`/marketplace`, `/marketplace/[vendorId]`) — a real, paginated,
+server-rendered vendor list backed by new public `apps/api` endpoints
+(`apps/api/src/modules/public-marketplace/`), not a client-side filter over a
+hardcoded array. Category pills and search are client-side controls
+(`vendor-filters.tsx`) that push URL query params (`?category=&search=&page=`), read
+server-side on each render. Categories come from the shared `vendor_categories`
+table (one source, per the original design goal). The vendor detail page composes
+the vendor's catalog row + `vendor_profile` (bio) + `portfolio_items` + `services` —
+reusing the existing `VendorProfileService`/`VendorPortfolioService`/
+`VendorServicesService` rather than duplicating model queries. Only `status: 'active'`
+vendors are ever exposed publicly (404 otherwise, same pattern as the public site
+resolver's `findPublishedCoupleBySlug`).
+
+**Template preview** (`/templates`, `/templates/[templateId]`) — a gallery of active
+`site_templates` (theme swatches), and a **live** render for each one: the real
+`packages/templates` `SiteRenderer` fed a fixed sample couple ("Alex & Sam") and
+hand-written sample content per section (`apps/web/src/app/templates/[templateId]/
+template-preview.tsx`), mirroring `apps/couple`'s `WebsitePreview` pattern exactly so
+it's the same renderer a real couple's site uses — not a static screenshot. This
+wasn't in the original checklist below; added since it surfaces the same public
+`site_templates` catalog the marketplace work already needed a public read path for.
+
+**About / Contact** — both static content pages. Contact is intentionally **not**
+wired to a submission backend — the message-destination design (table vs. email
+forwarding) is still unresolved (Phase 7 in [TODO.md](../../TODO.md)); building that
+silently here would have meant guessing a design that hasn't been made yet.
+
+**Not carried over from Clone-UI**: `FloatingElements` and `InvitationCardDemo`
+(pink/motion decorative widgets) — skipped as decorative-only and not needed for the
+"clean version" restyle; see "Decorative-only, low priority" below, still accurate.
+
 Everything below this point is **still open** — kept as design reference for when
 it's picked up.
 
@@ -36,31 +80,6 @@ else → rewrite to the `/[slug]` route after resolving the hostname to a slug
 (subdomain parsed directly; custom domain needs a lookup against
 `couples.custom_domain` — a backend call, not something middleware can do by
 string-parsing alone). Not started — flag before assuming it's a quick add.
-
-## Header / Nav
-
-Not built beyond the landing page's own minimal header (logo + two CTA buttons, no
-dropdown/session-aware nav). If a fuller nav is needed: `userType` should come from a
-real session (JWT decoded from stored token / a `/me`-style check), not client-only
-state; a services/categories dropdown should be driven by `vendor_categories`
-([docs/backend-schema.md](../backend-schema.md#vendor_categories)), not a hardcoded
-list.
-
-## About / Contact
-
-Not built. `ContactUs.tsx` (in `/Clone-UI`) needs a real submission destination if
-ported — either a `contact_messages` table (admin sheet, since there's no "actor" a
-message belongs to before registration) or an email-forwarding integration; not
-designed in [docs/backend-schema.md](../backend-schema.md) yet.
-
-## Marketplace / browse
-
-Not built — no public vendor-browsing surface exists yet, and no vendor has a public
-profile page to link to (see [docs/tasks/vendor.md](vendor.md)). When built:
-categories should come from `vendor_categories`, one shared source
-([docs/backend-schema.md](../backend-schema.md#vendor_categories)); vendor cards from
-a real, paginated public endpoint (filtered by `category_id`, `status: 'active'`),
-not a client-side filter over an in-memory array.
 
 ## Registration entry
 

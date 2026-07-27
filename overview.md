@@ -11,9 +11,10 @@ the detailed design each area was built against.
 
 **Status**: all four apps (admin, couple, vendor, web) and the backend are built and
 wired end-to-end — auth, the full couple-planning + website-builder flow, vendor
-listings, admin approvals/catalogs, and the public guest-facing site with RSVP. See
-[TODO.md](./TODO.md) for the precise list of what's still open (marketplace/browse,
-custom-domain routing, messaging, payments, invitation cards — none of these are
+listings, admin approvals/catalogs, and the public guest-facing site with RSVP, plus
+`apps/web`'s public vendor marketplace and template preview. See [TODO.md](./TODO.md)
+for the precise list of what's still open (custom-domain routing, a dedicated
+registration chooser, messaging, payments, invitation cards — none of these are
 started).
 
 ---
@@ -208,7 +209,9 @@ match, not a verified identity).
   - Couple-side modules: profile, members (invite-partner), guests, budget,
     checklist, milestones, website (template/theme/sections/publish), overview
     stats.
-  - Public modules: site resolver + RSVP submission (both unauthenticated).
+  - Public modules: site resolver + RSVP submission, and a public marketplace
+    resolver (vendor categories, paginated vendor list/detail, active site
+    templates) — all unauthenticated, all read-only.
   - A global Express error handler (`express-async-errors` + a catch-all
     middleware) — without it, any async error in a route handler crashed the whole
     process.
@@ -218,12 +221,13 @@ match, not a verified identity).
   covering everything in [TODO.md](./TODO.md) phases 2–4.
 - `packages/templates` — theme cascade, component registry, i18n, section
   components (including `opening`'s four variants), and the shared `SiteRenderer`.
-- `apps/web` — landing page + public per-couple site renderer with guest
-  personalization (`?to=`, `?lang=`) and RSVP.
+- `apps/web` — landing page, public marketplace (browse + vendor detail),
+  template gallery + live preview, About/Contact, and the public per-couple
+  site renderer with guest personalization (`?to=`, `?lang=`) and RSVP.
 
-Not built: marketplace/browse, custom-domain routing, couple↔vendor messaging,
-payments, invitation-card customizer — see [TODO.md](./TODO.md) Phases 6–7 for the
-full list of what's still open.
+Not built: custom-domain routing, a dedicated registration chooser,
+couple↔vendor messaging, payments, invitation-card customizer — see
+[TODO.md](./TODO.md) Phases 6–7 for the full list of what's still open.
 
 ---
 

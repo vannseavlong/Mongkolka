@@ -1,6 +1,8 @@
-import { Heart, PenLine, Palette, Send } from "lucide-react";
+import Link from "next/link";
+import { PenLine, Palette, Send, Store, LayoutTemplate, ArrowRight } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
-import { BrandThemeSwitcher } from "@mongkolka/ui/brand-theme-switcher";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 const COUPLE_URL = process.env.NEXT_PUBLIC_COUPLE_URL ?? "http://localhost:3002";
 const VENDOR_URL = process.env.NEXT_PUBLIC_VENDOR_URL ?? "http://localhost:3003";
@@ -23,24 +25,27 @@ const STEPS = [
   },
 ];
 
+const DISCOVER = [
+  {
+    icon: Store,
+    title: "Browse the marketplace",
+    description: "Photographers, venues, salons, and more — find vendors for your wedding.",
+    href: "/marketplace",
+    cta: "Explore vendors",
+  },
+  {
+    icon: LayoutTemplate,
+    title: "Preview a template",
+    description: "See exactly how each wedding website design looks before you pick one.",
+    href: "/templates",
+    cta: "Browse templates",
+  },
+];
+
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
-      <header className="flex items-center justify-between px-6 py-5 sm:px-12">
-        <div className="flex items-center gap-2">
-          <Heart className="size-5 text-primary" />
-          <span className="text-lg font-medium">Mongkolka</span>
-        </div>
-        <nav className="flex items-center gap-2">
-          <BrandThemeSwitcher />
-          <Button variant="ghost" asChild>
-            <a href={VENDOR_URL}>For vendors</a>
-          </Button>
-          <Button asChild>
-            <a href={COUPLE_URL}>Start planning</a>
-          </Button>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <section className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-20 text-center">
         <h1 className="max-w-2xl text-4xl font-medium tracking-tight sm:text-5xl">
@@ -72,9 +77,27 @@ export default function Home() {
         ))}
       </section>
 
-      <footer className="border-t px-6 py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Mongkolka
-      </footer>
+      <section className="grid grid-cols-1 gap-6 px-6 py-16 sm:grid-cols-2 sm:px-12">
+        {DISCOVER.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="group flex flex-col gap-3 rounded-xl border p-8 transition-colors hover:bg-accent"
+          >
+            <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+              <item.icon className="size-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-medium">{item.title}</h2>
+            <p className="text-sm text-muted-foreground">{item.description}</p>
+            <span className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary">
+              {item.cta}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }

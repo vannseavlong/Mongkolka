@@ -139,23 +139,36 @@ See [docs/tasks/template.md](docs/tasks/template.md).
       `POST /public/api/site/:slug/rsvp` (public, unauthenticated, resolves the
       couple from the slug only) — find-by-name-or-create, no guest auth exists.
 
-## Phase 6 — landing / marketing (`apps/web`) — landing page done, marketplace not started
+## Phase 6 — landing / marketing (`apps/web`) — mostly done
 
 See [docs/tasks/landing.md](docs/tasks/landing.md).
 
 - [x] Landing page — hero, three-step "how it works", CTAs straight into the
       couple/vendor portals' own login (which already self-registers on first
-      Google sign-in — no separate chooser/form was built, see below).
+      Google sign-in — no separate chooser/form was built, see below), plus
+      teaser sections linking to the marketplace and template gallery.
 - [ ] Domain routing middleware — not built; public sites are served at
       `apps/web`'s `/[slug]`, not couple-owned custom domains.
-- [ ] Header/nav with real routes + real session-derived `userType`.
-- [ ] About, Contact pages.
-- [ ] Marketplace/browse — real paginated vendor list + shared `vendor_categories`.
+- [x] Header/nav with real routes (Marketplace, Templates, About, Contact) —
+      no session-derived `userType`, since `apps/web` has no auth session at
+      all to derive one from.
+- [x] About, Contact pages — Contact is static info + FAQ, no submission form
+      (the message-destination design is still deferred, see Phase 7).
+- [x] Marketplace/browse — real paginated vendor list + shared
+      `vendor_categories`, plus a vendor detail page (bio, portfolio,
+      services). New public, read-only `apps/api` endpoints in
+      `modules/public-marketplace/`.
+- [x] Template gallery + live preview (`/templates`, `/templates/:id`) —
+      renders the real `packages/templates` `SiteRenderer` with sample
+      content, not a static screenshot. Not in the original checklist, added
+      alongside marketplace/browse since both surface the same public catalog
+      data.
 - [ ] Dedicated registration entry (couple/provider chooser page) — currently the
       landing page's CTAs just link to each portal's existing OAuth login, which
       is sufficient for self-registration but isn't a marketing-style chooser.
 - [ ] `FloatingElements` (copy verbatim) + `InvitationCardDemo` (keep as
-      self-contained decoration only).
+      self-contained decoration only) — skipped as decorative-only, low
+      priority (see [docs/tasks/landing.md](docs/tasks/landing.md)).
 
 ## Phase 7 — deferred / not scoped yet
 

@@ -12,6 +12,8 @@ import vendorsSchema from "../../schemas/admin/vendors.js";
 import vendorCategoriesSchema from "../../schemas/admin/vendor_categories.js";
 import siteTemplatesSchema from "../../schemas/admin/site_templates.js";
 import themesSchema from "../../schemas/admin/themes.js";
+import statsSchema from "../../schemas/admin/stats.js";
+import contactMessagesSchema from "../../schemas/admin/contact_messages.js";
 import sectionComponentsSchema from "../../schemas/admin/section_components.js";
 import bookingsSchema from "../../schemas/admin/bookings.js";
 
@@ -61,6 +63,8 @@ adapter.registerSchemas([
   vendorCategoriesSchema,
   siteTemplatesSchema,
   themesSchema,
+  statsSchema,
+  contactMessagesSchema,
   sectionComponentsSchema,
   bookingsSchema,
   coupleProfileSchema,

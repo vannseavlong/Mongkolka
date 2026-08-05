@@ -7,6 +7,8 @@ import {
   LayoutTemplate,
   Blocks,
   Palette,
+  BarChart3,
+  MessageSquare,
   Users,
 } from "lucide-react";
 import type { SidebarNavData } from "@mongkolka/ui/layout/nav-types";
@@ -24,6 +26,8 @@ export const sidebarData: SidebarNavData = {
         { title: "Site templates", href: "/site-templates", icon: LayoutTemplate },
         { title: "Section components", href: "/section-components", icon: Blocks },
         { title: "Themes", href: "/themes", icon: Palette },
+        { title: "Stats", href: "/stats", icon: BarChart3 },
+        { title: "Messages", href: "/messages", icon: MessageSquare },
         { title: "All users", href: "/users", icon: Users },
       ],
     },

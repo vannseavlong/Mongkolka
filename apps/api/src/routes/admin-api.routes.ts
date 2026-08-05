@@ -7,6 +7,8 @@ import { vendorsRouter } from "../modules/vendors/vendors.routes.js";
 import { vendorCategoriesRouter } from "../modules/vendor-categories/vendor-categories.routes.js";
 import { siteTemplatesRouter } from "../modules/site-templates/site-templates.routes.js";
 import { themesRouter } from "../modules/themes/themes.routes.js";
+import { statsRouter } from "../modules/stats/stats.routes.js";
+import { contactMessagesRouter } from "../modules/contact-messages/contact-messages.routes.js";
 import { sectionComponentsRouter } from "../modules/section-components/section-components.routes.js";
 
 export const adminApiRouter = Router();
@@ -20,4 +22,6 @@ adminApiRouter.use(vendorsRouter);
 adminApiRouter.use(vendorCategoriesRouter);
 adminApiRouter.use(siteTemplatesRouter);
 adminApiRouter.use(themesRouter);
+adminApiRouter.use(statsRouter);
+adminApiRouter.use(contactMessagesRouter);
 adminApiRouter.use(sectionComponentsRouter);

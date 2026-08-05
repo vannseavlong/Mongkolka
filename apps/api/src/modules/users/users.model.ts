@@ -9,6 +9,21 @@ export const UsersModel = {
     return adminContext().table("users").findOne({ where: { user_id: userId } });
   },
 
+  /** `email` is globally unique on this table, regardless of role. */
+  findByEmail(email: string) {
+    return adminContext().table("users").findOne({ where: { email } });
+  },
+
+  findByEmailAndRole(email: string, role: string) {
+    return adminContext().table("users").findOne({ where: { email, role } });
+  },
+
+  /** Creates a bare login-identity row with no Sheet yet — used by self-registration,
+   * before admin approval provisions the actor's real Sheet via `createActorSheet()`. */
+  create(data: Record<string, unknown>) {
+    return adminContext().table("users").create(data);
+  },
+
   updateStatus(userId: string, status: string, extra?: Record<string, unknown>) {
     return adminContext()
       .table("users")

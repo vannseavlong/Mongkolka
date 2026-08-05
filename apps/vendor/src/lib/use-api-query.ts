@@ -3,7 +3,9 @@
 import useSWR from "swr";
 import { api, ApiError } from "./api";
 
-export function useApiQuery<T>(path: string) {
+// `path: null` disables the fetch entirely (SWR's own convention for a
+// conditional key) — used to defer a query until its prerequisites are ready.
+export function useApiQuery<T>(path: string | null) {
   const { data, error, isLoading, mutate } = useSWR<T>(path, (p: string) => api.get<T>(p));
 
   return {

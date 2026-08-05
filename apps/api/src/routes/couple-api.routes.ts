@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { coupleSessionRouter } from "../modules/couple-session/couple-session.routes.js";
 import { coupleOverviewRouter } from "../modules/couple-overview/couple-overview.routes.js";
 import { coupleProfileRouter } from "../modules/couple-profile/couple-profile.routes.js";
 import { coupleMembersRouter } from "../modules/couple-members/couple-members.routes.js";
@@ -10,6 +11,7 @@ import { coupleWebsiteRouter } from "../modules/couple-website/couple-website.ro
 
 export const coupleApiRouter = Router();
 
+coupleApiRouter.use(coupleSessionRouter);
 coupleApiRouter.use(coupleOverviewRouter);
 coupleApiRouter.use(coupleProfileRouter);
 coupleApiRouter.use(coupleMembersRouter);

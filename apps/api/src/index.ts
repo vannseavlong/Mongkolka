@@ -9,6 +9,8 @@ import "express-async-errors";
 import { adminAuth } from "./modules/auth/admin-auth.router.js";
 import { coupleAuth } from "./modules/auth/couple-auth.router.js";
 import { vendorAuth } from "./modules/auth/vendor-auth.router.js";
+import { passwordAuthRouter } from "./modules/auth/password-auth.routes.js";
+import { registrationRouter } from "./modules/auth/registration.routes.js";
 import { adminApiRouter } from "./routes/admin-api.routes.js";
 import { coupleApiRouter } from "./routes/couple-api.routes.js";
 import { vendorApiRouter } from "./routes/vendor-api.routes.js";
@@ -27,6 +29,10 @@ app.get("/health", (_req, res) => {
 app.use(adminAuth.handler);
 app.use(coupleAuth.handler);
 app.use(vendorAuth.handler);
+app.use(passwordAuthRouter("admin"));
+app.use(passwordAuthRouter("couple"));
+app.use(passwordAuthRouter("vendor"));
+app.use(registrationRouter);
 
 app.use("/admin/api", adminApiRouter);
 app.use("/couple/api", coupleApiRouter);

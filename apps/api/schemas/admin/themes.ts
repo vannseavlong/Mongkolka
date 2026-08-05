@@ -1,9 +1,5 @@
 import { defineTable, string, json, boolean } from 'longcelot-sheet-db';
 
-// App-chrome color themes (admin/couple portal UI), NOT the couple's public
-// wedding-site theme (see site_templates.default_theme for that). tokens holds
-// a full CSS custom-property map matching packages/ui/src/styles/theme.css's
-// [data-brand-theme] blocks, e.g. { background, foreground, card, primary, ... }.
 export default defineTable({
   name: 'themes',
   actor: 'admin',

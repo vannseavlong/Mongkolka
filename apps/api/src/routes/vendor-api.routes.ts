@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { vendorSessionRouter } from "../modules/vendor-session/vendor-session.routes.js";
 import { vendorProfileRouter } from "../modules/vendor-profile/vendor-profile.routes.js";
 import { vendorPortfolioRouter } from "../modules/vendor-portfolio/vendor-portfolio.routes.js";
 import { vendorServicesRouter } from "../modules/vendor-services/vendor-services.routes.js";
@@ -6,6 +7,7 @@ import { vendorBookingsRouter } from "../modules/vendor-bookings/vendor-bookings
 
 export const vendorApiRouter = Router();
 
+vendorApiRouter.use(vendorSessionRouter);
 vendorApiRouter.use(vendorProfileRouter);
 vendorApiRouter.use(vendorPortfolioRouter);
 vendorApiRouter.use(vendorServicesRouter);

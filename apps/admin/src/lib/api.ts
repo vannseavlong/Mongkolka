@@ -6,6 +6,10 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
+    // Machine-readable variant, only set on a few auth responses (e.g.
+    // "google_only") that the UI needs to branch on without string-matching
+    // the human-readable `message`.
+    public code?: string,
   ) {
     super(message);
   }
@@ -24,7 +28,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new ApiError(body.error ?? "Request failed", res.status);
+    throw new ApiError(body.error ?? "Request failed", res.status, body.code);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;

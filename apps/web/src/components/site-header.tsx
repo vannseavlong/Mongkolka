@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Heart, Menu } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
-import { BrandThemeSwitcher } from "@mongkolka/ui/brand-theme-switcher";
 import {
   Sheet,
   SheetContent,
@@ -42,7 +41,6 @@ export function SiteHeader() {
       </nav>
 
       <div className="hidden items-center gap-2 md:flex">
-        <BrandThemeSwitcher />
         <Button variant="ghost" asChild>
           <a href={VENDOR_URL}>For vendors</a>
         </Button>
@@ -75,9 +73,6 @@ export function SiteHeader() {
             <Button className="justify-start" asChild>
               <a href={COUPLE_URL}>Start planning</a>
             </Button>
-            <div className="mt-2">
-              <BrandThemeSwitcher />
-            </div>
           </div>
         </SheetContent>
       </Sheet>

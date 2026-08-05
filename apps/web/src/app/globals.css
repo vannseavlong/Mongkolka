@@ -2,3 +2,20 @@
 @import "tw-animate-css";
 @import "@mongkolka/ui/theme.css";
 @source "../../../../packages/ui/src/components/**/*.{ts,tsx}";
+
+/*
+ * Theme-aware gradient text utility for the marketing site. Generalizes the
+ * hardcoded `.text-gradient-pink` utility (defined in
+ * `@mongkolka/ui/theme.css`) into one driven by the active brand theme's
+ * `--primary`/`--accent` CSS variables, so it keeps matching whichever brand
+ * theme (or future admin-controlled palette) is active instead of always
+ * rendering pink/rose.
+ */
+@layer utilities {
+  .text-gradient-brand {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}

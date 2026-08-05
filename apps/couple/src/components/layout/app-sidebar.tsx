@@ -13,7 +13,6 @@ import {
   SidebarRail,
 } from "@mongkolka/ui/sidebar";
 import { NavGroup } from "@mongkolka/ui/layout/nav-group";
-import { BrandThemeSwitcher } from "@mongkolka/ui/brand-theme-switcher";
 import { clearToken } from "@/lib/auth";
 import { sidebarData } from "./data/sidebar-data";
 
@@ -35,9 +34,6 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
-            <BrandThemeSwitcher />
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={() => {

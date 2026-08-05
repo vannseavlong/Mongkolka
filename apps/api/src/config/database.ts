@@ -11,6 +11,7 @@ import coupleMembersSchema from "../../schemas/admin/couple_members.js";
 import vendorsSchema from "../../schemas/admin/vendors.js";
 import vendorCategoriesSchema from "../../schemas/admin/vendor_categories.js";
 import siteTemplatesSchema from "../../schemas/admin/site_templates.js";
+import themesSchema from "../../schemas/admin/themes.js";
 import sectionComponentsSchema from "../../schemas/admin/section_components.js";
 import bookingsSchema from "../../schemas/admin/bookings.js";
 
@@ -40,6 +41,14 @@ export const adapter = createSheetAdapter({
   },
   tokens: loadTokens(),
   onSchemaMismatch: "warn",
+  // Default is 2s; every authenticated request re-resolves its actor via 2-3
+  // reads of the same admin tables (users/couples/couple_members/vendors),
+  // which burns through Sheets' per-minute read quota fast under normal
+  // traffic. Widening this is the package's own recommended fix for a
+  // read-heavy app (see README "Read caching"); writes still invalidate the
+  // affected tab immediately, so this only delays visibility of changes made
+  // outside this adapter instance (e.g. a human editing the sheet directly).
+  cache: { ttlMs: 15_000 },
 });
 
 adapter.registerSchemas([
@@ -51,6 +60,7 @@ adapter.registerSchemas([
   vendorsSchema,
   vendorCategoriesSchema,
   siteTemplatesSchema,
+  themesSchema,
   sectionComponentsSchema,
   bookingsSchema,
   coupleProfileSchema,

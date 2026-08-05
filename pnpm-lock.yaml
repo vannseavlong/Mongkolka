@@ -97,8 +97,8 @@ importers:
         specifier: ^9.0.3
         version: 9.0.3
       longcelot-sheet-db:
-        specifier: ^0.1.40
-        version: 0.1.40(@types/node@20.19.43)
+        specifier: ^0.1.41
+        version: 0.1.41(@types/node@20.19.43)
     devDependencies:
       '@mongkolka/eslint-config':
         specifier: workspace:*
@@ -264,6 +264,9 @@ importers:
       lucide-react:
         specifier: ^0.487.0
         version: 0.487.0(react@19.2.4)
+      motion:
+        specifier: ^12.42.2
+        version: 12.42.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next:
         specifier: 16.2.11
         version: 16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -3446,8 +3449,8 @@ packages:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
 
-  longcelot-sheet-db@0.1.40:
-    resolution: {integrity: sha512-JfUsOit3bMq7tKsv+H4G3wAFAaI/qm89EExlhG8PMdbswxOxaxeBDVtvnn8o2aMb4+N2O0vY+b3i1ow5fEhqyA==}
+  longcelot-sheet-db@0.1.41:
+    resolution: {integrity: sha512-MbzEhe/+R1VViIM1jfm9PTA6Kwp84EGPNsNBNoqunjViGZZqw3p5aJirr5u6ey9Pl5alcDqfRfLAL0ySWfk9og==}
     engines: {node: '>=16.0.0'}
     hasBin: true
     peerDependencies:
@@ -7294,7 +7297,7 @@ snapshots:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
 
-  longcelot-sheet-db@0.1.40(@types/node@20.19.43):
+  longcelot-sheet-db@0.1.41(@types/node@20.19.43):
     dependencies:
       bcryptjs: 3.0.3
       chalk: 4.1.2

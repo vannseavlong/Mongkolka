@@ -19,4 +19,4 @@ minimumReleaseAgeExclude:
   - '@turbo/windows-64@2.10.7'
   - '@turbo/windows-arm64@2.10.7'
   - turbo@2.10.7
-  - longcelot-sheet-db@0.1.40
+  - longcelot-sheet-db

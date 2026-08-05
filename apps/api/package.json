@@ -15,7 +15,7 @@
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.3",
-    "longcelot-sheet-db": "^0.1.40"
+    "longcelot-sheet-db": "^0.1.41"
   },
   "devDependencies": {
     "@mongkolka/eslint-config": "workspace:*",

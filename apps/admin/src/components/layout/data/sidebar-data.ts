@@ -1,4 +1,14 @@
-import { LayoutDashboard, UserCheck, Heart, Store, Tags, LayoutTemplate, Blocks, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  UserCheck,
+  Heart,
+  Store,
+  Tags,
+  LayoutTemplate,
+  Blocks,
+  Palette,
+  Users,
+} from "lucide-react";
 import type { SidebarNavData } from "@mongkolka/ui/layout/nav-types";
 
 export const sidebarData: SidebarNavData = {
@@ -13,6 +23,7 @@ export const sidebarData: SidebarNavData = {
         { title: "Vendor categories", href: "/vendor-categories", icon: Tags },
         { title: "Site templates", href: "/site-templates", icon: LayoutTemplate },
         { title: "Section components", href: "/section-components", icon: Blocks },
+        { title: "Themes", href: "/themes", icon: Palette },
         { title: "All users", href: "/users", icon: Users },
       ],
     },

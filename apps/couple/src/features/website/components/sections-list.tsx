@@ -1,13 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil } from "lucide-react";
 import { Switch } from "@mongkolka/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { Button } from "@mongkolka/ui/button";
 import { api, ApiError } from "@/lib/api";
 import type { SectionComponent, WebsiteSection } from "../data/schema";
+import { CONTENT_EDITABLE_SECTIONS, SectionContentDialog } from "./section-content-dialog";
 
 const SECTIONS_KEY = "/couple/api/website/sections";
 const TEMPLATE_DEFAULT = "__template_default__";
@@ -19,6 +21,7 @@ export function SectionsList({
   sections: WebsiteSection[];
   components: SectionComponent[];
 }) {
+  const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null);
   const ordered = [...sections].sort((a, b) => a.display_order - b.display_order);
 
   async function patchSection(sectionId: string, data: Record<string, unknown>) {
@@ -93,6 +96,11 @@ export function SectionsList({
                 ))}
               </SelectContent>
             </Select>
+            {CONTENT_EDITABLE_SECTIONS.includes(section.section_key) && (
+              <Button size="sm" variant="outline" onClick={() => setEditingSection(section)}>
+                <Pencil className="size-3" /> Edit content
+              </Button>
+            )}
             <Switch
               checked={section.enabled}
               onCheckedChange={(checked) => patchSection(section.section_id, { enabled: checked })}
@@ -100,6 +108,12 @@ export function SectionsList({
           </div>
         );
       })}
+      <SectionContentDialog
+        section={editingSection}
+        onOpenChange={(open) => {
+          if (!open) setEditingSection(null);
+        }}
+      />
     </div>
   );
 }

@@ -12,6 +12,15 @@ export interface SiteRendererSection {
   color_override: PartialTheme | null;
   display_order: number;
   enabled: boolean;
+  /**
+   * The section's own stored `website_sections.content` JSON (gallery's
+   * `photos`, registry's `links`, timeline's `chapters`, rsvp's
+   * `customMessage`/`deadline`, music's `playlistUrl`). `hero`/`story`/`details`
+   * have no canonical home here — they're derived by the consumer's
+   * `buildContent()` instead, which the render loop below falls back to
+   * whenever this is null/undefined.
+   */
+  content?: unknown | null;
 }
 
 export interface SiteRendererTemplate {
@@ -85,7 +94,7 @@ export function SiteRenderer({
             key={section.section_id}
             couple={couple}
             theme={theme}
-            content={buildContent(section.section_key)}
+            content={section.content ?? buildContent(section.section_key)}
             {...extraProps?.(section.section_key)}
           />
         );

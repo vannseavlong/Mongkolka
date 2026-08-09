@@ -16,6 +16,30 @@ const SECTION_KEYS = [
   "music",
 ] as const;
 
+function toComparableTime(value: unknown): number {
+  if (typeof value !== "string" || !value) return Number.POSITIVE_INFINITY;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+}
+
+function toComparableOrder(value: unknown): number {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : Number.POSITIVE_INFINITY;
+}
+
+/** Earliest _created_at wins; ties broken by lowest display_order, then lowest section_id. */
+function compareSectionsForDedupe(a: Record<string, unknown>, b: Record<string, unknown>): number {
+  const createdDiff = toComparableTime(a._created_at) - toComparableTime(b._created_at);
+  if (createdDiff !== 0) return createdDiff;
+  const orderDiff = toComparableOrder(a.display_order) - toComparableOrder(b.display_order);
+  if (orderDiff !== 0) return orderDiff;
+  return String(a.section_id ?? "").localeCompare(String(b.section_id ?? ""));
+}
+
+function compareByDisplayOrder(a: Record<string, unknown>, b: Record<string, unknown>): number {
+  return toComparableOrder(a.display_order) - toComparableOrder(b.display_order);
+}
+
 export const CoupleWebsiteService = {
   async getCatalog() {
     const [templates, components] = await Promise.all([
@@ -42,6 +66,16 @@ export const CoupleWebsiteService = {
    * Sets the couple's chosen design pack. The first time a couple selects a
    * template, bootstraps one website_sections row per SECTION_KEYS entry so the
    * builder has something to list/reorder/toggle immediately.
+   *
+   * Bootstrap is gated per section_key (not by "does the whole batch have zero
+   * rows") specifically so it's idempotent under concurrent calls: two
+   * near-simultaneous POSTs (double-click, fast re-selection) both observing an
+   * empty/partial set no longer each insert a full duplicate batch — each call
+   * only creates whatever keys it still sees missing, so retries self-heal
+   * instead of piling up more duplicates. This still isn't a true atomic lock
+   * (the underlying sheet-backed store has no transactions), so a duplicate is
+   * still theoretically possible for the same key on a dead heat between two
+   * reads — that residual case is covered by the dedupe in listSections().
    */
   async selectTemplate(actorSheetId: string, templateId: string) {
     const profile = await CoupleWebsiteModel.findProfile(actorSheetId);
@@ -57,12 +91,15 @@ export const CoupleWebsiteService = {
     }
 
     const existingSections = await CoupleWebsiteModel.findSections(actorSheetId);
-    if (existingSections.length === 0) {
-      for (const [index, sectionKey] of SECTION_KEYS.entries()) {
+    const existingKeys = new Set(existingSections.map((section) => section.section_key as string));
+    const missingKeys = SECTION_KEYS.filter((sectionKey) => !existingKeys.has(sectionKey));
+    if (missingKeys.length > 0) {
+      const nextOrderStart = existingSections.length;
+      for (const [offset, sectionKey] of missingKeys.entries()) {
         await CoupleWebsiteModel.createSection(actorSheetId, {
           section_id: randomUUID(),
           section_key: sectionKey,
-          display_order: index,
+          display_order: nextOrderStart + offset,
           enabled: true,
         });
       }
@@ -83,8 +120,53 @@ export const CoupleWebsiteService = {
     }
   },
 
-  listSections(actorSheetId: string) {
-    return CoupleWebsiteModel.findSections(actorSheetId);
+  /**
+   * Reads sections and collapses any duplicate rows sharing a section_key down
+   * to one — a display-layer safety net against the historical bootstrap race
+   * (see selectTemplate() above), not a data mutation the caller depends on.
+   * The "keeper" per key is deterministic: earliest-created row (ties broken by
+   * lowest display_order, then lowest section_id) wins, mirroring what a couple
+   * would expect to still see if they'd been editing the original row all along.
+   * True orphan duplicates are then best-effort deleted so they stop coming back
+   * on every future read; a failed cleanup never fails the request — the couple
+   * still gets a clean, deduped list either way.
+   */
+  async listSections(actorSheetId: string) {
+    const sections = await CoupleWebsiteModel.findSections(actorSheetId);
+
+    const bySectionKey = new Map<string, Record<string, unknown>[]>();
+    for (const section of sections) {
+      const key = section.section_key as string;
+      const group = bySectionKey.get(key);
+      if (group) {
+        group.push(section);
+      } else {
+        bySectionKey.set(key, [section]);
+      }
+    }
+
+    const duplicateIds: string[] = [];
+    const deduped: Record<string, unknown>[] = [];
+    for (const group of bySectionKey.values()) {
+      const sorted = [...group].sort(compareSectionsForDedupe);
+      const [keeper, ...rest] = sorted;
+      if (!keeper) continue;
+      deduped.push(keeper);
+      for (const duplicate of rest) {
+        duplicateIds.push(duplicate.section_id as string);
+      }
+    }
+
+    if (duplicateIds.length > 0) {
+      // Best-effort cleanup — never let it fail the read.
+      await Promise.all(
+        duplicateIds.map((sectionId) =>
+          CoupleWebsiteModel.deleteSection(actorSheetId, sectionId).catch(() => undefined),
+        ),
+      );
+    }
+
+    return deduped.sort(compareByDisplayOrder);
   },
 
   async updateSection(actorSheetId: string, sectionId: string, input: Record<string, unknown>) {

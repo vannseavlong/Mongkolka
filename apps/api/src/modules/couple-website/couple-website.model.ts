@@ -62,4 +62,10 @@ export const CoupleWebsiteModel = {
       .table("website_sections")
       .update({ where: { section_id: sectionId }, data });
   },
+
+  deleteSection(actorSheetId: string, sectionId: string) {
+    return coupleContext(actorSheetId)
+      .table("website_sections")
+      .delete({ where: { section_id: sectionId } });
+  },
 };

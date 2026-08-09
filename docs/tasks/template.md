@@ -132,14 +132,14 @@ packages/templates/
                              below
     sections/
       opening/{Curtain,Door,Book,Envelope}.tsx
-      hero/Classic.tsx
-      story/Classic.tsx
-      gallery/Grid.tsx
-      details/Classic.tsx
-      rsvp/Classic.tsx
-      registry/Classic.tsx
-      timeline/Classic.tsx
-      music/Classic.tsx
+      hero/{Classic,Polaroid,Fullbleed}.tsx
+      story/{Classic,Letter,Split}.tsx
+      gallery/{Grid,Masonry,Carousel}.tsx
+      details/{Classic,Split,Cards}.tsx
+      rsvp/{Classic,Card,Minimal}.tsx
+      registry/{Classic,Cards,List}.tsx
+      timeline/{Classic,VerticalLine,Horizontal}.tsx
+      music/{Classic,Playerbar,Minimal}.tsx
   package.json
 ```
 
@@ -163,10 +163,11 @@ pick it up.
   to whatever's first registered for that section, rather than throwing — a public
   wedding site should never hard-crash because a catalog row was retired or a
   `component_id` was mistyped.
-- Ships **one** component per section other than `opening` (`hero/Classic`,
-  `gallery/Grid`, etc.) — the registry and schema already support adding more variants
-  to any section later (exactly like `opening`'s four) without a migration; it's just
-  more components + more `section_components` catalog rows.
+- Ships **three** components per section other than `opening` — a `Classic` plus two
+  genuinely distinct variants (e.g. `hero_classic`/`hero_polaroid`/`hero_fullbleed`,
+  `gallery_grid`/`gallery_masonry`/`gallery_carousel`) — see `registry.ts`'s
+  `sectionRegistry` for the full list of `component_id`s per section. Adding more is
+  just more components + more `section_components` catalog rows, no migration.
 
 ## Couple portal: website builder (`apps/couple`)
 
@@ -263,6 +264,13 @@ of language. The admin/couple/vendor portals don't use this — not needed there
   new scope to size separately.
 - `usage_count` / template popularity reporting: not resolved, see
   [docs/backend-schema.md](../backend-schema.md#site_templates).
-- Whether non-`opening` sections eventually get multiple component variants too (the
-  architecture already supports it) is a product call to make per-section as demand
-  shows up, not something to pre-build.
+- Non-`opening` sections getting multiple component variants: done — each of
+  `hero`, `story`, `gallery`, `details`, `rsvp`, `registry`, `timeline`, `music` now
+  ships a `Classic` plus two additional variants (`hero_polaroid`/`hero_fullbleed`,
+  `story_letter`/`story_split`, `gallery_masonry`/`gallery_carousel`,
+  `details_split`/`details_cards`, `rsvp_card`/`rsvp_minimal`,
+  `registry_cards`/`registry_list`, `timeline_vertical_line`/`timeline_horizontal`,
+  `music_playerbar`/`music_minimal`) — see `packages/templates/src/registry.ts`'s
+  `sectionRegistry` for the authoritative list of `component_id`s. Whether any
+  section gets a *fourth* variant remains a product call to make per-section as
+  demand shows up.

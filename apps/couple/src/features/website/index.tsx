@@ -62,7 +62,15 @@ export function Website() {
                     <CardTitle>Sections</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <SectionsList sections={sectionsData?.sections ?? []} components={catalogData?.components ?? []} />
+                    {profileData && (
+                      <SectionsList
+                        sections={sectionsData?.sections ?? []}
+                        components={catalogData?.components ?? []}
+                        template={selectedTemplate}
+                        themeOverride={settings?.theme_override ?? null}
+                        profile={profileData.profile}
+                      />
+                    )}
                   </CardContent>
                 </Card>
               </>

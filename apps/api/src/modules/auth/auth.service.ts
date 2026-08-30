@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { GoogleProfile, SheetAdapter } from "longcelot-sheet-db";
 import { env } from "../../config/env.js";
+export const PORTAL_LOGIN_SCOPES = ["openid", "email", "profile"];
 
 /** login-only: admin must already exist as an active admin user, no self-signup. */
 export async function adminOnUser(profile: GoogleProfile, adapter: SheetAdapter) {

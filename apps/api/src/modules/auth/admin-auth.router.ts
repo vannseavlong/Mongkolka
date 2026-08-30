@@ -1,7 +1,7 @@
 import { createAuthRouter } from "longcelot-sheet-db";
 import { adapter } from "../../config/database.js";
 import { env } from "../../config/env.js";
-import { adminOnUser } from "./auth.service.js";
+import { adminOnUser, PORTAL_LOGIN_SCOPES } from "./auth.service.js";
 
 export const adminAuth = createAuthRouter({
   adapter,
@@ -9,6 +9,7 @@ export const adminAuth = createAuthRouter({
   frontendUrl: env.ADMIN_FRONTEND_URL,
   basePath: "/admin",
   registrationPolicy: "login-only",
+  scopes: PORTAL_LOGIN_SCOPES,
   oauthConfig: {
     clientId: env.GOOGLE_CLIENT_ID,
     clientSecret: env.GOOGLE_CLIENT_SECRET,

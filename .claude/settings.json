@@ -102,7 +102,16 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"http://localhost:3000/templates/botanical_romance\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"http://localhost:3000/templates/does-not-exist\")",
       "Bash(curl -s \"http://localhost:3000/templates/botanical_romance\")",
-      "Bash(curl -s \"http://localhost:3000/marketplace?category=257811c8-cd56-44dc-a8cf-ae3049de356c\")"
+      "Bash(curl -s \"http://localhost:3000/marketplace?category=257811c8-cd56-44dc-a8cf-ae3049de356c\")",
+      "Bash(grep -E \"^\\(church|party-popper|shirt|chevron-left|chevron-right|arrow-up-right|external-link|play|pause|list-music|quote|mail-open|image|image-off|disc-3|music-4|clock|map-pin|calendar\\)\\\\.js$\")",
+      "Bash(pnpm --filter @mongkolka/templates lint)",
+      "Bash(pnpm --filter couple build)",
+      "Bash(grep -n \"sections/$\\\\|opening/{Curtain\\\\|hero/Classic.tsx$\\\\|story/Classic.tsx$\\\\|gallery/Grid.tsx$\\\\|details/Classic.tsx$\\\\|rsvp/Classic.tsx$\\\\|registry/Classic.tsx$\\\\|timeline/Classic.tsx$\\\\|music/Classic.tsx$\" /Users/suntel/personal/Mongkolka/.claude/worktrees/agent-a1bbc3280e9529ce0/docs/tasks/template.md)",
+      "Bash(git commit -m 'feat\\(templates\\): add 2 new variants for each non-opening section *)",
+      "Bash(pnpm --filter couple lint)",
+      "Bash(git merge *)",
+      "Bash(git worktree *)",
+      "Bash(git branch *)"
     ],
     "additionalDirectories": [
       "/Users/suntel/personal/Mongkolka/Clone-UI/src/app/components/ui",

@@ -20,8 +20,9 @@ import type { BudgetCategory } from "../data/schema";
 
 const budgetCategoryFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  // "spent" isn't set here — it's derived server-side from the checklist
+  // tasks linked to this category (see CoupleBudgetService.withComputedSpent).
   allocated: z.coerce.number().min(0),
-  spent: z.coerce.number().min(0),
   color: z.string().optional(),
 });
 
@@ -43,7 +44,6 @@ export function BudgetActionDialog({
     defaultValues: {
       name: currentRow?.name ?? "",
       allocated: currentRow?.allocated ?? 0,
-      spent: currentRow?.spent ?? 0,
       color: currentRow?.color ?? "#c9a35c",
     },
   });
@@ -90,34 +90,19 @@ export function BudgetActionDialog({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="allocated"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Allocated</FormLabel>
-                    <FormControl>
-                      <Input type="number" min={0} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="spent"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Spent</FormLabel>
-                    <FormControl>
-                      <Input type="number" min={0} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="allocated"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Allocated</FormLabel>
+                  <FormControl>
+                    <Input type="number" min={0} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="color"

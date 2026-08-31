@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { ValidationError } from "longcelot-sheet-db";
+import { isValidCustomSlug } from "../../utils/slug.js";
 import { CoupleWebsiteModel } from "./couple-website.model.js";
 
 // Mirrors SECTION_KEYS in packages/templates/src/types.ts — kept as a plain
@@ -194,6 +196,31 @@ export const CoupleWebsiteService = {
 
   async unpublish(coupleId: string) {
     await CoupleWebsiteModel.updateWebsiteStatus(coupleId, "draft");
+    return CoupleWebsiteModel.findCoupleById(coupleId);
+  },
+
+  /**
+   * Lets a couple replace their random placeholder slug (e.g. "couple-a1b2c3d4")
+   * with a readable one (e.g. "vutha-nita") that also doubles as their site's
+   * subdomain label. Format is validated here; the "already taken" case is
+   * caught from the model's unique-constraint violation rather than checked
+   * up front, so a race between two saves still can't produce duplicates.
+   */
+  async updateSlug(coupleId: string, rawSlug: string) {
+    const slug = rawSlug.trim().toLowerCase();
+    if (!isValidCustomSlug(slug)) {
+      throw new Error(
+        "Link must be 3-40 characters: lowercase letters, numbers, and single hyphens only",
+      );
+    }
+    try {
+      await CoupleWebsiteModel.updateSlug(coupleId, slug);
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw new Error("That link is already taken — try another");
+      }
+      throw err;
+    }
     return CoupleWebsiteModel.findCoupleById(coupleId);
   },
 };

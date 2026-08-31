@@ -27,6 +27,12 @@ export const CoupleWebsiteModel = {
       .update({ where: { couple_id: coupleId }, data: { website_status } });
   },
 
+  updateSlug(coupleId: string, slug: string) {
+    return adminContext()
+      .table("couples")
+      .update({ where: { couple_id: coupleId }, data: { slug } });
+  },
+
   findProfile(actorSheetId: string) {
     return coupleContext(actorSheetId).table("couple_profile").findOne();
   },

@@ -13,7 +13,16 @@ export default async function Page({
 }) {
   const { slug } = await params;
   const query = await searchParams;
-  const to = typeof query.to === "string" ? query.to : undefined;
+  // `name` may hold more than one guest (a plus-one) as a comma-separated
+  // list, e.g. "?name=Guest+1,Chea" — joined into one greeting string here.
+  const rawName = typeof query.name === "string" ? query.name : undefined;
+  const guestGreeting = rawName
+    ? rawName
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .join(" & ")
+    : undefined;
   const lang = typeof query.lang === "string" && query.lang === "kh" ? "kh" : "en";
 
   const res = await fetch(`${API_URL}/public/api/site/${slug}`, { cache: "no-store" });
@@ -22,5 +31,5 @@ export default async function Page({
 
   const site = (await res.json()) as PublicSiteResponse;
 
-  return <SiteView site={site} guestGreeting={to} initialLanguage={lang} />;
+  return <SiteView site={site} guestGreeting={guestGreeting} initialLanguage={lang} />;
 }

@@ -28,7 +28,6 @@ const checklistItemFormSchema = z.object({
   category: z.string().optional(),
   due_date: z.string().optional(),
   priority: z.enum(CHECKLIST_PRIORITIES),
-  budget_allocated: z.coerce.number().min(0),
   budget_spent: z.coerce.number().min(0),
   notes: z.string().optional(),
 });
@@ -58,7 +57,6 @@ export function ChecklistActionDialog({
       category: currentRow?.category ?? "",
       due_date: currentRow?.due_date?.slice(0, 10) ?? "",
       priority: currentRow?.priority ?? "medium",
-      budget_allocated: currentRow?.budget_allocated ?? 0,
       budget_spent: currentRow?.budget_spent ?? 0,
       notes: currentRow?.notes ?? "",
     },
@@ -79,6 +77,9 @@ export function ChecklistActionDialog({
         toast.success("Task added");
       }
       mutate("/couple/api/checklist-items");
+      // A task's budget_spent feeds its category's computed "spent" total —
+      // refresh Budget's cache so it doesn't show a stale figure.
+      mutate("/couple/api/budget-categories");
       handleOpenChange(false);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to save task");
@@ -158,28 +159,15 @@ export function ChecklistActionDialog({
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="due_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Due date</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="budget_allocated"
+                name="due_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Budget allocated</FormLabel>
+                    <FormLabel>Due date</FormLabel>
                     <FormControl>
-                      <Input type="number" min={0} {...field} />
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -190,7 +178,7 @@ export function ChecklistActionDialog({
                 name="budget_spent"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Budget spent</FormLabel>
+                    <FormLabel>Amount spent</FormLabel>
                     <FormControl>
                       <Input type="number" min={0} {...field} />
                     </FormControl>

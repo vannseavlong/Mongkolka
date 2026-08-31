@@ -7,7 +7,9 @@ export const checklistItemSchema = z.object({
   text: z.string(),
   completed: z.boolean(),
   category: z.string().nullable(),
-  budget_allocated: z.number(),
+  // What this task cost, rolled up into its budget category's "spent" total
+  // (see CoupleBudgetService.withComputedSpent) — there's no separate
+  // per-task allocation; that lives once, on the category, in Budget.
   budget_spent: z.number(),
   due_date: z.string().nullable(),
   priority: z.enum(CHECKLIST_PRIORITIES),

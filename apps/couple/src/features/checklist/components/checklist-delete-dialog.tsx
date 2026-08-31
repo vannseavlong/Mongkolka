@@ -29,6 +29,9 @@ export function ChecklistDeleteDialog({
       await api.delete(`/couple/api/checklist-items/${currentRow.item_id}`);
       toast.success("Task removed");
       mutate("/couple/api/checklist-items");
+      // The removed task's budget_spent no longer counts toward its
+      // category's computed "spent" total — refresh Budget's cache too.
+      mutate("/couple/api/budget-categories");
       onOpenChange(false);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to remove task");

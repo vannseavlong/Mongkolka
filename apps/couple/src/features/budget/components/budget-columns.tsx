@@ -23,8 +23,10 @@ export const budgetColumns: ColumnDef<BudgetCategory>[] = [
     cell: ({ row }) => `$${row.original.allocated.toLocaleString()}`,
   },
   {
+    // Computed server-side from this category's checklist tasks (see
+    // CoupleBudgetService.withComputedSpent) — not directly editable here.
     accessorKey: "spent",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Spent" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Spent (from tasks)" />,
     cell: ({ row }) => `$${row.original.spent.toLocaleString()}`,
   },
   {

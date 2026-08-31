@@ -91,4 +91,18 @@ export const CoupleWebsiteController = {
     const couple = await CoupleWebsiteService.unpublish(req.coupleId as string);
     res.json({ couple });
   },
+
+  async updateSlug(req: CoupleRequest, res: Response) {
+    const slug = req.body?.slug;
+    if (typeof slug !== "string" || !slug) {
+      res.status(400).json({ error: "slug is required" });
+      return;
+    }
+    try {
+      const couple = await CoupleWebsiteService.updateSlug(req.coupleId as string, slug);
+      res.json({ couple });
+    } catch (err) {
+      res.status(409).json({ error: (err as Error).message });
+    }
+  },
 };

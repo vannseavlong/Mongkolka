@@ -8,6 +8,7 @@ export const coupleWebsiteRouter = Router();
 coupleWebsiteRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
 coupleWebsiteRouter.get("/website/catalog", CoupleWebsiteController.getCatalog);
 coupleWebsiteRouter.get("/website/settings", CoupleWebsiteController.getSettings);
+coupleWebsiteRouter.patch("/website/slug", CoupleWebsiteController.updateSlug);
 coupleWebsiteRouter.post("/website/template", CoupleWebsiteController.selectTemplate);
 coupleWebsiteRouter.patch("/website/theme", CoupleWebsiteController.updateTheme);
 coupleWebsiteRouter.get("/website/sections", CoupleWebsiteController.listSections);

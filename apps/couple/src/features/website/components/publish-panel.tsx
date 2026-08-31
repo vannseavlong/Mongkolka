@@ -6,6 +6,7 @@ import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
 import { api, ApiError } from "@/lib/api";
 import type { WebsiteSettings } from "../data/schema";
+import { SlugEditor } from "./slug-editor";
 
 const SETTINGS_KEY = "/couple/api/website/settings";
 
@@ -29,7 +30,7 @@ export function PublishPanel({ settings }: { settings: WebsiteSettings }) {
           <Badge variant={isPublished ? "default" : "outline"} className="capitalize">
             {settings.website_status}
           </Badge>
-          {settings.slug && <span className="text-sm text-muted-foreground">/{settings.slug}</span>}
+          <SlugEditor slug={settings.slug} />
         </div>
         {!isPublished && (
           <p className="mt-1 text-sm text-muted-foreground">

@@ -36,23 +36,44 @@ export function SectionColorPopover({
     values: { ...effectiveTheme, ...(section.color_override ?? {}) },
   });
 
+  // Functional-updater form of mutate() since this component only has its own
+  // section, not the full list — it patches whichever cached list is there
+  // rather than needing the list threaded down as a prop. Same
+  // update-now/reconcile-after-the-round-trip pattern as SectionsList.
+  function setOverrideOptimistically(colorOverride: Theme | null) {
+    mutate(
+      SECTIONS_KEY,
+      (current?: { sections: WebsiteSection[] }) =>
+        current && {
+          sections: current.sections.map((s) =>
+            s.section_id === section.section_id ? { ...s, color_override: colorOverride } : s,
+          ),
+        },
+      { revalidate: false },
+    );
+  }
+
   async function save(values: Theme) {
+    setOverrideOptimistically(values);
     try {
       await api.patch(`/couple/api/website/sections/${section.section_id}`, { color_override: values });
       toast.success("Section colors saved");
-      mutate(SECTIONS_KEY);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to save section colors");
+    } finally {
+      mutate(SECTIONS_KEY);
     }
   }
 
   async function clearOverride() {
+    setOverrideOptimistically(null);
     try {
       await api.patch(`/couple/api/website/sections/${section.section_id}`, { color_override: null });
       toast.success("Reset to template colors");
-      mutate(SECTIONS_KEY);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to reset section colors");
+    } finally {
+      mutate(SECTIONS_KEY);
     }
   }
 

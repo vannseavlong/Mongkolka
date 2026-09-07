@@ -1,4 +1,4 @@
-import { getToken } from "./auth";
+import { clearToken, getToken } from "./auth";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -28,6 +28,17 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
+    if (res.status === 401 && token && typeof window !== "undefined") {
+      // The token we sent was rejected (expired/invalid) — clear it and
+      // bounce to sign-in so this surfaces as a redirect instead of an
+      // inline error on whatever page happened to be fetching. Requests
+      // made with no token (e.g. the login form itself) are left alone to
+      // throw normally, so a bad-password attempt still shows as a toast.
+      clearToken();
+      if (window.location.pathname !== "/") {
+        window.location.assign("/");
+      }
+    }
     throw new ApiError(body.error ?? "Request failed", res.status, body.code);
   }
   if (res.status === 204) return undefined as T;

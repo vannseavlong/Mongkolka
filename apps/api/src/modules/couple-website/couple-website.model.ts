@@ -63,6 +63,10 @@ export const CoupleWebsiteModel = {
     return coupleContext(actorSheetId).table("website_sections").create(data);
   },
 
+  createSections(actorSheetId: string, data: Record<string, unknown>[]) {
+    return coupleContext(actorSheetId).table("website_sections").createMany(data);
+  },
+
   updateSection(actorSheetId: string, sectionId: string, data: Record<string, unknown>) {
     return coupleContext(actorSheetId)
       .table("website_sections")

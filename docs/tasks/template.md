@@ -77,13 +77,13 @@ Each consumer (the couple-portal preview, the public renderer) supplies its own
 rows above (`hero`/`story`/`details`) into each section's content shape — this
 mapping is deliberately *not* inside `packages/templates`, since it's about how each
 app's own fetched data (couple profile, in both cases) gets reshaped, not about
-rendering. **Not built**: any UI for editing `website_sections.content` itself —
+rendering. **Built**: a couple-facing editor for `website_sections.content` —
 `gallery`'s `photos`, `registry`'s `links`, `timeline`'s `chapters`, `rsvp`'s
-`customMessage`/`deadline`, and `music`'s `playlistUrl` have no couple-facing editor
-yet, so those sections render empty (most of them return `null` when their content
-is empty, by design — see `resolveComponent()`'s never-throw contract above) unless a
-row's `content` is populated directly. This is real, open work, not an oversight to
-silently work around.
+`customMessage`/`deadline`, and `music`'s `playlistUrl` each get a real
+`react-hook-form` + `zod` form (`SectionContentDialog`, see below) rather than
+rendering empty (most of them still return `null` when their content is empty, by
+design — see `resolveComponent()`'s never-throw contract above — but a couple now has
+a way to populate it themselves).
 
 ## The `opening` section
 
@@ -184,15 +184,20 @@ Lives at `/website`, restructured for the two-axis model rather than adapted fro
 2. **Whole-site theme** (`ThemeEditor`) — four color inputs + font-style select,
    `PATCH /couple/api/website/theme`, writing the *whole* resolved theme (not a
    sparse diff) into `couple_profile.theme_override`.
-3. **Sections** (`SectionsList`) — per section: an enabled `Switch` (inline, no
-   dialog), a component `<Select>` scoped to that section's active
-   `section_components` (or "Template default"), and up/down buttons that
-   POST the full reordered id list to `/couple/api/website/sections/reorder`
-   (no drag-and-drop library — up/down buttons cover the same ground more simply).
-   **Not built**: a color override per section (the schema/cascade supports
-   `website_sections.color_override`, but the builder UI only exposes the
-   whole-site theme editor) and any editor for `content` (see the content-source
-   table above — this is the same open gap).
+3. **Sections** (`SectionsList`) — per section: a scaled-down live preview swatch
+   (`SectionPreview`, rendering that one row through the real `SiteRenderer`), an
+   enabled `Switch` (inline, no dialog), a component `<Select>` scoped to that
+   section's active `section_components` (or "Template default"), up/down buttons
+   that POST the full reordered id list to `/couple/api/website/sections/reorder`
+   (no drag-and-drop library — up/down buttons cover the same ground more simply),
+   a per-section color override popover (`SectionColorPopover` — the same 4 fields
+   as `ThemeEditor`, scoped to `PATCH`ing that section's own `color_override`, with
+   a "use template default" reset), and — for `gallery`/`registry`/`timeline`/
+   `rsvp`/`music` — an "Edit content" button opening `SectionContentDialog` (see the
+   content-source table above). All of these go through the same generic
+   `PATCH /couple/api/website/sections/:sectionId`, which accepts any of
+   `enabled`/`component_id`/`color_override`/`content` in one body — no per-field
+   endpoints were needed.
 4. **Preview + publish** (`WebsitePreview`, `PublishPanel`) — the preview renders
    through `packages/templates`' `SiteRenderer` directly (boxed in a fixed-height,
    `overflow: hidden` container with a `transform` on it, so the `opening` gate's
@@ -253,13 +258,11 @@ of language. The admin/couple/vendor portals don't use this — not needed there
 
 ## Open calls / known gaps
 
-- **Per-section content editor** — `gallery`/`registry`/`timeline`/`rsvp`/`music`'s
-  free-form `content` (photos, registry links, timeline chapters, RSVP custom
-  message, playlist URL) has no couple-facing editor yet (see "Where each section's
-  content comes from" above). This is the biggest open gap in the builder.
-- **Per-section color override UI** — the cascade and schema support it
-  (`website_sections.color_override`), but the builder only exposes the whole-site
-  theme editor today.
+- Per-section content editor and per-section color override UI: done — see the
+  "Couple portal: website builder" section above (`SectionContentDialog`,
+  `SectionColorPopover`). Both were the two items listed here as open gaps; neither
+  needed a new endpoint, since `PATCH /couple/api/website/sections/:sectionId`
+  already took an arbitrary body.
 - Payment gate on publish: still none. If publish should be gated on payment, that's
   new scope to size separately.
 - `usage_count` / template popularity reporting: not resolved, see

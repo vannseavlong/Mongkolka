@@ -22,12 +22,21 @@ export const CoupleWebsiteController = {
       res.status(400).json({ error: "template_id is required" });
       return;
     }
-    await CoupleWebsiteService.selectTemplate(req.coupleActorSheetId as string, templateId);
-    const settings = await CoupleWebsiteService.getSettings(
-      req.coupleId as string,
-      req.coupleActorSheetId as string,
-    );
-    res.json({ settings });
+    try {
+      await CoupleWebsiteService.selectTemplate(req.coupleActorSheetId as string, templateId);
+      const settings = await CoupleWebsiteService.getSettings(
+        req.coupleId as string,
+        req.coupleActorSheetId as string,
+      );
+      res.json({ settings });
+    } catch (err) {
+      // Bootstrapping a couple's first-ever template write hits the Sheets-backed
+      // store several times in one request (profile + section rows); surface a
+      // message the couple can act on instead of the generic global-handler one,
+      // while still logging the real cause for us.
+      console.error("selectTemplate failed", err);
+      res.status(500).json({ error: "Couldn't save your template selection — please try again." });
+    }
   },
 
   async updateTheme(req: CoupleRequest, res: Response) {

@@ -96,15 +96,23 @@ export const CoupleWebsiteService = {
     const existingKeys = new Set(existingSections.map((section) => section.section_key as string));
     const missingKeys = SECTION_KEYS.filter((sectionKey) => !existingKeys.has(sectionKey));
     if (missingKeys.length > 0) {
+      // One batched append instead of N sequential creates — each create() was
+      // its own round trip to the Sheets API, so a couple selecting a template
+      // for the first time was paying for up to SECTION_KEYS.length (9)
+      // sequential network calls in series before the request could respond,
+      // and any single one of those calls failing/timing out took the whole
+      // request down with it. createMany() still validates each row the same
+      // way create() does — it just appends them in one call.
       const nextOrderStart = existingSections.length;
-      for (const [offset, sectionKey] of missingKeys.entries()) {
-        await CoupleWebsiteModel.createSection(actorSheetId, {
+      await CoupleWebsiteModel.createSections(
+        actorSheetId,
+        missingKeys.map((sectionKey, offset) => ({
           section_id: randomUUID(),
           section_key: sectionKey,
           display_order: nextOrderStart + offset,
           enabled: true,
-        });
-      }
+        })),
+      );
     }
   },
 

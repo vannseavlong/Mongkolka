@@ -1,6 +1,7 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { Button } from "@mongkolka/ui/button";
@@ -10,8 +11,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { api, ApiError } from "@/lib/api";
 import type { Theme } from "../data/schema";
 
-export function ThemeEditor({ theme }: { theme: Theme }) {
+export function ThemeEditor({
+  theme,
+  onPreview,
+}: {
+  theme: Theme;
+  /** Fired on every field change, before Save — lets the caller reflect
+   * in-progress edits in the live preview instead of the couple having to
+   * save-and-wait to see a color take effect. */
+  onPreview?: (theme: Theme) => void;
+}) {
   const form = useForm<Theme>({ values: theme });
+  const watched = useWatch({ control: form.control });
+
+  useEffect(() => {
+    // form.getValues() (not the `theme` prop) so this only reacts to actual
+    // field edits (via `watched`) — depending on `theme` directly would rerun
+    // on every parent render, since index.tsx recreates that object each time.
+    onPreview?.(form.getValues());
+  }, [watched, form, onPreview]);
 
   async function onSubmit(values: Theme) {
     try {

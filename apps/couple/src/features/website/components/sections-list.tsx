@@ -34,30 +34,49 @@ export function SectionsList({
   profile: PreviewProfile;
 }) {
   const [editingSection, setEditingSection] = useState<WebsiteSection | null>(null);
+  // Guards the arrow buttons against a rapid double-click firing a second
+  // reorder before the first round trip (and its Sheets-backed writes)
+  // resolves — see move() below for why that's worth avoiding.
+  const [reordering, setReordering] = useState(false);
   const ordered = [...sections].sort((a, b) => a.display_order - b.display_order);
 
+  // Every toggle/select/reorder here used to wait a full round trip before
+  // updating anything on screen — against a Sheets-backed API that's exactly
+  // what read as "laggy". These now update the local SWR cache immediately
+  // (revalidate: false) and only re-sync with the server once the request
+  // settles, succeed or fail — a failure's re-sync is what rolls the
+  // optimistic guess back if the write didn't actually happen.
   async function patchSection(sectionId: string, data: Record<string, unknown>) {
+    const optimistic = ordered.map((s) => (s.section_id === sectionId ? { ...s, ...data } : s));
+    mutate(SECTIONS_KEY, { sections: optimistic }, { revalidate: false });
     try {
       await api.patch(`/couple/api/website/sections/${sectionId}`, data);
-      mutate(SECTIONS_KEY);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to update section");
+    } finally {
+      mutate(SECTIONS_KEY);
     }
   }
 
   async function move(index: number, direction: -1 | 1) {
+    if (reordering) return;
     const targetIndex = index + direction;
     if (targetIndex < 0 || targetIndex >= ordered.length) return;
     const reordered = [...ordered];
     const [moved] = reordered.splice(index, 1);
     reordered.splice(targetIndex, 0, moved);
+    const optimistic = reordered.map((s, i) => ({ ...s, display_order: i }));
+    mutate(SECTIONS_KEY, { sections: optimistic }, { revalidate: false });
+    setReordering(true);
     try {
       await api.post("/couple/api/website/sections/reorder", {
         section_ids: reordered.map((s) => s.section_id),
       });
-      mutate(SECTIONS_KEY);
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to reorder sections");
+    } finally {
+      mutate(SECTIONS_KEY);
+      setReordering(false);
     }
   }
 
@@ -77,7 +96,7 @@ export function SectionsList({
                 size="icon"
                 variant="ghost"
                 className="size-5"
-                disabled={index === 0}
+                disabled={index === 0 || reordering}
                 onClick={() => move(index, -1)}
               >
                 <ArrowUp className="size-3" />
@@ -86,7 +105,7 @@ export function SectionsList({
                 size="icon"
                 variant="ghost"
                 className="size-5"
-                disabled={index === ordered.length - 1}
+                disabled={index === ordered.length - 1 || reordering}
                 onClick={() => move(index, 1)}
               >
                 <ArrowDown className="size-3" />

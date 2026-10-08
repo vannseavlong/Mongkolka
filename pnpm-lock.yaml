@@ -97,8 +97,8 @@ importers:
         specifier: ^9.0.3
         version: 9.0.3
       longcelot-sheet-db:
-        specifier: ^0.1.47
-        version: 0.1.47(@types/node@20.19.43)
+        specifier: ^0.1.48
+        version: 0.1.48(@types/node@20.19.43)
     devDependencies:
       '@mongkolka/eslint-config':
         specifier: workspace:*
@@ -3450,8 +3450,8 @@ packages:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
 
-  longcelot-sheet-db@0.1.47:
-    resolution: {integrity: sha512-dbvNi0WLOom6WtgV3lKaJWAwAdBXUpP9tcmq1si1rH1F23YnSs/X86rfsDclAYV3zCIQ0fXqGARX1moJF5XTKA==}
+  longcelot-sheet-db@0.1.48:
+    resolution: {integrity: sha512-ruPJARHkySDY+4/fQy+9iLIl/WFXF1+RrFz9M7lwu1mrv0t+O8u5rH7N1fzgBepTIyTOJDatZCUTsf2+nf3vzQ==}
     engines: {node: '>=16.0.0'}
     hasBin: true
     peerDependencies:
@@ -7298,7 +7298,7 @@ snapshots:
       chalk: 4.1.2
       is-unicode-supported: 0.1.0
 
-  longcelot-sheet-db@0.1.47(@types/node@20.19.43):
+  longcelot-sheet-db@0.1.48(@types/node@20.19.43):
     dependencies:
       bcryptjs: 3.0.3
       chalk: 4.1.2

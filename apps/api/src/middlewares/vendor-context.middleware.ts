@@ -20,13 +20,17 @@ export async function requireActiveVendor(req: VendorRequest, res: Response, nex
     return;
   }
 
-  const user = await adminContext().table("users").findOne({ where: { user_id: userId } });
+  // One batchGet for both admin tables instead of two sequential values.get calls.
+  const admin = adminContext();
+  await admin.prefetch(["users", "vendors"]);
+
+  const user = await admin.table("users").findOne({ where: { user_id: userId } });
   if (!user || user.role !== "vendor" || user.status !== "active" || !user.actor_sheet_id) {
     res.status(403).json({ error: "Vendor account is not active" });
     return;
   }
 
-  const vendor = await adminContext()
+  const vendor = await admin
     .table("vendors")
     .findOne({ where: { actor_sheet_id: user.actor_sheet_id } });
   if (!vendor) {

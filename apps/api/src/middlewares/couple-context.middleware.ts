@@ -21,13 +21,17 @@ export async function requireActiveCouple(req: CoupleRequest, res: Response, nex
     return;
   }
 
-  const user = await adminContext().table("users").findOne({ where: { user_id: userId } });
+  // One batchGet for all three admin tables instead of three sequential values.get calls.
+  const admin = adminContext();
+  await admin.prefetch(["users", "couple_members", "couples"]);
+
+  const user = await admin.table("users").findOne({ where: { user_id: userId } });
   if (!user || user.role !== "couple" || user.status !== "active" || !user.actor_sheet_id) {
     res.status(403).json({ error: "Couple account is not active" });
     return;
   }
 
-  const member = await adminContext()
+  const member = await admin
     .table("couple_members")
     .findOne({ where: { user_id: userId } });
   if (!member) {
@@ -35,7 +39,7 @@ export async function requireActiveCouple(req: CoupleRequest, res: Response, nex
     return;
   }
 
-  const couple = await adminContext()
+  const couple = await admin
     .table("couples")
     .findOne({ where: { couple_id: member.couple_id as string } });
   if (!couple) {

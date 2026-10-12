@@ -194,3 +194,44 @@ Flag before starting any of these — none are designed in
       on demand or run a periodic aggregation job; not resolved in the schema doc.
 - [ ] More component variants per section beyond `opening`'s four and the one
       default elsewhere — add as product demand shows up.
+
+## Phase 8 — public-site scale + guest photo uploads — planned, not started
+
+Design + rationale: [docs/tasks/guest-photos.md](docs/tasks/guest-photos.md). Context: expect
+~100–200 concurrent visitors per couple site, and guests uploading photos to it.
+All reads/writes share one admin Google OAuth grant (~60 req/min/user), so the
+public path must not hit Sheets per visitor.
+
+Done already: `longcelot-sheet-db` bumped to 0.1.48; `ctx.prefetch()` added to
+`requireActiveCouple` / `requireActiveVendor`.
+
+- [ ] 8.1 Public-site shell cache — in-memory `Map<slug, response>` around
+      `PublicSiteService.getSite`, ~5 min TTL, deleted on couple profile/sections
+      save and on publish/unpublish. Separately cache `site_templates` /
+      `section_components` / `themes` (few-minute TTL). Single API instance
+      assumed; Redis if scaling out.
+- [ ] 8.2 Photo settings, configurable by the couple in the portal — new
+      `couple_profile` columns: `photo_uploads` (`off`|`auto`|`pending`),
+      `photo_max_per_guest`, `photo_max_size_mb`, per-IP upload rate. Platform-wide
+      ceilings the couple cannot exceed.
+- [ ] 8.3 `guest_photos` couple-sheet table (`photo_id`, `url`/storage key,
+      `uploader_name`, `status` pending|approved|hidden, `uploaded_at`), presigned
+      upload endpoint, and a batched metadata writer (queue flushed every 2–5s via
+      `createMany`, retry/backoff on 429, flush on shutdown) so write quota stays
+      roughly constant however many guests upload at once.
+- [ ] 8.4 Couple-portal moderation UI (approve/hide/delete) + public gallery
+      endpoint (`approved` only, 15–30s TTL, stale-while-revalidate). Uploads must
+      NOT invalidate the shell cache. Couple can delete any guest photo (single and
+      bulk): removes the `guest_photos` row AND the stored file (storage adapter
+      delete; `adapter.deleteFile()` if on Drive), and drops it from the cached
+      gallery so it disappears before the TTL. Deleting a still-queued (unflushed)
+      photo must cancel the queued write and delete the file.
+- [ ] 8.5 Abuse limits — per-slug+IP in-memory rate limit, size cap, image MIME
+      allowlist, per-guest count (cookie/name, since venue Wi-Fi shares an IP).
+- [ ] 8.6 RSVP hardening — rate-limit `submitRsvp`; consider append-only
+      `rsvp_submissions` instead of find-by-name on the whole `guests` tab.
+
+Open decisions: file storage (Drive via `adapter.upload()` vs R2/S3 via a custom
+`StorageAdapter` — recommended R2/S3, Drive thumbnails likely throttle at gallery
+scale, untested); whether to later move hot tables (photo metadata, RSVPs) to SQL;
+whether to test `actorClientForCrud` for per-couple quota (untested upstream).

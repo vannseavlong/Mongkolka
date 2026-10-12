@@ -277,3 +277,50 @@ of language. The admin/couple/vendor portals don't use this — not needed there
   `sectionRegistry` for the authoritative list of `component_id`s. Whether any
   section gets a *fourth* variant remains a product call to make per-section as
   demand shows up.
+
+## "Ink & Gold" pack (`ink_and_gold`)
+
+An editorial printed-invitation design: one component per section under
+`packages/templates/src/sections/ink/` — `opening_seal`, `hero_folio`,
+`story_manuscript`, `gallery_plates`, `details_programme`, `rsvp_reply`,
+`registry_ledger`, `timeline_chapters`, `music_vinyl`. Seeded in
+`apps/api/seeds/site-templates.ts` / `section-components.ts` (`lsdb seed … --upsert`).
+
+- **Colors**: driven only by the four `Theme` colors (paper = `bg_color`, ink =
+  `text_color`, foil = `accent_color`); sections alternate paper/inverted-ink via
+  `InkSection` in `ink/shared.tsx`, so couples can still recolor it.
+- **Fonts**: `apps/web` loads Cormorant Garamond / Jost / Noto Serif Khmer through
+  `next/font` and exposes `--font-display`, `--font-label`, `--font-khmer`; the pack falls
+  back to Georgia/Arial where those variables aren't set (the couple-portal preview
+  doesn't load them yet).
+- **Khmer**: tracking and uppercase break Khmer glyph clusters, so `InkSection` and `Seal`
+  set `data-ink-lang` and inject a small reset under `kh`. Any new ink component that
+  uses `tracking-*`/`uppercase` must render inside `InkSection` (or set the attribute).
+- **Stacking gotcha**: positioned elements (a `relative` photo with `clipPath`) paint over
+  unpositioned siblings later in the DOM — text meant to overlap needs `relative z-10`.
+
+### Tailwind must scan `packages/templates`
+
+`apps/web` and `apps/couple` both need
+`@source "../../../../packages/templates/src/**/*.{ts,tsx}";` in `globals.css`. Without
+it every utility class used inside the shared package silently doesn't generate (the
+site renders as unstyled text). Add the same line to any new app that renders
+`SiteRenderer`.
+
+### Mock couple for e2e
+
+`apps/api/scripts/seed-mock-couple.ts` (re-runnable; `--clean` removes the rows, not the
+Drive spreadsheet) creates a published couple — slug `mock-demo`, login
+`mock.couple@example.test` / `MockCouple#2026` — with a full story, gallery, registry,
+timeline and playlist. It writes real rows to the admin sheet and a real spreadsheet in
+the connected Drive. Verified in a browser: the public site, RSVP submit, the portal
+login, the builder's template picker (Ink & Gold + the new `Folio Arch` option), a
+component swap, and a section enable/disable reflected on the public site.
+
+### Known gaps
+
+- The builder shows the site URL as `mock-demo.localhost:3000`, but sites are served
+  path-based (`/mock-demo`) — subdomain/custom-domain routing isn't built (Phase 6).
+- The opening gate's preview box in the builder is short, so the seal's caption sits at
+  the very bottom edge.
+- RSVP saves take 5–8s (Sheets schema checks + quota); see Phase 8.

@@ -219,19 +219,19 @@ Done already: `longcelot-sheet-db` bumped to 0.1.48; `ctx.prefetch()` added to
       mismatch log lines 102 → 6, Sheets quota errors 8 → 0.
       Still open: a cold first view costs ~6.5s (multiple tabs + first schema checks);
       could be pre-warmed on boot or on publish.
-- [~] 8.2 Photo settings (couple-configurable) — built: `couple_profile` columns
+- [x] 8.2 Photo settings (couple-configurable) — built: `couple_profile` columns
       `photo_uploads` off|auto|pending, `photo_max_per_guest`, `photo_max_size_mb`,
       `photo_rate_per_ip_per_hour`; API clamps to platform ceilings
       (`guest-photos.limits.ts`: 50 / 15 MB / 200 per hour); portal settings card at
-      `/photos`. **Blocked on `lsdb sync` of the new columns to live sheets** (see below).
-- [~] 8.3 `guest_photos` table + upload + batched writer — built: schema,
+      `/photos`. Verified live.
+- [x] 8.3 `guest_photos` table + upload + batched writer — built: schema,
       `POST /public/api/site/:slug/photos` (raw image body, magic-byte check, per-IP and
       per-guest caps), write-behind queue (`createMany` every 3s, backoff, flush on
       SIGTERM), storage drivers (`local` dev/pilot; `s3` for R2/S3 — **s3 untested, no
       credentials**). Decision: bytes go through the API rather than presigned URLs
       (simpler, one code path for both drivers; revisit if upload volume hurts the API).
-      Blocked on sheet sync for live verification.
-- [~] 8.4 Moderation + gallery — built: `GET /public/api/site/:slug/photos` (approved
+      Verified live (curl, single instance, local driver).
+- [x] 8.4 Moderation + gallery (API; public uploader UI pending) — built: `GET /public/api/site/:slug/photos` (approved
       only, 20s cache, evicted on moderation), couple `GET/PATCH/DELETE /couple/api/photos`
       + `bulk-delete`, portal page `/photos` (approve/hide/delete, multi-select). Delete
       removes the row (or cancels the queued write) then the stored file; uploads never
@@ -244,10 +244,13 @@ Done already: `longcelot-sheet-db` bumped to 0.1.48; `ctx.prefetch()` added to
       site cache. (Append-only `rsvp_submissions` not needed after the context-memo fix
       brought RSVP to ~1s.)
 
-**To unblock live verification** (needs the owner's go-ahead — it alters every registered
-user's real sheet): `cd apps/api && npx lsdb sync --all-users` (additive-only: adds the
-`guest_photos` tab and the four `couple_profile` columns). Then verify end to end:
-upload → couple list → approve → public gallery → delete.
+**Verified live** after `lsdb sync --all-users` (curl against the mock couple): upload →
+queued row visible to the couple instantly → written to the sheet within ~3s → approve →
+public gallery; file served with immutable cache + nosniff; HTML labelled `image/png`
+rejected (415); 3 MB over a 2 MB limit rejected (413); per-guest cap (429); auto mode
+shows publicly at once; off mode 403 (gallery still readable); delete removes row + file
+(404 afterwards); deleting a still-queued photo; bulk delete. Not yet exercised: the S3
+driver, the `/photos` portal page in a browser, and load from many simultaneous guests.
 
 Open decisions: file storage (Drive via `adapter.upload()` vs R2/S3 via a custom
 `StorageAdapter` — recommended R2/S3, Drive thumbnails likely throttle at gallery

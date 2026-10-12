@@ -31,3 +31,4 @@ next-env.d.ts
 # external reference clones (not part of the product)
 /Clone-UI/
 /Clone-Admin/
+uploads/

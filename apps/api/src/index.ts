@@ -16,11 +16,27 @@ import { coupleApiRouter } from "./routes/couple-api.routes.js";
 import { vendorApiRouter } from "./routes/vendor-api.routes.js";
 import { publicApiRouter } from "./routes/public-api.routes.js";
 import { env } from "./config/env.js";
+import { localUploadsRoot } from "./services/storage/local.driver.js";
+import { GuestPhotosQueue } from "./modules/guest-photos/guest-photos.queue.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+if (env.PHOTO_STORAGE === "local") {
+  // Keys are random UUIDs and never change, so cache aggressively; nosniff stops a
+  // mislabelled upload from being interpreted as HTML/script.
+  app.use(
+    "/uploads",
+    express.static(localUploadsRoot(env.PHOTO_LOCAL_DIR), {
+      maxAge: "365d",
+      immutable: true,
+      index: false,
+      setHeaders: (res) => res.set("X-Content-Type-Options", "nosniff"),
+    }),
+  );
+}
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
@@ -42,10 +58,26 @@ app.use("/public/api", publicApiRouter);
 // Express identifies error-handling middleware by arity; `next` must stay unused.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // body-parser errors (payload too large, malformed JSON) carry their own 4xx status.
+  const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode;
+  if (typeof status === "number" && status >= 400 && status < 500) {
+    res.status(status).json({ error: status === 413 ? "too_large" : "bad_request" });
+    return;
+  }
   console.error(err);
   res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(env.PORT, () => {
+const server = app.listen(env.PORT, () => {
   console.log(`api listening on port ${env.PORT}`);
 });
+
+// Un-flushed guest photo metadata lives in memory; write it out before exiting.
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => {
+    server.close();
+    GuestPhotosQueue.flushAll()
+      .catch((err) => console.error("[guest-photos] flush on shutdown failed", err))
+      .finally(() => process.exit(0));
+  });
+}

@@ -219,26 +219,35 @@ Done already: `longcelot-sheet-db` bumped to 0.1.48; `ctx.prefetch()` added to
       mismatch log lines 102 → 6, Sheets quota errors 8 → 0.
       Still open: a cold first view costs ~6.5s (multiple tabs + first schema checks);
       could be pre-warmed on boot or on publish.
-- [ ] 8.2 Photo settings, configurable by the couple in the portal — new
-      `couple_profile` columns: `photo_uploads` (`off`|`auto`|`pending`),
-      `photo_max_per_guest`, `photo_max_size_mb`, per-IP upload rate. Platform-wide
-      ceilings the couple cannot exceed.
-- [ ] 8.3 `guest_photos` couple-sheet table (`photo_id`, `url`/storage key,
-      `uploader_name`, `status` pending|approved|hidden, `uploaded_at`), presigned
-      upload endpoint, and a batched metadata writer (queue flushed every 2–5s via
-      `createMany`, retry/backoff on 429, flush on shutdown) so write quota stays
-      roughly constant however many guests upload at once.
-- [ ] 8.4 Couple-portal moderation UI (approve/hide/delete) + public gallery
-      endpoint (`approved` only, 15–30s TTL, stale-while-revalidate). Uploads must
-      NOT invalidate the shell cache. Couple can delete any guest photo (single and
-      bulk): removes the `guest_photos` row AND the stored file (storage adapter
-      delete; `adapter.deleteFile()` if on Drive), and drops it from the cached
-      gallery so it disappears before the TTL. Deleting a still-queued (unflushed)
-      photo must cancel the queued write and delete the file.
-- [ ] 8.5 Abuse limits — per-slug+IP in-memory rate limit, size cap, image MIME
-      allowlist, per-guest count (cookie/name, since venue Wi-Fi shares an IP).
-- [ ] 8.6 RSVP hardening — rate-limit `submitRsvp`; consider append-only
-      `rsvp_submissions` instead of find-by-name on the whole `guests` tab.
+- [~] 8.2 Photo settings (couple-configurable) — built: `couple_profile` columns
+      `photo_uploads` off|auto|pending, `photo_max_per_guest`, `photo_max_size_mb`,
+      `photo_rate_per_ip_per_hour`; API clamps to platform ceilings
+      (`guest-photos.limits.ts`: 50 / 15 MB / 200 per hour); portal settings card at
+      `/photos`. **Blocked on `lsdb sync` of the new columns to live sheets** (see below).
+- [~] 8.3 `guest_photos` table + upload + batched writer — built: schema,
+      `POST /public/api/site/:slug/photos` (raw image body, magic-byte check, per-IP and
+      per-guest caps), write-behind queue (`createMany` every 3s, backoff, flush on
+      SIGTERM), storage drivers (`local` dev/pilot; `s3` for R2/S3 — **s3 untested, no
+      credentials**). Decision: bytes go through the API rather than presigned URLs
+      (simpler, one code path for both drivers; revisit if upload volume hurts the API).
+      Blocked on sheet sync for live verification.
+- [~] 8.4 Moderation + gallery — built: `GET /public/api/site/:slug/photos` (approved
+      only, 20s cache, evicted on moderation), couple `GET/PATCH/DELETE /couple/api/photos`
+      + `bulk-delete`, portal page `/photos` (approve/hide/delete, multi-select). Delete
+      removes the row (or cancels the queued write) then the stored file; uploads never
+      touch the shell cache. **Not built: the public-site uploader/gallery UI** — waiting
+      on the website design brief.
+- [x] 8.5 Abuse limits — per slug+IP hourly limiter, size cap, MIME allowlist + magic
+      bytes, per-guest cap (client token, IP fallback), parser-level 15 MB ceiling.
+      In-memory, single instance.
+- [x] 8.6 RSVP hardening — 20/hour per slug+IP limiter; RSVP resolves the couple via the
+      site cache. (Append-only `rsvp_submissions` not needed after the context-memo fix
+      brought RSVP to ~1s.)
+
+**To unblock live verification** (needs the owner's go-ahead — it alters every registered
+user's real sheet): `cd apps/api && npx lsdb sync --all-users` (additive-only: adds the
+`guest_photos` tab and the four `couple_profile` columns). Then verify end to end:
+upload → couple list → approve → public gallery → delete.
 
 Open decisions: file storage (Drive via `adapter.upload()` vs R2/S3 via a custom
 `StorageAdapter` — recommended R2/S3, Drive thumbnails likely throttle at gallery

@@ -19,6 +19,10 @@ export const coupleProfileSchema = z.object({
   reception_venue: z.string().nullable(),
   reception_address: z.string().nullable(),
   dress_code: z.string().nullable(),
+  photo_uploads: z.enum(["off", "auto", "pending"]).nullable().optional(),
+  photo_max_per_guest: z.number().nullable().optional(),
+  photo_max_size_mb: z.number().nullable().optional(),
+  photo_rate_per_ip_per_hour: z.number().nullable().optional(),
 });
 
 export type CoupleProfile = z.infer<typeof coupleProfileSchema>;

@@ -54,6 +54,11 @@ export const PublicSiteService = {
    * anything guest-submitted, so RSVPs don't need to invalidate it; every
    * couple/admin write that changes it does (see the invalidate* call sites).
    */
+  /** The cached entry (site body + couple/sheet ids) — shared with other public modules. */
+  resolve(slug: string) {
+    return PublicSiteCache.getOrLoad(slug, () => loadSite(slug));
+  },
+
   async getSite(slug: string) {
     const entry = await PublicSiteCache.getOrLoad(slug, () => loadSite(slug));
     return entry.site;

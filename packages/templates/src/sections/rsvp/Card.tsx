@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import type { RsvpContent, Theme } from "../../types";
 import type { RsvpSubmission } from "./Classic";
 import { useLanguage } from "../../i18n";
+import { useGuest } from "../../guest-context";
 
 export interface RsvpCardProps {
   theme: Theme;
@@ -16,6 +17,7 @@ export interface RsvpCardProps {
 /** An elevated card with an accent-colored header band and pill-style attendance toggle. */
 export function RsvpCard({ theme, content, onSubmit }: RsvpCardProps) {
   const { t } = useLanguage();
+  const { name: guestName } = useGuest();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [attending, setAttending] = useState(true);
@@ -70,7 +72,7 @@ export function RsvpCard({ theme, content, onSubmit }: RsvpCardProps) {
               <input
                 name="name"
                 required
-                placeholder={t("section.rsvp.namePlaceholder")}
+                defaultValue={guestName ?? ""} placeholder={t("section.rsvp.namePlaceholder")}
                 className="rounded-xl px-4 py-3 shadow-sm outline-none"
                 style={{ backgroundColor: theme.bg_color, border: `1px solid ${theme.accent_color}` }}
               />

@@ -8,6 +8,16 @@ function header(req: Request, name: string): string | undefined {
   return typeof v === "string" ? v : undefined;
 }
 
+/** Header values are latin1-only, so clients URL-encode names (Khmer, accents). */
+function decodeHeader(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export const PublicGuestPhotosController = {
   async upload(req: Request, res: Response) {
     if (!Buffer.isBuffer(req.body)) {
@@ -18,7 +28,7 @@ export const PublicGuestPhotosController = {
       body: req.body,
       mimeType: (header(req, "content-type") ?? "").split(";")[0]!.trim().toLowerCase(),
       ip: req.ip ?? "unknown",
-      uploaderName: header(req, "x-uploader-name"),
+      uploaderName: decodeHeader(header(req, "x-uploader-name")),
       uploaderToken: header(req, "x-uploader-token")?.slice(0, 64),
     });
     if (!result.ok) {

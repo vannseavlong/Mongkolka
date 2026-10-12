@@ -15,7 +15,9 @@ export default async function Page({
   const query = await searchParams;
   // `name` may hold more than one guest (a plus-one) as a comma-separated
   // list, e.g. "?name=Guest+1,Chea" — joined into one greeting string here.
-  const rawName = typeof query.name === "string" ? query.name : undefined;
+  // `to` is accepted as an alias — it's what the docs and shared links used first.
+  const rawName =
+    typeof query.name === "string" ? query.name : typeof query.to === "string" ? query.to : undefined;
   const guestGreeting = rawName
     ? rawName
         .split(",")

@@ -1,6 +1,15 @@
 "use client";
 
-import { LanguageProvider, LanguageToggle, SiteRenderer, type CoupleInfo, type SectionKey } from "@mongkolka/templates";
+import { useEffect, useState } from "react";
+import {
+  LanguageProvider,
+  LanguageToggle,
+  SiteRenderer,
+  type CoupleInfo,
+  type GuestbookData,
+  type SectionKey,
+} from "@mongkolka/templates";
+import { buildActions, fetchGuestbook, submitGuestbook } from "./guestbook";
 import type { PublicSiteResponse } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -35,6 +44,20 @@ export function SiteView({
   guestGreeting?: string;
   initialLanguage: "en" | "kh";
 }) {
+  const [guestbook, setGuestbook] = useState<GuestbookData | undefined>();
+  const slug = site.couple.slug;
+  const hasGuestbook = site.sections.some((s) => s.section_key === "guestbook" && s.enabled);
+  useEffect(() => {
+    if (!hasGuestbook) return;
+    let cancelled = false;
+    fetchGuestbook(slug)
+      .then((data) => !cancelled && setGuestbook(data))
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, hasGuestbook]);
+
   if (!site.template) {
     return (
       <main className="flex min-h-screen items-center justify-center text-center text-muted-foreground">
@@ -75,7 +98,22 @@ export function SiteView({
         couple={couple}
         buildContent={(sectionKey) => buildContent(sectionKey, site.profile)}
         guestGreeting={guestGreeting}
-        extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: submitRsvp } : {})}
+        extraProps={(sectionKey) => {
+          if (sectionKey === "rsvp") return { onSubmit: submitRsvp };
+          if (sectionKey === "guestbook") {
+            return {
+              guestbook,
+              actions: buildActions(site, [couple.partner1Name, couple.partner2Name].filter(Boolean).join(" & ")),
+              onSubmit: async (input: Parameters<typeof submitGuestbook>[1]) => {
+                const result = await submitGuestbook(slug, input);
+                // re-read so an auto-approved wish shows up without a reload
+                fetchGuestbook(slug).then(setGuestbook).catch(() => undefined);
+                return result;
+              },
+            };
+          }
+          return {};
+        }}
       />
     </LanguageProvider>
   );

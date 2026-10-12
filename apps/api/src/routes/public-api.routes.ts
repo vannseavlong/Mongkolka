@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { publicSiteRouter } from "../modules/public-site/public-site.routes.js";
 import { publicGuestPhotosRouter } from "../modules/guest-photos/guest-photos.routes.js";
+import { publicGuestWishesRouter } from "../modules/guest-wishes/guest-wishes.routes.js";
 import { publicMarketplaceRouter } from "../modules/public-marketplace/public-marketplace.routes.js";
 import { publicThemeRouter } from "../modules/public-theme/public-theme.routes.js";
 import { publicStatsRouter } from "../modules/public-stats/public-stats.routes.js";
@@ -10,6 +11,7 @@ export const publicApiRouter = Router();
 
 publicApiRouter.use(publicSiteRouter);
 publicApiRouter.use(publicGuestPhotosRouter);
+publicApiRouter.use(publicGuestWishesRouter);
 publicApiRouter.use(publicMarketplaceRouter);
 publicApiRouter.use(publicThemeRouter);
 publicApiRouter.use(publicStatsRouter);

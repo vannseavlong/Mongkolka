@@ -319,8 +319,27 @@ component swap, and a section enable/disable reflected on the public site.
 
 ### Known gaps
 
-- The builder shows the site URL as `mock-demo.localhost:3000`, but sites are served
-  path-based (`/mock-demo`) — subdomain/custom-domain routing isn't built (Phase 6).
+- The builder shows the site URL as `{slug}.localhost:3000`; `apps/web/src/proxy.ts`
+  rewrites that host to `/{slug}`, and the plain `/{slug}` path also works. (Custom
+  domains — `couples.custom_domain` — are still not resolved.)
 - The opening gate's preview box in the builder is short, so the seal's caption sits at
   the very bottom edge.
 - RSVP saves take 5–8s (Sheets schema checks + quota); see Phase 8.
+
+## Guestbook section (`guestbook_wall`)
+
+New section key `guestbook`: a form (name prefilled from the invited guest, wish, optional
+photo, optional self-reported gift), a wall of approved wishes/photos, and "meaningful
+action" buttons (directions via the ceremony address, add-to-calendar `.ics`, share).
+Wiring: `packages/templates/src/sections/ink/Guestbook.tsx`; the web app supplies data and
+handlers through `extraProps` (`apps/web/src/app/[slug]/guestbook.ts` — client-side photo
+resize, per-browser guest token, upload then wish). API: `guest-photos` + `guest-wishes`
+modules. Existing couples get a *disabled* `guestbook` row the next time the builder lists
+their sections, so a published site doesn't change under them.
+
+### Invited guest (`?name=` / `?to=`)
+
+`SiteRenderer` provides the name through `GuestProvider`/`useGuest()` (`guest-context.tsx`):
+the opening gate greets them, the ink hero shows "A special invitation for …", and every
+RSVP component plus the guestbook prefill the name. Comma-separated names are joined with
+"&" server-side in `page.tsx`.

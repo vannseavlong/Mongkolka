@@ -8,6 +8,7 @@ import { coupleBudgetRouter } from "../modules/couple-budget/couple-budget.route
 import { coupleChecklistRouter } from "../modules/couple-checklist/couple-checklist.routes.js";
 import { coupleMilestonesRouter } from "../modules/couple-milestones/couple-milestones.routes.js";
 import { coupleGuestPhotosRouter } from "../modules/guest-photos/guest-photos.routes.js";
+import { coupleGuestWishesRouter } from "../modules/guest-wishes/guest-wishes.routes.js";
 import { coupleWebsiteRouter } from "../modules/couple-website/couple-website.routes.js";
 
 export const coupleApiRouter = Router();
@@ -22,3 +23,4 @@ coupleApiRouter.use(coupleChecklistRouter);
 coupleApiRouter.use(coupleMilestonesRouter);
 coupleApiRouter.use(coupleWebsiteRouter);
 coupleApiRouter.use(coupleGuestPhotosRouter);
+coupleApiRouter.use(coupleGuestWishesRouter);

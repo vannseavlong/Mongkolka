@@ -17,7 +17,7 @@ export const sidebarData: SidebarNavData = {
       title: "Website",
       items: [
         { title: "Builder", href: "/website", icon: Globe },
-        { title: "Guest photos", href: "/photos", icon: Images },
+        { title: "Guestbook", href: "/photos", icon: Images },
         { title: "Profile", href: "/profile", icon: Heart },
       ],
     },

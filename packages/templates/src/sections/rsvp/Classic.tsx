@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { RsvpContent, Theme } from "../../types";
+import { useGuest } from "../../guest-context";
 
 export interface RsvpSubmission {
   name: string;
@@ -18,6 +19,7 @@ export interface RsvpClassicProps {
 }
 
 export function RsvpClassic({ theme, content, onSubmit }: RsvpClassicProps) {
+  const { name: guestName } = useGuest();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [attending, setAttending] = useState(true);
@@ -64,7 +66,7 @@ export function RsvpClassic({ theme, content, onSubmit }: RsvpClassicProps) {
           <input
             name="name"
             required
-            placeholder="Your name"
+            defaultValue={guestName ?? ""} placeholder="Your name"
             className="rounded-md border px-3 py-2"
             style={{ borderColor: theme.accent_color }}
           />

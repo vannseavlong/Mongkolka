@@ -38,6 +38,7 @@ import { RsvpReply } from "./sections/ink/Reply";
 import { RegistryLedger } from "./sections/ink/Ledger";
 import { TimelineChapters } from "./sections/ink/Chapters";
 import { MusicVinyl } from "./sections/ink/Vinyl";
+import { GuestbookWall } from "./sections/ink/Guestbook";
 
 // Each section's components take a different, section-specific props shape (see
 // sections/*/*.tsx), so this lookup map is necessarily `ComponentType<any>` at the
@@ -101,6 +102,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     music_playerbar: MusicPlayerbar,
     music_minimal: MusicMinimal,
     music_vinyl: MusicVinyl,
+  },
+  guestbook: {
+    guestbook_wall: GuestbookWall,
   },
 };
 

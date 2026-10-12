@@ -18,6 +18,7 @@ import { publicApiRouter } from "./routes/public-api.routes.js";
 import { env } from "./config/env.js";
 import { localUploadsRoot } from "./services/storage/local.driver.js";
 import { GuestPhotosQueue } from "./modules/guest-photos/guest-photos.queue.js";
+import { GuestWishesQueue } from "./modules/guest-wishes/guest-wishes.queue.js";
 
 const app = express();
 
@@ -76,7 +77,7 @@ const server = app.listen(env.PORT, () => {
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, () => {
     server.close();
-    GuestPhotosQueue.flushAll()
+    Promise.all([GuestPhotosQueue.flushAll(), GuestWishesQueue.flushAll()])
       .catch((err) => console.error("[guest-photos] flush on shutdown failed", err))
       .finally(() => process.exit(0));
   });

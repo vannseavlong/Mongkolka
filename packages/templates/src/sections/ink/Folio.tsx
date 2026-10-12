@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
+import { useGuest } from "../../guest-context";
 import { DISPLAY_FONT, Eyebrow, InkSection, LABEL_FONT, mix, splitDate } from "./shared";
 
 export interface HeroFolioProps {
@@ -17,6 +18,7 @@ export interface HeroFolioProps {
  */
 export function HeroFolio({ couple, theme, content }: HeroFolioProps) {
   const { t } = useLanguage();
+  const { name: guestName } = useGuest();
   const date = splitDate(couple.weddingDate);
   const foil = theme.accent_color;
   const ring = `${t("ink.saveTheDate")} • ${date ? `${date.day} ${date.monthShort} ${date.year}` : ""} • `.toUpperCase();
@@ -44,6 +46,17 @@ export function HeroFolio({ couple, theme, content }: HeroFolioProps) {
         </motion.div>
 
         <div className="relative flex flex-col items-center">
+          {guestName && (
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="mb-8 text-center"
+            >
+              <Eyebrow color={foil}>{t("ink.invitedGuest")}</Eyebrow>
+              <p className="mt-2 text-2xl italic sm:text-3xl">{guestName}</p>
+            </motion.div>
+          )}
           <motion.div
             initial={{ clipPath: "inset(100% 0 0 0)" }}
             animate={{ clipPath: "inset(0% 0 0 0)" }}

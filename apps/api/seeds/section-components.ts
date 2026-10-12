@@ -342,6 +342,15 @@ const components = [
     preview_accent_color: "#b8893b",
     font_style: "serif",
   },
+  {
+    component_id: "guestbook_wall",
+    section: "guestbook",
+    name: "Wishes & Memories",
+    preview_bg_color: "#f3ead8",
+    preview_text_color: "#17142a",
+    preview_accent_color: "#b8893b",
+    font_style: "serif",
+  },
 ];
 
 export default {

@@ -17,6 +17,7 @@ const SECTION_KEYS = [
   "registry",
   "timeline",
   "music",
+  "guestbook",
 ] as const;
 
 function toComparableTime(value: unknown): number {
@@ -159,7 +160,30 @@ export const CoupleWebsiteService = {
    * still gets a clean, deduped list either way.
    */
   async listSections(actorSheetId: string) {
-    const sections = await CoupleWebsiteModel.findSections(actorSheetId);
+    let sections = await CoupleWebsiteModel.findSections(actorSheetId);
+
+    // A section type added after a couple first picked a template (e.g. `guestbook`)
+    // has no row for them yet — create it, disabled, so it shows up in the builder
+    // for them to opt in to instead of changing a site that's already published.
+    // Only once the couple has any sections at all (before that, selectTemplate
+    // bootstraps the whole set).
+    if (sections.length > 0) {
+      const have = new Set(sections.map((s) => s.section_key as string));
+      const missing = SECTION_KEYS.filter((key) => !have.has(key));
+      if (missing.length > 0) {
+        await CoupleWebsiteModel.createSections(
+          actorSheetId,
+          missing.map((sectionKey, offset) => ({
+            section_id: randomUUID(),
+            section_key: sectionKey,
+            display_order: sections.length + offset,
+            enabled: false,
+          })),
+        );
+        PublicSiteCache.invalidateActorSheet(actorSheetId);
+        sections = await CoupleWebsiteModel.findSections(actorSheetId);
+      }
+    }
 
     const bySectionKey = new Map<string, Record<string, unknown>[]>();
     for (const section of sections) {

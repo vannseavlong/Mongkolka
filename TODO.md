@@ -256,3 +256,28 @@ Open decisions: file storage (Drive via `adapter.upload()` vs R2/S3 via a custom
 `StorageAdapter` — recommended R2/S3, Drive thumbnails likely throttle at gallery
 scale, untested); whether to later move hot tables (photo metadata, RSVPs) to SQL;
 whether to test `actorClientForCrud` for per-couple quota (untested upstream).
+
+## Phase 9 — couple dashboard, gift tracking, guestbook (from the 2026-10 brief)
+
+- [x] Dashboard: countdown hero, KPI tiles (expected headcount, gifts per currency,
+      budget %, checklist), RSVP breakdown bar, "needs your attention", next milestones.
+- [x] Gift tracking on guests: `gift_status` none|reported|received, type, amount,
+      currency (USD/KHR, never summed together), received date, note; list column,
+      dialog fields, summary strip, dashboard totals.
+- [x] Guest self-reported gifts (from the site's guestbook form) land as *reported*;
+      the couple confirms with "Confirm & record" (matches the guest by name or creates
+      one). Auto-tracking real payments (KHQR/ABA) is **not** built — needs a payment
+      integration.
+- [x] Budget / checklist / milestones unchanged.
+- [x] Guestbook management page (`/photos`, sidebar "Guestbook"): redesigned settings
+      (radio cards + limits), photos and wishes tabs with approve/hide/delete.
+- [x] Profile page redesigned (sectioned cards, cover preview, sticky save bar).
+- [x] Wedding site: invited name (`?name=` or `?to=`) shown in the opening, ink hero, and
+      prefilled in RSVP + guestbook.
+- [x] New `guestbook` section (ink `guestbook_wall`): wish + optional photo + optional
+      gift report, wall, and actions (directions, add to calendar, share).
+- [ ] **Needs `lsdb sync --all-users` + `lsdb seed … --upsert`** (new `guests` gift
+      columns, `guest_wishes` tab, `guestbook` section enum, catalog rows) before live
+      verification. Typecheck-only until then.
+- [ ] Verify live: guestbook submit (photo+wish+gift) → couple review → confirm gift →
+      dashboard totals; invited-name flow; portal pages in a browser.

@@ -17,6 +17,7 @@ export const SECTION_KEYS = [
   "registry",
   "timeline",
   "music",
+  "guestbook",
 ] as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -71,4 +72,43 @@ export interface OpeningProps {
   theme: Theme;
   guestGreeting?: string;
   onOpen: () => void;
+}
+
+export interface GuestbookPhoto {
+  photo_id: string;
+  url: string;
+  uploader_name: string | null;
+}
+
+export interface GuestbookWish {
+  wish_id: string;
+  name: string;
+  message: string | null;
+  photo_id: string | null;
+}
+
+export interface GuestbookData {
+  photos: GuestbookPhoto[];
+  wishes: GuestbookWish[];
+}
+
+export interface GuestbookSubmission {
+  name: string;
+  message?: string;
+  /** The picked image; the consuming app resizes/uploads it (packages/templates never calls fetch). */
+  photo?: File;
+  /** Guest-reported gift — never authoritative, the couple confirms it. */
+  gift?: { amount: number; currency: "USD" | "KHR" };
+}
+
+export interface GuestbookResult {
+  /** `pending` = the couple reviews it first; `approved` = it's on the wall already. */
+  status: "pending" | "approved";
+}
+
+/** Facts the guestbook's "meaningful actions" (directions, calendar, share) are built from. */
+export interface GuestbookActions {
+  mapsUrl?: string;
+  calendar?: { title: string; start: string; location?: string; description?: string };
+  shareUrl?: string;
 }

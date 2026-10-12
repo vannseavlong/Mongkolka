@@ -158,7 +158,7 @@ export const GuestPhotosService = {
 
   async setStatus(actorSheetId: string, photoId: string, status: PhotoStatus): Promise<boolean> {
     try {
-      if (GuestPhotosQueue.updateStatus(actorSheetId, photoId, status)) return true;
+      if (GuestPhotosQueue.patch(actorSheetId, photoId, { status })) return true;
       const row = await GuestPhotosModel.findById(actorSheetId, photoId);
       if (!row) return false;
       await GuestPhotosModel.update(actorSheetId, photoId, { status });

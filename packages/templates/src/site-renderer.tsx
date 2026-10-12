@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { resolveComponent } from "./registry";
+import { GuestProvider } from "./guest-context";
 import { resolveTheme } from "./theme";
 import type { CoupleInfo, PartialTheme, SectionKey, Theme } from "./types";
 
@@ -80,7 +81,7 @@ export function SiteRenderer({
   }
 
   return (
-    <>
+    <GuestProvider name={guestGreeting}>
       {rest.map((section) => {
         const theme = resolveTheme(template.default_theme, themeOverride, section.color_override);
         const Component = resolveComponent(
@@ -99,6 +100,6 @@ export function SiteRenderer({
           />
         );
       })}
-    </>
+    </GuestProvider>
   );
 }

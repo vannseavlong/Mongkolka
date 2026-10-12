@@ -7,6 +7,7 @@ const defaultComponents = {
   registry: "registry_classic",
   timeline: "timeline_classic",
   music: "music_classic",
+  guestbook: "guestbook_wall",
 };
 
 export default {
@@ -30,6 +31,7 @@ export default {
         registry: "registry_ledger",
         timeline: "timeline_chapters",
         music: "music_vinyl",
+        guestbook: "guestbook_wall",
       },
       status: "active",
     },

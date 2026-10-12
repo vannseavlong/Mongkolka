@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import type { RsvpContent, Theme } from "../../types";
 import type { RsvpSubmission } from "../rsvp/Classic";
 import { useLanguage } from "../../i18n";
+import { useGuest } from "../../guest-context";
 import { DISPLAY_FONT, Eyebrow, InkSection, LABEL_FONT, mix } from "./shared";
 
 export interface RsvpReplyProps {
@@ -16,6 +17,7 @@ export interface RsvpReplyProps {
 /** A reply card with a perforated header, postage-stamp mark and underlined fields. */
 export function RsvpReply({ theme, content, onSubmit }: RsvpReplyProps) {
   const { t } = useLanguage();
+  const { name: guestName } = useGuest();
   const [attending, setAttending] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -98,6 +100,7 @@ export function RsvpReply({ theme, content, onSubmit }: RsvpReplyProps) {
             <input
               name="name"
               required
+              defaultValue={guestName ?? ""}
               placeholder={t("section.rsvp.namePlaceholder")}
               className="bg-transparent pb-2 text-2xl italic outline-none placeholder:opacity-40"
               style={field}

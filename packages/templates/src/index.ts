@@ -4,3 +4,4 @@ export * from "./format";
 export * from "./registry";
 export * from "./i18n";
 export * from "./site-renderer";
+export * from "./guest-context";

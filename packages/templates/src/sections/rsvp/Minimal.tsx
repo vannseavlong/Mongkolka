@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import type { RsvpContent, Theme } from "../../types";
 import type { RsvpSubmission } from "./Classic";
 import { useLanguage } from "../../i18n";
+import { useGuest } from "../../guest-context";
 
 export interface RsvpMinimalProps {
   theme: Theme;
@@ -16,6 +17,7 @@ export interface RsvpMinimalProps {
 /** An understated, borderless form with underline inputs instead of Classic's boxed fields. */
 export function RsvpMinimal({ theme, content, onSubmit }: RsvpMinimalProps) {
   const { t } = useLanguage();
+  const { name: guestName } = useGuest();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [attending, setAttending] = useState(true);
@@ -73,7 +75,7 @@ export function RsvpMinimal({ theme, content, onSubmit }: RsvpMinimalProps) {
           <input
             name="name"
             required
-            placeholder={t("section.rsvp.namePlaceholder")}
+            defaultValue={guestName ?? ""} placeholder={t("section.rsvp.namePlaceholder")}
             className="bg-transparent py-2 text-sm outline-none"
             style={fieldStyle}
           />

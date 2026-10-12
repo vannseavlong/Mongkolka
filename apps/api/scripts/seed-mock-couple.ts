@@ -14,6 +14,8 @@ import { CouplesService } from "../src/modules/couples/couples.service.js";
 import { UsersService } from "../src/modules/users/users.service.js";
 import { UsersModel } from "../src/modules/users/users.model.js";
 import { CoupleProfileService } from "../src/modules/couple-profile/couple-profile.service.js";
+import { CoupleGuestsService } from "../src/modules/couple-guests/couple-guests.service.js";
+import { GuestWishesQueue } from "../src/modules/guest-wishes/guest-wishes.queue.js";
 import { CoupleWebsiteService } from "../src/modules/couple-website/couple-website.service.js";
 
 const EMAIL = "mock.couple@example.test";
@@ -108,6 +110,30 @@ async function seed() {
   for (const [key, data] of Object.entries(content)) {
     const section = byKey.get(key);
     if (section) await CoupleWebsiteService.updateSection(actorSheetId, section.section_id as string, { content: data });
+  }
+
+  // Enable the guestbook section (existing couples get it disabled) and put it before RSVP.
+  const guestbook = byKey.get("guestbook");
+  if (guestbook) {
+    await CoupleWebsiteService.updateSection(actorSheetId, guestbook.section_id as string, { enabled: true });
+    const order = (await CoupleWebsiteService.listSections(actorSheetId)).map((x) => x.section_id as string);
+    const without = order.filter((id) => id !== guestbook.section_id);
+    const rsvpIdx = without.indexOf(byKey.get("rsvp")?.section_id as string);
+    without.splice(rsvpIdx < 0 ? without.length : rsvpIdx, 0, guestbook.section_id as string);
+    await CoupleWebsiteService.reorderSections(actorSheetId, without);
+  }
+
+  // Guests with a mix of gift states, so the portal's gift tracking has something to show.
+  const guests = await CoupleGuestsService.list(actorSheetId);
+  const have = new Set(guests.map((g) => g.name as string));
+  const sample = [
+    { name: "Chea Sophea", status: "confirmed", group: "family", gift_status: "received", gift_type: "cash", gift_amount: 100, gift_currency: "USD" },
+    { name: "Lim Vannak", status: "confirmed", group: "friends", plus_one: true, gift_status: "received", gift_type: "cash", gift_amount: 400000, gift_currency: "KHR" },
+    { name: "Srey Neang", status: "maybe", group: "colleagues", gift_status: "reported", gift_type: "cash", gift_amount: 50, gift_currency: "USD" },
+    { name: "Pov Rith", status: "declined", group: "neighbors" },
+  ];
+  for (const g of sample) {
+    if (!have.has(g.name)) await CoupleGuestsService.create(actorSheetId, g);
   }
 
   await CoupleWebsiteService.publish(coupleId, actorSheetId);

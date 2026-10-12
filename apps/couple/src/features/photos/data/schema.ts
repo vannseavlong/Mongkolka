@@ -27,3 +27,17 @@ export interface PhotoSettings {
 
 // Mirrors PHOTO_CEILINGS in apps/api (guest-photos.limits.ts); the API enforces them.
 export const PHOTO_CEILINGS = { maxPerGuest: 50, maxSizeMb: 15, ratePerIpPerHour: 200 } as const;
+
+export const wishSchema = z.object({
+  wish_id: z.string(),
+  name: z.string(),
+  message: z.string().nullable(),
+  photo_id: z.string().nullable(),
+  status: z.enum(PHOTO_STATUSES),
+  gift_amount: z.number(),
+  gift_currency: z.string().nullable(),
+  created_at: z.string().nullable(),
+  queued: z.boolean(),
+});
+
+export type Wish = z.infer<typeof wishSchema>;

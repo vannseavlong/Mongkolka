@@ -1,4 +1,5 @@
 import { SiteTemplatesModel } from "./site-templates.model.js";
+import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
 export interface Theme {
   bg_color?: string;
@@ -32,10 +33,13 @@ export const SiteTemplatesService = {
 
   async update(templateId: string, input: UpdateSiteTemplateInput) {
     await SiteTemplatesModel.update(templateId, { ...input });
+    PublicSiteCache.invalidateAll();
     return SiteTemplatesModel.findById(templateId);
   },
 
-  delete(templateId: string) {
-    return SiteTemplatesModel.delete(templateId);
+  async delete(templateId: string) {
+    const result = await SiteTemplatesModel.delete(templateId);
+    PublicSiteCache.invalidateAll();
+    return result;
   },
 };

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { CoupleProfileModel } from "./couple-profile.model.js";
+import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
 export interface CoupleProfileUpdateInput {
   partner1_name?: string;
@@ -64,6 +65,7 @@ export const CoupleProfileService = {
       }
     }
 
+    PublicSiteCache.invalidateCouple(coupleId);
     return CoupleProfileService.get(coupleId, actorSheetId);
   },
 };

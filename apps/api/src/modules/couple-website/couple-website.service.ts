@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { ValidationError } from "longcelot-sheet-db";
 import { isValidCustomSlug } from "../../utils/slug.js";
 import { CoupleWebsiteModel } from "./couple-website.model.js";
+import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
 // Mirrors SECTION_KEYS in packages/templates/src/types.ts — kept as a plain
 // constant here since the API is framework-agnostic and shouldn't depend on the
@@ -80,6 +81,14 @@ export const CoupleWebsiteService = {
    * reads — that residual case is covered by the dedupe in listSections().
    */
   async selectTemplate(actorSheetId: string, templateId: string) {
+    try {
+      await CoupleWebsiteService.selectTemplateUncached(actorSheetId, templateId);
+    } finally {
+      PublicSiteCache.invalidateActorSheet(actorSheetId);
+    }
+  },
+
+  async selectTemplateUncached(actorSheetId: string, templateId: string) {
     const profile = await CoupleWebsiteModel.findProfile(actorSheetId);
     if (profile) {
       await CoupleWebsiteModel.updateProfile(actorSheetId, profile.profile_id as string, {
@@ -117,6 +126,14 @@ export const CoupleWebsiteService = {
   },
 
   async updateTheme(actorSheetId: string, themeOverride: Record<string, unknown>) {
+    try {
+      await CoupleWebsiteService.updateThemeUncached(actorSheetId, themeOverride);
+    } finally {
+      PublicSiteCache.invalidateActorSheet(actorSheetId);
+    }
+  },
+
+  async updateThemeUncached(actorSheetId: string, themeOverride: Record<string, unknown>) {
     const profile = await CoupleWebsiteModel.findProfile(actorSheetId);
     if (profile) {
       await CoupleWebsiteModel.updateProfile(actorSheetId, profile.profile_id as string, {
@@ -180,16 +197,24 @@ export const CoupleWebsiteService = {
   },
 
   async updateSection(actorSheetId: string, sectionId: string, input: Record<string, unknown>) {
-    await CoupleWebsiteModel.updateSection(actorSheetId, sectionId, input);
+    try {
+      await CoupleWebsiteModel.updateSection(actorSheetId, sectionId, input);
+    } finally {
+      PublicSiteCache.invalidateActorSheet(actorSheetId);
+    }
     return CoupleWebsiteModel.findSectionById(actorSheetId, sectionId);
   },
 
   async reorderSections(actorSheetId: string, sectionIds: string[]) {
-    await Promise.all(
-      sectionIds.map((sectionId, index) =>
-        CoupleWebsiteModel.updateSection(actorSheetId, sectionId, { display_order: index }),
-      ),
-    );
+    try {
+      await Promise.all(
+        sectionIds.map((sectionId, index) =>
+          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, { display_order: index }),
+        ),
+      );
+    } finally {
+      PublicSiteCache.invalidateActorSheet(actorSheetId);
+    }
     return CoupleWebsiteModel.findSections(actorSheetId);
   },
 
@@ -198,12 +223,20 @@ export const CoupleWebsiteService = {
     if (!profile?.site_template_id) {
       throw new Error("Choose a site template before publishing");
     }
-    await CoupleWebsiteModel.updateWebsiteStatus(coupleId, "published");
+    try {
+      await CoupleWebsiteModel.updateWebsiteStatus(coupleId, "published");
+    } finally {
+      PublicSiteCache.invalidateCouple(coupleId);
+    }
     return CoupleWebsiteModel.findCoupleById(coupleId);
   },
 
   async unpublish(coupleId: string) {
-    await CoupleWebsiteModel.updateWebsiteStatus(coupleId, "draft");
+    try {
+      await CoupleWebsiteModel.updateWebsiteStatus(coupleId, "draft");
+    } finally {
+      PublicSiteCache.invalidateCouple(coupleId);
+    }
     return CoupleWebsiteModel.findCoupleById(coupleId);
   },
 
@@ -223,6 +256,10 @@ export const CoupleWebsiteService = {
     }
     try {
       await CoupleWebsiteModel.updateSlug(coupleId, slug);
+      // Old slug's entry is found by couple id; the new slug has no entry yet, but a
+      // cached "not found" for it (from a guest probing the link) must go too.
+      PublicSiteCache.invalidateCouple(coupleId);
+      PublicSiteCache.invalidateSlug(slug);
     } catch (err) {
       if (err instanceof ValidationError) {
         throw new Error("That link is already taken — try another");

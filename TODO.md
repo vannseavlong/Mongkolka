@@ -205,11 +205,20 @@ public path must not hit Sheets per visitor.
 Done already: `longcelot-sheet-db` bumped to 0.1.48; `ctx.prefetch()` added to
 `requireActiveCouple` / `requireActiveVendor`.
 
-- [ ] 8.1 Public-site shell cache — in-memory `Map<slug, response>` around
-      `PublicSiteService.getSite`, ~5 min TTL, deleted on couple profile/sections
-      save and on publish/unpublish. Separately cache `site_templates` /
-      `section_components` / `themes` (few-minute TTL). Single API instance
-      assumed; Redis if scaling out.
+- [x] 8.1 Public-site shell cache — `modules/public-site/public-site.cache.ts` (+
+      `utils/ttl-cache.ts`, with in-flight de-dupe and a generation guard so an
+      invalidation can't be undone by a load already in flight). 5 min TTL for sites, 20s
+      for unknown/unpublished slugs. Invalidated explicitly from couple-website
+      (template/theme/section/reorder/publish/unpublish/slug), couple-profile update,
+      couples suspend/reactivate, and site-template update/delete. RSVP resolves the
+      couple through the same cache. Measured (single instance, mock couple): warm page
+      ~1ms vs ~6.5s cold; edits visible on the next request.
+      **Also fixed the bigger cost**: `config/database.ts` built a new `withContext()` per
+      model call and each one fires a schema-version check (one read per registered
+      table) — contexts are now memoized per sheet. RSVP went ~8–21s → ~1s, schema
+      mismatch log lines 102 → 6, Sheets quota errors 8 → 0.
+      Still open: a cold first view costs ~6.5s (multiple tabs + first schema checks);
+      could be pre-warmed on boot or on publish.
 - [ ] 8.2 Photo settings, configurable by the couple in the portal — new
       `couple_profile` columns: `photo_uploads` (`off`|`auto`|`pending`),
       `photo_max_per_guest`, `photo_max_size_mb`, per-IP upload rate. Platform-wide

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PublicSiteModel } from "./public-site.model.js";
+import { PublicSiteCache, type CachedSite } from "./public-site.cache.js";
 
 export interface RsvpSubmissionInput {
   name: string;
@@ -16,22 +17,24 @@ async function findPublishedCoupleBySlug(slug: string) {
   return couple;
 }
 
-export const PublicSiteService = {
-  async getSite(slug: string) {
-    const couple = await findPublishedCoupleBySlug(slug);
-    if (!couple) return null;
+async function loadSite(slug: string): Promise<CachedSite> {
+  const couple = await findPublishedCoupleBySlug(slug);
+  if (!couple) return { site: null, coupleId: null, actorSheetId: null };
 
-    const actorSheetId = couple.actor_sheet_id as string;
-    const [profile, sections] = await Promise.all([
-      PublicSiteModel.findProfile(actorSheetId),
-      PublicSiteModel.findSections(actorSheetId),
-    ]);
+  const actorSheetId = couple.actor_sheet_id as string;
+  const [profile, sections] = await Promise.all([
+    PublicSiteModel.findProfile(actorSheetId),
+    PublicSiteModel.findSections(actorSheetId),
+  ]);
 
-    const template = profile?.site_template_id
-      ? await PublicSiteModel.findTemplateById(profile.site_template_id as string)
-      : null;
+  const template = profile?.site_template_id
+    ? await PublicSiteModel.findTemplateById(profile.site_template_id as string)
+    : null;
 
-    return {
+  return {
+    coupleId: couple.couple_id as string,
+    actorSheetId,
+    site: {
       couple: {
         partner1_name: couple.partner1_name ?? null,
         partner2_name: couple.partner2_name ?? null,
@@ -41,15 +44,29 @@ export const PublicSiteService = {
       profile: profile ?? null,
       template: template ?? null,
       sections: sections.filter((s) => s.enabled),
-    };
+    },
+  };
+}
+
+export const PublicSiteService = {
+  /**
+   * Cached per slug (see public-site.cache.ts). The cached body never contains
+   * anything guest-submitted, so RSVPs don't need to invalidate it; every
+   * couple/admin write that changes it does (see the invalidate* call sites).
+   */
+  async getSite(slug: string) {
+    const entry = await PublicSiteCache.getOrLoad(slug, () => loadSite(slug));
+    return entry.site;
   },
 
   /** Returns `false` if the site isn't published (caller should 404), `true` on success. */
   async submitRsvp(slug: string, input: RsvpSubmissionInput) {
-    const couple = await findPublishedCoupleBySlug(slug);
-    if (!couple) return false;
+    // Resolve the couple through the same cache the page uses, so a burst of RSVPs
+    // doesn't re-read couples/profile/sections once per guest.
+    const entry = await PublicSiteCache.getOrLoad(slug, () => loadSite(slug));
+    if (!entry.site || !entry.actorSheetId) return false;
 
-    const actorSheetId = couple.actor_sheet_id as string;
+    const actorSheetId = entry.actorSheetId;
     const status = input.attending ? "confirmed" : "declined";
     const data = {
       status,

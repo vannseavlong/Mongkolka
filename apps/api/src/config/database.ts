@@ -78,26 +78,33 @@ adapter.registerSchemas([
   servicesSchema,
 ]);
 
+// withContext() starts an async schema-version check (one `schema_versions` read per
+// registered table) every time it's called. Models call these helpers once per query,
+// so building a fresh context each time multiplied Sheets reads by ~6 and blew through
+// the per-minute quota on a single page view. Contexts here are immutable (fixed
+// userId/actor/sheet), so one instance per sheet is safe to share across requests.
+type Ctx = ReturnType<typeof adapter.withContext>;
+const MAX_CACHED_CONTEXTS = 500;
+const contexts = new Map<string, Ctx>();
+
+function memoContext(actor: "admin" | "couple" | "vendor", actorSheetId: string): Ctx {
+  const key = `${actor}:${actorSheetId}`;
+  const hit = contexts.get(key);
+  if (hit) return hit;
+  if (contexts.size >= MAX_CACHED_CONTEXTS) contexts.clear();
+  const ctx = adapter.withContext({ userId: "system", actor, actorSheetId });
+  contexts.set(key, ctx);
+  return ctx;
+}
+
 export function adminContext() {
-  return adapter.withContext({
-    userId: "system",
-    actor: "admin",
-    actorSheetId: env.ADMIN_SHEET_ID,
-  });
+  return memoContext("admin", env.ADMIN_SHEET_ID);
 }
 
 export function coupleContext(actorSheetId: string) {
-  return adapter.withContext({
-    userId: "system",
-    actor: "couple",
-    actorSheetId,
-  });
+  return memoContext("couple", actorSheetId);
 }
 
 export function vendorContext(actorSheetId: string) {
-  return adapter.withContext({
-    userId: "system",
-    actor: "vendor",
-    actorSheetId,
-  });
+  return memoContext("vendor", actorSheetId);
 }

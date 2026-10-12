@@ -4,6 +4,7 @@ import { generatePlaceholderSlug } from "../../utils/slug.js";
 import { UsersModel } from "../users/users.model.js";
 import { CredentialsModel } from "../auth/credentials.model.js";
 import { CouplesModel } from "./couples.model.js";
+import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
 export interface RegisterCoupleInput {
   email: string;
@@ -97,11 +98,13 @@ export const CouplesService = {
 
   async suspend(coupleId: string) {
     await CouplesModel.updateStatus(coupleId, "suspended");
+    PublicSiteCache.invalidateCouple(coupleId);
     return CouplesModel.findById(coupleId);
   },
 
   async reactivate(coupleId: string) {
     await CouplesModel.updateStatus(coupleId, "active");
+    PublicSiteCache.invalidateCouple(coupleId);
     return CouplesModel.findById(coupleId);
   },
 };

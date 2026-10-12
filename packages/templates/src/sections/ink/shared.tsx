@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import type { Theme } from "../../types";
+import { useLanguage } from "../../i18n";
 
 /*
  * Shared building blocks for the "Ink & Gold" printed-invitation pack. The pack is
@@ -11,7 +12,7 @@ import type { Theme } from "../../types";
  */
 
 export const DISPLAY_FONT =
-  'var(--font-display), "Cormorant Garamond", "Noto Serif Khmer", "Playfair Display", Georgia, serif';
+  'var(--font-display), "Cormorant Garamond", var(--font-khmer), "Noto Serif Khmer", "Playfair Display", Georgia, serif';
 export const LABEL_FONT = 'var(--font-label), "Helvetica Neue", Arial, "Noto Sans Khmer", sans-serif';
 
 const GRAIN =
@@ -32,6 +33,18 @@ export function Grain({ opacity = 0.09 }: { opacity?: number }) {
   );
 }
 
+/**
+ * Khmer is a script with stacked/combining glyph clusters — tracking and
+ * uppercase (the Latin "printer's mark" voice used across this pack) pull the
+ * clusters apart and break shaping, so both are neutralised under `kh`.
+ */
+export const KH_RESET_CSS =
+  '[data-ink-lang="kh"], [data-ink-lang="kh"] * { letter-spacing: normal !important; text-transform: none !important; }';
+
+export function KhResetStyle() {
+  return <style>{KH_RESET_CSS}</style>;
+}
+
 /** A section shell: paper (default) or inverted ink, with grain and a gold hairline. */
 export function InkSection({
   theme,
@@ -48,9 +61,11 @@ export function InkSection({
   style?: CSSProperties;
   id?: string;
 }) {
+  const { language } = useLanguage();
   return (
     <section
       id={id}
+      data-ink-lang={language}
       className={`relative isolate overflow-hidden ${className}`}
       style={{
         backgroundColor: inverted ? theme.text_color : theme.bg_color,
@@ -59,6 +74,7 @@ export function InkSection({
         ...style,
       }}
     >
+      {language === "kh" && <KhResetStyle />}
       <Grain opacity={inverted ? 0.16 : 0.09} />
       <div
         aria-hidden

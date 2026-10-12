@@ -5,14 +5,14 @@ import { motion } from "motion/react";
 import type { OpeningProps } from "../../types";
 import { formatWeddingDate } from "../../format";
 import { useLanguage } from "../../i18n";
-import { DISPLAY_FONT, Eyebrow, Grain, LABEL_FONT, Ornament, mix } from "./shared";
+import { DISPLAY_FONT, Eyebrow, Grain, KhResetStyle, LABEL_FONT, Ornament, mix } from "./shared";
 
 /**
  * A wax-seal gate: the invitation is sealed shut; breaking the seal splits it in
  * two, the frame lines draw out, and the whole cover lifts away like a page.
  */
 export function Seal({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [breaking, setBreaking] = useState(false);
   const [lifted, setLifted] = useState(false);
   const date = formatWeddingDate(couple.weddingDate);
@@ -32,6 +32,7 @@ export function Seal({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
 
   return (
     <motion.div
+      data-ink-lang={language}
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden px-6"
       style={{ backgroundColor: theme.text_color, color: paper, fontFamily: DISPLAY_FONT }}
       animate={{ y: lifted ? "-100%" : 0 }}
@@ -40,6 +41,7 @@ export function Seal({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
         if (lifted) onOpen();
       }}
     >
+      {language === "kh" && <KhResetStyle />}
       <Grain opacity={0.18} />
 
       {/* double hairline frame that draws itself in */}

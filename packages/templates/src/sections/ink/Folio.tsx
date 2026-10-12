@@ -71,7 +71,7 @@ export function HeroFolio({ couple, theme, content }: HeroFolioProps) {
 
           {/* names overlap the arch */}
           <h1
-            className="pointer-events-none -mt-[14%] text-center text-[clamp(3.25rem,13vw,9rem)] font-light leading-[0.86] tracking-tight"
+            className="pointer-events-none relative z-10 -mt-[14%] text-center text-[clamp(3.25rem,13vw,9rem)] font-light leading-[0.86] tracking-tight"
             style={{
               fontFamily: DISPLAY_FONT,
               color: theme.text_color,
@@ -97,7 +97,7 @@ export function HeroFolio({ couple, theme, content }: HeroFolioProps) {
           <motion.svg
             aria-hidden
             viewBox="0 0 120 120"
-            className="absolute -right-2 top-4 size-24 sm:-right-10 sm:size-32"
+            className="absolute -top-10 right-0 size-24 sm:-right-10 sm:top-4 sm:size-32"
             animate={{ rotate: 360 }}
             transition={{ duration: 28, ease: "linear", repeat: Infinity }}
           >

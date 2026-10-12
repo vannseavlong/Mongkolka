@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "@mongkolka/ui/theme.css";
 @source "../../../../packages/ui/src/components/**/*.{ts,tsx}";
+@source "../../../../packages/templates/src/**/*.{ts,tsx}";
 
 /*
  * Theme-aware gradient text utility for the marketing site. Generalizes the

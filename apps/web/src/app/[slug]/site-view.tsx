@@ -55,11 +55,14 @@ export function SiteView({
     plusOne: boolean;
     message?: string;
   }) {
-    await fetch(`${API_URL}/public/api/site/${site.couple.slug}/rsvp`, {
+    const res = await fetch(`${API_URL}/public/api/site/${site.couple.slug}/rsvp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(submission),
     });
+    // fetch() only rejects on network errors — without this a 4xx/5xx would still
+    // show the guest the "thank you" state even though nothing was saved.
+    if (!res.ok) throw new Error(`RSVP failed (${res.status})`);
   }
 
   return (

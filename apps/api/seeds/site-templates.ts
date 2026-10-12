@@ -12,6 +12,28 @@ const defaultComponents = {
 export default {
   site_templates: [
     {
+      template_id: "ink_and_gold",
+      name: "Ink & Gold",
+      default_theme: {
+        bg_color: "#f3ead8",
+        text_color: "#17142a",
+        accent_color: "#b8893b",
+        font_style: "serif",
+      },
+      default_components: {
+        opening: "opening_seal",
+        hero: "hero_folio",
+        story: "story_manuscript",
+        gallery: "gallery_plates",
+        details: "details_programme",
+        rsvp: "rsvp_reply",
+        registry: "registry_ledger",
+        timeline: "timeline_chapters",
+        music: "music_vinyl",
+      },
+      status: "active",
+    },
+    {
       template_id: "botanical_romance",
       name: "Botanical Romance",
       default_theme: {

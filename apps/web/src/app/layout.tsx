@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
+import { Cormorant_Garamond, Noto_Serif_Khmer, Jost } from "next/font/google";
 import "./globals.css";
 import { fetchJson } from "@/lib/api";
+
+// Display/label fonts for the "Ink & Gold" template pack (packages/templates/src/
+// sections/ink/shared.tsx reads these CSS variables, falling back to Georgia/Arial).
+const display = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap",
+});
+const khmer = Noto_Serif_Khmer({ subsets: ["khmer"], variable: "--font-khmer", display: "swap" });
+const label = Jost({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-label", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Mongkolka",
@@ -69,7 +82,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body className={`${display.variable} ${khmer.variable} ${label.variable}`}>
         {themeStyle && <style>{themeStyle}</style>}
         {children}
       </body>

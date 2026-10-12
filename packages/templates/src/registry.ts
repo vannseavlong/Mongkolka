@@ -29,6 +29,15 @@ import { TimelineHorizontal } from "./sections/timeline/Horizontal";
 import { MusicClassic } from "./sections/music/Classic";
 import { MusicPlayerbar } from "./sections/music/Playerbar";
 import { MusicMinimal } from "./sections/music/Minimal";
+import { Seal } from "./sections/ink/Seal";
+import { HeroFolio } from "./sections/ink/Folio";
+import { StoryManuscript } from "./sections/ink/Manuscript";
+import { GalleryPlates } from "./sections/ink/Plates";
+import { DetailsProgramme } from "./sections/ink/Programme";
+import { RsvpReply } from "./sections/ink/Reply";
+import { RegistryLedger } from "./sections/ink/Ledger";
+import { TimelineChapters } from "./sections/ink/Chapters";
+import { MusicVinyl } from "./sections/ink/Vinyl";
 
 // Each section's components take a different, section-specific props shape (see
 // sections/*/*.tsx), so this lookup map is necessarily `ComponentType<any>` at the
@@ -43,46 +52,55 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     opening_door: Door,
     opening_book: Book,
     opening_envelope: Envelope,
+    opening_seal: Seal,
   },
   hero: {
     hero_classic: HeroClassic,
     hero_polaroid: HeroPolaroid,
     hero_fullbleed: HeroFullbleed,
+    hero_folio: HeroFolio,
   },
   story: {
     story_classic: StoryClassic,
     story_letter: StoryLetter,
     story_split: StorySplit,
+    story_manuscript: StoryManuscript,
   },
   gallery: {
     gallery_grid: GalleryGrid,
     gallery_masonry: GalleryMasonry,
     gallery_carousel: GalleryCarousel,
+    gallery_plates: GalleryPlates,
   },
   details: {
     details_classic: DetailsClassic,
     details_split: DetailsSplit,
     details_cards: DetailsCards,
+    details_programme: DetailsProgramme,
   },
   rsvp: {
     rsvp_classic: RsvpClassic,
     rsvp_card: RsvpCard,
     rsvp_minimal: RsvpMinimal,
+    rsvp_reply: RsvpReply,
   },
   registry: {
     registry_classic: RegistryClassic,
     registry_cards: RegistryCards,
     registry_list: RegistryList,
+    registry_ledger: RegistryLedger,
   },
   timeline: {
     timeline_classic: TimelineClassic,
     timeline_vertical_line: TimelineVerticalLine,
     timeline_horizontal: TimelineHorizontal,
+    timeline_chapters: TimelineChapters,
   },
   music: {
     music_classic: MusicClassic,
     music_playerbar: MusicPlayerbar,
     music_minimal: MusicMinimal,
+    music_vinyl: MusicVinyl,
   },
 };
 

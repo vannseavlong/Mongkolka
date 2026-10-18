@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      gitask-cli:
+        specifier: ^0.2.0
+        version: 0.2.0
     devDependencies:
       prettier:
         specifier: ^3.3.3
@@ -3096,6 +3100,11 @@ packages:
 
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
+
+  gitask-cli@0.2.0:
+    resolution: {integrity: sha512-p8PglKaeC2ZXbWI6aorNq6d7ep1cUJ0agVXRaoiZrfVYkOLX0Sd8NUY7tmw5hiyx+s6+xUARlWRlKSunVWfnbQ==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -7129,6 +7138,8 @@ snapshots:
   get-tsconfig@4.14.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
+
+  gitask-cli@0.2.0: {}
 
   glob-parent@5.1.2:
     dependencies:

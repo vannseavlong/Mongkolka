@@ -36,7 +36,7 @@ Make the couple portal and website builder work correctly and respond well on ph
 ## Gates
 - [x] G1 scope  - [x] G2 static  - [ ] G3 tests (none exist for couple)  - [x] G4 run it (partial, see above)
 - [x] G5 code review (fresh agent, no high/medium findings; lows fixed)  - [x] G6 security (auth redirect analysed: no unauthenticated content render, API guard untouched)  - [ ] G7 docs sync
-- [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
+- [ ] G8 PR message  - [x] G9 human review (user okayed 2026-10-26)  - [ ] G10 release plan  - [x] G11 changelog
 
 ## Public site perf (apps/web production build, measured on /mock-demo, warm)
 FCP 68ms, LCP 1.2s (animated title), CLS 0, no long tasks, ~200KB JS, 182KB fonts. Cold API response took 2.9s (see backlog API-public-site-prewarm). Not changed.

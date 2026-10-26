@@ -29,8 +29,8 @@ export function SlugEditor({ slug }: { slug: string | null }) {
 
   if (!editing) {
     return (
-      <div className="flex items-center gap-1">
-        <span className="text-sm text-muted-foreground">
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="truncate text-sm text-muted-foreground">
           {slug ? siteHost(slug) : "Choose your link"}
         </span>
         <Button
@@ -69,13 +69,13 @@ export function SlugEditor({ slug }: { slug: string | null }) {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <Input
         autoFocus
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="vutha-nita"
-        className="h-8 w-32"
+        className="h-8 w-32 max-w-full"
         disabled={saving}
       />
       <span className="text-sm text-muted-foreground">.{ROOT_DOMAIN}</span>

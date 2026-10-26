@@ -40,14 +40,14 @@ export function Photos() {
       )}
 
       <div className="mt-8">
-        <div role="tablist" className="mb-4 flex gap-1 border-b">
+        <div role="tablist" className="mb-4 flex gap-1 overflow-x-auto border-b">
           {tabs.map((t) => (
             <button
               key={t.id}
               role="tab"
               aria-selected={tab === t.id}
               onClick={() => setTab(t.id)}
-              className={`-mb-px flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition ${
+              className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition ${
                 tab === t.id
                   ? "border-primary text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"

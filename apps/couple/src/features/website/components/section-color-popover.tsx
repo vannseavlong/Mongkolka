@@ -84,7 +84,7 @@ export function SectionColorPopover({
           <Palette className="size-3" /> Custom colors
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-[min(20rem,calc(100vw-2rem))]">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(save)} className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">

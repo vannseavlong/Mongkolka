@@ -16,7 +16,7 @@ export function Milestones() {
   return (
     <MilestonesProvider>
       <Main>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Milestones</h1>
             <p className="text-muted-foreground">

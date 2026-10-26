@@ -24,9 +24,9 @@ export function PublishPanel({ settings }: { settings: WebsiteSettings }) {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-lg border p-4">
-      <div>
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isPublished ? "default" : "outline"} className="capitalize">
             {settings.website_status}
           </Badge>
@@ -38,7 +38,7 @@ export function PublishPanel({ settings }: { settings: WebsiteSettings }) {
           </p>
         )}
       </div>
-      <Button onClick={toggle} variant={isPublished ? "outline" : "default"}>
+      <Button onClick={toggle} variant={isPublished ? "outline" : "default"} className="w-full sm:w-auto">
         {isPublished ? "Unpublish" : "Publish site"}
       </Button>
     </div>

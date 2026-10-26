@@ -91,28 +91,30 @@ export function SectionsList({
         const effectiveTheme = resolveTheme(template.default_theme, themeOverride, null);
         return (
           <div key={section.section_id} className="flex flex-wrap items-center gap-3 rounded-lg border p-3">
-            <div className="flex flex-col">
+            <div className="flex flex-col max-sm:flex-row">
               <Button
                 size="icon"
                 variant="ghost"
-                className="size-5"
+                className="size-5 max-sm:size-9"
                 disabled={index === 0 || reordering}
                 onClick={() => move(index, -1)}
               >
                 <ArrowUp className="size-3" />
+                <span className="sr-only">Move up</span>
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                className="size-5"
+                className="size-5 max-sm:size-9"
                 disabled={index === ordered.length - 1 || reordering}
                 onClick={() => move(index, 1)}
               >
                 <ArrowDown className="size-3" />
+                <span className="sr-only">Move down</span>
               </Button>
             </div>
             <SectionPreview section={section} template={template} themeOverride={themeOverride} profile={profile} />
-            <span className="w-24 shrink-0 text-sm font-medium capitalize">{section.section_key}</span>
+            <span className="min-w-0 flex-1 text-sm font-medium capitalize sm:w-24 sm:flex-none sm:shrink-0">{section.section_key}</span>
             <Select
               value={section.component_id ?? TEMPLATE_DEFAULT}
               onValueChange={(value) =>
@@ -121,7 +123,7 @@ export function SectionsList({
                 })
               }
             >
-              <SelectTrigger size="sm" className="w-40">
+              <SelectTrigger size="sm" className="w-full sm:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -142,7 +144,7 @@ export function SectionsList({
             <Switch
               checked={section.enabled}
               onCheckedChange={(checked) => patchSection(section.section_id, { enabled: checked })}
-              className="ml-auto"
+              className="sm:ml-auto"
             />
           </div>
         );

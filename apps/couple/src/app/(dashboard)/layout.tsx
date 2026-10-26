@@ -17,8 +17,12 @@ function subscribeToToken(callback: () => void) {
   return () => window.removeEventListener("storage", callback);
 }
 
+// `undefined` (not `null`) on the server and during hydration: "not read yet"
+// must stay distinguishable from "read it, nobody is signed in", otherwise the
+// redirect effect below fires on every hard load/refresh and bounces the
+// couple to the dashboard instead of the page they were on.
 function getServerToken() {
-  return null;
+  return undefined;
 }
 
 interface SessionInfo {
@@ -39,8 +43,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // of decoding the token (mirrors requireActiveCouple's own "don't trust
   // the JWT" reasoning on the server side).
   const { data, loading, error } = useApiQuery<SessionInfo>(token ? "/couple/api/session" : null);
+  const hydrated = token !== undefined;
 
   useEffect(() => {
+    if (!hydrated) return;
     if (!token) {
       router.replace("/");
       return;
@@ -50,7 +56,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       clearToken();
       router.replace("/");
     }
-  }, [token, error, router]);
+  }, [hydrated, token, error, router]);
 
   function signOut() {
     clearToken();

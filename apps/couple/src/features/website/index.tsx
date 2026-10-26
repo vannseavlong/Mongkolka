@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@mongkolka/ui/card";
 import { Main } from "@mongkolka/ui/layout/main";
+import { cn } from "@mongkolka/ui/utils";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { CoupleProfile } from "@/features/profile/data/schema";
 import { PublishPanel } from "./components/publish-panel";
@@ -43,6 +44,11 @@ export function Website() {
     setDraftTheme(null);
   }
 
+  // Below lg the editor and the preview stack into one column, which buries the
+  // preview under every card; this toggle shows one at a time there. At lg and
+  // up both panes are always visible side by side, so it has no effect.
+  const [mobilePane, setMobilePane] = useState<"edit" | "preview">("edit");
+
   return (
     <Main>
       <div className="flex flex-col gap-6">
@@ -50,8 +56,26 @@ export function Website() {
 
         {settings && <PublishPanel settings={settings} />}
 
+        <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 lg:hidden" role="tablist">
+          {(["edit", "preview"] as const).map((pane) => (
+            <button
+              key={pane}
+              type="button"
+              role="tab"
+              aria-selected={mobilePane === pane}
+              onClick={() => setMobilePane(pane)}
+              className={cn(
+                "h-9 rounded-md text-sm font-medium capitalize transition-colors",
+                mobilePane === pane ? "bg-background shadow-sm" : "text-muted-foreground",
+              )}
+            >
+              {pane}
+            </button>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="flex flex-col gap-6">
+          <div className={cn("flex min-w-0 flex-col gap-6", mobilePane === "preview" && "max-lg:hidden")}>
             <Card>
               <CardHeader>
                 <CardTitle>Template</CardTitle>
@@ -98,7 +122,7 @@ export function Website() {
             )}
           </div>
 
-          <div className="lg:sticky lg:top-20 lg:self-start">
+          <div className={cn("min-w-0 lg:sticky lg:top-20 lg:self-start", mobilePane === "edit" && "max-lg:hidden")}>
             {profileData && (
               <WebsitePreview
                 template={selectedTemplate}

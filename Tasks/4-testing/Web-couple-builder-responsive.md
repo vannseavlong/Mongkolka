@@ -17,6 +17,9 @@ Make the couple portal and website builder work correctly and respond well on ph
 - Fix: hard load/refresh of any dashboard route redirected to `/dashboard` (token read was `null` during hydration). Layout now waits until the token is read.
 - Builder: Edit/Preview toggle below `lg`; publish bar and slug editor wrap on phones; larger reorder arrow targets; full-width section select; colour popover capped to viewport; preview height responsive.
 
+- Review follow-ups: toggle is a labelled `aria-pressed` group, preview uses `dvh`, layout only signs out on 401 (other failures show a retry screen).
+- Builder: "View site" and "Copy link" when published, publish button disabled while the request runs.
+
 ## Verified (run in browser, mock couple `mock.couple@example.test`, phone width via 390px iframe)
 - No horizontal overflow on guests, budget, checklist, milestones, website, photos, profile (390px) and dashboard.
 - Deep link `/website` now stays on `/website`; Edit/Preview toggle works; section rows render.
@@ -32,5 +35,8 @@ Make the couple portal and website builder work correctly and respond well on ph
 
 ## Gates
 - [x] G1 scope  - [x] G2 static  - [ ] G3 tests (none exist for couple)  - [x] G4 run it (partial, see above)
-- [ ] G5 code review (needs a fresh agent)  - [ ] G6 security  - [ ] G7 docs sync
+- [x] G5 code review (fresh agent, no high/medium findings; lows fixed)  - [x] G6 security (auth redirect analysed: no unauthenticated content render, API guard untouched)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
+
+## Public site perf (apps/web production build, measured on /mock-demo, warm)
+FCP 68ms, LCP 1.2s (animated title), CLS 0, no long tasks, ~200KB JS, 182KB fonts. Cold API response took 2.9s (see backlog API-public-site-prewarm). Not changed.

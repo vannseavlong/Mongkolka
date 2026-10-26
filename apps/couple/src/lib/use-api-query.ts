@@ -12,6 +12,9 @@ export function useApiQuery<T>(path: string | null) {
     data: data ?? null,
     loading: isLoading,
     error: error ? (error instanceof ApiError ? error.message : "Something went wrong") : null,
+    // HTTP status of the failure (null for a network error or no error), so callers
+    // can tell "token rejected" (401) from a transient failure.
+    errorStatus: error instanceof ApiError ? error.status : null,
     refetch: () => mutate(),
   };
 }

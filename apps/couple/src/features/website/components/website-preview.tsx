@@ -32,7 +32,7 @@ export function WebsitePreview({
   return (
     <LanguageProvider>
       <div
-        className="relative h-[70vh] min-h-96 overflow-hidden lg:h-160 rounded-lg border"
+        className="relative h-[70dvh] min-h-96 overflow-hidden lg:h-160 rounded-lg border"
         style={{ transform: "translateZ(0)" }}
       >
         <div className="h-full overflow-y-auto">

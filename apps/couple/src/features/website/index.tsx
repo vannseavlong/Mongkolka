@@ -56,13 +56,12 @@ export function Website() {
 
         {settings && <PublishPanel settings={settings} />}
 
-        <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 lg:hidden" role="tablist">
+        <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 lg:hidden" role="group" aria-label="Builder view">
           {(["edit", "preview"] as const).map((pane) => (
             <button
               key={pane}
               type="button"
-              role="tab"
-              aria-selected={mobilePane === pane}
+              aria-pressed={mobilePane === pane}
               onClick={() => setMobilePane(pane)}
               className={cn(
                 "h-9 rounded-md text-sm font-medium capitalize transition-colors",

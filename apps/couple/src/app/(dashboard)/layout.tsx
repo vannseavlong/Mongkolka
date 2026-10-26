@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // the token until the next sign-in. So this asks the backend fresh instead
   // of decoding the token (mirrors requireActiveCouple's own "don't trust
   // the JWT" reasoning on the server side).
-  const { data, loading, error } = useApiQuery<SessionInfo>(token ? "/couple/api/session" : null);
+  const { data, loading, error, errorStatus, refetch } = useApiQuery<SessionInfo>(token ? "/couple/api/session" : null);
   const hydrated = token !== undefined;
 
   useEffect(() => {
@@ -51,19 +51,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.replace("/");
       return;
     }
-    if (error) {
+    if (error && errorStatus === 401) {
       // Invalid/expired token — bounce back to sign in instead of hanging.
+      // Any other failure (network blip, 5xx) keeps the session and offers a
+      // retry below instead of signing the couple out.
       clearToken();
       router.replace("/");
     }
-  }, [hydrated, token, error, router]);
+  }, [hydrated, token, error, errorStatus, router]);
 
   function signOut() {
     clearToken();
     router.replace("/");
   }
 
-  if (!token || loading || error) return null;
+  if (!token || loading) return null;
+
+  if (error) {
+    if (errorStatus === 401) return null;
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">Can&apos;t reach the server</h1>
+        <p className="text-muted-foreground max-w-sm text-sm">{error}</p>
+        <Button onClick={() => refetch()}>Try again</Button>
+      </main>
+    );
+  }
 
   const status = data?.status ?? "active";
 

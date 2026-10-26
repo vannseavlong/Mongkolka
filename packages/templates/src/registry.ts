@@ -39,6 +39,10 @@ import { RegistryLedger } from "./sections/ink/Ledger";
 import { TimelineChapters } from "./sections/ink/Chapters";
 import { MusicVinyl } from "./sections/ink/Vinyl";
 import { GuestbookWall } from "./sections/ink/Guestbook";
+import { KbachGate } from "./sections/kbach/Gate";
+import { HeroKbach } from "./sections/kbach/Hero";
+import { StoryKbach } from "./sections/kbach/Story";
+import { DetailsKbach } from "./sections/kbach/Details";
 
 // Each section's components take a different, section-specific props shape (see
 // sections/*/*.tsx), so this lookup map is necessarily `ComponentType<any>` at the
@@ -54,18 +58,21 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     opening_book: Book,
     opening_envelope: Envelope,
     opening_seal: Seal,
+    opening_kbach: KbachGate,
   },
   hero: {
     hero_classic: HeroClassic,
     hero_polaroid: HeroPolaroid,
     hero_fullbleed: HeroFullbleed,
     hero_folio: HeroFolio,
+    hero_kbach: HeroKbach,
   },
   story: {
     story_classic: StoryClassic,
     story_letter: StoryLetter,
     story_split: StorySplit,
     story_manuscript: StoryManuscript,
+    story_kbach: StoryKbach,
   },
   gallery: {
     gallery_grid: GalleryGrid,
@@ -78,6 +85,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     details_split: DetailsSplit,
     details_cards: DetailsCards,
     details_programme: DetailsProgramme,
+    details_kbach: DetailsKbach,
   },
   rsvp: {
     rsvp_classic: RsvpClassic,

@@ -36,6 +36,29 @@ export default {
       status: "active",
     },
     {
+      template_id: "khmer_kbach",
+      name: "Khmer Kbach",
+      default_theme: {
+        bg_color: "#fbf1de",
+        text_color: "#4a0e1a",
+        accent_color: "#c9962e",
+        font_style: "serif",
+      },
+      default_components: {
+        opening: "opening_kbach",
+        hero: "hero_kbach",
+        story: "story_kbach",
+        gallery: "gallery_plates",
+        details: "details_kbach",
+        rsvp: "rsvp_reply",
+        registry: "registry_ledger",
+        timeline: "timeline_chapters",
+        music: "music_vinyl",
+        guestbook: "guestbook_wall",
+      },
+      status: "active",
+    },
+    {
       template_id: "botanical_romance",
       name: "Botanical Romance",
       default_theme: {

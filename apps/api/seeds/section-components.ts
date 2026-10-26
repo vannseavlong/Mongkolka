@@ -260,6 +260,43 @@ const components = [
     preview_accent_color: "#c9a35c",
     font_style: "sans",
   },
+  // Khmer Kbach pack — ruby/ivory/gold ornament, original SVG motifs
+  {
+    component_id: "opening_kbach",
+    section: "opening",
+    name: "Kbach Gate",
+    preview_bg_color: "#4a0e1a",
+    preview_text_color: "#fbf1de",
+    preview_accent_color: "#c9962e",
+    font_style: "serif",
+  },
+  {
+    component_id: "hero_kbach",
+    section: "hero",
+    name: "Kbach Arch",
+    preview_bg_color: "#4a0e1a",
+    preview_text_color: "#fbf1de",
+    preview_accent_color: "#c9962e",
+    font_style: "serif",
+  },
+  {
+    component_id: "story_kbach",
+    section: "story",
+    name: "Kbach Letter",
+    preview_bg_color: "#fbf1de",
+    preview_text_color: "#4a0e1a",
+    preview_accent_color: "#c9962e",
+    font_style: "serif",
+  },
+  {
+    component_id: "details_kbach",
+    section: "details",
+    name: "Kbach Cards",
+    preview_bg_color: "#fbf1de",
+    preview_text_color: "#4a0e1a",
+    preview_accent_color: "#c9962e",
+    font_style: "serif",
+  },
   // Ink & Gold pack — editorial printed-invitation design, one component per section
   {
     component_id: "opening_seal",

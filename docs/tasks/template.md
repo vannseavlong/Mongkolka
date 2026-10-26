@@ -278,6 +278,22 @@ of language. The admin/couple/vendor portals don't use this — not needed there
   section gets a *fourth* variant remains a product call to make per-section as
   demand shows up.
 
+## "Khmer Kbach" pack (`khmer_kbach`)
+
+Ruby / ivory / gold template inspired by Khmer ornament (ក្បាច់ខ្មែរ). Artwork is original
+SVG drawn in `packages/templates/src/sections/kbach/shared.tsx` (lotus, flame-vine strip,
+corner fan, pointed arch frame, foil-gradient text), all recolored by the theme's accent.
+New components: `opening_kbach` (arch gate that splits open), `hero_kbach` (photo in a
+pointed arch), `story_kbach`, `details_kbach` (arch-capped cards). The other sections reuse
+the Ink & Gold components (`gallery_plates`, `rsvp_reply`, `registry_ledger`,
+`timeline_chapters`, `music_vinyl`, `guestbook_wall`), which follow the theme colors.
+Seeded in `seeds/site-templates.ts` / `section-components.ts` (`lsdb seed … --upsert`).
+
+- The gate renders its cover twice (each clipped to a half) so the split is a pure
+  transform; both copies must lay out identically (the inert copy still renders the button).
+- Gate text sizes use container query units (`cqw`) so it scales with the arch, not the viewport.
+- Not verified visually in Khmer (`?lang=kh`) yet; only English was checked.
+
 ## "Ink & Gold" pack (`ink_and_gold`)
 
 An editorial printed-invitation design: one component per section under

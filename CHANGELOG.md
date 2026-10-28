@@ -2,6 +2,62 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-10-28 · [Web] feat(couple): template gallery with live thumbnails and apply dialog
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-builder-template-apply.md
+- Branch/PR: feat/builder-template-apply (merged to main with --no-ff, local, no PR)
+- What changed: template picker shows live thumbnails and a preview link; switching templates asks whether to keep text and photos or start fresh and warns that it cannot be undone
+- Needs: API catalog change deployed
+
+## 2026-10-28 · [Web] feat(couple): site-wide theme presets and per-section colors
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-builder-site-theme.md
+- Branch/PR: feat/builder-site-theme (merged to main with --no-ff, local, no PR)
+- What changed: 10 contrast-checked palettes with live hover preview, custom colors, reset to template; per-section Colors tab with 'Use site theme'
+- Needs: none
+
+## 2026-10-28 · [Web] feat(couple): asset library tab and picker
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-builder-assets.md
+- Branch/PR: feat/builder-assets (merged to main with --no-ff, local, no PR)
+- What changed: couples upload and delete images in the builder, pick them for gallery and hero cover, and are warned before deleting an image that is in use
+- Needs: API asset library deployed
+
+## 2026-10-28 · [Web] feat(web): live template preview on template subdomains
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-template-preview-subdomain.md
+- Branch/PR: feat/template-preview-subdomain (merged to main with --no-ff, local, no PR)
+- What changed: `<template-slug>.<ROOT_DOMAIN>` serves a live, noindex preview of a template with sample data (English and Khmer); `/templates` cards link to it; proxy caches the active template slug list for 60 s
+- Needs: wildcard DNS and TLS for template subdomains; API catalog change deployed; consider edge rate limiting (junk-host flood grew server memory)
+
+## 2026-10-28 · [Web] feat(couple): builder workspace with section variant browser
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-builder-workspace-variants.md
+- Branch/PR: feat/builder-workspace (merged to main with --no-ff, local, no PR)
+- What changed: website builder now has a section rail, a live canvas (desktop/mobile) and a section panel; every variant of a section is previewed with the couple's own data and applies with one click; panel tabs are pluggable (`workspace/panel-tabs/*.tab.tsx`)
+- Needs: none
+
+## 2026-10-28 · [Admin] feat(admin): template slug and description fields
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Admin-template-slug-field.md
+- Branch/PR: feat/template-slug-field (merged to main with --no-ff, local, no PR)
+- What changed: admin can create and edit templates with slug and description, sees slug errors inline, and gets a preview link per template
+- Needs: `NEXT_PUBLIC_ROOT_DOMAIN`, `NEXT_PUBLIC_API_URL` (see apps/admin/.env.example); deploy together with the API catalog change
+
+## 2026-10-28 · [API] feat(api): couple website asset library
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/API-website-assets.md
+- Branch/PR: feat/website-assets (merged to main with --no-ff, local, no PR)
+- What changed: new `/couple/api/website/assets` (list, multipart upload, delete with in-use check and `force`, usage lookup); 8 MB / 12000 px / 100 per couple limits; `storageFor(coupleId)` seam; storage keys under `couples/<coupleId>/assets/`
+- Needs: schema sync for the new couple table `website_assets` (non-production sheet first); production uploads need `API-s3-storage-verify` (or the Drive driver); quota lock is single-instance only
+
+## 2026-10-28 · [API] feat(api): template catalog slug and apply modes
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/API-template-catalog-apply.md
+- Branch/PR: feat/template-catalog-apply (merged to main with --no-ff, local, no PR)
+- What changed: templates get a unique `slug` and `description`; public `GET /public/api/site-templates/by-slug/:slug`; template slugs are reserved (couples cannot claim them, nor `www`/`api`/`admin`…); applying a template takes `mode` (`keep_content` or `reset_all`) and clears per-section styles and the site theme override; unknown or inactive template is now a 404
+- Needs: run schema sync for admin `site_templates` (`slug`, `description`); set slugs on existing template rows (seed values: gold-ink-cream, crimson-gold-silk, blush-gold-garden, white-black-mono); Admin app must send `slug` on create (see the Admin entry)
+
 ## 2026-10-26 · [Web] fix(couple): responsive website builder, deep-link refresh fix
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-couple-builder-responsive.md

@@ -46,3 +46,6 @@ No blockers. Should-fix, sent back to the builder: (1) 413 only after full body 
 Review findings fixed: early 413 on size limit and Content-Length, abort handling; forced delete re-reads each section before writing (residual window remains, no compare-and-set in Sheets); cover_photo_url counted as usage and stripped on force; images over 12000 px rejected (413 image_too_large). Tests 22/22, typecheck and build pass.
 Contract changes for the frontend: `GET /:id/usage` -> `{ sections, cover }`; 409 `in_use` -> `{ error, sections, cover }`; new 413 `image_too_large`.
 Still not done: G4 against the real app and sheet, schema sync on a non-production sheet, G9, G10, G11, re-review of the fix commit.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

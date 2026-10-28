@@ -42,3 +42,6 @@ Shared-file change: index.tsx now passes `settings ? settings.site_template_id :
 Run in browser against a stub (delayed settings, first pick, keep_content, reset_all, keyboard, 390px iframe): all OK. tsc clean, lint 0 errors, next build passes.
 Not verified: Escape on an idle dialog, refetch-failure branch, settings-error alert, inline POST error after the change, empty state, a real 390px window, Preview link target, real API, tests (none).
 Next: re-review of the fix commit (optional for T2 if the owner accepts), G3 decision, G7, G8, G11.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

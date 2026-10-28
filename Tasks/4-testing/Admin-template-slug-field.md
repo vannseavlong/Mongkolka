@@ -44,3 +44,6 @@ Run in a real browser against a stub API (edit legacy row with empty components,
 Not verified: real API wording of 400/409 (assumed from the API branch source), Preview link for a legacy row beyond the "Not set" text.
 Side effects (scratch only, no repo or live data): the builder's probe edited a stub row on port 4000 and overwrote the shared scratchpad stub.mjs once; a dev server on port 3001 serving this worktree and a stub on port 4000 may still be running.
 Next: G3 decision (no tests added), G7 docs (NEXT_PUBLIC_ROOT_DOMAIN for admin), G8, G11; merge with or after API-template-catalog-apply.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

@@ -45,3 +45,6 @@ Curl tests against a stub with Host headers: 20 concurrent cold requests -> 1 li
 Open observation: during the junk-host flood the Next server RSS grew 186 MB -> 360 -> 416 MB (second round grew less). Attributed to rendering a couple/not-found page per junk host, not measured against a pre-change baseline. Worth a look before production (rate limiting at the edge/CDN, or return 404 early for hosts that fail both lookups).
 Not verified: error.tsx shown in a browser, toggle rendering, real API, wildcard DNS and TLS. Tests: none.
 Next: G3 decision, G7, G8, G11; re-review optional.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

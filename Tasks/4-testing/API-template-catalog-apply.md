@@ -41,3 +41,6 @@ Accepted/deferred: narrow cross-sheet race between a template slug and a couple 
 Review findings fixed: by-slug lookup reads all active templates once into a single-key 60s cache (no per-slug keys); apply clears sections with allSettled first and writes the profile only if all clears succeed, cache invalidated after everything settles; RESERVED_SLUGS enforced in updateSlug (409), template slug check (400) and placeholder generation; public response limited to template_id, name, slug, description, default_theme, default_components; status enum validation; formatting churn reverted; new tests. 27/27 tests, tsc and eslint (changed folders) clean, all with mocked models.
 Docs now state the cross-sheet slug race is accepted and that reset_all clears only content.
 Still open: re-review of the fix commit, live schema sync and slug backfill, real Sheets null/unique behavior, G9, G10, G11.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

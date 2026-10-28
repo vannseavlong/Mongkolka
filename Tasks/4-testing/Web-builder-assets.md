@@ -43,3 +43,6 @@ Shared-file edit: `apps/couple/src/lib/api.ts` exports `API_URL` and `ApiError` 
 Run in the browser against a stub: 409 mid-batch (90 stored, quota 91, 5 files), stale-usage delete, one DELETE on double-click, duplicate pick, cancel, 60 s timeout, 12001x2 PNG rejected, javascript: rejected, keyboard focus return. tsc clean, lint 0 errors, next build passes.
 Not verified: the exact "98 stored, upload 5" case, real-network 12000 px reject, a full keyboard-only pass (Assets tab focused by script because arrow-key switching in the shared Tabs behaved oddly), Space/Enter on picker tiles, focus after a successful delete, phone width, real API. Tests: none (no runner).
 Next: G3 decision, G7, G8, G11.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

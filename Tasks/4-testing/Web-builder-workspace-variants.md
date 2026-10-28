@@ -47,3 +47,6 @@ Pure logic lives in `workspace/section-actions-logic.ts`.
 G3 tests NOT done: apps/couple has no test runner and tsx is not in the workspace. Decision needed from the owner: add a runner (new dev dependency, T3 signal) or accept untested pure logic with a written Skipped G3 reason. Cases ready: applyPatch, rollbackFields, reorderSections payload/edges, panel-tabs order.
 Not run: overlapping failing writes, Switch disabled state during save, S2 scroll on narrow screen, a real screen reader, real API.
 Next: re-review of fix commit, G3 decision, G7, G8, G11.
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

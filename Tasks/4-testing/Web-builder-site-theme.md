@@ -45,3 +45,6 @@ Review items 1-10 and 12 fixed: saves in the Colors tab are serialized (promise 
 Run in browser against a stub with 1.5 s delayed PATCHes: rapid edits (no revert), edit then reset (null sent last), Escape, collapse while hovering (canvas returns to saved). tsc clean, lint 0 errors, next build passes.
 Not verified: real Firefox/Safari picker events (simulated in Chrome), screen reader, mobile, public site, `{}` reset against the real API, the Content-tab popover after the pruning change (code only).
 Next: G3 decision, G7, G8, G11; fresh re-review of the fix commit is advisable (the fix touched many paths).
+
+## Merged to main 2026-10-28
+Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).

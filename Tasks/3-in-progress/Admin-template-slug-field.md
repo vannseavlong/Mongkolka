@@ -37,3 +37,10 @@ Should-fix (sent back): editing a legacy row with partial or empty default_compo
 Not verified by reviewer: create flow, duplicate-slug 409, short-slug message, description limit (the builder was asked to exercise these).
 Deferred: close/reopen 500 ms timer race in dialogs (same pattern as delete dialog); duplicated site-url helper with apps/couple; description limit is client-only.
 Deploy: must merge together with or after API-template-catalog-apply.
+
+## Fixes 2026-10-28 (commit 44c25b9)
+Fixed: S1 default_components is now tolerant (`z.record(z.string(), z.string().nullish())`), empty or null sections are stripped before sending, component selects show a FormMessage; N1 only messages matching /slug/i go under the Slug field, other 400/409 go to a form-level alert; N3 NEXT_PUBLIC_API_URL added to .env.example.
+Run in a real browser against a stub API (edit legacy row with empty components, partial row, short slug, duplicate-slug 409, non-slug 400, create with 409 and success): all as expected. tsc clean, lint clean, build compiles.
+Not verified: real API wording of 400/409 (assumed from the API branch source), Preview link for a legacy row beyond the "Not set" text.
+Side effects (scratch only, no repo or live data): the builder's probe edited a stub row on port 4000 and overwrote the shared scratchpad stub.mjs once; a dev server on port 3001 serving this worktree and a stub on port 4000 may still be running.
+Next: G3 decision (no tests added), G7 docs (NEXT_PUBLIC_ROOT_DOMAIN for admin), G8, G11; merge with or after API-template-catalog-apply.

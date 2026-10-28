@@ -14,7 +14,7 @@
 Give templates a public identity and a real apply action: `site_templates.slug` + `description`, public by-slug lookup, reserved template slugs (couple slug validation rejects them, existing couple slugs checked), and apply `mode` (`keep_content` | `reset_all`) on `POST /couple/api/website/template`.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new + edge cases)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc+eslint on changed folders clean; pnpm lint has 1 pre-existing error in scripts/seed-mock-couple.ts)  - [x] G3 tests (16/16, mocked models)  - [ ] G4 run it (API never started; by-slug route checked over HTTP with stubbed model)
 - [ ] G5 code review (strict)  - [ ] G6 security  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
 
@@ -26,3 +26,9 @@ Give templates a public identity and a real apply action: `site_templates.slug` 
 - [ ] Response shape documented; Admin and Web tasks can start from it
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-28
+Built in commit 3043264 on `feat/template-catalog-apply`, not merged.
+Contract: public `GET /public/api/site-templates/by-slug/:slug`; admin create now REQUIRES `slug` (Admin app create form breaks until `Admin-template-slug-field` ships); couple `POST /couple/api/website/template` takes `mode` (default keep_content), returns `{settings, mode}`, client must refetch sections; both modes clear `theme_override`; unknown/inactive template now 404; reserved template slugs give 409 on couple slug change.
+Run live after merge (not done): schema sync for admin `site_templates` (slug, description); set slugs on existing rows (gold-ink-cream, crimson-gold-silk, blush-gold-garden, white-black-mono) if seed skips existing rows.
+Next: G5 and G6 by a fresh agent, then G9, G10, G11.

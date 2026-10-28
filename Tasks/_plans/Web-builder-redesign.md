@@ -67,9 +67,18 @@ Make the couple's website builder useful and friendly:
 | 3a | `Web-builder-assets` | apps/couple | 1a, 1c | T2 | M |
 | 3b | `Web-builder-site-theme` | apps/couple + packages/templates | 1c | T2 | M |
 | 3c | `Web-builder-template-apply` | apps/couple | 1b, 1c | T2 | M |
+| 2c | `API-couple-drive-storage` | apps/api | 1a | T3 | L |
+| 3d | `Web-couple-drive-connect` | apps/couple | 2c | T2 | S |
 | later | `Web-builder-polish` (backlog) | apps/couple | all | T1 | - |
 
 **Parallel groups:** wave 1 (1a, 1b, 1c) run in parallel, they touch different folders. Wave 2 (2a, 2b) after 1b. Wave 3 (3a, 3b, 3c) after 1c; they all touch `apps/couple/src/features/website`, so 1c must expose a panel/tab slot first and each task adds only its own files, otherwise sequence them.
+
+## Storage and database direction (decided 2026-10-28)
+- **Today:** data is on Google Sheets via lsdb (one sheet per couple/vendor + one admin sheet); uploads use the `PhotoStorage` driver (`local` verified, `s3` not).
+- **Target:** one central database (e.g. Neon Postgres) for all data, with per-couple isolation by `couple_id`. A separate plan is needed for that migration; it is not part of this one.
+- **Target for files:** each couple's uploads (own assets and guest photos) go to **that couple's own Google Drive** via their OAuth token; couples without a connection use the default driver (S3/R2). Owner accepted the risks (Drive quota and rate limits, revoked tokens, media served through our proxy).
+- **Rules that make this work and keep the migration cheap:** all code goes through `storageFor(coupleId)`; storage keys start with the couple id; the data layer stays inside each module's model file; the database row stores only the key and URL; Drive tokens are encrypted and in their own table.
+- **Not claimed:** that Drive-backed public sites perform well under real guest traffic. `API-couple-drive-storage` requires a load check and a fallback.
 
 ## Out of scope
 Custom domains (`Web-custom-domain-routing`), new section variants (`Web-more-section-variants`), invitation customizer, payments, free-form drag-and-drop layout, per-element text styling.

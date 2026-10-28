@@ -271,6 +271,25 @@ identically by the couple-portal builder preview and the public site renderer �
   `site_templates.default_components[section_key]` (template default). No partial
   merge here — a section renders exactly one component.
 
+### `website_assets`
+
+Couple's image library for the website builder (couple sheet). Sections reference an asset by
+its `url` string inside `website_sections.content`; there is no foreign key. Files live under
+the storage key `couples/<couple_id>/assets/<asset_id>.<ext>`. Limits: 100 assets per couple,
+8 MB each, jpeg/png/webp/gif only.
+
+| Column | Type | Notes |
+|---|---|---|
+| `asset_id` | string, PK | |
+| `couple_id` | string | Owning couple. |
+| `storage_key` | string | Key inside the storage driver; used to delete the file. |
+| `url` | string | As returned by the driver. Clients must not build URLs themselves. |
+| `mime` | string | One of the allowed image types. |
+| `size_bytes` | number | |
+| `width` / `height` | number, nullable | Read from the file header when possible. |
+
+API: `/couple/api/website/assets` (`GET`, `POST` multipart field `file`, `DELETE /:id[?force=true]`, `GET /:id/usage`).
+
 ### `guests`
 
 Near-verbatim from `GuestManager.tsx`'s `Guest` interface — the best-modeled data

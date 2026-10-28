@@ -30,3 +30,13 @@ export function photoStorage(): PhotoStorage {
   instance ??= build();
   return instance;
 }
+
+/**
+ * Storage driver for one couple's files. Today every couple shares the default driver;
+ * per-couple Drive storage plugs in here later. New code must use this, not photoStorage().
+ * Keys passed to the returned driver must start with `couples/<coupleId>/`.
+ */
+export function storageFor(coupleId: string): PhotoStorage {
+  void coupleId;
+  return photoStorage();
+}

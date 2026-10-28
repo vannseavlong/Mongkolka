@@ -25,6 +25,7 @@ import checklistItemsSchema from "../../schemas/couple/checklist_items.js";
 import milestonesSchema from "../../schemas/couple/milestones.js";
 import guestPhotosSchema from "../../schemas/couple/guest_photos.js";
 import guestWishesSchema from "../../schemas/couple/guest_wishes.js";
+import websiteAssetsSchema from "../../schemas/couple/website_assets.js";
 
 import vendorProfileSchema from "../../schemas/vendor/profile.js";
 import portfolioItemsSchema from "../../schemas/vendor/portfolio_items.js";
@@ -77,6 +78,7 @@ adapter.registerSchemas([
   milestonesSchema,
   guestPhotosSchema,
   guestWishesSchema,
+  websiteAssetsSchema,
   vendorProfileSchema,
   portfolioItemsSchema,
   servicesSchema,

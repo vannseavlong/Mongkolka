@@ -1,0 +1,22 @@
+{
+  "columns": {
+    "1-backlog": {
+      "color": "#8b949e"
+    },
+    "2-todo": {
+      "color": "#cca700"
+    },
+    "3-in-progress": {
+      "color": "#3794ff"
+    },
+    "4-testing": {
+      "color": "#b180d7"
+    },
+    "5-done": {
+      "color": "#89d185"
+    },
+    "6-deploy": {
+      "color": "#2aa198"
+    }
+  }
+}

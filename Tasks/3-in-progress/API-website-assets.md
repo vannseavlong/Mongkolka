@@ -38,3 +38,6 @@ Built in commit 68e1f38 on `feat/website-assets`, not merged. Contract: `/couple
 Not verified: real routes under auth, schema sync creating the `website_assets` tab (run on a non-production sheet), json content update behavior.
 Known limits: quota lock is in-process (single instance only); listing reads all rows to count; Sheets write limit ~60/min.
 Next: G5 and G6 by a fresh agent, then G9, G10, G11.
+
+## Review 2026-10-28 (fresh agent, G5+G6)
+No blockers. Should-fix, sent back to the builder: (1) 413 only after full body read, abort handling; (2) forced delete can overwrite a concurrent section edit; (3) cover_photo_url not covered by usage/strip. Nits: exact-string URL match only, no dimension cap, in-process lock (single instance), possible orphan on crash between put and create.

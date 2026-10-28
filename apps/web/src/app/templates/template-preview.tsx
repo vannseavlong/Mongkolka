@@ -2,6 +2,7 @@
 
 import {
   LanguageProvider,
+  LanguageToggle,
   SAMPLE_CONTENT,
   SAMPLE_COUPLE,
   SiteRenderer,
@@ -22,9 +23,11 @@ const SAMPLE_SECTIONS: SiteRendererSection[] = SECTION_KEYS.map((key, index) => 
 export function TemplatePreview({
   template,
   fullPage = false,
+  initialLanguage = "en",
 }: {
   template: SiteRendererTemplate;
   fullPage?: boolean;
+  initialLanguage?: "en" | "kh";
 }) {
   const site = (
     <SiteRenderer
@@ -38,10 +41,17 @@ export function TemplatePreview({
   );
 
   // fullPage: the subdomain preview renders the site as a real page (no frame).
-  if (fullPage) return <LanguageProvider>{site}</LanguageProvider>;
+  if (fullPage) {
+    return (
+      <LanguageProvider initialLanguage={initialLanguage}>
+        <LanguageToggle theme={{ text_color: template.default_theme.text_color }} />
+        {site}
+      </LanguageProvider>
+    );
+  }
 
   return (
-    <LanguageProvider>
+    <LanguageProvider initialLanguage={initialLanguage}>
       <div className="relative h-160 overflow-hidden rounded-xl border" style={{ transform: "translateZ(0)" }}>
         <div className="h-full overflow-y-auto">{site}</div>
       </div>

@@ -12,14 +12,18 @@ export const metadata: Metadata = {
 
 export default async function TemplateSubdomainPreviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const query = await searchParams;
+  const lang = query.lang === "kh" ? "kh" : "en";
   const data = await fetchJson<SiteTemplateBySlugResponse>(
     `/public/api/site-templates/by-slug/${encodeURIComponent(slug)}`,
   );
   if (!data) notFound();
 
-  return <TemplatePreview template={data.template} fullPage />;
+  return <TemplatePreview template={data.template} fullPage initialLanguage={lang} />;
 }

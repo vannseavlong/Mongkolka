@@ -5,7 +5,9 @@ import { fetchJson } from "@/lib/api";
 import type { SiteTemplatesResponse } from "./types";
 
 // Subdomain previews need ROOT_DOMAIN (wildcard DNS). Without it (plain local
-// dev) cards fall back to the /templates/[id] path preview.
+// dev) cards fall back to the /templates/[id] path preview. Deliberately no
+// "localhost:3000" default here (unlike proxy.ts, which defaults so local hosts
+// parse): an unset value must mean "no subdomain links".
 const ROOT_DOMAIN = process.env.ROOT_DOMAIN;
 
 function previewHref(template: { template_id: string; slug?: string }) {

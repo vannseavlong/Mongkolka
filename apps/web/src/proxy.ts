@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { API_URL } from "@/lib/api";
 
 // Wildcard subdomain routing for couple sites: a request to
 // {slug}.{ROOT_DOMAIN} is rewritten to the internal /[slug] route, so the
@@ -17,56 +18,51 @@ const ROOT_DOMAIN = (process.env.ROOT_DOMAIN ?? "localhost:3000").split(":")[0];
 
 // Template preview subdomains: {template-slug}.{ROOT_DOMAIN} renders a
 // template with sample data. Template slugs are resolved BEFORE the couple-slug
-// rewrite. The lookup is in-memory cached (proxy runs on the Node.js runtime in
-// Next 16, so module state persists), bounded in size, time-limited, and fails
-// open: any error/timeout means "not a template", i.e. the couple route.
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+// rewrite. The proxy runs on the Node.js runtime in Next 16, so module state
+// persists. Instead of one lookup per host label (junk hosts could churn the
+// cache), the set of published template slugs is fetched from the public list
+// once, cached as a single entry, and shared by concurrent requests through one
+// in-flight promise. Any error or timeout falls through to the couple route.
 const LOOKUP_TIMEOUT_MS = 1500;
-const HIT_TTL_MS = 5 * 60_000;
-const MISS_TTL_MS = 60_000;
+const SET_TTL_MS = 60_000;
 const ERROR_TTL_MS = 10_000;
-const MAX_CACHE_ENTRIES = 500;
-const SLUG_PATTERN = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/;
+// Same rule as the API (3-40 chars, lowercase letters/digits, single hyphens).
+const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+// Labels the API refuses as slugs (infrastructure subdomains); never looked up.
+const RESERVED_LABELS = new Set(["www", "api", "admin", "app", "mail", "couple", "vendor", "web", "static", "cdn"]);
 
-const templateSlugCache = new Map<string, { isTemplate: boolean; expires: number }>();
+let templateSlugs: { slugs: Set<string>; expires: number } | null = null;
+let inFlight: Promise<Set<string>> | null = null;
 
-async function isTemplateSlug(slug: string): Promise<boolean> {
-  // Only plausible DNS labels reach the API/cache; junk hosts cost nothing.
-  if (!SLUG_PATTERN.test(slug)) return false;
-
-  const now = Date.now();
-  const cached = templateSlugCache.get(slug);
-  if (cached && cached.expires > now) return cached.isTemplate;
-
-  let isTemplate = false;
-  let ttl = MISS_TTL_MS;
+async function loadTemplateSlugs(): Promise<Set<string>> {
   try {
-    const res = await fetch(`${API_URL}/public/api/site-templates/by-slug/${slug}`, {
+    const res = await fetch(`${API_URL}/public/api/site-templates`, {
       signal: AbortSignal.timeout(LOOKUP_TIMEOUT_MS),
       cache: "no-store",
     });
-    if (res.ok) {
-      isTemplate = true;
-      ttl = HIT_TTL_MS;
-    } else if (res.status !== 404) {
-      ttl = ERROR_TTL_MS;
-    }
+    if (!res.ok) throw new Error(`status ${res.status}`);
+    const data = (await res.json()) as { templates?: { slug?: string | null }[] };
+    const slugs = new Set<string>();
+    for (const t of data.templates ?? []) if (t.slug) slugs.add(t.slug);
+    templateSlugs = { slugs, expires: Date.now() + SET_TTL_MS };
+    return slugs;
   } catch {
-    ttl = ERROR_TTL_MS;
+    // Keep serving the previous set for a short while, then retry.
+    const previous = templateSlugs?.slugs ?? new Set<string>();
+    templateSlugs = { slugs: previous, expires: Date.now() + ERROR_TTL_MS };
+    return previous;
+  } finally {
+    inFlight = null;
   }
+}
 
-  if (templateSlugCache.size >= MAX_CACHE_ENTRIES) {
-    // Drop expired entries first, then the oldest inserted one.
-    for (const [key, entry] of templateSlugCache) {
-      if (entry.expires <= now) templateSlugCache.delete(key);
-    }
-    if (templateSlugCache.size >= MAX_CACHE_ENTRIES) {
-      const oldest = templateSlugCache.keys().next().value;
-      if (oldest !== undefined) templateSlugCache.delete(oldest);
-    }
+async function isTemplateSlug(slug: string): Promise<boolean> {
+  if (slug.length < 3 || slug.length > 40 || !SLUG_PATTERN.test(slug) || RESERVED_LABELS.has(slug)) {
+    return false;
   }
-  templateSlugCache.set(slug, { isTemplate, expires: now + ttl });
-  return isTemplate;
+  if (templateSlugs && templateSlugs.expires > Date.now()) return templateSlugs.slugs.has(slug);
+  inFlight ??= loadTemplateSlugs();
+  return (await inFlight).has(slug);
 }
 
 export async function proxy(request: NextRequest) {

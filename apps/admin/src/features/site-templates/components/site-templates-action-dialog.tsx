@@ -53,7 +53,8 @@ const siteTemplateFormSchema = z.object({
     accent_color: z.string().min(1),
     font_style: z.string().min(1),
   }),
-  default_components: z.record(z.string(), z.string()),
+  // Legacy rows may have no entry (or a null/empty one) for some sections.
+  default_components: z.record(z.string(), z.string().nullish()),
 });
 
 type SiteTemplateFormValues = z.infer<typeof siteTemplateFormSchema>;
@@ -103,7 +104,14 @@ export function SiteTemplatesActionDialog({
     onOpenChange(state);
   }
 
-  async function onSubmit(values: SiteTemplateFormValues) {
+  async function onSubmit(rawValues: SiteTemplateFormValues) {
+    // Drop sections with no component chosen so the API only gets real ids.
+    const values = {
+      ...rawValues,
+      default_components: Object.fromEntries(
+        Object.entries(rawValues.default_components).filter(([, v]) => !!v),
+      ) as Record<string, string>,
+    };
     try {
       if (currentRow) {
         await api.patch(`/admin/api/site-templates/${currentRow.template_id}`, {
@@ -124,7 +132,9 @@ export function SiteTemplatesActionDialog({
       // 400 (bad format / reserved word) and 409 (duplicate slug) are shown
       // under the slug field; anything else falls back to a toast.
       if (err instanceof ApiError && (err.status === 400 || err.status === 409)) {
-        form.setError("slug", { type: "server", message: err.message });
+        // Only slug problems belong under the slug field; others go to a form-level message.
+        if (/slug/i.test(err.message)) form.setError("slug", { type: "server", message: err.message });
+        else form.setError("root", { type: "server", message: err.message });
         return;
       }
       toast.error(
@@ -281,11 +291,17 @@ export function SiteTemplatesActionDialog({
                             ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
               ))}
             </div>
+            {form.formState.errors.root?.message && (
+              <p role="alert" className="text-sm text-destructive">
+                {form.formState.errors.root.message}
+              </p>
+            )}
           </form>
         </Form>
         <DialogFooter>

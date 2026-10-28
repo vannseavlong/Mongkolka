@@ -14,7 +14,7 @@
 Replace the flat section list with a workspace: section rail, live canvas (desktop/mobile toggle, scrolls to selected section), and a section panel with tabs. First tab is **Style**: a variant browser rendering every active variant of that section with the couple's own data, one click to apply. Expose a tab/slot registry so Assets, Colors and Apply tasks add their own files. Keep optimistic updates and the existing responsive behavior.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc clean; couple lint 0 errors; repo-wide lint has pre-existing failures)  - [ ] G3 tests (none exist or added; T2 needs new logic tests: use-section-actions optimistic/rollback)  - [x] G4 run it (against a stub API only, desktop width; phone/tablet via iframe emulation)
 - [ ] G5 code review  - [ ] G6 security (if input/upload)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -27,3 +27,10 @@ Replace the flat section list with a workspace: section rail, live canvas (deskt
 - [ ] Panel tab slots documented in a short comment so 3a/3b/3c do not edit shared files
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-28
+Built in commit 7dc5fba on `feat/builder-workspace`, not merged. Tier stays T2 (shared package gets a new export and an optional `wrapSection` prop on SiteRenderer; no auth/data).
+Slot registry: add `workspace/panel-tabs/<name>.tab.tsx` exporting `tab`/`tabs` (`SectionPanelTab`: id, label, order, appliesTo?, Component); auto-registered via `require.context`; Style=10, Content=20, later tasks use 30+. Production build compatibility of the glob NOT confirmed.
+Not verified: real API, reorder in browser, content dialog and color popover from Content tab, mobile canvas toggle only narrows width (viewport media queries won't switch), screen reader, next build.
+Follow-ups: apps/web template-preview.tsx still has its own SAMPLE_CONTENT (switch to the shared export in Web-template-preview-subdomain); live-mounted tiles may need lazy mounting for many variants.
+Next: G5 by a fresh agent (with `next build`), then G7, G8, G11.

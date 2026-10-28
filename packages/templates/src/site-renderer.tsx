@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { resolveComponent } from "./registry";
 import { GuestProvider } from "./guest-context";
 import { resolveTheme } from "./theme";
@@ -43,6 +43,11 @@ export interface SiteRendererProps {
    * simply ignored by React.
    */
   extraProps?: (sectionKey: SectionKey) => Record<string, unknown>;
+  /**
+   * Wraps each rendered non-opening section, e.g. so the builder canvas can
+   * anchor, outline and scroll to one. Omit on the public site (no extra DOM).
+   */
+  wrapSection?: (section: SiteRendererSection, node: ReactNode) => ReactNode;
 }
 
 /**
@@ -59,6 +64,7 @@ export function SiteRenderer({
   buildContent,
   guestGreeting,
   extraProps,
+  wrapSection,
 }: SiteRendererProps) {
   const [openingDismissed, setOpeningDismissed] = useState(false);
 
@@ -90,7 +96,7 @@ export function SiteRenderer({
           template.default_components[section.section_key],
         );
         if (!Component) return null;
-        return (
+        const node = (
           <Component
             key={section.section_id}
             couple={couple}
@@ -99,6 +105,7 @@ export function SiteRenderer({
             {...extraProps?.(section.section_key)}
           />
         );
+        return wrapSection ? <Fragment key={section.section_id}>{wrapSection(section, node)}</Fragment> : node;
       })}
     </GuestProvider>
   );

@@ -20,7 +20,7 @@
 Couple asset library API: list, upload (multipart, MIME allowlist, size and count limits), delete, and usage lookup (which sections reference an asset). Reuse `photoStorage()` and `ALLOWED_MIME`; follow config/controllers/models/modules/services/middlewares/utils layering.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new + edge cases)  - [ ] G4 run it
+- [x] G1 scope (one edit outside Touches: matchesSignature moved to utils/image-signature.ts, shared with guest-photos)  - [x] G2 static (typecheck+build pass; lint: 1 pre-existing error in scripts/seed-mock-couple.ts)  - [x] G3 tests (15/15, fakes)  - [ ] G4 run it (server and live sheet not run)
 - [ ] G5 code review (strict)  - [ ] G6 security  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
 
@@ -32,3 +32,9 @@ Couple asset library API: list, upload (multipart, MIME allowlist, size and coun
 - [ ] Edge-case tests: concurrent uploads, delete of in-use asset, storage failure
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-28
+Built in commit 68e1f38 on `feat/website-assets`, not merged. Contract: `/couple/api/website/assets` GET, POST (multipart `file`), DELETE `/:id[?force=true]`, GET `/:id/usage` (see agent report; copy into Docs before wave 3).
+Not verified: real routes under auth, schema sync creating the `website_assets` tab (run on a non-production sheet), json content update behavior.
+Known limits: quota lock is in-process (single instance only); listing reads all rows to count; Sheets write limit ~60/min.
+Next: G5 and G6 by a fresh agent, then G9, G10, G11.

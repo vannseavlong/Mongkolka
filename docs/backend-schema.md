@@ -290,6 +290,11 @@ the storage key `couples/<couple_id>/assets/<asset_id>.<ext>`. Limits: 100 asset
 
 API: `/couple/api/website/assets` (`GET`, `POST` multipart field `file`, `DELETE /:id[?force=true]`, `GET /:id/usage`).
 
+- `GET /:id/usage` returns `{ sections: [{ section_id, section_key }], cover: boolean }`; `cover` is true when `couple_profile.cover_photo_url` is the asset's URL.
+- `DELETE /:id` on an asset in use returns 409 `{ error: "in_use", sections, cover }`. With `?force=true` it strips the URL from those sections' `content` and clears the cover, then invalidates the public site cache.
+- Upload errors: 400 `empty` / `expected_one_file`, 413 `too_large` (over 8 MB) / `image_too_large` (over 12000 px on either side), 415 `unsupported_type`, 409 `quota_exceeded`, 502 `storage_failed`.
+- Usage matches the exact URL string only (a URL embedded inside longer text is not detected). The quota lock is in-process, so it is only correct for a single API instance.
+
 ### `guests`
 
 Near-verbatim from `GuestManager.tsx`'s `Guest` interface — the best-modeled data

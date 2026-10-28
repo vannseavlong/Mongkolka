@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { Check, ExternalLink } from "lucide-react";
 import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
+import { Skeleton } from "@mongkolka/ui/skeleton";
 import { api, ApiError } from "@/lib/api";
 import { siteOrigin } from "@/lib/site-url";
 import { cn } from "@mongkolka/ui/utils";
@@ -16,38 +17,97 @@ import { TemplateThumbnail } from "./template-thumbnail";
 export function TemplatePicker({
   templates,
   selectedTemplateId,
+  templatesLoading = false,
+  settingsError = null,
+  onRetry,
 }: {
   templates: SiteTemplate[];
-  selectedTemplateId: string | null;
+  /** `undefined` = settings not loaded (or failed): the current template is unknown, so nothing is selectable. */
+  selectedTemplateId: string | null | undefined;
+  templatesLoading?: boolean;
+  settingsError?: string | null;
+  onRetry?: () => void;
 }) {
   // One request in flight at a time: a rapid double-click used to fire the
   // template POST twice, racing on the couple_profile bootstrap. Buttons use
   // aria-disabled (not `disabled`) so a focused button keeps focus while pending.
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<SiteTemplate | null>(null);
+  const [dialogError, setDialogError] = useState<string | null>(null);
+  const inFlight = useRef(false);
+  const opener = useRef<HTMLElement | null>(null);
 
   async function apply(template: SiteTemplate, mode: ApplyMode) {
-    if (pendingId) return;
+    if (inFlight.current) return;
+    inFlight.current = true;
     setPendingId(template.template_id);
+    setDialogError(null);
+    let posted = false;
     try {
       await api.post("/couple/api/website/template", { template_id: template.template_id, mode });
-      // The apply response has no sections: refetch both so the canvas refreshes.
-      await Promise.all([mutate("/couple/api/website/settings"), mutate("/couple/api/website/sections")]);
+      posted = true;
+      // The apply response has no sections. Fetch sections first and settings
+      // last so the canvas never pairs the new template with old sections; a
+      // failed refetch throws here instead of being swallowed by SWR.
+      const sections = await api.get("/couple/api/website/sections");
+      const settings = await api.get("/couple/api/website/settings");
+      await mutate("/couple/api/website/sections", sections, { revalidate: false });
+      await mutate("/couple/api/website/settings", settings, { revalidate: false });
       toast.success(`Now using ${template.name}`);
       setConfirming(null);
     } catch (err) {
-      // Nothing was refetched, so the previous template and content stay on screen.
-      toast.error(err instanceof ApiError ? err.message : "Failed to apply template");
+      let message: string;
+      if (posted) {
+        // Applied on the server but we could not reload it: be honest, and try
+        // the normal revalidation in the background.
+        message = "Template applied, but the page could not refresh. Reload to see it.";
+        void mutate("/couple/api/website/sections");
+        void mutate("/couple/api/website/settings");
+        setConfirming(null);
+      } else {
+        message = err instanceof ApiError ? err.message : "Failed to apply template";
+        setDialogError(message);
+      }
+      toast.error(message);
     } finally {
+      inFlight.current = false;
       setPendingId(null);
     }
   }
 
   function choose(template: SiteTemplate) {
-    if (pendingId || template.template_id === selectedTemplateId) return;
+    if (inFlight.current || selectedTemplateId === undefined || template.template_id === selectedTemplateId) return;
     // First pick has nothing to lose, so it applies directly.
     if (selectedTemplateId === null) void apply(template, "keep_content");
-    else setConfirming(template);
+    else {
+      opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      setConfirming(template);
+    }
+  }
+
+  if (settingsError) {
+    return (
+      <div role="alert" className="flex flex-col items-start gap-2 rounded-md border border-destructive/50 p-4 text-sm">
+        <p>Could not load your current template: {settingsError}</p>
+        {onRetry && (
+          <Button size="sm" variant="outline" onClick={onRetry}>
+            Try again
+          </Button>
+        )}
+      </div>
+    );
+  }
+  if (templatesLoading || selectedTemplateId === undefined) {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-busy="true" aria-label="Loading templates">
+        {[0, 1].map((i) => (
+          <Skeleton key={i} className="h-64 w-full" />
+        ))}
+      </div>
+    );
+  }
+  if (templates.length === 0) {
+    return <p className="text-sm text-muted-foreground">No templates are available yet.</p>;
   }
 
   return (
@@ -90,7 +150,6 @@ export function TemplatePicker({
                   size="sm"
                   variant={selected ? "secondary" : "default"}
                   aria-disabled={pendingId !== null || selected}
-                  aria-pressed={selected}
                   className={cn((pendingId !== null || selected) && "opacity-60")}
                   onClick={() => choose(template)}
                 >
@@ -105,7 +164,12 @@ export function TemplatePicker({
         <TemplateApplyDialog
           templateName={confirming.name}
           pending={pendingId !== null}
-          onCancel={() => setConfirming(null)}
+          error={dialogError}
+          onCloseFocus={() => opener.current?.focus()}
+          onCancel={() => {
+            setConfirming(null);
+            setDialogError(null);
+          }}
           onConfirm={(mode) => apply(confirming, mode)}
         />
       )}

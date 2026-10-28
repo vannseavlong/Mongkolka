@@ -41,3 +41,8 @@ Next: G5 and G6 by a fresh agent, then G9, G10, G11.
 
 ## Review 2026-10-28 (fresh agent, G5+G6)
 No blockers. Should-fix, sent back to the builder: (1) 413 only after full body read, abort handling; (2) forced delete can overwrite a concurrent section edit; (3) cover_photo_url not covered by usage/strip. Nits: exact-string URL match only, no dimension cap, in-process lock (single instance), possible orphan on crash between put and create.
+
+## Fixes 2026-10-28 (commit 4555098)
+Review findings fixed: early 413 on size limit and Content-Length, abort handling; forced delete re-reads each section before writing (residual window remains, no compare-and-set in Sheets); cover_photo_url counted as usage and stripped on force; images over 12000 px rejected (413 image_too_large). Tests 22/22, typecheck and build pass.
+Contract changes for the frontend: `GET /:id/usage` -> `{ sections, cover }`; 409 `in_use` -> `{ error, sections, cover }`; new 413 `image_too_large`.
+Still not done: G4 against the real app and sheet, schema sync on a non-production sheet, G9, G10, G11, re-review of the fix commit.

@@ -15,6 +15,9 @@ export default {
     {
       template_id: "ink_and_gold",
       name: "Ink & Gold",
+      slug: "gold-ink-cream",
+      description:
+        "Warm cream pages with deep ink text and gold accents, set like a printed folio.",
       default_theme: {
         bg_color: "#f3ead8",
         text_color: "#17142a",
@@ -38,6 +41,8 @@ export default {
     {
       template_id: "khmer_kbach",
       name: "Khmer Kbach",
+      slug: "crimson-gold-silk",
+      description: "Deep crimson and gold with Khmer kbach ornament, for a traditional ceremony.",
       default_theme: {
         bg_color: "#fbf1de",
         text_color: "#4a0e1a",
@@ -61,6 +66,8 @@ export default {
     {
       template_id: "botanical_romance",
       name: "Botanical Romance",
+      slug: "blush-gold-garden",
+      description: "Soft blush backgrounds with gold details and an envelope opening.",
       default_theme: {
         bg_color: "#fff8f5",
         text_color: "#3a2e2e",
@@ -73,6 +80,8 @@ export default {
     {
       template_id: "modern_minimal",
       name: "Modern Minimal",
+      slug: "white-black-mono",
+      description: "Clean white and black, sans-serif type, and a curtain opening.",
       default_theme: {
         bg_color: "#ffffff",
         text_color: "#111111",

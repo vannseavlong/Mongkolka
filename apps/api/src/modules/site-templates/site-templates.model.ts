@@ -11,6 +11,15 @@ export const SiteTemplatesModel = {
       .findOne({ where: { template_id: templateId } });
   },
 
+  findBySlug(slug: string) {
+    return adminContext().table("site_templates").findOne({ where: { slug } });
+  },
+
+  /** Used to keep template slugs from colliding with a couple's site slug. */
+  findCoupleBySlug(slug: string) {
+    return adminContext().table("couples").findOne({ where: { slug } });
+  },
+
   create(data: Record<string, unknown>) {
     return adminContext().table("site_templates").create(data);
   },

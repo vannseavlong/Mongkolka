@@ -7,3 +7,7 @@ siteTemplatesRouter.get("/site-templates", SiteTemplatesController.list);
 siteTemplatesRouter.post("/site-templates", SiteTemplatesController.create);
 siteTemplatesRouter.patch("/site-templates/:templateId", SiteTemplatesController.update);
 siteTemplatesRouter.delete("/site-templates/:templateId", SiteTemplatesController.remove);
+
+export const publicSiteTemplatesRouter = Router();
+
+publicSiteTemplatesRouter.get("/site-templates/by-slug/:slug", SiteTemplatesController.getBySlug);

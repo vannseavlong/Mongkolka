@@ -178,9 +178,13 @@ Lives at `/website`, restructured for the two-axis model rather than adapted fro
 1. **Select a site template** (`TemplatePicker`) — picks
    `couple_profile.site_template_id` via `POST /couple/api/website/template`, which
    also bootstraps one `website_sections` row per section key the first time (so the
-   builder always has something to list). Changing the template later doesn't touch
-   any section's explicit `component_id`/`color_override` — those still win over the
-   new template's defaults.
+   builder always has something to list). The body takes an optional
+   `mode`: `keep_content` (default) clears every section's `component_id` and
+   `color_override` plus `couple_profile.theme_override` so the new template's look
+   applies fully, but keeps section `content`; `reset_all` clears `content` too (only `content`; `enabled` and `display_order` are never touched).
+   Unknown or inactive templates return 404. Templates also have a public `slug`
+   and `description`; `GET /public/api/site-templates/by-slug/:slug` returns
+   `{ template }` (404 if unknown or inactive).
 2. **Whole-site theme** (`ThemeEditor`) — four color inputs + font-style select,
    `PATCH /couple/api/website/theme`, writing the *whole* resolved theme (not a
    sparse diff) into `couple_profile.theme_override`.

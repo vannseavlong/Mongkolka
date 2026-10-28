@@ -10,6 +10,13 @@ export default defineTable({
   columns: {
     template_id: string().required().unique(),
     name: string().required(),
+    // Public identity of the template: the preview address (`{slug}.<domain>`) and the
+    // by-slug lookup. Same format as a couple slug (utils/slug.ts), unique among
+    // templates and never equal to a couple's slug (enforced at the application layer
+    // in both directions). Not required in the sheet so rows that predate it still load.
+    slug: string().unique(),
+    // Short marketing blurb shown in the picker and the preview page.
+    description: string(),
     // { bg_color, text_color, accent_color, font_style }
     default_theme: json(),
     // { [sectionKey]: componentId }, e.g. { opening: 'opening_curtain', gallery: 'gallery_grid' }

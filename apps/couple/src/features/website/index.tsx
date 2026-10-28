@@ -80,6 +80,7 @@ export function Website() {
                 <CardContent>
                   <ThemeEditor
                     theme={{ ...selectedTemplate.default_theme, ...(settings?.theme_override ?? {}) }}
+                    templateDefault={selectedTemplate.default_theme}
                     onPreview={setDraftTheme}
                   />
                 </CardContent>

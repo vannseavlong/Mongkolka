@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { type Row } from "@tanstack/react-table";
 import { Button } from "@mongkolka/ui/button";
 import {
@@ -24,6 +24,15 @@ export function SiteTemplatesRowActions({ row }: { row: Row<SiteTemplate> }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuItem
+          onClick={() => {
+            setCurrentRow(row.original);
+            setOpen("edit");
+          }}
+        >
+          Edit
+          <Pencil className="ms-auto size-4" />
+        </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
           onClick={() => {

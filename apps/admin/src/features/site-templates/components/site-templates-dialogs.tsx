@@ -16,6 +16,18 @@ export function SiteTemplatesDialogs() {
       />
 
       {currentRow && (
+        <SiteTemplatesActionDialog
+          key={`site-template-edit-${currentRow.template_id}`}
+          open={open === "edit"}
+          onOpenChange={(state) => {
+            setOpen(state ? "edit" : null);
+            if (!state) setTimeout(() => setCurrentRow(null), 500);
+          }}
+          currentRow={currentRow}
+        />
+      )}
+
+      {currentRow && (
         <SiteTemplatesDeleteDialog
           key={`site-template-delete-${currentRow.template_id}`}
           open={open === "delete"}

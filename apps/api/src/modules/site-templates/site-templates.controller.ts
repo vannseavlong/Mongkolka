@@ -5,6 +5,8 @@ import {
   type UpdateSiteTemplateInput,
 } from "./site-templates.service.js";
 
+const STATUSES = ["active", "inactive"];
+
 export const SiteTemplatesController = {
   async list(req: Request, res: Response) {
     const status = typeof req.query.status === "string" ? req.query.status : undefined;
@@ -19,8 +21,11 @@ export const SiteTemplatesController = {
       res.status(400).json({ error: "template_id, name and slug are required" });
       return;
     }
-    if (description !== undefined && typeof description !== "string") {
-      res.status(400).json({ error: "description must be a string" });
+    if (
+      (description !== undefined && typeof description !== "string") ||
+      (req.body?.status !== undefined && !STATUSES.includes(req.body.status))
+    ) {
+      res.status(400).json({ error: "description must be a string and status active or inactive" });
       return;
     }
     try {
@@ -46,9 +51,12 @@ export const SiteTemplatesController = {
     const { name, slug, description, default_theme, default_components, status } = req.body ?? {};
     if (
       (slug !== undefined && typeof slug !== "string") ||
-      (description !== undefined && typeof description !== "string")
+      (description !== undefined && typeof description !== "string") ||
+      (status !== undefined && !STATUSES.includes(status))
     ) {
-      res.status(400).json({ error: "slug and description must be strings" });
+      res.status(400).json({
+        error: "slug and description must be strings; status must be active or inactive",
+      });
       return;
     }
     const input: UpdateSiteTemplateInput = {};

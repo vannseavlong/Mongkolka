@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { ValidationError } from "longcelot-sheet-db";
-import { isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
+import { isReservedSlug, isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
 import { CoupleWebsiteModel } from "./couple-website.model.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
 import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
@@ -124,6 +124,25 @@ export const CoupleWebsiteService = {
       CoupleWebsiteModel.findProfile(actorSheetId),
       CoupleWebsiteModel.findSections(actorSheetId),
     ]);
+    // Section clears go first and are all awaited (allSettled) before anything else is
+    // written: if any fail we stop with the profile still on the old template, so the
+    // couple keeps a consistent old look instead of a new template over half-cleared
+    // sections. The adapter has no multi-row update, so this is one write per section
+    // that actually needs clearing (already-clean rows are skipped), run in parallel.
+    const clearContent = mode === "reset_all";
+    const resets = existingSections.flatMap((section) => {
+      const patch: Record<string, unknown> = {};
+      if (isSet(section.component_id)) patch.component_id = null;
+      if (isSet(section.color_override)) patch.color_override = null;
+      if (clearContent && isSet(section.content)) patch.content = null;
+      return Object.keys(patch).length > 0
+        ? [CoupleWebsiteModel.updateSection(actorSheetId, section.section_id as string, patch)]
+        : [];
+    });
+    const results = await Promise.allSettled(resets);
+    const failed = results.find((r): r is PromiseRejectedResult => r.status === "rejected");
+    if (failed) throw failed.reason;
+
     // Applying a template always drops the whole-site color override so the new
     // template's theme shows (null = "use the template's theme as-is").
     if (profile) {
@@ -137,20 +156,6 @@ export const CoupleWebsiteService = {
         site_template_id: templateId,
       });
     }
-
-    // The adapter has no multi-row update, so this is one write per section that
-    // actually needs clearing (already-clean rows are skipped), issued in parallel.
-    const clearContent = mode === "reset_all";
-    const resets = existingSections.flatMap((section) => {
-      const patch: Record<string, unknown> = {};
-      if (isSet(section.component_id)) patch.component_id = null;
-      if (isSet(section.color_override)) patch.color_override = null;
-      if (clearContent && isSet(section.content)) patch.content = null;
-      return Object.keys(patch).length > 0
-        ? [CoupleWebsiteModel.updateSection(actorSheetId, section.section_id as string, patch)]
-        : [];
-    });
-    await Promise.all(resets);
 
     const existingKeys = new Set(existingSections.map((section) => section.section_key as string));
     const missingKeys = SECTION_KEYS.filter((sectionKey) => !existingKeys.has(sectionKey));
@@ -282,9 +287,7 @@ export const CoupleWebsiteService = {
     try {
       await Promise.all(
         sectionIds.map((sectionId, index) =>
-          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, {
-            display_order: index,
-          }),
+          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, { display_order: index }),
         ),
       );
     } finally {
@@ -330,8 +333,7 @@ export const CoupleWebsiteService = {
       );
     }
     // Template slugs are reserved: each one is the public preview address of a template.
-    const reserved = await SiteTemplatesService.listTemplateSlugs();
-    if (reserved.has(slug)) {
+    if (isReservedSlug(slug) || (await SiteTemplatesService.listTemplateSlugs()).has(slug)) {
       throw new Error("That link is reserved — try another");
     }
     try {

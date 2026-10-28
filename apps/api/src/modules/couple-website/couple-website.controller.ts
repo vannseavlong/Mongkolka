@@ -51,9 +51,7 @@ export const CoupleWebsiteController = {
       // message the couple can act on instead of the generic global-handler one,
       // while still logging the real cause for us.
       console.error("selectTemplate failed", err);
-      res.status(500).json({
-        error: "Couldn't save your template selection — please try again.",
-      });
+      res.status(500).json({ error: "Couldn't save your template selection — please try again." });
     }
   },
 

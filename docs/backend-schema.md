@@ -153,7 +153,7 @@ below).
 |---|---|---|
 | `template_id` | string, PK | |
 | `name` | string | Display name. |
-| `slug` | string, unique | Public identity, e.g. `green-blue-sky` (color-descriptive). Same format rules as a couple slug. Doubles as the preview address and the `GET /public/api/site-templates/by-slug/:slug` key. Reserved: a couple cannot pick a template slug (`updateSlug` rejects it), and a template slug cannot equal an existing couple's slug (checked in the application, both directions). Nullable in the sheet only so older rows still load. |
+| `slug` | string, unique | Public identity, e.g. `green-blue-sky` (color-descriptive). Same format rules as a couple slug. Doubles as the preview address and the `GET /public/api/site-templates/by-slug/:slug` key. Reserved: `updateSlug` rejects any template slug and a small list of reserved words (`www`, `api`, `admin`, ...), and creating/renaming a template rejects a slug an existing couple already uses. These are application-level checks across two tables with no transaction, so a narrow race remains (a template slug created at the same moment a couple claims it); accepted for now. Nullable in the sheet only so older rows still load. |
 | `description` | string | Short blurb for the picker and preview page. |
 | `default_theme` | json | `{ bg_color, text_color, accent_color, font_style }` — the base theme every section falls back to unless overridden. |
 | `default_components` | json | `{ [sectionKey]: componentId }` — which `section_components` row each section type uses by default, e.g. `{ opening: "opening_curtain", gallery: "gallery_grid" }`. |

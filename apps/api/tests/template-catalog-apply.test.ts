@@ -1,8 +1,10 @@
+import { beforeEach, describe, it } from "node:test";
 import assert from "node:assert/strict";
 import express from "express";
 import type { AddressInfo } from "node:net";
 import { publicSiteTemplatesRouter } from "../src/modules/site-templates/site-templates.routes.js";
-import { beforeEach, describe, it } from "node:test";
+import { CoupleWebsiteController } from "../src/modules/couple-website/couple-website.controller.js";
+import { isReservedSlug, generatePlaceholderSlug } from "../src/utils/slug.js";
 import { CoupleWebsiteModel } from "../src/modules/couple-website/couple-website.model.js";
 import { CoupleWebsiteService } from "../src/modules/couple-website/couple-website.service.js";
 import { SiteTemplatesModel } from "../src/modules/site-templates/site-templates.model.js";
@@ -22,8 +24,10 @@ let sections: Row[];
 let profileWrites: Row[];
 let sectionWrites: { id: string; data: Row }[];
 let created: Row[];
+let findManyCalls = 0;
 
 beforeEach(() => {
+  SiteTemplatesService.invalidatePublicCache();
   templates = [
     { template_id: "a", slug: "green-blue-sky", status: "active", name: "A" },
     { template_id: "b", slug: "old-rose", status: "inactive", name: "B" },
@@ -51,8 +55,11 @@ beforeEach(() => {
   sectionWrites = [];
   created = [];
 
+  findManyCalls = 0;
   t.findMany = async (where?: Row) =>
-    templates.filter((r) => !where || Object.entries(where).every(([k, v]) => r[k] === v));
+    (findManyCalls++, templates).filter(
+      (r) => !where || Object.entries(where).every(([k, v]) => r[k] === v),
+    );
   t.findBySlug = async (slug: string) => templates.find((r) => r.slug === slug) ?? null;
   t.findById = async (id: string) => templates.find((r) => r.template_id === id) ?? null;
   t.findCoupleBySlug = async (slug: string) => couples.find((r) => r.slug === slug) ?? null;
@@ -184,5 +191,118 @@ describe("GET /site-templates/by-slug/:slug (http)", () => {
   it("404 for unknown and inactive", async () => {
     assert.equal((await get("/site-templates/by-slug/missing-one")).status, 404);
     assert.equal((await get("/site-templates/by-slug/old-rose")).status, 404);
+  });
+});
+
+describe("public by-slug hardening", () => {
+  it("returns only the allowlisted fields", async () => {
+    templates[0] = {
+      ...templates[0],
+      _id: "x",
+      _created_at: "t",
+      description: "d",
+      default_theme: {},
+    };
+    const row = await SiteTemplatesService.getPublicBySlug("green-blue-sky");
+    assert.deepEqual(Object.keys(row ?? {}).sort(), [
+      "default_components",
+      "default_theme",
+      "description",
+      "name",
+      "slug",
+      "template_id",
+    ]);
+  });
+  it("junk slugs never add cache keys: one catalog read serves all lookups", async () => {
+    findManyCalls = 0;
+    for (let i = 0; i < 20; i++) await SiteTemplatesService.getPublicBySlug(`junk-${i}`);
+    await SiteTemplatesService.getPublicBySlug("green-blue-sky");
+    assert.equal(findManyCalls, 1);
+  });
+  it("an update invalidates the cache so a deactivated template stops resolving", async () => {
+    assert.ok(await SiteTemplatesService.getPublicBySlug("green-blue-sky"));
+    templates[0] = { ...templates[0], status: "inactive" };
+    await SiteTemplatesService.update("a", { status: "inactive" });
+    assert.equal(await SiteTemplatesService.getPublicBySlug("green-blue-sky"), null);
+  });
+});
+
+describe("reserved words", () => {
+  it("recognises reserved words", () => {
+    for (const w of ["www", "api", "admin", "couple", "cdn"]) assert.ok(isReservedSlug(w));
+    assert.equal(isReservedSlug("vutha-nita"), false);
+  });
+  it("couple updateSlug rejects them", async () => {
+    await assert.rejects(CoupleWebsiteService.updateSlug("c1", "admin"), /reserved/);
+  });
+  it("template slug check rejects them", async () => {
+    await assert.rejects(
+      SiteTemplatesService.create({
+        template_id: "n",
+        name: "N",
+        slug: "www",
+        default_theme: {},
+        default_components: {},
+      }),
+      (e) => e instanceof SiteTemplateInputError && e.status === 400,
+    );
+  });
+  it("placeholder slugs are never reserved", () => {
+    assert.equal(isReservedSlug(generatePlaceholderSlug()), false);
+  });
+});
+
+describe("apply partial failure", () => {
+  it("does not touch the profile and rethrows when a section clear fails", async () => {
+    m.updateSection = async (_a: string, id: string) => {
+      if (id === "s2") throw new Error("sheets down");
+      sectionWrites.push({ id, data: {} });
+    };
+    await assert.rejects(
+      CoupleWebsiteService.selectTemplate("sheet", "a", "reset_all"),
+      /sheets down/,
+    );
+    assert.equal(profileWrites.length, 0);
+    assert.ok(
+      sectionWrites.some((w) => w.id === "s1"),
+      "other writes were allowed to settle",
+    );
+  });
+});
+
+describe("POST /website/template (http)", () => {
+  async function post(body: Row) {
+    const app = express();
+    app.use(express.json());
+    app.post("/t", (req, res, next) => {
+      Object.assign(req, { coupleId: "c1", coupleActorSheetId: "sheet" });
+      CoupleWebsiteController.selectTemplate(req as never, res).catch(next);
+    });
+    const server = app.listen(0);
+    try {
+      const { port } = server.address() as AddressInfo;
+      const res = await fetch(`http://127.0.0.1:${port}/t`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      return { status: res.status, body: (await res.json()) as Row };
+    } finally {
+      server.close();
+    }
+  }
+  it("404 for an unknown template", async () => {
+    const r = await post({ template_id: "zzz" });
+    assert.equal(r.status, 404);
+    assert.equal(profileWrites.length, 0);
+  });
+  it("400 for a bad mode", async () => {
+    assert.equal((await post({ template_id: "a", mode: "wipe" })).status, 400);
+  });
+  it("200 echoes the mode", async () => {
+    m.findCoupleById = async () => ({ slug: "s", website_status: "draft" });
+    const r = await post({ template_id: "a", mode: "reset_all" });
+    assert.equal(r.status, 200);
+    assert.equal(r.body.mode, "reset_all");
   });
 });

@@ -1,5 +1,5 @@
 import { ValidationError } from "longcelot-sheet-db";
-import { isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
+import { isReservedSlug, isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
 import { TtlCache } from "../../utils/ttl-cache.js";
 import { SiteTemplatesModel } from "./site-templates.model.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
@@ -39,11 +39,26 @@ export class SiteTemplateInputError extends Error {
   }
 }
 
-// Public by-slug lookups come from the preview site on every visit; keep them off Sheets.
-const BY_SLUG_TTL_MS = 60 * 1000;
-const MISS_TTL_MS = 20 * 1000;
-type Row = Record<string, unknown> | null;
-const bySlugCache = new TtlCache<{ template: Row }>(BY_SLUG_TTL_MS, 200);
+// The public by-slug lookup is hit on every preview visit. The whole active catalog is
+// tiny, so it is loaded with ONE read into a short-TTL cache and looked up in memory:
+// no per-slug keys, so junk slugs can neither grow the cache nor evict real entries.
+const CATALOG_TTL_MS = 60 * 1000;
+type Row = Record<string, unknown>;
+const activeCatalogCache = new TtlCache<Row[]>(CATALOG_TTL_MS, 1);
+const CATALOG_KEY = "active";
+
+const PUBLIC_FIELDS = [
+  "template_id",
+  "name",
+  "slug",
+  "description",
+  "default_theme",
+  "default_components",
+] as const;
+
+function toPublicTemplate(row: Row) {
+  return Object.fromEntries(PUBLIC_FIELDS.map((key) => [key, row[key] ?? null]));
+}
 
 /**
  * A template slug must follow the couple slug rules, be unique among templates,
@@ -51,6 +66,9 @@ const bySlugCache = new TtlCache<{ template: Row }>(BY_SLUG_TTL_MS, 200);
  * in CoupleWebsiteService.updateSlug via listTemplateSlugs()).
  */
 async function assertSlugAvailable(slug: string, templateId: string) {
+  if (isReservedSlug(slug)) {
+    throw new SiteTemplateInputError("That slug is reserved", 400);
+  }
   if (!isValidCustomSlug(slug)) {
     throw new SiteTemplateInputError(
       "slug must be 3-40 characters: lowercase letters, numbers, and single hyphens only",
@@ -70,7 +88,7 @@ async function assertSlugAvailable(slug: string, templateId: string) {
 }
 
 function invalidate() {
-  bySlugCache.clear();
+  activeCatalogCache.clear();
   PublicSiteCache.invalidateAll();
 }
 
@@ -83,18 +101,15 @@ export const SiteTemplatesService = {
   async getPublicBySlug(rawSlug: string) {
     const slug = normalizeSlug(rawSlug);
     if (!isValidCustomSlug(slug)) return null;
-    const entry = await bySlugCache.getOrLoad(
-      slug,
-      async () => {
-        const template = await SiteTemplatesModel.findBySlug(slug);
-        return {
-          template: template && template.status === "active" ? template : null,
-        };
-      },
-      (value) => (value.template ? BY_SLUG_TTL_MS : MISS_TTL_MS),
+    const catalog = await activeCatalogCache.getOrLoad(CATALOG_KEY, () =>
+      SiteTemplatesModel.findMany({ status: "active" }),
     );
-    return entry.template;
+    const row = catalog.find((r) => r.slug === slug && r.status === "active");
+    return row ? toPublicTemplate(row) : null;
   },
+
+  /** Drops the public catalog cache (also called by every write here). */
+  invalidatePublicCache: invalidate,
 
   /** Every template slug (any status), for couple slug validation. */
   async listTemplateSlugs(): Promise<Set<string>> {

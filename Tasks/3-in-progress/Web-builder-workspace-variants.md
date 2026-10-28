@@ -3,9 +3,9 @@
 - **Repo:** apps/couple, packages/templates
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new screen layout, shared package export (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/builder-workspace/` · **Branch:** `feat/builder-workspace` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (Web-builder-workspace-variants), 2026-10-28
+- **Worktree:** `Mongkolka/builder-workspace/` · **Branch:** `feat/builder-workspace` 
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** none
 - **Touches:** apps/couple/src/features/website (index.tsx, sections-list.tsx, section-preview.tsx, new variant-browser, section-panel), packages/templates (export shared SAMPLE content)

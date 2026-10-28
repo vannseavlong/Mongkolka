@@ -3,9 +3,9 @@
 - **Repo:** apps/api
 - **Owner:** SNLRLONG
 - **Tier:** T3 · file upload, storage driver, new couple-sheet table (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/website-assets/` · **Branch:** `feat/website-assets` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (API-website-assets), 2026-10-28
+- **Worktree:** `Mongkolka/website-assets/` · **Branch:** `feat/website-assets` 
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** none (release needs `API-s3-storage-verify` for production (or the Drive driver))
 - **Touches:** apps/api/src/modules/website-assets (new), config/database table registration, services/storage (reuse only), Docs/backend-schema.md

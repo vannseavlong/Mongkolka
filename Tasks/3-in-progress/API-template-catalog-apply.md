@@ -3,9 +3,9 @@
 - **Repo:** apps/api
 - **Owner:** SNLRLONG
 - **Tier:** T3 · fields another app depends on, schema change on admin sheet, slug rules (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/template-catalog-apply/` · **Branch:** `feat/template-catalog-apply` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (API-template-catalog-apply), 2026-10-28
+- **Worktree:** `Mongkolka/template-catalog-apply/` · **Branch:** `feat/template-catalog-apply` 
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** none
 - **Touches:** apps/api/src/modules/site-templates, modules/couple-website (selectTemplate), utils/slug.ts, modules/public-site routes, seeds/site-templates.ts, Docs/backend-schema.md

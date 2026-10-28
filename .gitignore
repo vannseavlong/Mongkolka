@@ -32,3 +32,8 @@ next-env.d.ts
 /Clone-UI/
 /Clone-Admin/
 uploads/
+
+# task worktrees
+/website-assets/
+/template-catalog-apply/
+/builder-workspace/

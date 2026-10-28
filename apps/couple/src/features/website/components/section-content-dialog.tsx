@@ -12,9 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@mongkolka/ui/input";
 import { Textarea } from "@mongkolka/ui/textarea";
 import { api, ApiError } from "@/lib/api";
+import { SECTIONS_KEY } from "../lib/keys";
 import type { WebsiteSection, WebsiteSectionKey } from "../data/schema";
 
-const SECTIONS_KEY = "/couple/api/website/sections";
 
 /** The only section keys with no other canonical content source — see
  * docs/tasks/template.md's "Where each section's content comes from" table. */

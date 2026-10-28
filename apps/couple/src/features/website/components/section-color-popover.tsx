@@ -10,9 +10,9 @@ import { Input } from "@mongkolka/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@mongkolka/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { api, ApiError } from "@/lib/api";
+import { SECTIONS_KEY } from "../lib/keys";
 import type { Theme, WebsiteSection } from "../data/schema";
 
-const SECTIONS_KEY = "/couple/api/website/sections";
 
 /**
  * Per-section variant of ThemeEditor.tsx — same 4 fields (bg/text/accent color +

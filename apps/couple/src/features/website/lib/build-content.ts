@@ -2,8 +2,8 @@ import type { SectionKey } from "@mongkolka/templates";
 
 /**
  * Canonical couple-profile fields hero/story/details are derived from — shared
- * between the full-page preview (website-preview.tsx) and the per-row preview
- * (section-preview.tsx) so the mapping only lives in one place.
+ * between the builder canvas (workspace/site-canvas.tsx) and the variant previews
+ * (components/section-preview.tsx) so the mapping only lives in one place.
  */
 export interface PreviewProfile {
   partner1_name: string | null;

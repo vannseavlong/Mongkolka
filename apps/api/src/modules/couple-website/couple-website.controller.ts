@@ -1,6 +1,12 @@
 import type { Response } from "express";
 import type { CoupleRequest } from "../../middlewares/couple-context.middleware.js";
-import { CoupleWebsiteService } from "./couple-website.service.js";
+import {
+  APPLY_TEMPLATE_MODES,
+  CoupleWebsiteService,
+  DEFAULT_APPLY_TEMPLATE_MODE,
+  TemplateNotAvailableError,
+  type ApplyTemplateMode,
+} from "./couple-website.service.js";
 
 export const CoupleWebsiteController = {
   async getCatalog(_req: CoupleRequest, res: Response) {
@@ -22,20 +28,32 @@ export const CoupleWebsiteController = {
       res.status(400).json({ error: "template_id is required" });
       return;
     }
+    const rawMode = req.body?.mode;
+    if (rawMode !== undefined && !APPLY_TEMPLATE_MODES.includes(rawMode)) {
+      res.status(400).json({ error: 'mode must be "keep_content" or "reset_all"' });
+      return;
+    }
+    const mode: ApplyTemplateMode = rawMode ?? DEFAULT_APPLY_TEMPLATE_MODE;
     try {
-      await CoupleWebsiteService.selectTemplate(req.coupleActorSheetId as string, templateId);
+      await CoupleWebsiteService.selectTemplate(req.coupleActorSheetId as string, templateId, mode);
       const settings = await CoupleWebsiteService.getSettings(
         req.coupleId as string,
         req.coupleActorSheetId as string,
       );
-      res.json({ settings });
+      res.json({ settings, mode });
     } catch (err) {
+      if (err instanceof TemplateNotAvailableError) {
+        res.status(404).json({ error: err.message });
+        return;
+      }
       // Bootstrapping a couple's first-ever template write hits the Sheets-backed
       // store several times in one request (profile + section rows); surface a
       // message the couple can act on instead of the generic global-handler one,
       // while still logging the real cause for us.
       console.error("selectTemplate failed", err);
-      res.status(500).json({ error: "Couldn't save your template selection — please try again." });
+      res.status(500).json({
+        error: "Couldn't save your template selection — please try again.",
+      });
     }
   },
 

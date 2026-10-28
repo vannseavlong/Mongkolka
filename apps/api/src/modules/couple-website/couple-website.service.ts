@@ -1,8 +1,21 @@
 import { randomUUID } from "node:crypto";
 import { ValidationError } from "longcelot-sheet-db";
-import { isValidCustomSlug } from "../../utils/slug.js";
+import { isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
 import { CoupleWebsiteModel } from "./couple-website.model.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
+import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
+
+/**
+ * How applying a template treats what the couple already edited:
+ * - `keep_content`: clears per-section `component_id` / `color_override` and the
+ *   profile `theme_override` (so the template's look applies fully) but keeps `content`.
+ * - `reset_all`: also clears every section's `content`.
+ */
+export type ApplyTemplateMode = "keep_content" | "reset_all";
+export const APPLY_TEMPLATE_MODES: readonly ApplyTemplateMode[] = ["keep_content", "reset_all"];
+export const DEFAULT_APPLY_TEMPLATE_MODE: ApplyTemplateMode = "keep_content";
+
+export class TemplateNotAvailableError extends Error {}
 
 // Mirrors SECTION_KEYS in packages/templates/src/types.ts — kept as a plain
 // constant here since the API is framework-agnostic and shouldn't depend on the
@@ -44,6 +57,11 @@ function compareByDisplayOrder(a: Record<string, unknown>, b: Record<string, unk
   return toComparableOrder(a.display_order) - toComparableOrder(b.display_order);
 }
 
+function isSet(value: unknown): boolean {
+  if (value === undefined || value === null || value === "") return false;
+  return true;
+}
+
 export const CoupleWebsiteService = {
   async getCatalog() {
     const [templates, components] = await Promise.all([
@@ -81,19 +99,37 @@ export const CoupleWebsiteService = {
    * still theoretically possible for the same key on a dead heat between two
    * reads — that residual case is covered by the dedupe in listSections().
    */
-  async selectTemplate(actorSheetId: string, templateId: string) {
+  async selectTemplate(
+    actorSheetId: string,
+    templateId: string,
+    mode: ApplyTemplateMode = DEFAULT_APPLY_TEMPLATE_MODE,
+  ) {
+    const template = await CoupleWebsiteModel.findTemplateById(templateId);
+    if (!template || template.status !== "active") {
+      throw new TemplateNotAvailableError("That template isn't available");
+    }
     try {
-      await CoupleWebsiteService.selectTemplateUncached(actorSheetId, templateId);
+      await CoupleWebsiteService.selectTemplateUncached(actorSheetId, templateId, mode);
     } finally {
       PublicSiteCache.invalidateActorSheet(actorSheetId);
     }
   },
 
-  async selectTemplateUncached(actorSheetId: string, templateId: string) {
-    const profile = await CoupleWebsiteModel.findProfile(actorSheetId);
+  async selectTemplateUncached(
+    actorSheetId: string,
+    templateId: string,
+    mode: ApplyTemplateMode = DEFAULT_APPLY_TEMPLATE_MODE,
+  ) {
+    const [profile, existingSections] = await Promise.all([
+      CoupleWebsiteModel.findProfile(actorSheetId),
+      CoupleWebsiteModel.findSections(actorSheetId),
+    ]);
+    // Applying a template always drops the whole-site color override so the new
+    // template's theme shows (null = "use the template's theme as-is").
     if (profile) {
       await CoupleWebsiteModel.updateProfile(actorSheetId, profile.profile_id as string, {
         site_template_id: templateId,
+        theme_override: null,
       });
     } else {
       await CoupleWebsiteModel.createProfile(actorSheetId, {
@@ -102,7 +138,20 @@ export const CoupleWebsiteService = {
       });
     }
 
-    const existingSections = await CoupleWebsiteModel.findSections(actorSheetId);
+    // The adapter has no multi-row update, so this is one write per section that
+    // actually needs clearing (already-clean rows are skipped), issued in parallel.
+    const clearContent = mode === "reset_all";
+    const resets = existingSections.flatMap((section) => {
+      const patch: Record<string, unknown> = {};
+      if (isSet(section.component_id)) patch.component_id = null;
+      if (isSet(section.color_override)) patch.color_override = null;
+      if (clearContent && isSet(section.content)) patch.content = null;
+      return Object.keys(patch).length > 0
+        ? [CoupleWebsiteModel.updateSection(actorSheetId, section.section_id as string, patch)]
+        : [];
+    });
+    await Promise.all(resets);
+
     const existingKeys = new Set(existingSections.map((section) => section.section_key as string));
     const missingKeys = SECTION_KEYS.filter((sectionKey) => !existingKeys.has(sectionKey));
     if (missingKeys.length > 0) {
@@ -233,7 +282,9 @@ export const CoupleWebsiteService = {
     try {
       await Promise.all(
         sectionIds.map((sectionId, index) =>
-          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, { display_order: index }),
+          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, {
+            display_order: index,
+          }),
         ),
       );
     } finally {
@@ -272,11 +323,16 @@ export const CoupleWebsiteService = {
    * up front, so a race between two saves still can't produce duplicates.
    */
   async updateSlug(coupleId: string, rawSlug: string) {
-    const slug = rawSlug.trim().toLowerCase();
+    const slug = normalizeSlug(rawSlug);
     if (!isValidCustomSlug(slug)) {
       throw new Error(
         "Link must be 3-40 characters: lowercase letters, numbers, and single hyphens only",
       );
+    }
+    // Template slugs are reserved: each one is the public preview address of a template.
+    const reserved = await SiteTemplatesService.listTemplateSlugs();
+    if (reserved.has(slug)) {
+      throw new Error("That link is reserved — try another");
     }
     try {
       await CoupleWebsiteModel.updateSlug(coupleId, slug);

@@ -6,6 +6,7 @@ import { publicMarketplaceRouter } from "../modules/public-marketplace/public-ma
 import { publicThemeRouter } from "../modules/public-theme/public-theme.routes.js";
 import { publicStatsRouter } from "../modules/public-stats/public-stats.routes.js";
 import { publicContactRouter } from "../modules/public-contact/public-contact.routes.js";
+import { publicSiteTemplatesRouter } from "../modules/site-templates/site-templates.routes.js";
 
 export const publicApiRouter = Router();
 
@@ -16,3 +17,4 @@ publicApiRouter.use(publicMarketplaceRouter);
 publicApiRouter.use(publicThemeRouter);
 publicApiRouter.use(publicStatsRouter);
 publicApiRouter.use(publicContactRouter);
+publicApiRouter.use(publicSiteTemplatesRouter);

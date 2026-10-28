@@ -20,3 +20,8 @@ const CUSTOM_SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 export function isValidCustomSlug(slug: string): boolean {
   return slug.length >= 3 && slug.length <= 40 && CUSTOM_SLUG_PATTERN.test(slug);
 }
+
+/** Normalises user input the way every slug check expects: trimmed and lowercase. */
+export function normalizeSlug(raw: string): string {
+  return raw.trim().toLowerCase();
+}

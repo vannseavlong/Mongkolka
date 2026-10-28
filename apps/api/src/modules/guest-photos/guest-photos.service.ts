@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { photoStorage } from "../../services/storage/index.js";
 import { RateLimiter } from "../../utils/rate-limit.js";
 import { TtlCache } from "../../utils/ttl-cache.js";
+import { matchesSignature } from "../../utils/image-signature.js";
 import { PublicSiteService } from "../public-site/public-site.service.js";
 import { GuestPhotosModel } from "./guest-photos.model.js";
 import { GuestPhotosQueue } from "./guest-photos.queue.js";
@@ -32,22 +33,6 @@ const uploadLimiter = new RateLimiter(60 * 60 * 1000);
 // Short TTL so new approved photos appear within seconds with no coupling to the
 // upload path; moderation deletes the entry so a removal is instant.
 const galleryCache = new TtlCache<PublicPhoto[]>(20_000, 1000);
-
-/** Checks the file's magic bytes match the claimed type — a client-supplied header isn't proof. */
-function matchesSignature(mime: string, b: Buffer): boolean {
-  switch (mime) {
-    case "image/jpeg":
-      return b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
-    case "image/png":
-      return b.length > 8 && b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-    case "image/gif":
-      return b.length > 6 && b.subarray(0, 4).toString("ascii") === "GIF8";
-    case "image/webp":
-      return b.length > 12 && b.subarray(0, 4).toString("ascii") === "RIFF" && b.subarray(8, 12).toString("ascii") === "WEBP";
-    default:
-      return false;
-  }
-}
 
 function normalizeStatus(row: Record<string, unknown>): PhotoStatus {
   return (PHOTO_STATUSES as readonly unknown[]).includes(row.status) ? (row.status as PhotoStatus) : "pending";

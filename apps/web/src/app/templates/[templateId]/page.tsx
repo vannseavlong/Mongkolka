@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { fetchJson } from "@/lib/api";
 import type { SiteTemplatesResponse } from "../types";
-import { TemplatePreview } from "./template-preview";
+import { TemplatePreview } from "../template-preview";
 
 export default async function TemplateDetailPage({
   params,

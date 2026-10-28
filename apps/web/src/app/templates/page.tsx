@@ -4,6 +4,16 @@ import { SiteFooter } from "@/components/site-footer";
 import { fetchJson } from "@/lib/api";
 import type { SiteTemplatesResponse } from "./types";
 
+// Subdomain previews need ROOT_DOMAIN (wildcard DNS). Without it (plain local
+// dev) cards fall back to the /templates/[id] path preview.
+const ROOT_DOMAIN = process.env.ROOT_DOMAIN;
+
+function previewHref(template: { template_id: string; slug?: string }) {
+  if (!ROOT_DOMAIN || !template.slug) return `/templates/${template.template_id}`;
+  const protocol = ROOT_DOMAIN.startsWith("localhost") ? "http" : "https";
+  return `${protocol}://${template.slug}.${ROOT_DOMAIN}`;
+}
+
 export default async function TemplatesPage() {
   const data = await fetchJson<SiteTemplatesResponse>("/public/api/site-templates");
   const templates = data?.templates ?? [];
@@ -27,7 +37,7 @@ export default async function TemplatesPage() {
             {templates.map((template) => (
               <Link
                 key={template.template_id}
-                href={`/templates/${template.template_id}`}
+                href={previewHref(template)}
                 className="flex flex-col gap-4 rounded-xl border p-6 transition-colors hover:bg-accent"
               >
                 <div
@@ -45,7 +55,12 @@ export default async function TemplatesPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <h2 className="font-medium">{template.name}</h2>
+                  <div className="flex min-w-0 flex-col">
+                    <h2 className="font-medium">{template.name}</h2>
+                    {template.description && (
+                      <p className="line-clamp-2 text-sm text-muted-foreground">{template.description}</p>
+                    )}
+                  </div>
                   <div className="flex shrink-0 -space-x-1">
                     {[template.default_theme.bg_color, template.default_theme.accent_color, template.default_theme.text_color].map(
                       (color, i) => (

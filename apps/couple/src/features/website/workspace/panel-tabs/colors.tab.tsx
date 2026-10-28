@@ -1,54 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { contrastRatio, FONT_STYLES, MIN_TEXT_CONTRAST, resolveTheme } from "@mongkolka/templates";
-import type { Theme } from "@mongkolka/templates";
+import { FONT_STYLES, normalizeColor, resolveTheme, sameColor } from "@mongkolka/templates";
+import type { PartialTheme, Theme } from "@mongkolka/templates";
 import { Button } from "@mongkolka/ui/button";
 import { Input } from "@mongkolka/ui/input";
 import { Label } from "@mongkolka/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
+import { useApiQuery } from "@/lib/use-api-query";
+import { ContrastNote } from "../../components/contrast-note";
+import type { WebsiteSettings } from "../../data/schema";
 import type { SectionPanelContext, SectionPanelTab } from "./types";
 
-const FIELDS: { key: keyof Theme; label: string }[] = [
+const FIELDS: { key: "bg_color" | "text_color" | "accent_color"; label: string }[] = [
   { key: "bg_color", label: "Background" },
   { key: "text_color", label: "Text" },
   { key: "accent_color", label: "Accent" },
 ];
+const DEBOUNCE_MS = 600;
 
 function ColorsPanel({ context }: { context: SectionPanelContext }) {
   const { section, template, themeOverride, patchSection } = context;
-  const inherited = resolveTheme(template.default_theme, themeOverride, null);
+  // Prune against the SAVED site theme, not the unsaved draft on the canvas.
+  const { data: settingsData } = useApiQuery<{ settings: WebsiteSettings }>("/couple/api/website/settings");
+  const savedOverride = settingsData ? (settingsData.settings.theme_override ?? null) : themeOverride;
+  const inherited = resolveTheme(template.default_theme, savedOverride, null);
   const override = section.color_override ?? null;
-  const [busy, setBusy] = useState(false);
-  // Pickers fire on every drag step; keep the in-progress value here and save
-  // once on blur/commit instead of PATCHing per step.
-  const [drafts, setDrafts] = useState<Partial<Theme>>({});
 
-  async function save(next: Partial<Theme> | null, message: string) {
-    if (busy) return;
-    setBusy(true);
-    const ok = await patchSection({ color_override: next }, "Failed to save section colors");
-    setBusy(false);
-    if (ok && message) toast.success(message);
+  // Saves are serialized through a promise chain. `latest` is the override as
+  // of the last queued save (the SWR cache only updates when a queued patch
+  // starts), so back-to-back edits build on each other instead of the stale prop.
+  const chain = useRef<Promise<unknown>>(Promise.resolve());
+  const latest = useRef<{ value: PartialTheme | null } | null>(null);
+  const [pending, setPending] = useState(0);
+  const [drafts, setDrafts] = useState<Partial<Theme>>({});
+  // Keys edited but not yet committed (so blur after Enter does not save twice).
+  const dirty = useRef(new Set<keyof Theme>());
+  const timers = useRef<Partial<Record<keyof Theme, ReturnType<typeof setTimeout>>>>({});
+
+  useEffect(() => {
+    const t = timers.current;
+    return () => Object.values(t).forEach((id) => clearTimeout(id));
+  }, []);
+
+  function enqueue(next: PartialTheme | null, onDone: () => void, message?: string) {
+    latest.current = { value: next };
+    setPending((n) => n + 1);
+    chain.current = chain.current
+      .then(() => patchSection({ color_override: next }, "Failed to save section colors"))
+      .then((ok) => {
+        if (ok && message) toast.success(message);
+      })
+      .finally(() => {
+        onDone();
+        setPending((n) => {
+          if (n === 1) latest.current = null;
+          return n - 1;
+        });
+      });
   }
 
-  // Only keys that differ from what the section would inherit are stored, so
-  // a later site-wide change still flows through for untouched keys.
-  function setKey(key: keyof Theme, value: string) {
-    const next: Partial<Theme> = { ...(override ?? {}) };
-    if (value === inherited[key]) delete next[key];
-    else next[key] = value;
+  function clearTimer(key: keyof Theme) {
+    clearTimeout(timers.current[key]);
+    delete timers.current[key];
+  }
+
+  function dropDraft(key: keyof Theme, onlyIfValue?: string) {
     setDrafts((d) => {
+      if (d[key] === undefined || (onlyIfValue !== undefined && d[key] !== onlyIfValue)) return d;
       const rest = { ...d };
       delete rest[key];
       return rest;
     });
-    return save(Object.keys(next).length ? next : null, "");
+  }
+
+  // Only keys that differ from the saved site theme are stored, so later
+  // site-wide changes still flow through for untouched keys.
+  function commit(key: keyof Theme, value: string) {
+    clearTimer(key);
+    dirty.current.delete(key);
+    const base = latest.current ? latest.current.value : override;
+    const next: PartialTheme = { ...(base ?? {}) };
+    const same = key === "font_style" ? value === inherited[key] : sameColor(value, inherited[key]);
+    if (same) delete next[key];
+    else next[key] = value;
+    enqueue(Object.keys(next).length ? next : null, () => dropDraft(key, value));
+  }
+
+  function edit(key: keyof Theme, value: string) {
+    dirty.current.add(key);
+    setDrafts((d) => ({ ...d, [key]: value }));
+    clearTimer(key);
+    timers.current[key] = setTimeout(() => commit(key, value), DEBOUNCE_MS);
+  }
+
+  function cancel(key: keyof Theme) {
+    clearTimer(key);
+    dirty.current.delete(key);
+    dropDraft(key);
+  }
+
+  function resetToSiteTheme() {
+    if (!resettable) return;
+    (Object.keys(timers.current) as (keyof Theme)[]).forEach(clearTimer);
+    dirty.current.clear();
+    setDrafts({});
+    enqueue(null, () => {}, "Section now uses the site theme");
   }
 
   const effective = resolveTheme(template.default_theme, themeOverride, override);
-  const ratio = contrastRatio(effective.text_color, effective.bg_color);
+  const shown = { ...effective, ...drafts };
+  const resettable = !!override || pending > 0 || Object.keys(drafts).length > 0;
 
   return (
     <div className="flex flex-col gap-4">
@@ -60,19 +123,29 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {FIELDS.map(({ key, label }) => {
           const overridden = !!override && override[key] !== undefined;
+          const id = `sec-${section.section_id}-${key}`;
           return (
             <div key={key} className="flex flex-col gap-1.5">
-              <Label htmlFor={`sec-${section.section_id}-${key}`} className="flex items-center justify-between">
+              <Label htmlFor={id} className="flex items-center justify-between">
                 {label}
                 <span className="text-xs font-normal text-muted-foreground">{overridden ? "Custom" : "Site theme"}</span>
               </Label>
               <Input
-                id={`sec-${section.section_id}-${key}`}
+                id={id}
                 type="color"
-                value={drafts[key] ?? effective[key]}
-                aria-disabled={busy}
-                onChange={(e) => setDrafts((d) => ({ ...d, [key]: e.target.value }))}
-                onBlur={(e) => drafts[key] !== undefined && e.target.value !== effective[key] && setKey(key, e.target.value)}
+                value={normalizeColor(shown[key])}
+                onChange={(e) => edit(key, e.target.value)}
+                onBlur={(e) => dirty.current.has(key) && commit(key, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (dirty.current.has(key)) commit(key, e.currentTarget.value);
+                  } else if (e.key === "Escape" && dirty.current.has(key)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    cancel(key);
+                  }
+                }}
               />
               {overridden && (
                 <p className="text-xs text-muted-foreground">
@@ -83,12 +156,9 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
           );
         })}
         <div className="flex flex-col gap-1.5">
-          <Label>Font style</Label>
-          <Select
-            value={effective.font_style}
-            onValueChange={(v) => setKey("font_style", v)}
-          >
-            <SelectTrigger className="w-full">
+          <Label htmlFor={`sec-${section.section_id}-font`}>Font style</Label>
+          <Select value={shown.font_style} onValueChange={(v) => commit("font_style", v)}>
+            <SelectTrigger id={`sec-${section.section_id}-font`} aria-label="Font style" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -104,16 +174,14 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
           )}
         </div>
       </div>
-      <p role="status" className={ratio < MIN_TEXT_CONTRAST ? "text-xs text-destructive" : "text-xs text-muted-foreground"}>
-        Text on background contrast {ratio.toFixed(1)}:1
-        {ratio < MIN_TEXT_CONTRAST ? " (may be hard to read)" : " (good)"}
-      </p>
+      <p className="text-xs text-muted-foreground">Enter saves a color, Escape discards it. Edits also save after a short pause.</p>
+      <ContrastNote theme={shown} />
       <Button
         type="button"
         variant="outline"
-        className="w-fit"
-        aria-disabled={!override || busy}
-        onClick={() => override && save(null, "Section now uses the site theme")}
+        className="w-fit aria-disabled:pointer-events-none aria-disabled:opacity-50"
+        aria-disabled={!resettable}
+        onClick={resetToSiteTheme}
       >
         Use site theme
       </Button>

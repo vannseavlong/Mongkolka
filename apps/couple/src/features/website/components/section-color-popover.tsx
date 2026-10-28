@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { Palette } from "lucide-react";
+import { sameColor } from "@mongkolka/templates";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { Button } from "@mongkolka/ui/button";
@@ -54,9 +55,15 @@ export function SectionColorPopover({
   }
 
   async function save(values: Theme) {
-    setOverrideOptimistically(values);
+    // Store only keys that differ from the saved site theme, same as the Colors tab.
+    const diff: Partial<Theme> = {};
+    for (const k of Object.keys(values) as (keyof Theme)[]) {
+      if (k === "font_style" ? values[k] !== effectiveTheme[k] : !sameColor(values[k], effectiveTheme[k])) diff[k] = values[k];
+    }
+    const next = Object.keys(diff).length ? diff : null;
+    setOverrideOptimistically(next as Theme | null);
     try {
-      await api.patch(`/couple/api/website/sections/${section.section_id}`, { color_override: values });
+      await api.patch(`/couple/api/website/sections/${section.section_id}`, { color_override: next });
       toast.success("Section colors saved");
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to save section colors");
@@ -69,7 +76,7 @@ export function SectionColorPopover({
     setOverrideOptimistically(null);
     try {
       await api.patch(`/couple/api/website/sections/${section.section_id}`, { color_override: null });
-      toast.success("Reset to template colors");
+      toast.success("Section now uses the site theme");
     } catch (err) {
       toast.error(err instanceof ApiError ? err.message : "Failed to reset section colors");
     } finally {
@@ -150,10 +157,11 @@ export function SectionColorPopover({
                 type="button"
                 variant="ghost"
                 size="sm"
-                disabled={!hasOverride}
-                onClick={clearOverride}
+                aria-disabled={!hasOverride}
+                className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+                onClick={() => hasOverride && clearOverride()}
               >
-                Use template default
+                Use site theme
               </Button>
               <Button type="submit" size="sm" disabled={form.formState.isSubmitting}>
                 Save

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Check } from "lucide-react";
-import { contrastRatio, FONT_STYLES, MIN_TEXT_CONTRAST, THEME_PRESETS } from "@mongkolka/templates";
+import { FONT_STYLES, sameColor, THEME_PRESETS } from "@mongkolka/templates";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@mongkolka/ui/utils";
 import { api, ApiError } from "@/lib/api";
 import type { Theme } from "../data/schema";
+import { ContrastNote } from "./contrast-note";
 
 const COLOR_KEYS = ["bg_color", "text_color", "accent_color", "font_style"] as const;
 
@@ -28,7 +29,7 @@ export function ThemeEditor({
   /** Fired on every field change, before Save — lets the caller reflect
    * in-progress edits in the live preview instead of the couple having to
    * save-and-wait to see a color take effect. */
-  onPreview?: (theme: Theme) => void;
+  onPreview?: (theme: Theme | null) => void;
 }) {
   const form = useForm<Theme>({ values: theme });
   const watched = useWatch({ control: form.control });
@@ -40,18 +41,24 @@ export function ThemeEditor({
     onPreview?.(form.getValues());
   }, [watched, form, onPreview]);
 
-  const ratio = contrastRatio(watched.text_color ?? theme.text_color, watched.bg_color ?? theme.bg_color);
-  const lowContrast = ratio < MIN_TEXT_CONTRAST;
-
   function applyPreset(preset: Theme) {
     for (const key of COLOR_KEYS) form.setValue(key, preset[key], { shouldDirty: true });
   }
 
+  // Drop the unsaved preview when the editor goes away (panel collapsed,
+  // template switched), including a hover preview still in progress.
+  useEffect(() => () => onPreview?.(null), [onPreview]);
+
   async function onSubmit(values: Theme) {
-    // Partial override: only keys that differ from the template, so a later
-    // template switch still brings its own colors for everything left alone.
+    // Partial override. The three colors are a readable set (text on bg), so
+    // they are stored together whenever any differs from the template; font is
+    // independent. Untouched parts keep following the template.
     const override: Partial<Theme> = {};
-    for (const key of COLOR_KEYS) if (values[key] !== templateDefault[key]) override[key] = values[key];
+    const palette = ["bg_color", "text_color", "accent_color"] as const;
+    if (palette.some((k) => !sameColor(values[k], templateDefault[k]))) {
+      for (const k of palette) override[k] = values[k];
+    }
+    if (values.font_style !== templateDefault.font_style) override.font_style = values.font_style;
     try {
       await api.patch("/couple/api/website/theme", { theme_override: override });
       toast.success("Theme saved");
@@ -82,7 +89,7 @@ export function ThemeEditor({
           <p className="text-xs text-muted-foreground">Hover or focus a palette to preview it on the page. Click to use it, then Save.</p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
             {THEME_PRESETS.map((preset) => {
-              const active = COLOR_KEYS.every((k) => current[k] === preset.theme[k]);
+              const active = COLOR_KEYS.every((k) => sameColor(String(current[k]), preset.theme[k]));
               return (
                 <button
                   key={preset.id}
@@ -175,14 +182,11 @@ export function ThemeEditor({
             )}
           />
         </div>
-        <p role="status" className={cn("text-xs", lowContrast ? "text-destructive" : "text-muted-foreground")}>
-          Text on background contrast {ratio.toFixed(1)}:1
-          {lowContrast ? ` (below ${MIN_TEXT_CONTRAST}:1, may be hard to read)` : " (good)"}
-        </p>
+        <ContrastNote theme={{ bg_color: current.bg_color, text_color: current.text_color, accent_color: current.accent_color }} />
         <div className="flex flex-wrap gap-2">
           <Button type="submit" aria-disabled={form.formState.isSubmitting}
             onClick={(e) => form.formState.isSubmitting && e.preventDefault()}
-            className="w-fit"
+            className="w-fit aria-disabled:pointer-events-none aria-disabled:opacity-50"
           >
             Save colors
           </Button>

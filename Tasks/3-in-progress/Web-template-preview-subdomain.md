@@ -33,3 +33,8 @@ Verified by curl against a stub: template host 200 with sample name and noindex,
 Not verified: Khmer and visual rendering, real API, wildcard DNS and TLS.
 Known tradeoff: a couple site request while the API is slow costs up to 1.5s once per 10s per slug.
 Next: G5 review, G3 decision, G7, G8, G11.
+
+## Review 2026-10-28 (fresh agent, G5 + security read; code read only, nothing run)
+No blockers. Sent back: S1 preview has no Khmer (no ?lang, no toggle) so the Khmer criterion is unmet; S2 proxy cache has no in-flight de-duplication and junk subdomains can evict real entries -> switch to one cached set of active template slugs from the public list with a shared in-flight promise. Nits: import API_URL, tighten SLUG_PATTERN and skip reserved labels, error.tsx for API-down, comment on ROOT_DOMAIN defaults.
+Checked fine by reviewer: host injection (pattern runs before fetch URL and rewrite), no shadowing between template and couple slugs (API enforces both directions), noindex, no real couple data, public couple route untouched.
+Deferred: robots.txt/favicon rewritten on template hosts (cosmetic), template_id `preview` shadowing (theoretical).

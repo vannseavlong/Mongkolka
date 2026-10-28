@@ -34,3 +34,9 @@ Slot registry: add `workspace/panel-tabs/<name>.tab.tsx` exporting `tab`/`tabs` 
 Not verified: real API, reorder in browser, content dialog and color popover from Content tab, mobile canvas toggle only narrows width (viewport media queries won't switch), screen reader, next build.
 Follow-ups: apps/web template-preview.tsx still has its own SAMPLE_CONTENT (switch to the shared export in Web-template-preview-subdomain); live-mounted tiles may need lazy mounting for many variants.
 Next: G5 by a fresh agent (with `next build`), then G7, G8, G11.
+
+## Review 2026-10-28 (fresh agent, G5)
+Verified by reviewer: tsc clean; `next build` (Next 16.2.11, Turbopack) passes and `require.context` tab registry works in the production build (depends on Turbopack); no leftover imports of deleted files; `wrapSection` does not leak into apps/web and omitting it renders identically.
+No blockers. Sent back: S1 opening gate click blanks canvas; S2 no scroll to section while Preview pane hidden on mobile; S3/S4 focus loss from `disabled` on rail buttons and variant tiles; S5 optimistic rollback races on rapid actions; S6 canvas click triggers scroll jump; plus nits (empty content fallback, section names, shared SECTIONS_KEY, memo).
+Deferred: wrapper div differs slightly from public site (sticky/full-bleed); opening gate height inside the scaled box not checked; no cue to switch to Preview on mobile.
+Tests: none exist; apps/couple has no runner. Pure-logic tests only, no new dependency without a decision (dependency changes are a T3 signal in PIPELINE.md).

@@ -30,3 +30,10 @@ Built in commit e905d22 on `feat/template-slug-field` (based on main), not merge
 Request bodies checked against the API branch controller (feat/template-catalog-apply): match. Description limit of 500 chars is the agent's choice.
 Not verified: UI never run, 400/409 inline errors untested, no zod tests.
 Must merge together with or after API-template-catalog-apply: admin create without slug returns 400.
+
+## Review 2026-10-28 (fresh agent, G5; ran the admin app against a stub)
+No blockers. Verified: PATCH body matches the API; slug lowercased and trimmed; reserved slug shown inline; list refreshes; legacy row without slug shows "Not set" and no preview link; template_id locked in edit.
+Should-fix (sent back): editing a legacy row with partial or empty default_components fails zod validation silently (no message, no request). Also: non-slug 400/409 errors shown under the Slug field; add NEXT_PUBLIC_API_URL to .env.example.
+Not verified by reviewer: create flow, duplicate-slug 409, short-slug message, description limit (the builder was asked to exercise these).
+Deferred: close/reopen 500 ms timer race in dialogs (same pattern as delete dialog); duplicated site-url helper with apps/couple; description limit is client-only.
+Deploy: must merge together with or after API-template-catalog-apply.

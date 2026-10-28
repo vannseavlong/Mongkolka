@@ -36,3 +36,8 @@ Next: G5 and G6 by a fresh agent, then G9, G10, G11.
 ## Review 2026-10-28 (fresh agent, G5+G6)
 No blockers. Sent back to the builder: junk-slug cache flooding (load all active templates once), partial-failure apply with early cache invalidation (allSettled, clear sections before profile write), reserved infrastructure slugs (www, api, admin...), explicit public response allowlist, status enum, revert formatting churn, missing tests.
 Accepted/deferred: narrow cross-sheet race between a template slug and a couple claiming the same slug (documented); reset_all clears only content (documented); multi-instance cache staleness up to 60s.
+
+## Fixes 2026-10-28 (commit 045b75d)
+Review findings fixed: by-slug lookup reads all active templates once into a single-key 60s cache (no per-slug keys); apply clears sections with allSettled first and writes the profile only if all clears succeed, cache invalidated after everything settles; RESERVED_SLUGS enforced in updateSlug (409), template slug check (400) and placeholder generation; public response limited to template_id, name, slug, description, default_theme, default_components; status enum validation; formatting churn reverted; new tests. 27/27 tests, tsc and eslint (changed folders) clean, all with mocked models.
+Docs now state the cross-sheet slug race is accepted and that reset_all clears only content.
+Still open: re-review of the fix commit, live schema sync and slug backfill, real Sheets null/unique behavior, G9, G10, G11.

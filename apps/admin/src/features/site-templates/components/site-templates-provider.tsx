@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useDialogState } from "@mongkolka/ui/hooks/use-dialog-state";
 import type { SiteTemplate } from "../data/schema";
 
-type SiteTemplatesDialogType = "create" | "delete";
+type SiteTemplatesDialogType = "create" | "edit" | "delete";
 
 type SiteTemplatesContextType = {
   open: SiteTemplatesDialogType | null;

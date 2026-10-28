@@ -13,11 +13,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@mongkolka/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@mongkolka/ui/form";
 import { Input } from "@mongkolka/ui/input";
+import { Textarea } from "@mongkolka/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
+import { ROOT_DOMAIN } from "@/lib/site-url";
+import type { SiteTemplate } from "../data/schema";
 import { WEBSITE_SECTIONS, type SectionComponent } from "@/features/section-components/data/schema";
 
 const siteTemplateFormSchema = z.object({
@@ -26,6 +37,16 @@ const siteTemplateFormSchema = z.object({
     .min(1, "Template ID is required")
     .regex(/^[a-z0-9_]+$/, "Lowercase letters, numbers, and underscores only"),
   name: z.string().min(1, "Name is required"),
+  // Mirrors isValidCustomSlug in apps/api/src/utils/slug.ts; the API also
+  // rejects reserved words and duplicates, shown inline after submit.
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(3, "Slug must be at least 3 characters")
+    .max(40, "Slug must be at most 40 characters")
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Lowercase letters and numbers, with single hyphens between"),
+  description: z.string().trim().max(500, "Description must be at most 500 characters"),
   default_theme: z.object({
     bg_color: z.string().min(1),
     text_color: z.string().min(1),
@@ -40,27 +61,41 @@ type SiteTemplateFormValues = z.infer<typeof siteTemplateFormSchema>;
 export function SiteTemplatesActionDialog({
   open,
   onOpenChange,
+  currentRow,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  currentRow?: SiteTemplate;
 }) {
+  const isEdit = !!currentRow;
   const { data: componentData } = useApiQuery<{ components: SectionComponent[] }>(
     "/admin/api/section-components",
   );
 
   const form = useForm<SiteTemplateFormValues>({
     resolver: zodResolver(siteTemplateFormSchema),
-    defaultValues: {
-      template_id: "",
-      name: "",
-      default_theme: {
-        bg_color: "#ffffff",
-        text_color: "#111111",
-        accent_color: "#c9a35c",
-        font_style: "serif",
-      },
-      default_components: {},
-    },
+    defaultValues: currentRow
+      ? {
+          template_id: currentRow.template_id,
+          name: currentRow.name,
+          slug: currentRow.slug ?? "",
+          description: currentRow.description ?? "",
+          default_theme: currentRow.default_theme,
+          default_components: currentRow.default_components,
+        }
+      : {
+          template_id: "",
+          name: "",
+          slug: "",
+          description: "",
+          default_theme: {
+            bg_color: "#ffffff",
+            text_color: "#111111",
+            accent_color: "#c9a35c",
+            font_style: "serif",
+          },
+          default_components: {},
+        },
   });
 
   function handleOpenChange(state: boolean) {
@@ -70,12 +105,31 @@ export function SiteTemplatesActionDialog({
 
   async function onSubmit(values: SiteTemplateFormValues) {
     try {
-      await api.post("/admin/api/site-templates", values);
-      toast.success("Template created");
+      if (currentRow) {
+        await api.patch(`/admin/api/site-templates/${currentRow.template_id}`, {
+          name: values.name,
+          slug: values.slug,
+          description: values.description,
+          default_theme: values.default_theme,
+          default_components: values.default_components,
+        });
+        toast.success("Template updated");
+      } else {
+        await api.post("/admin/api/site-templates", values);
+        toast.success("Template created");
+      }
       mutate("/admin/api/site-templates");
       handleOpenChange(false);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to create template");
+      // 400 (bad format / reserved word) and 409 (duplicate slug) are shown
+      // under the slug field; anything else falls back to a toast.
+      if (err instanceof ApiError && (err.status === 400 || err.status === 409)) {
+        form.setError("slug", { type: "server", message: err.message });
+        return;
+      }
+      toast.error(
+        err instanceof ApiError ? err.message : `Failed to ${isEdit ? "update" : "create"} template`,
+      );
     }
   }
 
@@ -83,7 +137,7 @@ export function SiteTemplatesActionDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>New site template</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit site template" : "New site template"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form id="site-template-form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
@@ -94,7 +148,7 @@ export function SiteTemplatesActionDialog({
                 <FormItem>
                   <FormLabel>Template ID</FormLabel>
                   <FormControl>
-                    <Input placeholder="botanical_romance" {...field} />
+                    <Input placeholder="botanical_romance" disabled={isEdit} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,6 +162,35 @@ export function SiteTemplatesActionDialog({
                   <FormLabel>Display name</FormLabel>
                   <FormControl>
                     <Input placeholder="Botanical Romance" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <Input placeholder="botanical-romance" autoComplete="off" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Preview URL: {field.value || "your-slug"}.{ROOT_DOMAIN}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea rows={3} placeholder="Short summary shown to couples" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -207,7 +290,7 @@ export function SiteTemplatesActionDialog({
         </Form>
         <DialogFooter>
           <Button type="submit" form="site-template-form" disabled={form.formState.isSubmitting}>
-            Create
+            {isEdit ? "Save" : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

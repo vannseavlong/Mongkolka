@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@mongkolka/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@mongkolka/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
@@ -14,6 +15,7 @@ import { Textarea } from "@mongkolka/ui/textarea";
 import { api, ApiError } from "@/lib/api";
 import { SECTIONS_KEY } from "../lib/keys";
 import type { WebsiteSection, WebsiteSectionKey } from "../data/schema";
+import { AssetPicker } from "./asset-picker";
 
 
 /** The only section keys with no other canonical content source — see
@@ -54,6 +56,7 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
     },
   });
   const { fields, append, remove, move } = useFieldArray({ control: form.control, name: "photos" });
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function onSubmit(values: GalleryFormValues) {
     try {
@@ -109,8 +112,17 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
           ))}
         </div>
         <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => append({ url: "" })}>
-          <Plus className="size-3" /> Add photo
+          <Plus className="size-3" /> Add photo by URL
         </Button>
+        <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setPickerOpen(true)}>
+          <ImagePlus className="size-3" /> Choose from library
+        </Button>
+        <AssetPicker
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          title="Add photos to gallery"
+          onConfirm={(urls) => urls.forEach((url) => append({ url }))}
+        />
         <DialogFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
             Save gallery

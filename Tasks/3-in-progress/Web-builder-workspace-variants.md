@@ -40,3 +40,10 @@ Verified by reviewer: tsc clean; `next build` (Next 16.2.11, Turbopack) passes a
 No blockers. Sent back: S1 opening gate click blanks canvas; S2 no scroll to section while Preview pane hidden on mobile; S3/S4 focus loss from `disabled` on rail buttons and variant tiles; S5 optimistic rollback races on rapid actions; S6 canvas click triggers scroll jump; plus nits (empty content fallback, section names, shared SECTIONS_KEY, memo).
 Deferred: wrapper div differs slightly from public site (sticky/full-bleed); opening gate height inside the scaled box not checked; no cue to switch to Preview on mobile.
 Tests: none exist; apps/couple has no runner. Pure-logic tests only, no new dependency without a decision (dependency changes are a T3 signal in PIPELINE.md).
+
+## Fixes 2026-10-28 (commit c2465ae)
+Review findings S1-S6 and nits N2, N3, N4, N6 fixed (inert canvas while opening selected; `active` pane prop and click-skip for scroll; aria-disabled plus live region for rail and tiles; in-flight counter, per-field rollback, per-section pending Switch; friendly section labels; shared SECTIONS_KEY in lib/keys.ts; React.memo on SectionPreview). tsc clean, couple lint 0 errors, `next build` passes, dev run against the stub API.
+Pure logic lives in `workspace/section-actions-logic.ts`.
+G3 tests NOT done: apps/couple has no test runner and tsx is not in the workspace. Decision needed from the owner: add a runner (new dev dependency, T3 signal) or accept untested pure logic with a written Skipped G3 reason. Cases ready: applyPatch, rollbackFields, reorderSections payload/edges, panel-tabs order.
+Not run: overlapping failing writes, Switch disabled state during save, S2 scroll on narrow screen, a real screen reader, real API.
+Next: re-review of fix commit, G3 decision, G7, G8, G11.

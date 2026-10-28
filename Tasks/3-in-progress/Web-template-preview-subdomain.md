@@ -14,7 +14,7 @@
 Serve each template at `<template-slug>.<ROOT_DOMAIN>` as a full live site with sample data. Proxy resolves reserved template slugs before the couple-slug rewrite; unknown subdomains still fall through to the couple route. Templates gallery links to the subdomain preview and shows name + palette.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc, eslint, next build pass)  - [ ] G3 tests  - [~] G4 run it (curl with Host headers against a stub API; no browser, Khmer or visual check)
 - [ ] G5 code review  - [ ] G6 security (if input/upload)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -26,3 +26,10 @@ Serve each template at `<template-slug>.<ROOT_DOMAIN>` as a full live site with 
 - [ ] `/templates/[id]` still works as path fallback in dev (no wildcard DNS)
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-28
+Built in commit dbd921c on `feat/template-preview-subdomain` (based on feat/builder-workspace), not merged. proxy.ts is async: for `<slug>.<ROOT_DOMAIN>` it asks `GET /public/api/site-templates/by-slug/:slug` (1.5s timeout; hits cached 5 min, 404s 1 min, errors 10s; max 500 entries) and rewrites to `/templates/preview/<slug>`, else the unchanged couple rewrite. New noindex preview route; template-preview.tsx now uses the shared sample content; /templates cards link to the subdomain when ROOT_DOMAIN and slug are set.
+Verified by curl against a stub: template host 200 with sample name and noindex, repeat requests hit the cache, couple host falls through, slow API times out after about 1.5s and falls through.
+Not verified: Khmer and visual rendering, real API, wildcard DNS and TLS.
+Known tradeoff: a couple site request while the API is slow costs up to 1.5s once per 10s per slug.
+Next: G5 review, G3 decision, G7, G8, G11.

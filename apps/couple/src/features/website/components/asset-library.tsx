@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { AlertTriangle, Check, ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { AlertTriangle, Check, ImagePlus, Loader2, Trash2, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@mongkolka/ui/alert";
 import {
   AlertDialog,
@@ -23,20 +23,25 @@ import { useApiQuery } from "@/lib/use-api-query";
 import { SECTIONS_KEY } from "../lib/keys";
 import { sectionLabel } from "../workspace/section-labels";
 import type { WebsiteSectionKey } from "../data/schema";
-import { ASSETS_KEY, PROFILE_KEY, uploadAsset } from "./asset-library-api";
+import { ASSETS_KEY, PROFILE_KEY, readImageSize, uploadAsset, UPLOAD_CANCELLED } from "./asset-library-api";
 import {
   ASSET_ACCEPT,
+  ASSET_MAX_BYTES,
   ASSET_QUOTA,
+  dimensionsError,
   formatBytes,
   planUploads,
   type AssetUsage,
   type WebsiteAsset,
 } from "./asset-library-logic";
 
+/** Shared look for buttons that use aria-disabled (the shared Button has no style for it). */
+export const ARIA_DISABLED = "aria-disabled:pointer-events-none aria-disabled:opacity-50";
+
 interface UploadItem {
   id: number;
   name: string;
-  status: "uploading" | "done" | "error";
+  status: "queued" | "uploading" | "done" | "error";
   percent: number;
   error?: string;
 }
@@ -62,10 +67,19 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
   const [dragging, setDragging] = useState(false);
   const [notes, setNotes] = useState<string[]>([]);
   const [deleting, setDeleting] = useState<WebsiteAsset | null>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chooseRef = useRef<HTMLButtonElement>(null);
+  const controllers = useRef(new Map<number, AbortController>());
+
+  // Abort everything still in flight when the library goes away.
+  useEffect(() => {
+    const map = controllers.current;
+    return () => map.forEach((c) => c.abort());
+  }, []);
 
   const full = assets.length >= ASSET_QUOTA;
-  const busy = uploads.some((u) => u.status === "uploading");
+  const busy = uploads.some((u) => u.status === "uploading" || u.status === "queued");
 
   function patchUpload(id: number, patch: Partial<UploadItem>) {
     setUploads((prev) => prev.map((u) => (u.id === id ? { ...u, ...patch } : u)));
@@ -76,25 +90,56 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
     if (files.length === 0) return;
     const { accepted, rejected } = planUploads(files, assets.length);
     setNotes(rejected);
-    const items = accepted.map((f) => ({ file: f, id: nextUploadId++ }));
+    const items = accepted.map((file) => ({ file, id: nextUploadId++ }));
+    for (const { id } of items) controllers.current.set(id, new AbortController());
     setUploads((prev) => [
-      ...prev.filter((u) => u.status === "uploading"),
-      ...items.map(({ file, id }) => ({ id, name: file.name, status: "uploading" as const, percent: 0 })),
+      ...prev.filter((u) => u.status === "uploading" || u.status === "queued"),
+      ...items.map(({ file, id }) => ({ id, name: file.name, status: "queued" as const, percent: 0 })),
     ]);
-    for (const { file, id } of items) {
-      try {
-        const asset = await uploadAsset(file, (percent) => patchUpload(id, { percent }));
-        patchUpload(id, { status: "done", percent: 100 });
-        mutate(ASSETS_KEY, (cur?: { assets: WebsiteAsset[] }) => ({ assets: [asset, ...(cur?.assets ?? [])] }), {
-          revalidate: false,
-        });
-      } catch (err) {
-        patchUpload(id, { status: "error", error: err instanceof ApiError ? err.message : "Upload failed." });
-        // Stop early when the library is full: the rest would fail the same way.
-        if (err instanceof ApiError && err.status === 409) break;
+    let libraryFull = false;
+    try {
+      for (const { file, id } of items) {
+        const signal = controllers.current.get(id)!.signal;
+        if (libraryFull) {
+          patchUpload(id, { status: "error", error: "Skipped: your library is full." });
+          continue;
+        }
+        if (signal.aborted) {
+          patchUpload(id, { status: "error", error: "Cancelled." });
+          continue;
+        }
+        patchUpload(id, { status: "uploading" });
+        try {
+          const size = await readImageSize(file);
+          const tooBig = size && dimensionsError(file.name, size.width, size.height);
+          if (tooBig) throw new ApiError(tooBig, 0);
+          if (signal.aborted) throw new ApiError("Cancelled", UPLOAD_CANCELLED);
+          const asset = await uploadAsset(file, (percent) => patchUpload(id, { percent }), signal);
+          patchUpload(id, { status: "done", percent: 100 });
+          mutate(ASSETS_KEY, (cur?: { assets: WebsiteAsset[] }) => ({ assets: [asset, ...(cur?.assets ?? [])] }), {
+            revalidate: false,
+          });
+        } catch (err) {
+          const cancelled = err instanceof ApiError && err.status === UPLOAD_CANCELLED;
+          patchUpload(id, {
+            status: "error",
+            error: cancelled ? "Cancelled." : err instanceof ApiError ? err.message : "Upload failed.",
+          });
+          if (err instanceof ApiError && err.status === 409) libraryFull = true;
+        }
       }
+    } finally {
+      // Whatever happened, nothing may stay spinning.
+      for (const { id } of items) controllers.current.delete(id);
+      setUploads((prev) =>
+        prev.map((u) =>
+          items.some((i) => i.id === u.id) && (u.status === "uploading" || u.status === "queued")
+            ? { ...u, status: "error", error: "Stopped." }
+            : u,
+        ),
+      );
+      mutate(ASSETS_KEY);
     }
-    mutate(ASSETS_KEY);
   }
 
   return (
@@ -102,7 +147,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium">Image library</h3>
         <p className={cn("text-xs", full ? "font-medium text-destructive" : "text-muted-foreground")} aria-live="polite">
-          {data ? `${assets.length}/${ASSET_QUOTA} images` : " "}
+          {data ? `${assets.length}/${ASSET_QUOTA} images${full ? " (full)" : ""}` : " "}
         </p>
       </div>
 
@@ -138,18 +183,23 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
           }}
         />
         <Button
+          ref={chooseRef}
           type="button"
           size="sm"
           variant="outline"
           aria-disabled={full}
-          onClick={() => {
-            if (full) toast.error(`Your library is full (${ASSET_QUOTA} images). Delete some to upload more.`);
-            else inputRef.current?.click();
-          }}
+          aria-describedby={full ? "asset-full-hint" : undefined}
+          className={ARIA_DISABLED}
+          onClick={() => !full && inputRef.current?.click()}
         >
           Choose images
         </Button>
-        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(8 * 1024 * 1024)} each.</p>
+        {full && (
+          <p id="asset-full-hint" className="text-xs text-destructive">
+            Your library is full ({ASSET_QUOTA} images). Delete some to upload more.
+          </p>
+        )}
+        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(ASSET_MAX_BYTES)} each.</p>
       </div>
 
       {notes.length > 0 && (
@@ -176,8 +226,26 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
                 {u.status === "error" && <AlertTriangle className="size-4 text-destructive" aria-hidden />}
                 <span className="min-w-0 flex-1 truncate">{u.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  {u.status === "uploading" ? `${u.percent}%` : u.status === "done" ? "Uploaded" : "Failed"}
+                  {u.status === "queued"
+                    ? "Waiting"
+                    : u.status === "uploading"
+                      ? `${u.percent}%`
+                      : u.status === "done"
+                        ? "Uploaded"
+                        : "Failed"}
                 </span>
+                {(u.status === "uploading" || u.status === "queued") && (
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className="size-6"
+                    aria-label={`Cancel upload of ${u.name}`}
+                    onClick={() => controllers.current.get(u.id)?.abort()}
+                  >
+                    <X className="size-3.5" />
+                  </Button>
+                )}
               </span>
               {u.status === "uploading" && <Progress value={u.percent} aria-label={`Uploading ${u.name}`} />}
               {u.status === "error" && <span className="text-xs text-destructive">{u.error}</span>}
@@ -216,15 +284,16 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         </p>
       ) : (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Images">
-          {assets.map((asset) => {
+          {assets.map((asset, i) => {
             const index = selected.indexOf(asset.url);
             const isSelected = index !== -1;
+            const name = `image ${i + 1} of ${assets.length} (${formatBytes(asset.size_bytes)})`;
             return (
               <li key={asset.asset_id} className="group relative">
                 <button
                   type="button"
                   aria-pressed={onPick ? isSelected : undefined}
-                  aria-label={onPick ? `${pickLabel}: image ${formatBytes(asset.size_bytes)}` : `Image ${formatBytes(asset.size_bytes)}`}
+                  aria-label={onPick ? `${pickLabel}: ${name}` : name}
                   onClick={() => onPick?.(asset)}
                   className={cn(
                     "block aspect-square w-full overflow-hidden rounded-md border bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
@@ -245,9 +314,12 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
                     type="button"
                     size="icon"
                     variant="secondary"
-                    aria-label="Delete image"
+                    aria-label={`Delete ${name}`}
                     className="absolute top-1 right-1 size-7 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
-                    onClick={() => setDeleting(asset)}
+                    onClick={(e) => {
+                      openerRef.current = e.currentTarget;
+                      setDeleting(asset);
+                    }}
                   >
                     <Trash2 className="size-3.5" />
                   </Button>
@@ -258,19 +330,60 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         </ul>
       )}
 
-      <DeleteAssetDialog asset={deleting} onClose={() => setDeleting(null)} />
+      <AlertDialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
+        {deleting && (
+          <DeleteAssetBody
+            key={deleting.asset_id}
+            asset={deleting}
+            onClose={() => setDeleting(null)}
+            // No AlertDialogTrigger exists, so return focus ourselves: to the delete button,
+            // or to the upload button when that tile is gone.
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              const opener = openerRef.current;
+              (opener?.isConnected ? opener : chooseRef.current)?.focus();
+            }}
+          />
+        )}
+      </AlertDialog>
     </div>
   );
 }
 
-function DeleteAssetDialog({ asset, onClose }: { asset: WebsiteAsset | null; onClose: () => void }) {
-  const { data: usage, loading, error } = useApiQuery<AssetUsage>(asset ? `${ASSETS_KEY}/${asset.asset_id}/usage` : null);
+function DeleteAssetBody({
+  asset,
+  onClose,
+  onCloseAutoFocus,
+}: {
+  asset: WebsiteAsset;
+  onClose: () => void;
+  onCloseAutoFocus: (e: Event) => void;
+}) {
+  // Fetched fresh on every open (not through the SWR cache) so the warning is never stale.
+  const [usage, setUsage] = useState<AssetUsage | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
   const [removing, setRemoving] = useState(false);
+  const busyRef = useRef(false);
+
+  useEffect(() => {
+    let live = true;
+    api
+      .get<AssetUsage>(`${ASSETS_KEY}/${asset.asset_id}/usage`)
+      .then((u) => live && setUsage(u))
+      .catch((e) => live && setError(e instanceof ApiError ? e.message : "Something went wrong"));
+    return () => {
+      live = false;
+    };
+  }, [asset.asset_id]);
+
+  const loading = !usage && !error;
   const inUse = !!usage && (usage.cover || usage.sections.length > 0);
-  const ready = !loading && !error && !!usage && !removing;
+  const ready = !loading && !error && !removing;
 
   async function confirm() {
-    if (!asset || !ready) return;
+    if (!ready || busyRef.current) return;
+    busyRef.current = true;
     setRemoving(true);
     try {
       await api.delete(`${ASSETS_KEY}/${asset.asset_id}${inUse ? "?force=true" : ""}`);
@@ -284,47 +397,52 @@ function DeleteAssetDialog({ asset, onClose }: { asset: WebsiteAsset | null; onC
       toast.success("Image deleted");
       onClose();
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Could not delete the image");
+      const body = err instanceof ApiError ? err.body : undefined;
+      if (err instanceof ApiError && err.status === 409 && body && Array.isArray(body.sections)) {
+        // Used since the dialog opened: show the fresh list and let the couple confirm again.
+        setUsage({ sections: body.sections as AssetUsage["sections"], cover: body.cover === true });
+        setStale(true);
+      } else {
+        toast.error(err instanceof ApiError ? err.message : "Could not delete the image");
+      }
     } finally {
+      busyRef.current = false;
       setRemoving(false);
     }
   }
 
   return (
-    <AlertDialog open={!!asset} onOpenChange={(open) => !open && !removing && onClose()}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete this image?</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="flex flex-col gap-2">
-              {asset && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={asset.url} alt="" className="max-h-40 w-fit rounded-md border object-contain" />
-              )}
-              {loading && <p>Checking where it is used…</p>}
-              {error && <p className="text-destructive">Could not check where this image is used: {error}</p>}
-              {usage && !inUse && <p>It is not used anywhere. This cannot be undone.</p>}
-              {inUse && usage && (
-                <>
-                  <p>This image is in use. Deleting it will remove it from:</p>
-                  <ul className="list-disc pl-5">
-                    {usage.cover && <li>Your cover photo</li>}
-                    {usage.sections.map((s) => (
-                      <li key={s.section_id}>{sectionLabel(s.section_key as WebsiteSectionKey)} section</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button type="button" variant="destructive" aria-disabled={!ready} onClick={confirm}>
-            {removing ? "Deleting…" : inUse ? "Delete and remove from site" : "Delete"}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <AlertDialogContent onCloseAutoFocus={onCloseAutoFocus}>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Delete this image?</AlertDialogTitle>
+        <AlertDialogDescription asChild>
+          <div className="flex flex-col gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={asset.url} alt="" className="max-h-40 w-fit rounded-md border object-contain" />
+            {loading && <p>Checking where it is used…</p>}
+            {error && <p className="text-destructive">Could not check where this image is used: {error}</p>}
+            {usage && !inUse && <p>It is not used anywhere. This cannot be undone.</p>}
+            {stale && <p className="font-medium">This image was just added to your site. Please review and confirm again.</p>}
+            {inUse && usage && (
+              <>
+                <p>This image is in use. Deleting it will remove it from:</p>
+                <ul className="list-disc pl-5">
+                  {usage.cover && <li>Your cover photo</li>}
+                  {usage.sections.map((s) => (
+                    <li key={s.section_id}>{sectionLabel(s.section_key as WebsiteSectionKey)} section</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <Button type="button" variant="destructive" aria-disabled={!ready} className={ARIA_DISABLED} onClick={confirm}>
+          {loading ? "Checking usage…" : removing ? "Deleting…" : inUse ? "Delete and remove from site" : "Delete"}
+        </Button>
+      </AlertDialogFooter>
+    </AlertDialogContent>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type RefObject } from "react";
 import { Button } from "@mongkolka/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@mongkolka/ui/dialog";
-import { AssetLibrary } from "./asset-library";
+import { AssetLibrary, ARIA_DISABLED } from "./asset-library";
 import { togglePhoto } from "./asset-library-logic";
 
 interface AssetPickerProps {
@@ -14,13 +14,22 @@ interface AssetPickerProps {
   multiple?: boolean;
   /** Called with the chosen URLs, exactly as the API returned them. */
   onConfirm: (urls: string[]) => void;
+  /** Element to focus when the picker closes (Dialog has no trigger here to return to). */
+  returnFocusRef?: RefObject<HTMLElement | null>;
 }
 
 /** Modal picker over the image library. Body remounts per open so selection starts empty. */
-export function AssetPicker({ open, onOpenChange, title = "Choose images", multiple = true, onConfirm }: AssetPickerProps) {
+export function AssetPicker({ open, onOpenChange, title = "Choose images", multiple = true, onConfirm, returnFocusRef }: AssetPickerProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"
+        onCloseAutoFocus={(e) => {
+          if (!returnFocusRef?.current) return;
+          e.preventDefault();
+          returnFocusRef.current.focus();
+        }}
+      >
         {open && <PickerBody title={title} multiple={multiple} onConfirm={onConfirm} onClose={() => onOpenChange(false)} />}
       </DialogContent>
     </Dialog>
@@ -68,6 +77,7 @@ function PickerBody({
           <Button
             type="button"
             aria-disabled={chosen.length === 0}
+            className={ARIA_DISABLED}
             onClick={() => {
               if (chosen.length === 0) return;
               onConfirm(chosen);

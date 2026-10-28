@@ -11,6 +11,7 @@ import type { CoupleProfile } from "@/features/profile/data/schema";
 import type { SectionPanelContext } from "../workspace/panel-tabs/types";
 import { AssetLibrary } from "./asset-library";
 import { PROFILE_KEY } from "./asset-library-api";
+import { isHttpUrl, URL_ERROR } from "./asset-library-logic";
 
 type ProfileCache = { profile: CoupleProfile };
 
@@ -42,6 +43,7 @@ async function saveCover(url: string | null) {
 export function CoverAssets({ context }: { context: SectionPanelContext }) {
   const cover = context.profile.cover_photo_url || null;
   const [rawUrl, setRawUrl] = useState("");
+  const [urlError, setUrlError] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col gap-4">
@@ -81,14 +83,32 @@ export function CoverAssets({ context }: { context: SectionPanelContext }) {
               e.preventDefault();
               const url = rawUrl.trim();
               if (!url) return;
+              if (!isHttpUrl(url)) return setUrlError(URL_ERROR);
+              setUrlError(null);
               void saveCover(url).then((ok) => ok && setRawUrl(""));
             }}
           >
-            <Input value={rawUrl} onChange={(e) => setRawUrl(e.target.value)} placeholder="https://…" aria-label="Cover photo URL" inputMode="url" />
+            <Input
+              value={rawUrl}
+              onChange={(e) => {
+                setRawUrl(e.target.value);
+                setUrlError(null);
+              }}
+              placeholder="https://…"
+              aria-label="Cover photo URL"
+              aria-invalid={!!urlError}
+              aria-describedby={urlError ? "cover-url-error" : undefined}
+              inputMode="url"
+            />
             <Button type="submit" variant="outline">
               Set
             </Button>
           </form>
+          {urlError && (
+            <p id="cover-url-error" role="alert" className="mt-1 text-xs text-destructive">
+              {urlError}
+            </p>
+          )}
         </CollapsibleContent>
       </Collapsible>
     </div>

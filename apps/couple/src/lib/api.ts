@@ -1,6 +1,6 @@
 import { clearToken, getToken } from "./auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 export class ApiError extends Error {
   constructor(
@@ -10,6 +10,8 @@ export class ApiError extends Error {
     // "google_only") that the UI needs to branch on without string-matching
     // the human-readable `message`.
     public code?: string,
+    // Raw parsed JSON error body, for callers that need extra fields (e.g. 409 in_use usage lists).
+    public body?: Record<string, unknown>,
   ) {
     super(message);
   }
@@ -39,7 +41,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         window.location.assign("/");
       }
     }
-    throw new ApiError(body.error ?? "Request failed", res.status, body.code);
+    throw new ApiError(body.error ?? "Request failed", res.status, body.code, body);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;

@@ -6,14 +6,15 @@ import { Button } from "@mongkolka/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@mongkolka/ui/collapsible";
 import { Input } from "@mongkolka/ui/input";
 import type { SectionPanelContext } from "../workspace/panel-tabs/types";
-import { AssetLibrary } from "./asset-library";
-import { moveItem, photosOf, togglePhoto } from "./asset-library-logic";
+import { AssetLibrary, ARIA_DISABLED } from "./asset-library";
+import { isHttpUrl, moveItem, newUrlsOnly, photosOf, togglePhoto, URL_ERROR } from "./asset-library-logic";
 
 /** Gallery photos: ordered list plus the library; every change saves optimistically so the canvas updates at once. */
 export function GalleryAssets({ context }: { context: SectionPanelContext }) {
   const { section, patchSection } = context;
   const photos = photosOf(section.content);
   const [rawUrl, setRawUrl] = useState("");
+  const [urlError, setUrlError] = useState<string | null>(null);
   const base = section.content && typeof section.content === "object" ? (section.content as Record<string, unknown>) : {};
 
   const save = (next: string[]) => patchSection({ content: { ...base, photos: next } }, "Could not update the gallery");
@@ -27,7 +28,7 @@ export function GalleryAssets({ context }: { context: SectionPanelContext }) {
         ) : (
           <ol className="flex flex-col gap-2">
             {photos.map((url, i) => (
-              <li key={`${url}-${i}`} className="flex items-center gap-2 rounded-md border p-1.5">
+              <li key={`${url}-${i}`} aria-label={`Photo ${i + 1} of ${photos.length}`} className="flex items-center gap-2 rounded-md border p-1.5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="size-12 shrink-0 rounded object-cover" />
                 <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">Photo {i + 1}</span>
@@ -37,6 +38,7 @@ export function GalleryAssets({ context }: { context: SectionPanelContext }) {
                   variant="ghost"
                   aria-label={`Move photo ${i + 1} up`}
                   aria-disabled={i === 0}
+                  className={ARIA_DISABLED}
                   onClick={() => i > 0 && void save(moveItem(photos, i, i - 1))}
                 >
                   <ArrowUp className="size-3" />
@@ -47,6 +49,7 @@ export function GalleryAssets({ context }: { context: SectionPanelContext }) {
                   variant="ghost"
                   aria-label={`Move photo ${i + 1} down`}
                   aria-disabled={i === photos.length - 1}
+                  className={ARIA_DISABLED}
                   onClick={() => i < photos.length - 1 && void save(moveItem(photos, i, i + 1))}
                 >
                   <ArrowDown className="size-3" />
@@ -86,21 +89,33 @@ export function GalleryAssets({ context }: { context: SectionPanelContext }) {
               e.preventDefault();
               const url = rawUrl.trim();
               if (!url) return;
-              void save([...photos, url]);
+              if (!isHttpUrl(url)) return setUrlError(URL_ERROR);
+              setUrlError(null);
+              void save([...photos, ...newUrlsOnly(photos, [url])]);
               setRawUrl("");
             }}
           >
             <Input
               value={rawUrl}
-              onChange={(e) => setRawUrl(e.target.value)}
+              onChange={(e) => {
+                setRawUrl(e.target.value);
+                setUrlError(null);
+              }}
               placeholder="https://…"
               aria-label="Photo URL"
+              aria-invalid={!!urlError}
+              aria-describedby={urlError ? "gallery-url-error" : undefined}
               inputMode="url"
             />
             <Button type="submit" variant="outline" aria-label="Add photo by URL">
               <Plus className="size-4" /> Add
             </Button>
           </form>
+          {urlError && (
+            <p id="gallery-url-error" role="alert" className="mt-1 text-xs text-destructive">
+              {urlError}
+            </p>
+          )}
         </CollapsibleContent>
       </Collapsible>
     </div>

@@ -95,3 +95,31 @@ export function photosOf(content: unknown): string[] {
 export function togglePhoto(photos: string[], url: string): string[] {
   return photos.includes(url) ? photos.filter((p) => p !== url) : [...photos, url];
 }
+
+export const ASSET_MAX_DIMENSION = 12000;
+export const ASSET_UPLOAD_TIMEOUT_MS = 60_000;
+
+/** Message when an image is larger than the server accepts on its longest side, else null. */
+export function dimensionsError(name: string, width: number, height: number): string | null {
+  return Math.max(width, height) > ASSET_MAX_DIMENSION
+    ? `${name}: ${width}x${height} pixels is over the ${ASSET_MAX_DIMENSION} pixel limit. Resize it and try again.`
+    : null;
+}
+
+/** True for a well-formed http(s) URL. */
+export function isHttpUrl(value: string): boolean {
+  try {
+    const u = new URL(value.trim());
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+export const URL_ERROR = "Enter a full address starting with http:// or https://";
+
+/** Returns `incoming` without URLs already in `existing` (and without repeats within itself). */
+export function newUrlsOnly(existing: string[], incoming: string[]): string[] {
+  const seen = new Set(existing);
+  return incoming.filter((u) => (seen.has(u) ? false : (seen.add(u), true)));
+}

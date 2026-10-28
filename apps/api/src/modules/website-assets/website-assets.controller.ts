@@ -25,19 +25,19 @@ export const WebsiteAssetsController = {
   },
 
   async usage(req: CoupleRequest, res: Response) {
-    const sections = await WebsiteAssetsService.usage(tenant(req), req.params.id as string);
-    if (!sections) {
+    const usage = await WebsiteAssetsService.usage(tenant(req), req.params.id as string);
+    if (!usage) {
       res.status(404).json({ error: "not_found" });
       return;
     }
-    res.json({ sections });
+    res.json(usage);
   },
 
   async remove(req: CoupleRequest, res: Response) {
     const force = req.query.force === "true" || req.query.force === "1";
     const result = await WebsiteAssetsService.remove(tenant(req), req.params.id as string, force);
     if (!result.ok) {
-      res.status(result.status).json({ error: result.error, ...(result.sections ? { sections: result.sections } : {}) });
+      res.status(result.status).json({ error: result.error, ...(result.sections ? { sections: result.sections, cover: !!result.cover } : {}) });
       return;
     }
     res.status(204).end();

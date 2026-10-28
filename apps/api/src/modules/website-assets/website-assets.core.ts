@@ -27,6 +27,9 @@ export interface AssetModel {
   create(sheet: string, data: Record<string, unknown>): Promise<unknown>;
   delete(sheet: string, id: string): Promise<unknown>;
   findSections(sheet: string): Promise<SectionRecord[]>;
+  findSectionById(sheet: string, sectionId: string): Promise<SectionRecord | null>;
+  findProfile(sheet: string): Promise<{ profile_id: string; cover_photo_url?: unknown } | null>;
+  updateProfileCover(sheet: string, profileId: string, coverPhotoUrl: string): Promise<unknown>;
   updateSectionContent(sheet: string, sectionId: string, content: unknown): Promise<unknown>;
 }
 export interface AssetStorage {
@@ -43,13 +46,13 @@ export interface Tenant {
   actorSheetId: string;
 }
 
-export type UploadError = "empty" | "too_large" | "unsupported_type" | "quota_exceeded" | "storage_failed";
+export type UploadError = "empty" | "too_large" | "unsupported_type" | "image_too_large" | "quota_exceeded" | "storage_failed";
 export type UploadResult =
   | { ok: true; asset: PublicAsset }
   | { ok: false; status: 400 | 409 | 413 | 415 | 502; error: UploadError };
 export type DeleteResult =
   | { ok: true }
-  | { ok: false; status: 404 | 409; error: "not_found" | "in_use"; sections?: UsageSection[] };
+  | { ok: false; status: 404 | 409; error: "not_found" | "in_use"; sections?: UsageSection[]; cover?: boolean };
 
 export interface UsageSection {
   section_id: string;
@@ -117,6 +120,11 @@ export function createWebsiteAssetsCore(deps: Deps) {
       .filter((s) => containsUrl(s.content, url));
   }
 
+  async function coverUsed(sheet: string, url: string) {
+    const profile = await model.findProfile(sheet);
+    return profile && profile.cover_photo_url === url ? profile : null;
+  }
+
   return {
     async list(t: Tenant): Promise<PublicAsset[]> {
       const rows = await model.findMany(t.actorSheetId);
@@ -134,6 +142,11 @@ export function createWebsiteAssetsCore(deps: Deps) {
       if (input.body.length > ASSET_LIMITS.maxBytes) return { ok: false, status: 413, error: "too_large" };
 
       // Count-check and insert are serialised per couple so parallel uploads can't overshoot the quota.
+      const size = readImageSize(input.mimeType, input.body);
+      if (size && (size.width > ASSET_LIMITS.maxDimension || size.height > ASSET_LIMITS.maxDimension)) {
+        return { ok: false, status: 413, error: "image_too_large" };
+      }
+
       return lock.run(t.coupleId, async (): Promise<UploadResult> => {
         const existing = await model.findMany(t.actorSheetId);
         if (existing.length >= ASSET_LIMITS.maxPerCouple) {
@@ -150,7 +163,6 @@ export function createWebsiteAssetsCore(deps: Deps) {
           console.error(`[website-assets] storage put failed for ${key}`, err);
           return { ok: false, status: 502, error: "storage_failed" };
         }
-        const size = readImageSize(input.mimeType, input.body);
         const row = {
           asset_id: assetId,
           couple_id: t.coupleId,
@@ -173,13 +185,14 @@ export function createWebsiteAssetsCore(deps: Deps) {
     },
 
     /** null when the asset doesn't exist in this couple's sheet. */
-    async usage(t: Tenant, assetId: string): Promise<UsageSection[] | null> {
+    async usage(t: Tenant, assetId: string): Promise<{ sections: UsageSection[]; cover: boolean } | null> {
       const asset = await model.findById(t.actorSheetId, assetId);
       if (!asset) return null;
-      return (await usageOf(t.actorSheetId, asset.url)).map(({ section }) => ({
+      const sections = (await usageOf(t.actorSheetId, asset.url)).map(({ section }) => ({
         section_id: section.section_id,
         section_key: section.section_key,
       }));
+      return { sections, cover: !!(await coverUsed(t.actorSheetId, asset.url)) };
     },
 
     async remove(t: Tenant, assetId: string, force: boolean): Promise<DeleteResult> {
@@ -191,16 +204,26 @@ export function createWebsiteAssetsCore(deps: Deps) {
         section_id: section.section_id,
         section_key: section.section_key,
       }));
-      if (used.length > 0 && !force) return { ok: false, status: 409, error: "in_use", sections };
+      const profile = await coverUsed(t.actorSheetId, asset.url);
+      const inUse = used.length > 0 || !!profile;
+      if (inUse && !force) return { ok: false, status: 409, error: "in_use", sections, cover: !!profile };
 
       try {
-        for (const { section, content } of used) {
+        for (const { section } of used) {
+          // Re-read just before writing so an edit saved since our scan isn't overwritten with
+          // stale content. A save landing between this read and the write can still be lost
+          // (Sheets has no compare-and-set); the window is a few milliseconds.
+          const fresh = await model.findSectionById(t.actorSheetId, section.section_id);
+          if (!fresh) continue;
+          const content = parseContent(fresh.content);
+          if (!containsUrl(content, asset.url)) continue;
           await model.updateSectionContent(t.actorSheetId, section.section_id, stripUrl(content, asset.url));
         }
+        if (profile) await model.updateProfileCover(t.actorSheetId, profile.profile_id, "");
         // Row before file: if the file delete fails the asset is already gone from the library.
         await model.delete(t.actorSheetId, assetId);
       } finally {
-        if (used.length > 0) deps.invalidateCouple(t.coupleId);
+        if (inUse) deps.invalidateCouple(t.coupleId);
       }
       await deps
         .storageFor(t.coupleId)

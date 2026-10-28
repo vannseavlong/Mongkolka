@@ -41,6 +41,24 @@ export const WebsiteAssetsModel = {
     return coupleContext(actorSheetId).table("website_sections").findMany() as Promise<SectionRow[]>;
   },
 
+  findSectionById(actorSheetId: string, sectionId: string) {
+    return coupleContext(actorSheetId)
+      .table("website_sections")
+      .findOne({ where: { section_id: sectionId } }) as Promise<SectionRow | null>;
+  },
+
+  findProfile(actorSheetId: string) {
+    return coupleContext(actorSheetId).table("couple_profile").findOne() as Promise<
+      (Record<string, unknown> & { profile_id: string; cover_photo_url?: unknown }) | null
+    >;
+  },
+
+  updateProfileCover(actorSheetId: string, profileId: string, coverPhotoUrl: string) {
+    return coupleContext(actorSheetId)
+      .table("couple_profile")
+      .update({ where: { profile_id: profileId }, data: { cover_photo_url: coverPhotoUrl } });
+  },
+
   updateSectionContent(actorSheetId: string, sectionId: string, content: unknown) {
     return coupleContext(actorSheetId)
       .table("website_sections")

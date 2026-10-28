@@ -1,6 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import Busboy from "busboy";
 
+const MULTIPART_OVERHEAD_BYTES = 64 * 1024;
+
 export interface UploadedFile {
   buffer: Buffer;
   mimeType: string;
@@ -19,6 +21,13 @@ export function singleFileUpload(field: string, maxBytes: number) {
       res.status(415).json({ error: "unsupported_type" });
       return;
     }
+    // Cheap early reject; the allowance covers multipart boundaries and headers.
+    const declared = Number(req.headers["content-length"]);
+    if (Number.isFinite(declared) && declared > maxBytes + MULTIPART_OVERHEAD_BYTES) {
+      res.set("Connection", "close").status(413).json({ error: "too_large" });
+      req.resume();
+      return;
+    }
     let bb: ReturnType<typeof Busboy>;
     try {
       bb = Busboy({ headers: req.headers, limits: { files: 1, fields: 0, fileSize: maxBytes } });
@@ -26,14 +35,24 @@ export function singleFileUpload(field: string, maxBytes: number) {
       res.status(400).json({ error: "bad_request" });
       return;
     }
-    let tooLarge = false;
     let extraFile = false;
     let done = false;
     const finish = (fn: () => void) => {
       if (done) return;
       done = true;
+      req.off("aborted", onAbort);
+      req.off("error", onAbort);
       fn();
     };
+    /** Stop parsing and discard the rest of the body without buffering it. */
+    const stopReading = () => {
+      req.unpipe(bb);
+      bb.destroy();
+      req.resume();
+    };
+    const onAbort = () => finish(() => stopReading());
+    req.on("aborted", onAbort);
+    req.on("error", onAbort);
 
     bb.on("file", (name, stream, info) => {
       if (name !== field || req.uploadedFile) {
@@ -42,12 +61,18 @@ export function singleFileUpload(field: string, maxBytes: number) {
         return;
       }
       const chunks: Buffer[] = [];
+      // A truncated body (client abort) errors the file stream; the abort handler already responded.
+      stream.on("error", () => undefined);
       stream.on("data", (c: Buffer) => chunks.push(c));
       stream.on("limit", () => {
-        tooLarge = true;
+        chunks.length = 0;
+        finish(() => {
+          stopReading();
+          res.set("Connection", "close").status(413).json({ error: "too_large" });
+        });
       });
       stream.on("end", () => {
-        if (!tooLarge) req.uploadedFile = { buffer: Buffer.concat(chunks), mimeType: info.mimeType.toLowerCase() };
+        if (!done) req.uploadedFile = { buffer: Buffer.concat(chunks), mimeType: info.mimeType.toLowerCase() };
       });
     });
     bb.on("filesLimit", () => {
@@ -56,8 +81,7 @@ export function singleFileUpload(field: string, maxBytes: number) {
     bb.on("error", () => finish(() => res.status(400).json({ error: "bad_request" })));
     bb.on("close", () =>
       finish(() => {
-        if (tooLarge) res.status(413).json({ error: "too_large" });
-        else if (extraFile || !req.uploadedFile) res.status(400).json({ error: "expected_one_file", field });
+        if (extraFile || !req.uploadedFile) res.status(400).json({ error: "expected_one_file", field });
         else next();
       }),
     );

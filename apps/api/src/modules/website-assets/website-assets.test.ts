@@ -16,6 +16,8 @@ PNG.writeUInt32BE(480, 20);
 function setup(opts: { putFails?: boolean; createFails?: boolean } = {}) {
   const assets = new Map<string, AssetRecord[]>();
   const sections = new Map<string, SectionRecord[]>();
+  const profiles = new Map<string, { profile_id: string; cover_photo_url?: unknown }>();
+  let beforeSectionWrite: (() => void) | undefined;
   const files = new Map<string, string>(); // key -> couple that stored it
   const invalidated: string[] = [];
   const rows = (s: string) => assets.get(s) ?? [];
@@ -29,7 +31,17 @@ function setup(opts: { putFails?: boolean; createFails?: boolean } = {}) {
     },
     delete: async (s, id) => void assets.set(s, rows(s).filter((r) => r.asset_id !== id)),
     findSections: async (s) => sections.get(s) ?? [],
+    findSectionById: async (s, id) => {
+      const sec = (sections.get(s) ?? []).find((x) => x.section_id === id);
+      return sec ? { ...sec } : null;
+    },
+    findProfile: async (s) => profiles.get(s) ?? null,
+    updateProfileCover: async (s, _id, url) => {
+      const p = profiles.get(s);
+      if (p) p.cover_photo_url = url;
+    },
     updateSectionContent: async (s, id, content) => {
+      beforeSectionWrite?.();
       for (const sec of sections.get(s) ?? []) if (sec.section_id === id) sec.content = content;
     },
   };
@@ -42,7 +54,7 @@ function setup(opts: { putFails?: boolean; createFails?: boolean } = {}) {
     delete: async (key) => void files.delete(key),
   });
   const core = createWebsiteAssetsCore({ model, storageFor, invalidateCouple: (c) => invalidated.push(c) });
-  return { core, assets, sections, files, invalidated };
+  return { core, assets, sections, profiles, files, invalidated, onBeforeSectionWrite: (fn: () => void) => (beforeSectionWrite = fn) };
 }
 
 const A = { coupleId: "cA", actorSheetId: "sheetA" };
@@ -70,6 +82,15 @@ describe("website assets: validation", () => {
     assert.equal(r.asset.width, 640);
     assert.equal(r.asset.height, 480);
     assert.equal(r.asset.url, `https://cdn.test/${key}`);
+  });
+});
+
+describe("website assets: dimensions", () => {
+  it("rejects images over 12000 px", async () => {
+    const { core } = setup();
+    const huge = Buffer.from(PNG);
+    huge.writeUInt32BE(12001, 16);
+    assert.deepEqual(await core.upload(A, { body: huge, mimeType: "image/png" }), { ok: false, status: 413, error: "image_too_large" });
   });
 });
 
@@ -133,10 +154,13 @@ describe("website assets: delete in use", () => {
 
   it("lists the sections using the asset", async () => {
     const { core, id } = await withUsage();
-    assert.deepEqual(await core.usage(A, id), [
-      { section_id: "s1", section_key: "gallery" },
-      { section_id: "s2", section_key: "hero" },
-    ]);
+    assert.deepEqual(await core.usage(A, id), {
+      sections: [
+        { section_id: "s1", section_key: "gallery" },
+        { section_id: "s2", section_key: "hero" },
+      ],
+      cover: false,
+    });
   });
 
   it("refuses without force and changes nothing", async () => {
@@ -157,6 +181,40 @@ describe("website assets: delete in use", () => {
     assert.equal(files.size, 0);
     assert.equal(assets.get("sheetA")!.length, 0);
     assert.deepEqual(invalidated, ["cA"]);
+  });
+
+  it("a section edited to drop the URL after the scan is not rewritten", async () => {
+    const { core, id, sections, onBeforeSectionWrite } = await withUsage();
+    // s2 is written second; before the first write, s2 is replaced with new content lacking the URL
+    onBeforeSectionWrite(() => {
+      sections.get("sheetA")![1]!.content = { image: "https://new/y.jpg", title: "New" };
+    });
+    assert.deepEqual(await core.remove(A, id, true), { ok: true });
+    assert.deepEqual(sections.get("sheetA")![1]!.content, { image: "https://new/y.jpg", title: "New" });
+  });
+
+  it("treats couple_profile.cover_photo_url as usage and strips it on force", async () => {
+    const { core, id, profiles, assets, invalidated } = await withUsage();
+    const url = assets.get("sheetA")![0]!.url;
+    profiles.set("sheetA", { profile_id: "p1", cover_photo_url: url });
+    const u = await core.usage(A, id);
+    assert.equal(u?.cover, true);
+    const r = await core.remove(A, id, false);
+    assert.equal(!r.ok && r.status, 409);
+    assert.equal(!r.ok && r.cover, true);
+    assert.equal(profiles.get("sheetA")!.cover_photo_url, url);
+    assert.deepEqual(await core.remove(A, id, true), { ok: true });
+    assert.equal(profiles.get("sheetA")!.cover_photo_url, "");
+    assert.deepEqual(invalidated, ["cA"]);
+  });
+
+  it("an asset used only as cover blocks delete without force", async () => {
+    const { core, profiles } = setup();
+    const up = await core.upload(A, png);
+    assert.ok(up.ok);
+    profiles.set("sheetA", { profile_id: "p1", cover_photo_url: up.asset.url });
+    const r = await core.remove(A, up.asset.asset_id, false);
+    assert.equal(!r.ok && r.error, "in_use");
   });
 
   it("deleting an unused asset needs no force and does not touch the cache", async () => {

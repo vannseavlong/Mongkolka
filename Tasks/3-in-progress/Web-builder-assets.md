@@ -14,7 +14,7 @@
 Asset tab in the section panel plus an asset picker used by gallery (multi-select, reorder) and hero cover. Upload with progress, delete with usage warning, quota display.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc, lint 0 errors, next build)  - [ ] G3 tests (no runner in apps/couple)  - [~] G4 run it (stub API; AssetPicker in the gallery dialog NOT opened)
 - [ ] G5 code review  - [ ] G6 security (if input/upload)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -25,3 +25,9 @@ Asset tab in the section panel plus an asset picker used by gallery (multi-selec
 - [ ] Live canvas updates as soon as an asset is picked
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-28
+Built in commit c3f05ed on `feat/builder-assets` (based on feat/builder-workspace), not merged. Assets tab (order 30, hero and gallery only via appliesTo), asset library (grid, drag-drop and picker multi-upload with per-file progress via XHR because lib/api.ts forces a JSON Content-Type, quota n/100, delete with in-use confirmation using ?force=true only when in use), AssetPicker modal, gallery and cover pickers, "Add photo by URL" kept as advanced. Gallery saves `photos: string[]` via patchSection; cover via PATCH /couple/api/profile.
+Checked in this repo: couple-profile.service accepts any string for cover_photo_url when defined, so "Remove cover" sending "" is stored as an empty string (not null); the website-assets force-delete also writes "".
+Not verified: real API (multipart, 413/409/502, quota-full), AssetPicker dialog opened in the browser, keyboard, phone width, true OS drag-drop. Tests deferred (no runner). XHR upload duplicates the API_URL fallback from lib/api.ts.
+Next: G5 review, G3 decision, G7, G8, G11.

@@ -3,11 +3,15 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { Check, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@mongkolka/ui/card";
+import { Check, ExternalLink } from "lucide-react";
+import { Badge } from "@mongkolka/ui/badge";
+import { Button } from "@mongkolka/ui/button";
 import { api, ApiError } from "@/lib/api";
+import { siteOrigin } from "@/lib/site-url";
 import { cn } from "@mongkolka/ui/utils";
 import type { SiteTemplate } from "../data/schema";
+import { TemplateApplyDialog, type ApplyMode } from "./template-apply-dialog";
+import { TemplateThumbnail } from "./template-thumbnail";
 
 export function TemplatePicker({
   templates,
@@ -16,63 +20,95 @@ export function TemplatePicker({
   templates: SiteTemplate[];
   selectedTemplateId: string | null;
 }) {
-  // Tracks the one request in flight (if any) so the whole grid can be
-  // disabled while it resolves — a rapid double-click used to fire the
-  // template-select POST twice, racing on the couple_profile bootstrap
-  // (see couple-website.service.ts). Also lets the clicked card show
-  // its own spinner instead of the picker just sitting there looking stuck.
+  // One request in flight at a time: a rapid double-click used to fire the
+  // template POST twice, racing on the couple_profile bootstrap. Buttons use
+  // aria-disabled (not `disabled`) so a focused button keeps focus while pending.
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<SiteTemplate | null>(null);
 
-  async function selectTemplate(templateId: string) {
-    if (pendingId || templateId === selectedTemplateId) return;
-    setPendingId(templateId);
+  async function apply(template: SiteTemplate, mode: ApplyMode) {
+    if (pendingId) return;
+    setPendingId(template.template_id);
     try {
-      await api.post("/couple/api/website/template", { template_id: templateId });
-      toast.success("Template selected");
+      await api.post("/couple/api/website/template", { template_id: template.template_id, mode });
+      // The apply response has no sections: refetch both so the canvas refreshes.
       await Promise.all([mutate("/couple/api/website/settings"), mutate("/couple/api/website/sections")]);
+      toast.success(`Now using ${template.name}`);
+      setConfirming(null);
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to select template");
+      // Nothing was refetched, so the previous template and content stay on screen.
+      toast.error(err instanceof ApiError ? err.message : "Failed to apply template");
     } finally {
       setPendingId(null);
     }
   }
 
+  function choose(template: SiteTemplate) {
+    if (pendingId || template.template_id === selectedTemplateId) return;
+    // First pick has nothing to lose, so it applies directly.
+    if (selectedTemplateId === null) void apply(template, "keep_content");
+    else setConfirming(template);
+  }
+
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {templates.map((template) => {
-        const selected = template.template_id === selectedTemplateId;
-        const isPending = pendingId === template.template_id;
-        return (
-          <Card
-            key={template.template_id}
-            role="button"
-            tabIndex={0}
-            aria-disabled={pendingId !== null}
-            onClick={() => selectTemplate(template.template_id)}
-            className={cn(
-              "cursor-pointer transition-colors",
-              selected && "ring-2 ring-primary",
-              pendingId !== null && pendingId !== template.template_id && "pointer-events-none opacity-50",
-            )}
-          >
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">{template.name}</CardTitle>
-              {isPending ? (
-                <Loader2 className="size-4 animate-spin text-muted-foreground" />
-              ) : (
-                selected && <Check className="size-4 text-primary" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="flex h-8 overflow-hidden rounded-md border">
-                <div className="flex-1" style={{ backgroundColor: template.default_theme.bg_color }} />
-                <div className="flex-1" style={{ backgroundColor: template.default_theme.text_color }} />
-                <div className="flex-1" style={{ backgroundColor: template.default_theme.accent_color }} />
+    <>
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {templates.map((template) => {
+          const selected = template.template_id === selectedTemplateId;
+          const isPending = pendingId === template.template_id;
+          const theme = template.default_theme;
+          return (
+            <li
+              key={template.template_id}
+              className={cn("flex flex-col gap-3 rounded-lg border bg-card p-3", selected && "ring-2 ring-primary")}
+            >
+              <TemplateThumbnail template={template} />
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base font-semibold">{template.name}</h3>
+                {selected && (
+                  <Badge>
+                    <Check className="size-3" /> Selected
+                  </Badge>
+                )}
               </div>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
+              {template.description && <p className="text-sm text-muted-foreground">{template.description}</p>}
+              <div className="flex h-5 overflow-hidden rounded-md border" aria-hidden="true">
+                {[theme.bg_color, theme.text_color, theme.accent_color].map((color, i) => (
+                  <div key={i} className="flex-1" style={{ backgroundColor: color }} />
+                ))}
+              </div>
+              <div className="mt-auto flex flex-wrap gap-2">
+                {template.slug && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={siteOrigin(template.slug)} target="_blank" rel="noopener noreferrer">
+                      Preview <ExternalLink className="size-3.5" />
+                      <span className="sr-only"> {template.name} (opens in a new tab)</span>
+                    </a>
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant={selected ? "secondary" : "default"}
+                  aria-disabled={pendingId !== null || selected}
+                  aria-pressed={selected}
+                  className={cn((pendingId !== null || selected) && "opacity-60")}
+                  onClick={() => choose(template)}
+                >
+                  {selected ? "Current template" : isPending ? "Applying..." : "Use this template"}
+                </Button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {confirming && (
+        <TemplateApplyDialog
+          templateName={confirming.name}
+          pending={pendingId !== null}
+          onCancel={() => setConfirming(null)}
+          onConfirm={(mode) => apply(confirming, mode)}
+        />
+      )}
+    </>
   );
 }

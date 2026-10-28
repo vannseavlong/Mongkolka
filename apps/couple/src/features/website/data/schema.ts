@@ -26,6 +26,8 @@ export type Theme = z.infer<typeof themeSchema>;
 export const siteTemplateSchema = z.object({
   template_id: z.string(),
   name: z.string(),
+  slug: z.string().nullish(),
+  description: z.string().nullish(),
   default_theme: themeSchema,
   default_components: z.record(z.string(), z.string()),
   status: z.enum(["active", "inactive"]),

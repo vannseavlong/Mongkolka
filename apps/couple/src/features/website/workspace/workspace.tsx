@@ -36,7 +36,7 @@ export function Workspace({
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<WebsiteSection | null>(null);
   const [pane, setPane] = useState<"sections" | "preview">("sections");
-  const { patchSection, move, reordering } = useSectionActions(ordered);
+  const { patchSection, move, reordering, pending, announcement } = useSectionActions(ordered);
 
   // Falls back to the first section until one is picked (or if it was removed).
   const selected = ordered.find((s) => s.section_id === pickedId) ?? ordered[0] ?? null;
@@ -70,10 +70,14 @@ export function Workspace({
             sections={ordered}
             selectedId={selected.section_id}
             reordering={reordering}
+            pending={pending}
             onSelect={setPickedId}
             onMove={move}
             onToggle={(section, enabled) => patchSection(section.section_id, { enabled })}
           />
+          <p role="status" aria-live="polite" className="sr-only">
+            {announcement}
+          </p>
         </div>
 
         <div
@@ -89,6 +93,7 @@ export function Workspace({
             themeOverride={themeOverride}
             profile={profile}
             onSelect={setPickedId}
+            active={pane === "preview"}
           />
         </div>
 

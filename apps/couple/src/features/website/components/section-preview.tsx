@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import {
   LanguageProvider,
   SAMPLE_CONTENT,
@@ -13,8 +13,8 @@ import type { WebsiteSection } from "../data/schema";
 import { buildPreviewContent, type PreviewProfile } from "../lib/build-content";
 
 // Renders one section at a fixed "design" width, then scales that whole box
-// down to fit its container — the same containment trick website-preview.tsx
-// uses for the full-page preview (a transformed ancestor becomes the
+// down to fit its container — the same containment trick the builder canvas
+// uses (a transformed ancestor becomes the
 // containing block for the opening gate's `position: fixed`, which is why the
 // box also gets an explicit height). The width is
 // measured, so it fills a grid cell of any size. Not pixel-perfect, just enough
@@ -27,13 +27,20 @@ const ASPECT = 10 / 16;
  * only when the couple has nothing for it yet (e.g. no gallery photos), so an
  * empty section still previews as something instead of a blank tile.
  */
-export function previewContentFor(section: WebsiteSection, profile: PreviewProfile) {
-  const own = section.content ?? buildPreviewContent(section.section_key, profile);
-  const hasData = Object.values(own as Record<string, unknown>).some((v) => v !== undefined && v !== null && v !== "");
-  return hasData ? own : (SAMPLE_CONTENT[section.section_key] ?? own);
+/** True for null/""/[]/{} and for objects or arrays holding only such values. */
+function isEmpty(value: unknown): boolean {
+  if (value === null || value === undefined || value === "") return true;
+  if (Array.isArray(value)) return value.every(isEmpty);
+  if (typeof value === "object") return Object.values(value).every(isEmpty);
+  return false;
 }
 
-export function SectionPreview({
+export function previewContentFor(section: WebsiteSection, profile: PreviewProfile) {
+  const own = section.content ?? buildPreviewContent(section.section_key, profile);
+  return isEmpty(own) ? (SAMPLE_CONTENT[section.section_key] ?? own) : own;
+}
+
+export const SectionPreview = memo(function SectionPreview({
   section,
   componentId,
   template,
@@ -93,4 +100,4 @@ export function SectionPreview({
       )}
     </div>
   );
-}
+});

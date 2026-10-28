@@ -28,6 +28,7 @@ export function SiteCanvas({
   themeOverride,
   profile,
   onSelect,
+  active,
 }: {
   template: SiteRendererTemplate;
   sections: WebsiteSection[];
@@ -35,22 +36,42 @@ export function SiteCanvas({
   themeOverride: PartialTheme | null;
   profile: PreviewProfile;
   onSelect: (sectionId: string) => void;
+  /** Whether the canvas is on screen below lg (it is display:none while the other pane shows). */
+  active: boolean;
 }) {
   const [device, setDevice] = useState<Device>("desktop");
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Set when the selection came from a click inside the canvas: that section is
+  // already on screen, so the next selection change must not scroll.
+  const fromCanvas = useRef(false);
   const selected = sections.find((s) => s.section_id === selectedId) ?? null;
   const showOpening = selected?.section_key === "opening";
-  const shown = sections.filter((s) => (s.section_key === "opening") === showOpening);
+  const shown = sections.filter(
+    (s) => (s.section_key === "opening") === showOpening,
+  );
 
   // Scroll the canvas (not the page) so the selected section's top is in view.
   useEffect(() => {
+    if (fromCanvas.current) {
+      fromCanvas.current = false;
+      return;
+    }
     const container = scrollRef.current;
-    const target = selectedId && container?.querySelector<HTMLElement>(`[data-section-id="${CSS.escape(selectedId)}"]`);
+    const target =
+      selectedId &&
+      container?.querySelector<HTMLElement>(
+        `[data-section-id="${CSS.escape(selectedId)}"]`,
+      );
     if (!container || !target) return;
-    const top = target.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const top =
+      target.getBoundingClientRect().top -
+      container.getBoundingClientRect().top +
+      container.scrollTop;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     container.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
-  }, [selectedId, device, showOpening]);
+  }, [selectedId, device, showOpening, active]);
 
   const couple: CoupleInfo = {
     partner1Name: profile.partner1_name ?? "Partner One",
@@ -62,7 +83,11 @@ export function SiteCanvas({
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium">Live preview</span>
-        <div className="flex gap-1 rounded-lg bg-muted p-1" role="group" aria-label="Preview size">
+        <div
+          className="flex gap-1 rounded-lg bg-muted p-1"
+          role="group"
+          aria-label="Preview size"
+        >
           {(
             [
               ["desktop", Monitor, "Desktop"],
@@ -76,7 +101,9 @@ export function SiteCanvas({
               onClick={() => setDevice(value)}
               className={cn(
                 "flex h-8 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring",
-                device === value ? "bg-background shadow-sm" : "text-muted-foreground",
+                device === value
+                  ? "bg-background shadow-sm"
+                  : "text-muted-foreground",
               )}
             >
               <Icon className="size-4" /> {label}
@@ -85,46 +112,67 @@ export function SiteCanvas({
         </div>
       </div>
       {selected && !selected.enabled && (
-        <p role="status" className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
-          This section is hidden, so it is not shown on your website. Turn it on in the list.
+        <p
+          role="status"
+          className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground"
+        >
+          This section is hidden, so it is not shown on your website. Turn it on
+          in the list.
         </p>
       )}
       <div className="rounded-lg border bg-muted/40 p-0 sm:p-3">
         <div
-          className={cn("relative mx-auto h-[70dvh] min-h-96 overflow-hidden rounded-lg border bg-background lg:h-160", device === "mobile" ? "max-w-sm" : "w-full")}
+          className={cn(
+            "relative mx-auto h-[70dvh] min-h-96 overflow-hidden rounded-lg border bg-background lg:h-160",
+            device === "mobile" ? "max-w-sm" : "w-full",
+          )}
           style={{ transform: "translateZ(0)" }}
         >
           <div ref={scrollRef} className="h-full overflow-y-auto">
-            <LanguageProvider>
-              {/* key: remounts SiteRenderer when switching to/from the opening gate so its dismissed state resets */}
-              <SiteRenderer
-                key={showOpening ? "opening" : "page"}
-                template={template}
-                sections={shown}
-                themeOverride={themeOverride}
-                couple={couple}
-                buildContent={(sectionKey) => buildPreviewContent(sectionKey, profile)}
-                guestGreeting="Guest"
-                extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : {})}
-                wrapSection={(section, node) => (
-                  <div
-                    data-section-id={section.section_id}
-                    onClickCapture={(e) => {
-                      // Selecting must not trigger the section's own links/buttons.
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onSelect(section.section_id);
-                    }}
-                    className={cn(
-                      "cursor-pointer outline-offset-[-3px]",
-                      section.section_id === selectedId && "outline-3 outline-primary",
-                    )}
-                  >
-                    {node}
-                  </div>
-                )}
-              />
-            </LanguageProvider>
+            {/* The opening gate is only a preview here: inert + no pointer events so its
+                button cannot dismiss it and blank the canvas. */}
+            <div
+              className={cn(showOpening && "pointer-events-none")}
+              inert={showOpening}
+            >
+              <LanguageProvider>
+                {/* key: remounts SiteRenderer when switching to/from the opening gate so its dismissed state resets */}
+                <SiteRenderer
+                  key={showOpening ? "opening" : "page"}
+                  template={template}
+                  sections={shown}
+                  themeOverride={themeOverride}
+                  couple={couple}
+                  buildContent={(sectionKey) =>
+                    buildPreviewContent(sectionKey, profile)
+                  }
+                  guestGreeting="Guest"
+                  extraProps={(sectionKey) =>
+                    sectionKey === "rsvp" ? { onSubmit: async () => {} } : {}
+                  }
+                  wrapSection={(section, node) => (
+                    <div
+                      data-section-id={section.section_id}
+                      onClickCapture={(e) => {
+                        // Selecting must not trigger the section's own links/buttons.
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (section.section_id !== selectedId)
+                          fromCanvas.current = true;
+                        onSelect(section.section_id);
+                      }}
+                      className={cn(
+                        "cursor-pointer outline-offset-[-3px]",
+                        section.section_id === selectedId &&
+                          "outline-3 outline-primary",
+                      )}
+                    >
+                      {node}
+                    </div>
+                  )}
+                />
+              </LanguageProvider>
+            </div>
           </div>
         </div>
       </div>

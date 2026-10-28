@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mongkolka/ui/tabs";
+import { sectionLabel } from "./section-labels";
 import { sectionPanelTabs } from "./panel-tabs/registry";
 import type { SectionPanelContext } from "./panel-tabs/types";
 
@@ -12,8 +13,8 @@ export function SectionPanel({ context }: { context: SectionPanelContext }) {
   const value = tabs.some((t) => t.id === active) ? active : tabs[0]?.id;
 
   return (
-    <section aria-label={`${context.section.section_key} settings`} className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold capitalize">{context.section.section_key}</h2>
+    <div className="flex flex-col gap-3">
+      <h2 className="text-lg font-semibold">{sectionLabel(context.section.section_key)}</h2>
       <Tabs value={value} onValueChange={setActive}>
         <TabsList className="flex-wrap">
           {tabs.map((t) => (
@@ -28,6 +29,6 @@ export function SectionPanel({ context }: { context: SectionPanelContext }) {
           </TabsContent>
         ))}
       </Tabs>
-    </section>
+    </div>
   );
 }

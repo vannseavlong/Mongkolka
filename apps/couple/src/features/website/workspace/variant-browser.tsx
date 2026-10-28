@@ -5,6 +5,7 @@ import { sectionRegistry } from "@mongkolka/templates";
 import { Badge } from "@mongkolka/ui/badge";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { cn } from "@mongkolka/ui/utils";
+import { sectionLabel } from "./section-labels";
 import { SectionPreview } from "../components/section-preview";
 import type { SectionPanelContext } from "./panel-tabs/types";
 
@@ -48,7 +49,7 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
       {variants.length === 1 && (
         <p className="text-sm text-muted-foreground">This section has one style for now. More are coming.</p>
       )}
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label={`${section.section_key} styles`}>
+      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label={`${sectionLabel(section.section_key)} styles`}>
         {variants.map((variant) => {
           const isCurrent = variant.component_id === currentId;
           const isDefault = variant.component_id === defaultId;
@@ -57,8 +58,10 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
               <button
                 type="button"
                 aria-pressed={isCurrent}
-                disabled={isCurrent}
+                // aria-disabled, not disabled, so focus and aria-pressed survive.
+                aria-disabled={isCurrent}
                 onClick={() =>
+                  !isCurrent &&
                   // Choosing the template's own default stores null so the
                   // section keeps following the template if it changes.
                   patchSection(
@@ -68,7 +71,7 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
                 }
                 className={cn(
                   "flex w-full flex-col gap-2 rounded-lg border p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                  isCurrent ? "border-primary ring-2 ring-primary/30" : "hover:border-foreground/40",
+                  isCurrent ? "cursor-default border-primary ring-2 ring-primary/30" : "hover:border-foreground/40",
                 )}
               >
                 <SectionPreview

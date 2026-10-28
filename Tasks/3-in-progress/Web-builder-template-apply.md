@@ -3,9 +3,9 @@
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · edits template selection flow (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/builder-template-apply/` · **Branch:** `feat/builder-template-apply` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (Web-builder-template-apply), 2026-10-28
+- **Worktree:** `Mongkolka/builder-template-apply/` · **Branch:** `feat/builder-template-apply`
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** API-template-catalog-apply, Web-builder-workspace-variants
 - **Touches:** apps/couple/src/features/website/components/template-picker.tsx, new apply-dialog

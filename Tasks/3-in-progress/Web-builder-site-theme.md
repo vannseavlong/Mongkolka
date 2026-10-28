@@ -3,9 +3,9 @@
 - **Repo:** apps/couple, packages/templates
 - **Owner:** SNLRLONG
 - **Tier:** T2 · shared package constant, edits theme UI (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/builder-site-theme/` · **Branch:** `feat/builder-site-theme` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (Web-builder-site-theme), 2026-10-28
+- **Worktree:** `Mongkolka/builder-site-theme/` · **Branch:** `feat/builder-site-theme`
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** Web-builder-workspace-variants
 - **Touches:** apps/couple/src/features/website/components/theme-editor.tsx, section-color-popover.tsx, packages/templates (theme presets)

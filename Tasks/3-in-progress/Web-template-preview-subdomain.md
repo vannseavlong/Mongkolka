@@ -3,9 +3,9 @@
 - **Repo:** apps/web
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new route and proxy behavior (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/template-preview-subdomain/` · **Branch:** `feat/template-preview-subdomain` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (Web-template-preview-subdomain), 2026-10-28
+- **Worktree:** `Mongkolka/template-preview-subdomain/` · **Branch:** `feat/template-preview-subdomain`
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** API-template-catalog-apply
 - **Touches:** apps/web/src/proxy.ts, app/templates (preview route, gallery cards), shared sample content

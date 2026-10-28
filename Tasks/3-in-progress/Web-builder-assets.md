@@ -3,9 +3,9 @@
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new UI for upload (API carries the T3 review) (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/builder-assets/` · **Branch:** `feat/builder-assets` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (Web-builder-assets), 2026-10-28
+- **Worktree:** `Mongkolka/builder-assets/` · **Branch:** `feat/builder-assets`
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** API-website-assets, Web-builder-workspace-variants
 - **Touches:** apps/couple/src/features/website/components/asset-library*, asset-picker*, section-content-dialog.tsx (gallery/hero fields only)

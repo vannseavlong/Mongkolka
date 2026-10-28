@@ -3,9 +3,9 @@
 - **Repo:** apps/admin
 - **Owner:** SNLRLONG
 - **Tier:** T2 · edits admin catalog form, depends on API contract (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/template-slug-field/` · **Branch:** `feat/template-slug-field` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Claimed by:** sub-agent (Admin-template-slug-field), 2026-10-28
+- **Worktree:** `Mongkolka/template-slug-field/` · **Branch:** `feat/template-slug-field`
+- **Started / updated:** 2026-10-28 / 2026-10-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/template.md, Docs/backend-schema.md
 - **Depends on:** API-template-catalog-apply
 - **Touches:** apps/admin template catalog form and table

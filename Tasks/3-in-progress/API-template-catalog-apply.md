@@ -32,3 +32,7 @@ Built in commit 3043264 on `feat/template-catalog-apply`, not merged.
 Contract: public `GET /public/api/site-templates/by-slug/:slug`; admin create now REQUIRES `slug` (Admin app create form breaks until `Admin-template-slug-field` ships); couple `POST /couple/api/website/template` takes `mode` (default keep_content), returns `{settings, mode}`, client must refetch sections; both modes clear `theme_override`; unknown/inactive template now 404; reserved template slugs give 409 on couple slug change.
 Run live after merge (not done): schema sync for admin `site_templates` (slug, description); set slugs on existing rows (gold-ink-cream, crimson-gold-silk, blush-gold-garden, white-black-mono) if seed skips existing rows.
 Next: G5 and G6 by a fresh agent, then G9, G10, G11.
+
+## Review 2026-10-28 (fresh agent, G5+G6)
+No blockers. Sent back to the builder: junk-slug cache flooding (load all active templates once), partial-failure apply with early cache invalidation (allSettled, clear sections before profile write), reserved infrastructure slugs (www, api, admin...), explicit public response allowlist, status enum, revert formatting churn, missing tests.
+Accepted/deferred: narrow cross-sheet race between a template slug and a couple claiming the same slug (documented); reset_all clears only content (documented); multi-instance cache staleness up to 60s.

@@ -18,7 +18,7 @@ export function Website() {
   const { data: catalogData, loading: catalogLoading } = useApiQuery<{ templates: SiteTemplate[]; components: SectionComponent[] }>(
     "/couple/api/website/catalog",
   );
-  const { data: settingsData } = useApiQuery<{ settings: WebsiteSettings }>("/couple/api/website/settings");
+  const { data: settingsData, error: settingsError, refetch: refetchSettings } = useApiQuery<{ settings: WebsiteSettings }>("/couple/api/website/settings");
   const { data: sectionsData } = useApiQuery<{ sections: WebsiteSection[] }>("/couple/api/website/sections");
   const { data: profileData } = useApiQuery<{ profile: CoupleProfile }>("/couple/api/profile");
 
@@ -67,7 +67,10 @@ export function Website() {
               <CardContent>
                 <TemplatePicker
                   templates={catalogData?.templates ?? []}
-                  selectedTemplateId={settings?.site_template_id ?? null}
+                  selectedTemplateId={settings ? settings.site_template_id : undefined}
+                  templatesLoading={catalogLoading}
+                  settingsError={settings ? null : settingsError}
+                  onRetry={refetchSettings}
                 />
               </CardContent>
             </Card>

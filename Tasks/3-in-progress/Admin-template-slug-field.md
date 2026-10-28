@@ -14,7 +14,7 @@
 Admin can set and edit a template's `slug` and `description`, sees a validation error for duplicates or reserved/invalid slugs, and gets a link to the template's live preview URL.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc, lint, build pass)  - [ ] G3 tests  - [ ] G4 run it (app never run)
 - [ ] G5 code review  - [ ] G6 security (if input/upload)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -24,3 +24,9 @@ Admin can set and edit a template's `slug` and `description`, sees a validation 
 - [ ] Preview link opens `<slug>.<ROOT_DOMAIN>`
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-28
+Built in commit e905d22 on `feat/template-slug-field` (based on main), not merged. Edit mode added to the template dialog (admin only had create and delete); Slug column and Preview link; `src/lib/site-url.ts` and `.env.example` (`NEXT_PUBLIC_ROOT_DOMAIN`, force-added because admin ignores .env*). Column header "Preview" (swatches) renamed to "Theme".
+Request bodies checked against the API branch controller (feat/template-catalog-apply): match. Description limit of 500 chars is the agent's choice.
+Not verified: UI never run, 400/409 inline errors untested, no zod tests.
+Must merge together with or after API-template-catalog-apply: admin create without slug returns 400.

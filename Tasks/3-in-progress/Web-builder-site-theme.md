@@ -33,3 +33,9 @@ Reset to template sends `{}`: API rejects null but its updateTheme REPLACES the 
 Content tab's SectionColorPopover and the new Colors tab both edit color_override (duplication left in place).
 Not verified: keyboard, narrow layouts, real API and public site rendering, touch hover. Tests deferred (no runner).
 Next: G5 review, G3 decision, G7, G8, G11.
+
+## Review 2026-10-28 (fresh agent, G5; static read, tsc clean, app not run)
+No blockers; not ready for testing until the should-fix items are done. Sent back:
+1 Colors tab drops edits while a save is in flight (and "Use site theme" silently does nothing right after an edit); 2 color commit relies on blur only (unreliable for native pickers in Firefox/Safari, no Enter/Escape); 3 saving only differing keys can split a palette and leave unreadable colors after switching templates -> store bg, text, accent together; 4 unsaved draft theme sticks on the canvas after the editor unmounts; 5 SectionColorPopover and the Colors tab disagree (snapshot of all four keys, wrong label); 6 font Select has no accessible name; 7 four presets have accent contrast below 4.5:1 (Ivory & Gold 3.36, Sky Linen 4.39, Lotus Pink 4.42, Terracotta 4.44, Sage Garden 4.51); the earlier "no accent threshold required" note was wrong, accent is used for text.
+Nits sent back: contrast helper returns null for invalid colors, announce threshold crossings only, aria-disabled styling, case/3-digit normalization, unused getThemePreset, `as const` presets.
+Deferred: free-text font_style in admin (pre-existing); no Escape to cancel hover preview by keyboard; touch hover behavior.

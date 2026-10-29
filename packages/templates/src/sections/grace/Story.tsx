@@ -50,7 +50,7 @@ export function GraceStory({ theme, content }: GraceStoryProps) {
             {paragraphs.map((para, i) => (
               <p
                 key={i}
-                data-first={i === 0 && !kh && !short ? "1" : undefined}
+                data-first={i === 0 && !kh && !short && /^\p{L}/u.test(para) ? "1" : undefined}
                 className="grace-story-p whitespace-pre-line break-words"
               >
                 {para}

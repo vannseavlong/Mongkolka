@@ -1,5 +1,6 @@
 # Web-couple-builder-responsive
 
+- **ID:** T-0033
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T3 · touches the dashboard layout's token/redirect handling (login/token signal in `PIPELINE.md`); otherwise T1 UI tweaks

@@ -1,5 +1,6 @@
 # Web-section-keys-verse-footer
 
+- **ID:** T-0024
 - **Repo:** packages/templates, apps/api, apps/couple, apps/web
 - **Owner:** SNLRLONG
 - **Tier:** T2 · spans 4 places, shared package and API enums (auto picker) (auto picker, see `PIPELINE.md`)

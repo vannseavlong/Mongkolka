@@ -1,5 +1,6 @@
 # Admin-template-slug-field
 
+- **ID:** T-0027
 - **Repo:** apps/admin
 - **Owner:** SNLRLONG
 - **Tier:** T2 · edits admin catalog form, depends on API contract (auto picker, see `PIPELINE.md`)

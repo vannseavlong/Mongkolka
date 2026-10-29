@@ -1,5 +1,6 @@
 # Web-grace-sections (wave 3 and 4 of the Grace template)
 
+- **ID:** T-0017
 - **Repo:** packages/templates (+ apps/api seeds, apps/web for QA)
 - **Owner:** SNLRLONG
 - **Tier:** T2 per slice · new components in a shared package (auto picker, see `PIPELINE.md`)

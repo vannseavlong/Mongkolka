@@ -1,5 +1,6 @@
 # Web-template-preview-subdomain
 
+- **ID:** T-0032
 - **Repo:** apps/web
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new route and proxy behavior (auto picker, see `PIPELINE.md`)

@@ -1,5 +1,6 @@
 # Web-grace-skeleton
 
+- **ID:** T-0021
 - **Repo:** packages/templates, apps/api seeds
 - **Owner:** SNLRLONG
 - **Tier:** T2 · registry, i18n and seed rows (auto picker) (auto picker, see `PIPELINE.md`)

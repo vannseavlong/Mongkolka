@@ -1,5 +1,6 @@
 # API-template-catalog-apply
 
+- **ID:** T-0025
 - **Repo:** apps/api
 - **Owner:** SNLRLONG
 - **Tier:** T3 · fields another app depends on, schema change on admin sheet, slug rules (auto picker, see `PIPELINE.md`)

@@ -1,5 +1,6 @@
 # Web-khmer-kbach-template
 
+- **ID:** T-0023
 - **Repo:** packages/templates (+ apps/api seeds)
 - **Owner:** SNLRLONG
 - **Tier:** T2 · shared package, new components, new catalog seed rows (auto picker, see `PIPELINE.md`)

@@ -25,6 +25,8 @@ Split into five parallel slices, each its own task and branch when promoted to `
 - Flip the template row AND the nine `grace_*` section_components rows to `active` in the seeds together (the rows are seeded inactive so couples on other templates never see unfinished variants); owner runs the live seed (`lsdb seed seeds/site-templates.ts --upsert` and section-components) after copying the sheet.
 - Owner reviews the template (the client-facing acceptance).
 
+- Footer credit link: `GraceFooter` takes an optional `brandUrl`; wire it from apps/web `site-view.tsx` (`extraProps` for `footer`) using `https://${ROOT_DOMAIN}` (settle the production domain first; unset renders plain text).
+
 ## Done when
 - [ ] All nine Grace components built, no stubs left
 - [ ] Owner has reviewed the template and signed off

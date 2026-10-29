@@ -406,7 +406,8 @@ const components = [
     preview_accent_color: "#b8893b",
     font_style: "serif",
   },
-  // Grace pack: pink, gold and white Christian-wedding design (stubs until the section tasks land)
+  // Grace pack: pink, gold and white Christian-wedding design (stubs until the section tasks land).
+  // INACTIVE on purpose: the final Grace launch task flips these rows and the grace_blush template to active together.
   {
     component_id: "opening_grace",
     section: "opening",
@@ -415,6 +416,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "hero_grace",
@@ -424,6 +426,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "verse_grace",
@@ -433,6 +436,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "story_grace",
@@ -442,6 +446,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "gallery_grace",
@@ -451,6 +456,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "details_grace",
@@ -460,6 +466,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "rsvp_grace",
@@ -469,6 +476,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "guestbook_grace",
@@ -478,6 +486,7 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
   {
     component_id: "footer_grace",
@@ -487,9 +496,11 @@ const components = [
     preview_text_color: "#4a2c35",
     preview_accent_color: "#8a6418",
     font_style: "serif",
+    status: "inactive",
   },
 ];
 
 export default {
-  section_components: components.map((c) => ({ ...c, status: "active" })),
+  // Rows may carry their own status (the Grace rows are inactive until launch); the rest default to active.
+  section_components: components.map((c) => ({ status: "active", ...c })),
 };

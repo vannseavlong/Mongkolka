@@ -375,3 +375,12 @@ required, and the two new `section_components` seed rows must be seeded.
 the opening gate greets them, the ink hero shows "A special invitation for …", and every
 RSVP component plus the guestbook prefill the name. Comma-separated names are joined with
 "&" server-side in `page.tsx`.
+
+## Grace Blush & Gold seed (release ordering)
+
+The `grace_blush` row in `apps/api/seeds/site-templates.ts` and the nine `*_grace` rows in
+`seeds/section-components.ts` are seeded **inactive**; the final Grace launch task flips them to
+active together. The seeder silently **drops** any key that is not in the schema, and the template row
+carries `default_sections`. So: deploy API-template-default-sections, run `lsdb sync` to add the
+`default_sections` column, then seed with `--upsert`. A `--skip-existing` re-seed would never write
+`default_sections` because the row already exists.

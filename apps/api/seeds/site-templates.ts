@@ -91,6 +91,10 @@ export default {
       default_components: { opening: "opening_curtain", ...defaultComponents },
       status: "active",
     },
+    // RELEASE ORDER: the seeder silently DROPS keys that are not in the schema. Seed this row only after
+    // API-template-default-sections is deployed and `lsdb sync` has added the `default_sections` column,
+    // and seed with --upsert (a --skip-existing re-seed never writes default_sections to an existing row).
+    // Stays inactive until the final Grace launch task flips it and the grace_* components to active together.
     {
       template_id: "grace_blush",
       name: "Grace Blush & Gold",

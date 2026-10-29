@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import siteTemplates from "../seeds/site-templates.js";
+import { graceKeyMismatches } from "../../../packages/templates/src/sections/grace/strings/index.js";
 import sectionComponents from "../seeds/section-components.js";
 
 // Reads the registry as text so the API never imports the React templates package.
@@ -16,6 +17,26 @@ describe("grace_blush seed rows", () => {
   const grace = siteTemplates.site_templates.find((t) => t.template_id === "grace_blush") as
     | (Record<string, unknown> & { default_components: Record<string, string>; default_sections: { section_key: string; enabled: boolean }[] })
     | undefined;
+
+  it("grace en and kh string keys match", () => {
+    assert.deepEqual(graceKeyMismatches(), []);
+  });
+
+  it("template and all nine grace component rows are inactive (the launch task flips them together)", () => {
+    assert.ok(grace);
+    assert.equal(grace.status, "inactive");
+    const rows = sectionComponents.section_components.filter((c) => c.component_id.endsWith("_grace"));
+    assert.equal(rows.length, 9);
+    for (const r of rows) assert.equal(r.status, "inactive", `${r.component_id} must be inactive`);
+  });
+
+  it("each component row's section matches the key it is used under in default_components", () => {
+    assert.ok(grace);
+    const bySection = new Map(sectionComponents.section_components.map((c) => [c.component_id, c.section]));
+    for (const [section, id] of Object.entries(grace.default_components)) {
+      assert.equal(bySection.get(id), section, `${id} is seeded under ${bySection.get(id)}, used as ${section}`);
+    }
+  });
 
   it("is inactive and has the expected slug", () => {
     assert.ok(grace);

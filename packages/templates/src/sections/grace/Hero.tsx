@@ -7,7 +7,7 @@ import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { formatCoupleNames } from "../../format";
 
 export interface GraceHeroProps {
-  couple: CoupleInfo;
+  couple?: CoupleInfo;
   theme: Theme;
   content?: HeroContent;
 }
@@ -19,7 +19,7 @@ export function GraceHero({ couple, theme }: GraceHeroProps) {
     <GraceSection theme={theme} id="hero" className="text-center">
       <Cross stroke={p.accent} className="mx-auto h-10 w-auto" />
       <h2 className="mt-4 text-2xl" style={{ color: p.accent }}>{t("grace.hero.stub")}</h2>
-      <p className="mt-3 break-words">{formatCoupleNames(couple)}</p>
+      <p className="mt-3 break-words">{couple?.partner1Name ? formatCoupleNames(couple) : null}</p>
     </GraceSection>
   );
 }

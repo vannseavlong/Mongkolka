@@ -156,6 +156,16 @@ const dictionary: Record<Language, Record<string, string>> = {
   kh: { ...baseDictionary.kh, ...GRACE_KH },
 };
 
+declare const process: { env: { NODE_ENV?: string } };
+const warned = new Set<string>();
+function warnMissing(language: Language, key: string) {
+  if (process.env.NODE_ENV === "production") return;
+  const id = `${language}:${key}`;
+  if (warned.has(id)) return;
+  warned.add(id);
+  console.warn(`[i18n] missing ${language} translation: ${key}`);
+}
+
 export type TranslationKey = keyof (typeof baseDictionary)["en"] | `grace.${string}`;
 
 interface LanguageContextValue {
@@ -174,7 +184,12 @@ export function LanguageProvider({
   children: ReactNode;
 }) {
   const [language, setLanguage] = useState<Language>(initialLanguage);
-  const t = (key: TranslationKey) => dictionary[language][key] ?? key;
+  const t = (key: TranslationKey) => {
+    const value = dictionary[language][key];
+    if (value !== undefined) return value;
+    warnMissing(language, key);
+    return key;
+  };
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

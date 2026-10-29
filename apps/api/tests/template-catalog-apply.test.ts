@@ -206,6 +206,7 @@ describe("public by-slug hardening", () => {
     const row = await SiteTemplatesService.getPublicBySlug("green-blue-sky");
     assert.deepEqual(Object.keys(row ?? {}).sort(), [
       "default_components",
+      "default_sections",
       "default_theme",
       "description",
       "name",

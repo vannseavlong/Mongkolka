@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { brandUrl } from "@/lib/brand-url";
+import { guestGreetingFrom } from "@/lib/guest-name";
 import { SiteView } from "./site-view";
 import type { PublicSiteResponse } from "./types";
 
@@ -13,18 +15,8 @@ export default async function Page({
 }) {
   const { slug } = await params;
   const query = await searchParams;
-  // `name` may hold more than one guest (a plus-one) as a comma-separated
-  // list, e.g. "?name=Guest+1,Chea" — joined into one greeting string here.
-  // `to` is accepted as an alias — it's what the docs and shared links used first.
-  const rawName =
-    typeof query.name === "string" ? query.name : typeof query.to === "string" ? query.to : undefined;
-  const guestGreeting = rawName
-    ? rawName
-        .split(",")
-        .map((part) => part.trim())
-        .filter(Boolean)
-        .join(" & ")
-    : undefined;
+  // `name` (or the alias `to`) may hold several guests, comma-separated; capped at 80 characters.
+  const guestGreeting = guestGreetingFrom(query);
   const lang = typeof query.lang === "string" && query.lang === "kh" ? "kh" : "en";
 
   const res = await fetch(`${API_URL}/public/api/site/${slug}`, { cache: "no-store" });
@@ -33,5 +25,5 @@ export default async function Page({
 
   const site = (await res.json()) as PublicSiteResponse;
 
-  return <SiteView site={site} guestGreeting={guestGreeting} initialLanguage={lang} />;
+  return <SiteView site={site} guestGreeting={guestGreeting} initialLanguage={lang} brandUrl={brandUrl()} />;
 }

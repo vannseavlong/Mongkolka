@@ -97,7 +97,7 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
             {t("grace.rsvp.deadlinePrefix")} {content.deadline}
           </p>
         ) : null}
-        <GoldDivider theme={theme} className="mt-6" />
+        <GoldDivider theme={theme} mark="diamond" className="mt-6" />
       </Reveal>
 
       <Reveal delay={0.1}>

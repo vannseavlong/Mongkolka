@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchJson } from "@/lib/api";
+import { brandUrl } from "@/lib/brand-url";
+import { guestGreetingFrom } from "@/lib/guest-name";
 import type { SiteTemplateBySlugResponse } from "../../types";
 import { TemplatePreview } from "../../template-preview";
 
@@ -20,10 +22,11 @@ export default async function TemplateSubdomainPreviewPage({
   const { slug } = await params;
   const query = await searchParams;
   const lang = query.lang === "kh" ? "kh" : "en";
+  const guestGreeting = guestGreetingFrom(query);
   const data = await fetchJson<SiteTemplateBySlugResponse>(
     `/public/api/site-templates/by-slug/${encodeURIComponent(slug)}`,
   );
   if (!data) notFound();
 
-  return <TemplatePreview template={data.template} fullPage initialLanguage={lang} />;
+  return <TemplatePreview template={data.template} fullPage initialLanguage={lang} guestGreeting={guestGreeting} brandUrl={brandUrl()} />;
 }

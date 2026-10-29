@@ -400,13 +400,13 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
           {t("grace.guestbook.wallHeading")}
         </h3>
         {hasWall ? (
-          <ul className="mt-8 columns-1 gap-5 text-left min-[520px]:columns-2 lg:columns-3">
+          <ul className="mt-8 columns-2 gap-3 text-left sm:columns-3 sm:gap-5">
             {wishes.map((w) => {
               const ph = w.photo_id ? photoById.get(w.photo_id) : undefined;
               const aspect = aspectFor(w.wish_id);
               return (
-                <li key={w.wish_id} className="mb-5 break-inside-avoid">
-                  <div className={ph ? "p-3" : "p-5"} style={note}>
+                <li key={w.wish_id} className="mb-3 break-inside-avoid sm:mb-5">
+                  <div className={ph ? "p-2.5 sm:p-3" : "p-4 sm:p-5"} style={note}>
                     {ph && <ArchPhoto theme={theme} src={ph.url} alt="" aspect={aspect} />}
                     {w.message && (
                       <p className={`whitespace-pre-line break-words text-lg leading-relaxed ${ph ? "mt-3" : ""}`}>{w.message}</p>
@@ -421,7 +421,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
             {loosePhotos.map((ph) => {
               const aspect = aspectFor(ph.photo_id);
               return (
-                <li key={ph.photo_id} className="mb-5 break-inside-avoid">
+                <li key={ph.photo_id} className="mb-3 break-inside-avoid sm:mb-5">
                   <div className="p-3" style={note}>
                     <ArchPhoto theme={theme} src={ph.url} alt={ph.uploader_name ? "" : photoBy} aspect={aspect} />
                     {ph.uploader_name && (

@@ -43,6 +43,7 @@ export function GraceFooter({
     <GraceSection
       theme={theme}
       id="footer"
+      ground="white"
       maxWidth="max-w-xl"
       className="text-center"
     >
@@ -74,7 +75,7 @@ export function GraceFooter({
                   {n1}
                   {n2 ? (
                     <>
-                      <span className="mx-2" style={{ color: p.accent }}>
+                      <span className="mx-3" style={{ color: p.accent }}>
                         &amp;
                       </span>
                       {n2}

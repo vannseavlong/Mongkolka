@@ -1,6 +1,6 @@
 "use client";
 
-import { GraceSection, Cross, GoldDivider, Reveal, gracePalette } from "./shared";
+import { GraceSection, Cross, GoldDivider, FoilText, Reveal, gracePalette, nameFont } from "./shared";
 import { useLanguage } from "../../i18n";
 import type { StoryContent, Theme } from "../../types";
 
@@ -36,11 +36,8 @@ export function GraceStory({ theme, content }: GraceStoryProps) {
           }}
         >
           <Cross stroke={p.accent} className="mx-auto h-8 w-auto" strokeWidth={3} />
-          <h2
-            className="mt-4 text-3xl sm:text-4xl"
-            style={{ color: p.text, letterSpacing: kh ? undefined : "0.04em" }}
-          >
-            {t("grace.story.title")}
+          <h2 className="mt-4 text-4xl leading-tight sm:text-5xl" style={{ fontFamily: nameFont(language), color: p.accent }}>
+            <FoilText theme={theme}>{t("grace.story.title")}</FoilText>
           </h2>
           <GoldDivider theme={theme} mark="diamond" className="mt-5 max-w-[12rem]" />
           <div

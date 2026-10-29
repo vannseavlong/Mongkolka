@@ -398,3 +398,13 @@ active together. The seeder silently **drops** any key that is not in the schema
 carries `default_sections`. So: deploy API-template-default-sections, run `lsdb sync` to add the
 `default_sections` column, then seed with `--upsert`. A `--skip-existing` re-seed would never write
 `default_sections` because the row already exists.
+
+## Grace Blush & Gold (`grace_blush`, slug `pink-gold-white`)
+
+Pink (#fff3f6), white and gold (#8a6418) Christian-wedding design with a cross motif and arched portraits. Section order (`default_sections`): opening gate, hero, verse, story, gallery, details, guestbook, rsvp, footer (registry, timeline and music exist but are off). Grounds alternate: hero pink, verse white, story pink, gallery white, details pink, guestbook white, rsvp pink, footer white.
+
+What each section reads: opening: couple names, date, `?to=` guest name; hero: `coverPhotoUrl`, names, date; verse: `text`, `textKh`, `reference`; story: `loveStory`; gallery: `photos[]` (lightbox on tap); details: ceremony and reception time/venue/address, `dressCode`; guestbook: `guestbook` data, `actions`, `onSubmit` (apps/web supplies them); rsvp: `customMessage`, `deadline`, `onSubmit`, prefilled guest name; footer: `message`, `hashtag`, optional `brandUrl`.
+
+`brandUrl`: the footer's "Made with Mongkolka" credit links to it. apps/web builds it server-side in `src/lib/brand-url.ts` from `ROOT_DOMAIN` (http for localhost, https otherwise, undefined when unset), passes it `[slug]/page.tsx` -> `SiteView` -> `extraProps("footer")`, and the template preview pages do the same. Unset means plain text. `footer_classic` ignores the extra prop.
+
+`FoilText` (gradient script text) uses `foilTextGradient`: lightest stop 90% accent (about 4.0:1 on pink, 4.35:1 on white; an earlier 88% stop measured 3.86 and 4.18); lines and borders keep the lighter `foilGradient`. Template previews use `SAMPLE_GUESTBOOK` (6 photos, 4 wishes) with a no-op submit that returns "pending". Owner steps to see it: `docs/grace-template-howto.md`.

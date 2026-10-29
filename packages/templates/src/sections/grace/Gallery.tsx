@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GraceSection, GoldDivider, Reveal, gracePalette, nameFont } from "./shared";
+import { GraceSection, GoldDivider, FoilText, Reveal, gracePalette, nameFont } from "./shared";
 import { GraceLightbox, fillTemplate } from "./gallery-lightbox";
 import { useLanguage } from "../../i18n";
 import type { CoupleInfo, GalleryContent, Theme } from "../../types";
@@ -16,8 +16,10 @@ export interface GraceGalleryProps {
 function staggerClass(i: number, total: number): string {
   if (total === 1) return "";
   if (total === 2) return i % 2 === 1 ? "mt-6" : "";
-  const phone = i % 2 === 1 ? "mt-6 lg:mt-0" : "";
-  const desk = i % 3 === 1 ? "lg:mt-10" : "";
+  // an odd last tile would sit alone in the left column: centre it under the pair (until the 3-column layout at sm)
+  if (total % 2 === 1 && i === total - 1) return "col-span-2 mx-auto w-[calc(50%-0.5rem)] sm:col-span-1 sm:mx-0 sm:w-full";
+  const phone = i % 2 === 1 ? "mt-6 sm:mt-0" : "";
+  const desk = i % 3 === 1 ? "sm:mt-10" : "";
   return `${phone} ${desk}`.trim();
 }
 
@@ -130,16 +132,16 @@ export function GraceGallery({ theme, content }: GraceGalleryProps) {
 
   const alt = (n: number, count: number = total) => fillTemplate(t("grace.gallery.photoAlt"), { n, total: count });
   const widthClass = total === 1 ? "max-w-[15rem]" : total === 2 ? "max-w-xl" : "max-w-5xl";
-  const colsClass = total === 1 ? "grid-cols-1" : total === 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-3";
+  const colsClass = total === 1 ? "grid-cols-1" : total === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3";
   // The viewer keeps a photo that failed while it was open, so it never silently swaps pictures.
   const viewerPhotos = all.filter((s) => !failed.has(s) || s === openSrc);
   const viewerIndex = openSrc != null ? viewerPhotos.indexOf(openSrc) : -1;
 
   return (
-    <GraceSection theme={theme} id="gallery" className="text-center">
+    <GraceSection theme={theme} id="gallery" ground="white" className="text-center">
       <Reveal>
-        <h2 className="text-4xl sm:text-5xl" style={{ fontFamily: nameFont(language), lineHeight: 1.25, color: p.accent }}>
-          {t("grace.gallery.heading")}
+        <h2 className="text-5xl leading-tight sm:text-6xl" style={{ fontFamily: nameFont(language), color: p.accent }}>
+          <FoilText theme={theme}>{t("grace.gallery.heading")}</FoilText>
         </h2>
         <GoldDivider theme={theme} className="mt-5" />
       </Reveal>

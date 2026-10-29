@@ -43,10 +43,13 @@ export function SiteView({
   site,
   guestGreeting,
   initialLanguage,
+  brandUrl,
 }: {
   site: PublicSiteResponse;
   guestGreeting?: string;
   initialLanguage: "en" | "kh";
+  /** Main-site URL for the footer credit link; undefined renders plain text. */
+  brandUrl?: string;
 }) {
   const [guestbook, setGuestbook] = useState<GuestbookData | undefined>();
   const slug = site.couple.slug;
@@ -116,6 +119,7 @@ export function SiteView({
               },
             };
           }
+          if (sectionKey === "footer") return { brandUrl };
           return {};
         }}
       />

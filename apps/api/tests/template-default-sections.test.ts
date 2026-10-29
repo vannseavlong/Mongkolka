@@ -417,10 +417,14 @@ describe("admin validation", () => {
 });
 
 describe("read side", () => {
-  it("public by-slug response does not expose default_sections", async () => {
+  it("public by-slug response exposes a normalised default_sections", async () => {
+    templates[0]!.default_sections = [{ section_key: "bogus", enabled: true }, ...DEFAULTS];
     const row = await SiteTemplatesService.getPublicBySlug("grace");
     assert.ok(row);
-    assert.ok(!("default_sections" in row));
+    assert.deepEqual(row.default_sections, DEFAULTS);
+    const other = templates[1]!;
+    const none = await SiteTemplatesService.getPublicBySlug(String(other.slug));
+    if (none) assert.equal(none.default_sections, null);
   });
   it("couple catalog returns a normalised default_sections", async () => {
     templates[0]!.default_sections = [{ section_key: "bogus", enabled: true }, ...DEFAULTS];

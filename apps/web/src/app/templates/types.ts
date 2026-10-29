@@ -7,6 +7,8 @@ export interface SiteTemplateSummary {
   description?: string;
   default_theme: Theme;
   default_components: Partial<Record<SectionKey, string>>;
+  /** Normalised by the public API (null when the template has none); the preview uses its order and on/off flags. */
+  default_sections?: { section_key: SectionKey; enabled: boolean }[] | null;
   status: string;
 }
 

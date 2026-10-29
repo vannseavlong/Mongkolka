@@ -388,6 +388,24 @@ const components = [
     preview_accent_color: "#b8893b",
     font_style: "serif",
   },
+  {
+    component_id: "verse_classic",
+    section: "verse",
+    name: "Classic",
+    preview_bg_color: "#ffffff",
+    preview_text_color: "#222222",
+    preview_accent_color: "#b8893b",
+    font_style: "serif",
+  },
+  {
+    component_id: "footer_classic",
+    section: "footer",
+    name: "Classic",
+    preview_bg_color: "#ffffff",
+    preview_text_color: "#222222",
+    preview_accent_color: "#b8893b",
+    font_style: "serif",
+  },
 ];
 
 export default {

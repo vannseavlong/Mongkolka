@@ -30,6 +30,10 @@ function buildContent(sectionKey: SectionKey, profile: PublicSiteResponse["profi
         receptionAddress: profile?.reception_address ?? undefined,
         dressCode: profile?.dress_code ?? undefined,
       };
+    case "verse":
+    case "footer":
+      // Owned by website_sections.content; nothing derived from the profile.
+      return {};
     default:
       return {};
   }

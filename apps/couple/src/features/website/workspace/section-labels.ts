@@ -4,6 +4,7 @@ import type { WebsiteSectionKey } from "../data/schema";
 export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
   opening: "Opening",
   hero: "Hero",
+  verse: "Verse",
   story: "Our story",
   gallery: "Gallery",
   details: "Event details",
@@ -11,6 +12,8 @@ export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
   registry: "Registry",
   timeline: "Timeline",
   music: "Music",
+  guestbook: "Guestbook",
+  footer: "Footer",
 };
 
 export const sectionLabel = (key: WebsiteSectionKey) => SECTION_LABELS[key] ?? key;

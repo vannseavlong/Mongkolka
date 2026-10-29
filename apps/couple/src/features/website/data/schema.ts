@@ -3,6 +3,7 @@ import { z } from "zod";
 export const WEBSITE_SECTIONS = [
   "opening",
   "hero",
+  "verse",
   "story",
   "gallery",
   "details",
@@ -10,6 +11,8 @@ export const WEBSITE_SECTIONS = [
   "registry",
   "timeline",
   "music",
+  "guestbook",
+  "footer",
 ] as const;
 
 export type WebsiteSectionKey = (typeof WEBSITE_SECTIONS)[number];

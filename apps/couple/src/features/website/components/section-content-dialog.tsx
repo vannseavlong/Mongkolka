@@ -17,6 +17,7 @@ import { SECTIONS_KEY } from "../lib/keys";
 import type { WebsiteSection, WebsiteSectionKey } from "../data/schema";
 import { AssetPicker } from "./asset-picker";
 import { newUrlsOnly } from "./asset-library-logic";
+import { VERSE_PRESETS } from "../lib/verse-presets";
 
 
 /** The only section keys with no other canonical content source — see
@@ -27,6 +28,8 @@ export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
   "timeline",
   "rsvp",
   "music",
+  "verse",
+  "footer",
 ];
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -487,6 +490,181 @@ function MusicContentForm({ section, onSaved }: { section: WebsiteSection; onSav
 }
 
 // ---------------------------------------------------------------------------
+// verse — content: { text?: string, reference?: string, textKh?: string }
+// ---------------------------------------------------------------------------
+
+const verseSchema = z.object({ text: z.string(), reference: z.string(), textKh: z.string() });
+type VerseFormValues = z.infer<typeof verseSchema>;
+
+function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+  const content = asRecord(section.content);
+  const str = (v: unknown) => (typeof v === "string" ? v : "");
+  const form = useForm<VerseFormValues>({
+    resolver: zodResolver(verseSchema),
+    defaultValues: { text: str(content.text), reference: str(content.reference), textKh: str(content.textKh) },
+  });
+
+  function applyPreset(index: string) {
+    const preset = VERSE_PRESETS[Number(index)];
+    if (!preset) return;
+    form.setValue("text", preset.text, { shouldDirty: true });
+    form.setValue("reference", preset.reference, { shouldDirty: true });
+  }
+
+  async function onSubmit(values: VerseFormValues) {
+    try {
+      await saveContent(section.section_id, {
+        text: values.text.trim() || undefined,
+        reference: values.reference.trim() || undefined,
+        textKh: values.textKh.trim() || undefined,
+      });
+      toast.success("Verse updated");
+      onSaved();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Failed to save verse");
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label htmlFor="verse-preset" className="text-sm font-medium">
+            Choose a well-known verse
+          </label>
+          <select
+            id="verse-preset"
+            defaultValue=""
+            onChange={(e) => applyPreset(e.target.value)}
+            className="h-9 rounded-md border bg-transparent px-3 text-sm"
+          >
+            <option value="">Pick a preset (optional)…</option>
+            {VERSE_PRESETS.map((preset, i) => (
+              <option key={preset.reference} value={i}>
+                {preset.reference}
+              </option>
+            ))}
+          </select>
+        </div>
+        <FormField
+          control={form.control}
+          name="text"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Verse or quote</FormLabel>
+              <FormControl>
+                <Textarea rows={5} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="reference"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Reference</FormLabel>
+              <FormControl>
+                <Input placeholder="1 Corinthians 13:4-7" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="textKh"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Khmer text (optional)</FormLabel>
+              <FormControl>
+                <Textarea rows={4} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <DialogFooter>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            Save verse
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// footer — content: { message?: string, hashtag?: string }
+// ---------------------------------------------------------------------------
+
+const footerSchema = z.object({ message: z.string(), hashtag: z.string() });
+type FooterFormValues = z.infer<typeof footerSchema>;
+
+function FooterContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+  const content = asRecord(section.content);
+  const form = useForm<FooterFormValues>({
+    resolver: zodResolver(footerSchema),
+    defaultValues: {
+      message: typeof content.message === "string" ? content.message : "",
+      hashtag: typeof content.hashtag === "string" ? content.hashtag : "",
+    },
+  });
+
+  async function onSubmit(values: FooterFormValues) {
+    try {
+      await saveContent(section.section_id, {
+        message: values.message.trim() || undefined,
+        hashtag: values.hashtag.trim() || undefined,
+      });
+      toast.success("Footer updated");
+      onSaved();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Failed to save footer");
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Closing message</FormLabel>
+              <FormControl>
+                <Textarea rows={3} placeholder="Thank you for celebrating with us." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="hashtag"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Hashtag</FormLabel>
+              <FormControl>
+                <Input placeholder="#SokhaAndDara" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <DialogFooter>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            Save footer
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+}
+
+// ---------------------------------------------------------------------------
 
 const SECTION_LABELS: Partial<Record<WebsiteSectionKey, string>> = {
   gallery: "gallery photos",
@@ -494,6 +672,8 @@ const SECTION_LABELS: Partial<Record<WebsiteSectionKey, string>> = {
   timeline: "timeline chapters",
   rsvp: "RSVP details",
   music: "playlist",
+  verse: "verse",
+  footer: "footer",
 };
 
 export function SectionContentDialog({
@@ -527,6 +707,12 @@ export function SectionContentDialog({
             )}
             {section.section_key === "music" && (
               <MusicContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
+            )}
+            {section.section_key === "verse" && (
+              <VerseContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
+            )}
+            {section.section_key === "footer" && (
+              <FooterContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
             )}
           </>
         )}

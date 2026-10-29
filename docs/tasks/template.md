@@ -63,6 +63,8 @@ chosen; only sections with no other canonical home need
 | `registry` | `content: { links: { label: string, url: string }[] }` |
 | `timeline` | `content: { chapters: { title: string, text: string, year: string }[] }` — the "How We Met / The Proposal / Looking Forward" pattern from `PublicCouplePage.tsx`, made data-driven. |
 | `music` | `content: { playlistUrl?: string }` |
+| `verse` | `content: { text?: string, reference?: string, textKh?: string }` — renders nothing without `text`; `textKh` shows when the language is Khmer. |
+| `footer` | `content: { message?: string, hashtag?: string }` — names and wedding date come from the couple. |
 
 RSVP submissions are guest responses, not template content — they write into the
 couple's own `guests` table (matching `status`/`plus_one` fields already in
@@ -356,6 +358,16 @@ handlers through `extraProps` (`apps/web/src/app/[slug]/guestbook.ts` — client
 resize, per-browser guest token, upload then wish). API: `guest-photos` + `guest-wishes`
 modules. Existing couples get a *disabled* `guestbook` row the next time the builder lists
 their sections, so a published site doesn't change under them.
+
+## Verse and footer sections (`verse_classic`, `footer_classic`)
+
+New section keys `verse` and `footer`; `SECTION_KEYS` order is now opening, hero, verse, story,
+gallery, details, rsvp, registry, timeline, music, guestbook, footer. Existing couples keep
+their `display_order`; the missing keys are appended disabled by the existing mechanism. The
+couple builder also gained the previously missing `guestbook` key. The verse editor offers KJV
+preset verses (`apps/couple/src/features/website/lib/verse-presets.ts`). **Release note:** the
+`website_sections.section_key` and `section_components.section` enums changed, so a schema sync is
+required, and the two new `section_components` seed rows must be seeded.
 
 ### Invited guest (`?name=` / `?to=`)
 

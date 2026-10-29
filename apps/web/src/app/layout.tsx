@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Noto_Serif_Khmer, Jost } from "next/font/google";
+import { Cormorant_Garamond, Noto_Serif_Khmer, Jost, Great_Vibes } from "next/font/google";
 import "./globals.css";
 import { fetchJson } from "@/lib/api";
 
@@ -14,6 +14,8 @@ const display = Cormorant_Garamond({
 });
 const khmer = Noto_Serif_Khmer({ subsets: ["khmer"], variable: "--font-khmer", display: "swap" });
 const label = Jost({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-label", display: "swap" });
+// Script font for couple names in the "Grace" pack (Latin only; Khmer names use --font-khmer).
+const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Mongkolka",
@@ -82,7 +84,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${display.variable} ${khmer.variable} ${label.variable}`}>
+      <body className={`${display.variable} ${khmer.variable} ${label.variable} ${script.variable}`}>
         {themeStyle && <style>{themeStyle}</style>}
         {children}
       </body>

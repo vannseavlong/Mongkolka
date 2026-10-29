@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { Great_Vibes } from "next/font/google";
 import { Toaster } from "@mongkolka/ui/sonner";
 import "./globals.css";
+
+// Only --font-script is set up here (the other pack fonts fall back) so the builder preview matches the public site.
+const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "swap" });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -72,7 +76,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body className={script.variable}>
         {themeStyle && <style>{themeStyle}</style>}
         {children}
         <Toaster />

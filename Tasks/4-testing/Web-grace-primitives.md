@@ -49,3 +49,6 @@ Review items 1-6 and nits fixed: Petals and Reveal render the same tree on serve
 Results: tsc clean (templates, web, couple); eslint grace/ clean; next build web and couple pass (run sequentially); preview console showed no hydration warnings with and without reduced motion; broken photo URL -> monogram; 320 px iframe no overflow.
 Not verified: browsers without color-mix (by construction only), print rule, petals pause when the tab is hidden, container-height fall in motion, Reveal with JS disabled in a real browser (server HTML only), petal count after the fix. Tests deferred.
 No fresh re-review of this fix commit yet; the section tasks consume these primitives and are reviewed next.
+
+## Merged to main 2026-10-29
+Merged locally with --no-ff after review and fixes; combined typecheck (api, couple, web, admin, templates), API tests (55/55) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done: no tests for couple/templates/web (no runner), no fresh re-review of the fix commits, live schema sync and seeding not done (see CHANGELOG Needs).

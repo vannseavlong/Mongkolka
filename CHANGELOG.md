@@ -2,6 +2,20 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-10-29 · [Web] feat(templates): Grace pack primitives
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-primitives.md
+- Branch/PR: feat/grace-primitives (merged to main with --no-ff, local, no PR)
+- What changed: shared pieces for the pink, gold and white pack: original cross artwork, gold divider, falling petals, arch photo frame with monogram fallback, scroll reveal that stays visible without JavaScript, section wrapper, and a script font for names (Great Vibes); palette bg #fff3f6, text #4a2c35, accent #8a6418 (4.95:1)
+- Needs: none (not used by any template yet)
+
+## 2026-10-29 · [Cross] feat: verse and footer section types
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-section-keys-verse-footer.md
+- Branch/PR: feat/section-keys-verse-footer (merged to main with --no-ff, local, no PR)
+- What changed: new `verse` and `footer` sections with generic default components, verse editor with six KJV wedding-verse presets, footer editor, Khmer date formatting; the couple builder now lists `guestbook`; new couples get the order opening, hero, verse, story, gallery, details, rsvp, registry, timeline, music, guestbook, footer (existing couples get verse and footer appended, disabled)
+- Needs: schema sync for the couple `website_sections.section_key` enum and the admin `section_components.section` enum; seed the two new section_components rows (verse_classic, footer_classic); until the sync every request logs a schema-mismatch warning
+
 ## 2026-10-28 · [Web] feat(couple): template gallery with live thumbnails and apply dialog
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-builder-template-apply.md

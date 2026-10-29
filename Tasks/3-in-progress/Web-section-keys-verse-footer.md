@@ -22,7 +22,7 @@ Add two new section types, `verse` and `footer`, end to end, each with a generic
 - Update the API's two enums and the `SECTION_KEYS` mirror; seeds for the two section_components rows. Note in the task file that the admin sheet `section_components` and the couple `website_sections` enums change, so the release needs a schema sync.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc clean in templates, api, couple, web; couple lint 0 errors; api lint 1 pre-existing error; next build couple and web pass)  - [x] G3 tests (API 54/54 incl. 5 new key-list tests; none for couple/templates/web: no runner)  - [~] G4 run it (couple against a stub API: rail, verse preset, footer; public web render and kh path not checked)
 - [ ] G5 code review  - [ ] G6 security (if auth/data/input)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -35,3 +35,10 @@ Add two new section types, `verse` and `footer`, end to end, each with a generic
 - [ ] Docs updated; release note says schema sync is required
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-29
+Built in commit 1763831 on `feat/section-keys-verse-footer`, not merged. New SECTION_KEYS order: opening, hero, verse, story, gallery, details, rsvp, registry, timeline, music, guestbook, footer (existing couples keep display_order; missing keys appended disabled, so verse and footer land at the end for them). `verse_classic` (null without text; textKh when language is kh) and `footer_classic` (names, date, message, hashtag). Couple: schema/labels now include verse, guestbook, footer; verse editor with six KJV presets (text checked against bible-api.com translation=kjv, line breaks collapsed) and free text incl. Khmer; footer editor. API enums, SECTION_KEYS mirror and two section_components seed rows (seed not run).
+RELEASE NOTE: schema sync required for the couple `website_sections.section_key` enum and the admin `section_components.section` enum; the two new section_components rows must be seeded. Written in docs/tasks/template.md.
+Not verified: public site render, kh path of the new components, Khmer field in a browser, live API/sheets. Tests deferred for couple/templates/web.
+Process note: the builder briefly navigated another agent's shared browser tab (3058) to its own URL; no repo effect.
+Next: G5 review, G7, G8, G11.

@@ -1,5 +1,4 @@
-// Scaffold: the section task owns this file. The stub only needs the `grace.verse.stub` key.
 export const strings = {
-  en: { "grace.verse.stub": "Verse" } as Record<string, string>,
-  kh: { "grace.verse.stub": "ខគម្ពីរ" } as Record<string, string>,
+  en: { "grace.verse.reference": "Scripture reference" } as Record<string, string>,
+  kh: { "grace.verse.reference": "ឯកសារយោងព្រះគម្ពីរ" } as Record<string, string>,
 };

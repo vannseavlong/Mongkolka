@@ -1,9 +1,10 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import type { Theme } from "../../types";
-import type { Language } from "../../i18n";
+import { useLanguage, type Language } from "../../i18n";
 import { DISPLAY_FONT, LABEL_FONT, mix } from "../ink/shared";
 
 /*
@@ -20,6 +21,8 @@ import { DISPLAY_FONT, LABEL_FONT, mix } from "../ink/shared";
  * smaller than large script; use `accent` for readable gold text.
  */
 
+// NOTE: gracePalette, foilGradient, nameFont and initialsOf are plain functions in a "use client" file;
+// do not import them from a server component (they would become client references).
 export { DISPLAY_FONT, LABEL_FONT, mix };
 
 export const SCRIPT_FONT = 'var(--font-script), "Great Vibes", cursive';
@@ -73,15 +76,44 @@ export function foilGradient(accent: string, angle = 135): string {
   return `linear-gradient(${angle}deg, ${mid} 0%, ${light} 30%, ${accent} 55%, ${light} 80%, ${mid} 100%)`;
 }
 
-/** Style for text filled with the gold foil gradient (decorative / large display only). */
-export function foilTextStyle(accent: string): CSSProperties {
-  return {
-    backgroundImage: foilGradient(accent),
-    WebkitBackgroundClip: "text",
-    backgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    color: accent,
-  };
+const FOIL_TEXT_CSS =
+  ".grace-foil{color:var(--grace-accent)}" +
+  "@supports (color:color-mix(in srgb,red 50%,white)) and (-webkit-background-clip:text){" +
+  ".grace-foil{background-image:var(--grace-foil);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}}";
+
+/**
+ * Text filled with the gold foil gradient (decorative / large display only). Falls back
+ * to solid accent where color-mix or background-clip:text is unsupported, so it is never invisible.
+ */
+export function FoilText({
+  theme,
+  children,
+  className = "",
+  style,
+}: {
+  theme: Theme;
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return (
+    <>
+      <style>{FOIL_TEXT_CSS}</style>
+      <span
+        className={`grace-foil ${className}`}
+        style={{ ["--grace-accent" as string]: theme.accent_color, ["--grace-foil" as string]: foilGradient(theme.accent_color), ...style }}
+      >
+        {children}
+      </span>
+    </>
+  );
+}
+
+/** Mounted flag: false on the server and first client render, so server and client trees match. */
+function useMounted(): boolean {
+  const [m, setM] = useState(false);
+  useEffect(() => setM(true), []);
+  return m;
 }
 
 const KH_CSS_ATTR = "data-grace-lang";
@@ -126,16 +158,14 @@ export function Cross({
       role={title ? "img" : undefined}
     >
       {title && <title>{title}</title>}
-      <path d="M28 4H36V24H54V32H36V80H28V32H10V24H28Z" />
+      <path d={spray ? "M28 4H36V24H54V32H36V70H28V32H10V24H28Z" : "M28 4H36V24H54V32H36V80H28V32H10V24H28Z"} />
       {spray && (
         <g>
-          {leaf(-70, 1.1)}
-          {leaf(-40, 1.3)}
-          {leaf(70, 1.1)}
-          {leaf(40, 1.3)}
-          <path d="M32 90V82" />
-          <circle cx="22" cy="86" r="1.6" />
-          <circle cx="42" cy="86" r="1.6" />
+          {leaf(-72, 0.8)}
+          {leaf(-42, 1)}
+          {leaf(72, 0.8)}
+          {leaf(42, 1)}
+          <circle cx="32" cy="76" r="1.8" />
         </g>
       )}
     </svg>
@@ -156,6 +186,7 @@ export function GoldDivider({
 }) {
   const p = gracePalette(theme);
   const line: CSSProperties = {
+    backgroundColor: p.accent, // solid fallback if the gradient (color-mix) is unsupported
     backgroundImage: `linear-gradient(90deg, transparent, ${p.foilLight}, ${p.accent})`,
   };
   return (
@@ -184,31 +215,65 @@ const PETALS = Array.from({ length: 14 }, (_, i) => ({
   rotate: 120 + ((i * 53) % 240),
 }));
 
-/** Falling blush petals. Decorative; renders nothing under prefers-reduced-motion. */
+/**
+ * Falling blush petals. Decorative. The container renders identically on server and first
+ * client render; petals mount only after hydration, while in view, with the tab visible,
+ * and never under prefers-reduced-motion.
+ */
 export function Petals({ theme, className = "" }: { theme: Theme; className?: string }) {
   const reduce = useReducedMotion();
-  if (reduce) return null;
+  const mounted = useMounted();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    const onVis = () => setTabVisible(document.visibilityState !== "hidden");
+    onVis();
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setHeight(el.offsetHeight);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const { blush, foilLight } = gracePalette(theme);
+  const show = mounted && !reduce && inView && tabVisible && height > 0;
   return (
-    <div aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
-      {PETALS.map((p, i) => (
-        <motion.svg
-          key={i}
-          viewBox="0 0 20 20"
-          className="absolute -top-8"
-          style={{ left: `${p.left}%`, width: p.size, height: p.size }}
-          initial={{ y: -40, x: 0, rotate: 0, opacity: 0 }}
-          animate={{
-            y: ["0vh", "105vh"],
-            x: [0, p.sway, -p.sway / 2, p.sway / 3],
-            rotate: [0, p.rotate],
-            opacity: [0, 0.85, 0.85, 0],
-          }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "linear" }}
-        >
-          <path d="M10 1C16 4 18 11 10 19C2 11 4 4 10 1Z" fill={i % 5 === 0 ? foilLight : blush} />
-        </motion.svg>
-      ))}
+    <div ref={ref} aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
+      {show &&
+        PETALS.map((p, i) => (
+          <motion.svg
+            key={i}
+            viewBox="0 0 20 20"
+            className="absolute -top-8"
+            style={{ left: `${p.left}%`, width: p.size, height: p.size, willChange: "transform" }}
+            initial={{ y: -40, x: 0, rotate: 0, opacity: 0 }}
+            animate={{
+              y: [0, height + 40],
+              x: [0, p.sway, -p.sway / 2, p.sway / 3],
+              rotate: [0, p.rotate],
+              opacity: [0, 0.85, 0.85, 0],
+            }}
+            transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "linear" }}
+          >
+            {/* fill attribute = static fallback; style fill = theme-derived (dropped if color-mix unsupported) */}
+            <path
+              d="M10 1C16 4 18 11 10 19C2 11 4 4 10 1Z"
+              fill={i % 5 === 0 ? "#ecd9a8" : "#f6b9c8"}
+              style={{ fill: i % 5 === 0 ? foilLight : blush }}
+            />
+          </motion.svg>
+        ))}
     </div>
   );
 }
@@ -220,7 +285,7 @@ export function initialsOf(text: string | undefined, max = 2): string {
   if (!text) return "";
   return Array.from(
     text
-      .split(/[\s&+,]+/)
+      .split(/[\s&+,\-\u2013]+/)
       .filter(Boolean)
       .map((w) => Array.from(w)[0] ?? ""),
   )
@@ -230,44 +295,74 @@ export function initialsOf(text: string | undefined, max = 2): string {
 }
 
 /**
- * Gold double-line arch that clips a photo (object-cover). With no `src` it shows a soft
+ * Gold double-line arch that clips a photo (object-cover). Callers must pass `alt`
+ * (the couple's names). With no `src`, or if the photo fails to load, it shows a soft
  * pink monogram from `initials` (e.g. initialsOf("Sokha & Dara")).
+ * `position` is the CSS object-position focal point; `priority` loads eagerly (above the fold).
  */
 export function ArchFrame({
   theme,
   src,
   alt = "",
   initials,
-  language = "en",
+  position = "center",
+  priority = false,
   className = "",
 }: {
   theme: Theme;
   src?: string | null;
   alt?: string;
   initials?: string;
-  language?: Language;
+  position?: string;
+  priority?: boolean;
   className?: string;
 }) {
+  const { language } = useLanguage();
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  // The error event can fire before hydration attaches onError; re-check the finished-but-broken state on mount.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth === 0 && src) setFailedSrc(src);
+  }, [src]);
   const p = gracePalette(theme);
   const arch = "rounded-t-[999px]";
+  // backgroundColor = solid fallback when the foil gradient (color-mix) is unsupported
+  const foil: CSSProperties = { backgroundColor: p.accent, backgroundImage: p.foilGradient };
+  const showPhoto = !!src && failedSrc !== src;
   return (
     <div className={`mx-auto w-full max-w-sm ${className}`}>
-      <div className={`${arch} p-[2px]`} style={{ backgroundImage: p.foilGradient }}>
+      <div className={`${arch} p-[2px]`} style={foil}>
         <div className={`${arch} p-[5px]`} style={{ backgroundColor: p.card }}>
-          <div className={`${arch} p-[1.5px]`} style={{ backgroundImage: p.foilGradient }}>
+          <div className={`${arch} p-[1.5px]`} style={foil}>
             <div className={`${arch} relative aspect-[3/4] w-full overflow-hidden`} style={{ backgroundColor: p.blush }}>
-              {src ? (
-                <img src={src} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+              {showPhoto ? (
+                <img
+                  ref={imgRef}
+                  src={src!}
+                  alt={alt}
+                  loading={priority ? "eager" : "lazy"}
+                  decoding="async"
+                  onError={() => setFailedSrc(src!)}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  style={{ objectPosition: position }}
+                />
               ) : (
                 <div
-                  className="absolute inset-0 flex items-center justify-center"
+                  className="absolute inset-0 flex items-center justify-center overflow-hidden"
                   style={{
                     backgroundImage: `linear-gradient(180deg, ${p.card}, ${p.blush})`,
                     color: p.accent,
                     fontFamily: nameFont(language),
                   }}
                 >
-                  <span aria-hidden={!alt} role={alt ? "img" : undefined} aria-label={alt || undefined} className="text-6xl">
+                  <span
+                    role={alt ? "img" : undefined}
+                    aria-label={alt || undefined}
+                    aria-hidden={alt ? undefined : true}
+                    className="max-w-full whitespace-nowrap px-2 leading-none"
+                    style={{ fontSize: "clamp(2rem, 16vw, 3.75rem)" }}
+                  >
                     {initials || <Cross stroke={p.accent} className="h-16 w-auto" strokeWidth={2} />}
                   </span>
                 </div>
@@ -282,7 +377,12 @@ export function ArchFrame({
 
 /* ------------------------------------------------------------------ Reveal */
 
-/** Fade-up on scroll. Plain div (no animation) under prefers-reduced-motion. */
+const REVEAL_PRINT_CSS = "@media print{[data-grace-reveal]{opacity:1!important;transform:none!important}}";
+
+/**
+ * Fade-up on scroll. Content starts visible (no JS, before hydration, no IntersectionObserver,
+ * reduced motion, print); the hidden state is armed only after mount, and only below the fold.
+ */
 export function Reveal({
   children,
   delay = 0,
@@ -293,17 +393,25 @@ export function Reveal({
   className?: string;
 }) {
   const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
+  const mounted = useMounted();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "0px 0px -60px 0px" });
+  const armed = mounted && !reduce && typeof IntersectionObserver !== "undefined";
+  const hidden = armed && !inView;
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
+    <>
+      <style>{REVEAL_PRINT_CSS}</style>
+      <motion.div
+        ref={ref}
+        data-grace-reveal
+        className={className}
+        initial={false}
+        animate={hidden ? { opacity: 0, y: 24 } : { opacity: 1, y: 0 }}
+        transition={armed ? { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }}
+      >
+        {children}
+      </motion.div>
+    </>
   );
 }
 
@@ -312,7 +420,6 @@ export function Reveal({
 /** Section shell: pink (default) or white ground, vertical padding, centered max width. */
 export function GraceSection({
   theme,
-  language = "en",
   ground = "pink",
   children,
   className = "",
@@ -321,7 +428,6 @@ export function GraceSection({
   id,
 }: {
   theme: Theme;
-  language?: Language;
   ground?: "pink" | "white";
   children: ReactNode;
   className?: string;
@@ -330,6 +436,7 @@ export function GraceSection({
   id?: string;
 }) {
   const p = gracePalette(theme);
+  const { language } = useLanguage();
   return (
     <section
       id={id}
@@ -348,7 +455,7 @@ export function GraceSection({
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-px"
-        style={{ backgroundImage: `linear-gradient(90deg, transparent, ${p.foilLight}, transparent)` }}
+        style={{ backgroundColor: p.accent, opacity: 0.4, backgroundImage: `linear-gradient(90deg, transparent, ${p.foilLight}, transparent)` }}
       />
       <div className={`relative mx-auto w-full ${maxWidth}`}>{children}</div>
     </section>

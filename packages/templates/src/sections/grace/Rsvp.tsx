@@ -23,19 +23,26 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
   const { name: invitedName } = useGuest();
   const p = gracePalette(theme);
 
-  const [name, setName] = useState(invitedName ?? "");
+  const [name, setName] = useState((invitedName ?? "").slice(0, 80));
   const [attending, setAttending] = useState<boolean | null>(null);
   const [guests, setGuests] = useState(1);
   const [message, setMessage] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [tried, setTried] = useState(false);
   const doneRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const attendRef = useRef<HTMLInputElement>(null);
+  const refocus = useRef(false);
 
   useEffect(() => {
-    if (invitedName) setName((n) => n || invitedName);
+    if (invitedName) setName((n) => n || invitedName.slice(0, 80));
   }, [invitedName]);
   useEffect(() => {
     if (state === "done") doneRef.current?.focus();
+    if (state === "idle" && refocus.current) {
+      refocus.current = false;
+      nameRef.current?.focus();
+    }
   }, [state]);
 
   const nameError = tried && !name.trim();
@@ -45,10 +52,18 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
     e.preventDefault();
     if (state === "sending") return;
     setTried(true);
-    if (!name.trim() || attending === null) return;
+    if (!name.trim()) {
+      nameRef.current?.focus();
+      return;
+    }
+    if (attending === null) {
+      attendRef.current?.focus();
+      return;
+    }
     setState("sending");
-    // The API only knows plusOne; a bigger party is passed along inside the message so the couple sees the number.
-    const party = attending && guests > 1 ? `${t("grace.rsvp.guestsNote")}: ${guests}` : "";
+    // TODO(owner): the API only knows plusOne. Until it gets a structured guest-count field, the party size is
+    // appended as a fixed, language-neutral "Guests: N" line so the couple (and any parser) can read it.
+    const party = attending && guests > 1 ? `Guests: ${guests}` : "";
     const note = [message.trim(), party].filter(Boolean).join("\n");
     try {
       await onSubmit({ name: name.trim(), attending, plusOne: attending && guests > 1, message: note || undefined });
@@ -97,7 +112,10 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
               <p className="mt-3 break-words text-lg">{attending ? t("grace.rsvp.thanksYes") : t("grace.rsvp.thanksNo")}</p>
               <button
                 type="button"
-                onClick={() => setState("idle")}
+                onClick={() => {
+                  refocus.current = true;
+                  setState("idle");
+                }}
                 className="mt-6 min-h-11 px-4 text-base underline underline-offset-4"
                 style={{ color: p.accent }}
               >
@@ -112,6 +130,7 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
                 </label>
                 <input
                   id="grace-rsvp-name"
+                  ref={nameRef}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   maxLength={80}
@@ -122,7 +141,7 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
                   style={fieldStyle(theme, nameError)}
                 />
                 {nameError && (
-                  <p id="grace-rsvp-name-err" className="mt-1.5 text-base" style={{ color: ERROR_COLOR }}>
+                  <p id="grace-rsvp-name-err" role="alert" className="mt-1.5 text-base" style={{ color: ERROR_COLOR }}>
                     {t("grace.rsvp.nameRequired")}
                   </p>
                 )}
@@ -136,10 +155,11 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
                       [true, t("grace.rsvp.accept")],
                       [false, t("grace.rsvp.decline")],
                     ] as const
-                  ).map(([val, label]) => (
+                  ).map(([val, label], idx) => (
                     <label key={String(val)} className="grace-pill relative block cursor-pointer">
                       <input
                         type="radio"
+                        ref={idx === 0 ? attendRef : undefined}
                         name="grace-rsvp-attending"
                         className="sr-only"
                         checked={attending === val}
@@ -156,7 +176,7 @@ export function GraceRsvp({ theme, content, onSubmit }: GraceRsvpProps) {
                   ))}
                 </div>
                 {attendError && (
-                  <p id="grace-rsvp-att-err" className="mt-1.5 text-base" style={{ color: ERROR_COLOR }}>
+                  <p id="grace-rsvp-att-err" role="alert" className="mt-1.5 text-base" style={{ color: ERROR_COLOR }}>
                     {t("grace.rsvp.attendRequired")}
                   </p>
                 )}

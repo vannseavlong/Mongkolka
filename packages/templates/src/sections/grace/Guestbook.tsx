@@ -37,6 +37,7 @@ function ArchPhoto({ theme, src, alt, aspect }: { theme: Theme; src: string; alt
               alt={alt}
               loading="lazy"
               decoding="async"
+              referrerPolicy="no-referrer"
               onError={() => setFailed(true)}
               className="absolute inset-0 h-full w-full object-cover"
             />
@@ -49,12 +50,19 @@ function ArchPhoto({ theme, src, alt, aspect }: { theme: Theme; src: string; alt
 
 const ASPECTS = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-square"];
 
+/** Stable per-item aspect: depends only on the id, so adding items never reshapes other tiles. */
+function aspectFor(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return ASPECTS[h % ASPECTS.length]!;
+}
+
 export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: GuestbookWallProps) {
   const { t, language } = useLanguage();
   const { name: invitedName } = useGuest();
   const p = gracePalette(theme);
 
-  const [name, setName] = useState(invitedName ?? "");
+  const [name, setName] = useState((invitedName ?? "").slice(0, 80));
   const [message, setMessage] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -63,11 +71,17 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
   const [tried, setTried] = useState(false);
   const [resultStatus, setResultStatus] = useState<GuestbookResult["status"]>("pending");
   const [copied, setCopied] = useState(false);
+  const [manualLink, setManualLink] = useState<string | null>(null);
+  const [pickError, setPickError] = useState<PhotoErrorKind | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const doneRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const wishRef = useRef<HTMLTextAreaElement>(null);
+  const photoBtnRef = useRef<HTMLButtonElement>(null);
+  const refocus = useRef(false);
 
   useEffect(() => {
-    if (invitedName) setName((n) => n || invitedName);
+    if (invitedName) setName((n) => n || invitedName.slice(0, 80));
   }, [invitedName]);
   useEffect(() => {
     if (!photo) {
@@ -80,6 +94,10 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
   }, [photo]);
   useEffect(() => {
     if (state === "done") doneRef.current?.focus();
+    if (state === "idle" && refocus.current) {
+      refocus.current = false;
+      (photoBtnRef.current ?? nameRef.current)?.focus();
+    }
   }, [state]);
 
   const photoById = useMemo(() => new Map((guestbook?.photos ?? []).map((ph) => [ph.photo_id, ph])), [guestbook?.photos]);
@@ -90,17 +108,18 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
 
   const nameError = tried && !name.trim();
   const needError = tried && !message.trim() && !photo;
-  const photoError = errorKind === "type" || errorKind === "tooBig" ? errorKind : null;
+  const photoError = pickError;
 
   function pick(file: File | null) {
     if (!file) return;
     const bad = validatePhoto(file);
     if (fileRef.current) fileRef.current.value = "";
     if (bad) {
-      setPhoto(null);
-      setErrorKind(bad);
+      // keep any previously chosen valid photo; just explain why the new file was refused
+      setPickError(bad);
       return;
     }
+    setPickError(null);
     setErrorKind(null);
     setState((s) => (s === "error" ? "idle" : s));
     setPhoto(file);
@@ -110,7 +129,14 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
     e.preventDefault();
     if (state === "sending") return;
     setTried(true);
-    if (!name.trim() || (!message.trim() && !photo)) return;
+    if (!name.trim()) {
+      nameRef.current?.focus();
+      return;
+    }
+    if (!message.trim() && !photo) {
+      wishRef.current?.focus();
+      return;
+    }
     setState("sending");
     setErrorKind(null);
     try {
@@ -128,6 +154,8 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
     setPhoto(null);
     setTried(false);
     setErrorKind(null);
+    setPickError(null);
+    refocus.current = true;
     setState("idle");
   }
 
@@ -149,11 +177,18 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
         await navigator.share({ title: `${couple.partner1Name} & ${couple.partner2Name ?? ""}`.trim(), url });
         return;
       }
+    } catch {
+      return; // share sheet cancelled
+    }
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("no clipboard");
       await navigator.clipboard.writeText(url);
+      setManualLink(null);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* share sheet cancelled */
+      // insecure context or blocked clipboard: show the link so it can be copied by hand
+      setManualLink(url);
     }
   }
 
@@ -165,7 +200,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
       onClick: () => window.open(actions.mapsUrl, "_blank", "noopener,noreferrer"),
     },
     actions?.calendar && { key: "cal", icon: Calendar, label: t("grace.guestbook.calendar"), onClick: addToCalendar },
-    { key: "share", icon: Share2, label: copied ? t("grace.guestbook.copied") : t("grace.guestbook.share"), onClick: share },
+    { key: "share", icon: Share2, label: t("grace.guestbook.share"), onClick: share },
   ].filter(Boolean) as { key: string; icon: typeof MapPin; label: string; onClick: () => void }[];
 
   const heading = nameFont(language);
@@ -177,7 +212,6 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
     boxShadow: "0 14px 30px -24px rgba(74,44,53,0.4)",
   } as const;
   const photoBy = t("grace.guestbook.photoBy");
-  let tileIndex = 0;
 
   return (
     <GraceSection theme={theme} id="guestbook" ground="white" className="text-center" maxWidth="max-w-5xl">
@@ -249,6 +283,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
                         type="button"
                         onClick={() => {
                           setPhoto(null);
+                          setPickError(null);
                           if (fileRef.current) fileRef.current.value = "";
                         }}
                         className="flex min-h-11 items-center gap-2 px-1 text-base"
@@ -261,6 +296,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
                   </div>
                 ) : (
                   <button
+                    ref={photoBtnRef}
                     type="button"
                     onClick={() => fileRef.current?.click()}
                     aria-labelledby="grace-gb-photo-label grace-gb-photo-cta"
@@ -294,6 +330,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
                 </label>
                 <input
                   id="grace-gb-name"
+                  ref={nameRef}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   maxLength={80}
@@ -304,7 +341,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
                   style={fieldStyle(theme, nameError)}
                 />
                 {nameError && (
-                  <p id="grace-gb-name-err" className="mt-1.5 text-base" style={{ color: ERROR_COLOR }}>
+                  <p id="grace-gb-name-err" role="alert" className="mt-1.5 text-base" style={{ color: ERROR_COLOR }}>
                     {t("grace.guestbook.nameRequired")}
                   </p>
                 )}
@@ -316,6 +353,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
                 </label>
                 <textarea
                   id="grace-gb-wish"
+                  ref={wishRef}
                   value={message}
                   onChange={(e) => setMessage(e.target.value.slice(0, MAX_WISH))}
                   rows={4}
@@ -329,7 +367,7 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
                   {MAX_WISH - message.length} {t("grace.guestbook.counter")}
                 </p>
                 {needError && (
-                  <p id="grace-gb-need-err" className="mt-1 text-base" style={{ color: ERROR_COLOR }}>
+                  <p id="grace-gb-need-err" role="alert" className="mt-1 text-base" style={{ color: ERROR_COLOR }}>
                     {t("grace.guestbook.needSomething")}
                   </p>
                 )}
@@ -365,11 +403,11 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
           <ul className="mt-8 columns-1 gap-5 text-left min-[520px]:columns-2 lg:columns-3">
             {wishes.map((w) => {
               const ph = w.photo_id ? photoById.get(w.photo_id) : undefined;
-              const aspect = ASPECTS[tileIndex++ % ASPECTS.length]!;
+              const aspect = aspectFor(w.wish_id);
               return (
                 <li key={w.wish_id} className="mb-5 break-inside-avoid">
                   <div className={ph ? "p-3" : "p-5"} style={note}>
-                    {ph && <ArchPhoto theme={theme} src={ph.url} alt={`${photoBy} ${w.name}`} aspect={aspect} />}
+                    {ph && <ArchPhoto theme={theme} src={ph.url} alt="" aspect={aspect} />}
                     {w.message && (
                       <p className={`whitespace-pre-line break-words text-lg leading-relaxed ${ph ? "mt-3" : ""}`}>{w.message}</p>
                     )}
@@ -381,11 +419,11 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
               );
             })}
             {loosePhotos.map((ph) => {
-              const aspect = ASPECTS[tileIndex++ % ASPECTS.length]!;
+              const aspect = aspectFor(ph.photo_id);
               return (
                 <li key={ph.photo_id} className="mb-5 break-inside-avoid">
                   <div className="p-3" style={note}>
-                    <ArchPhoto theme={theme} src={ph.url} alt={ph.uploader_name ? `${photoBy} ${ph.uploader_name}` : photoBy} aspect={aspect} />
+                    <ArchPhoto theme={theme} src={ph.url} alt={ph.uploader_name ? "" : photoBy} aspect={aspect} />
                     {ph.uploader_name && (
                       <p className="mt-2 break-words text-base font-medium" style={{ color: p.accent }}>
                         {ph.uploader_name}
@@ -422,6 +460,23 @@ export function GraceGuestbook({ couple, theme, guestbook, actions, onSubmit }: 
             </button>
           ))}
         </div>
+        <p role="status" aria-live="polite" className="mt-3 min-h-6 text-base" style={{ color: p.accent }}>
+          {copied ? t("grace.guestbook.copied") : ""}
+        </p>
+        {manualLink && (
+          <div className="mx-auto mt-2 max-w-sm text-left">
+            <label htmlFor="grace-gb-link" className="mb-1.5 block text-base">
+              {t("grace.guestbook.copyManual")}
+            </label>
+            <input
+              id="grace-gb-link"
+              readOnly
+              value={manualLink}
+              onFocus={(e) => e.currentTarget.select()}
+              style={fieldStyle(theme)}
+            />
+          </div>
+        )}
       </div>
     </GraceSection>
   );

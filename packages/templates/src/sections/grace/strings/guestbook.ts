@@ -32,6 +32,7 @@ export const strings = {
     "grace.guestbook.calendar": "Add to calendar",
     "grace.guestbook.share": "Share the invitation",
     "grace.guestbook.copied": "Link copied",
+    "grace.guestbook.copyManual": "Copy this link to share:",
   } as Record<string, string>,
   kh: {
     "grace.guestbook.heading": "ចែករំលែកក្តីរីករាយ",
@@ -66,5 +67,6 @@ export const strings = {
     "grace.guestbook.calendar": "បន្ថែមទៅប្រតិទិន",
     "grace.guestbook.share": "ចែករំលែកការអញ្ជើញ",
     "grace.guestbook.copied": "បានចម្លងតំណ",
+    "grace.guestbook.copyManual": "ចម្លងតំណនេះដើម្បីចែករំលែក៖",
   } as Record<string, string>,
 };

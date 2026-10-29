@@ -29,10 +29,17 @@ function luminance(hex: string): number | null {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-/** White on the gold unless the gold is so light that dark text reads better. */
+function contrast(l1: number, l2: number): number {
+  const [hi, lo] = l1 > l2 ? [l1, l2] : [l2, l1];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+/** Button text on the gold: white or the dark text color, whichever has the better contrast ratio. */
 export function onAccent(theme: Theme): string {
-  const l = luminance(theme.accent_color);
-  return l !== null && l > 0.45 ? theme.text_color : "#ffffff";
+  const bg = luminance(theme.accent_color);
+  const dark = luminance(theme.text_color);
+  if (bg === null || dark === null) return "#ffffff";
+  return contrast(1, bg) >= contrast(dark, bg) ? "#ffffff" : theme.text_color;
 }
 
 export const ERROR_COLOR = "#b3261e";

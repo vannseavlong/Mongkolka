@@ -27,6 +27,8 @@ Split into five parallel slices, each its own task and branch when promoted to `
 
 - Footer credit link: `GraceFooter` takes an optional `brandUrl`; wire it from apps/web `site-view.tsx` (`extraProps` for `footer`) using `https://${ROOT_DOMAIN}` (settle the production domain first; unset renders plain text).
 
+- Shared `FoilText` (grace/shared.tsx): its lightest gradient stop (accent 60% + white 40%) is 2.29:1 on the pink ground and the 85% stop 3.65:1; darken the stops for text use (minimum about 85% accent, or solid accent for headings below about 48px) so large script text stays at least 3:1 everywhere (hero names, opening names, gallery/details headings); re-run the contrast check.
+
 ## Done when
 - [ ] All nine Grace components built, no stubs left
 - [ ] Owner has reviewed the template and signed off

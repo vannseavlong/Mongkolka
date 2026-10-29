@@ -1,4 +1,4 @@
-import type { CoupleInfo, SectionKey } from "./types";
+import type { CoupleInfo, GuestbookActions, GuestbookData, GuestbookResult, SectionKey } from "./types";
 
 /**
  * Placeholder couple + section content for places that show a template without
@@ -51,3 +51,28 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
     ],
   },
 };
+
+/** A sample guest wall (6 photos, 4 wishes) so the preview shows what a guestbook looks like. Not real guests. */
+export const SAMPLE_GUESTBOOK: GuestbookData = {
+  photos: [0, 1, 2, 3, 4, 5].map((i) => ({
+    photo_id: `sample-photo-${i}`,
+    url: SAMPLE_PHOTOS[i % SAMPLE_PHOTOS.length]!,
+    uploader_name: ["Dara", "Mey", "Vireak", "Sophea", "Chantha", "Rith"][i] ?? null,
+  })),
+  wishes: [
+    { wish_id: "sample-wish-1", name: "Dara", message: "Wishing you a lifetime of love and laughter. We are so happy for you both!", photo_id: "sample-photo-0" },
+    { wish_id: "sample-wish-2", name: "Mey & Vireak", message: "May God bless your marriage with joy and peace.", photo_id: null },
+    { wish_id: "sample-wish-3", name: "Sophea", message: "Congratulations! Can't wait to celebrate with you.", photo_id: "sample-photo-3" },
+    { wish_id: "sample-wish-4", name: "Chantha", message: "Two beautiful hearts, one beautiful story.", photo_id: null },
+  ],
+};
+
+export const SAMPLE_GUESTBOOK_ACTIONS: GuestbookActions = {
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Riverside%20Garden%20Phnom%20Penh",
+  calendar: { title: "Alex & Sam's wedding", start: "2026-12-12T16:00:00", location: "Riverside Garden, Phnom Penh" },
+};
+
+/** Preview-only submit handler for the guestbook: resolves as if the couple must approve first. */
+export async function sampleGuestbookSubmit(): Promise<GuestbookResult> {
+  return { status: "pending" };
+}

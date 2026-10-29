@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { brandUrl } from "@/lib/brand-url";
 import { SiteView } from "./site-view";
 import type { PublicSiteResponse } from "./types";
 
@@ -33,5 +34,5 @@ export default async function Page({
 
   const site = (await res.json()) as PublicSiteResponse;
 
-  return <SiteView site={site} guestGreeting={guestGreeting} initialLanguage={lang} />;
+  return <SiteView site={site} guestGreeting={guestGreeting} initialLanguage={lang} brandUrl={brandUrl()} />;
 }

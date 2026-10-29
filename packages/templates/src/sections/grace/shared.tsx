@@ -76,6 +76,16 @@ export function foilGradient(accent: string, angle = 135): string {
   return `linear-gradient(${angle}deg, ${mid} 0%, ${light} 30%, ${accent} 55%, ${light} 80%, ${mid} 100%)`;
 }
 
+/**
+ * Foil gradient for TEXT: lightest stop is 88% accent (about 3.9:1 on the pink ground, 4.2:1 on white),
+ * so large script text always clears 3:1. Lines and borders use the lighter foilGradient.
+ */
+export function foilTextGradient(accent: string, angle = 135): string {
+  const light = `color-mix(in srgb, ${accent} 88%, #ffffff)`;
+  const mid = `color-mix(in srgb, ${accent} 94%, #ffffff)`;
+  return `linear-gradient(${angle}deg, ${mid} 0%, ${light} 30%, ${accent} 55%, ${light} 80%, ${mid} 100%)`;
+}
+
 const FOIL_TEXT_CSS =
   ".grace-foil{color:var(--grace-accent)}" +
   "@supports (color:color-mix(in srgb,red 50%,white)) and (-webkit-background-clip:text){" +
@@ -101,7 +111,7 @@ export function FoilText({
       <style>{FOIL_TEXT_CSS}</style>
       <span
         className={`grace-foil ${className}`}
-        style={{ ["--grace-accent" as string]: theme.accent_color, ["--grace-foil" as string]: foilGradient(theme.accent_color), ...style }}
+        style={{ ["--grace-accent" as string]: theme.accent_color, ["--grace-foil" as string]: foilTextGradient(theme.accent_color), ...style }}
       >
         {children}
       </span>

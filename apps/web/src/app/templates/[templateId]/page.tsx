@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { fetchJson } from "@/lib/api";
+import { brandUrl } from "@/lib/brand-url";
 import type { SiteTemplatesResponse } from "../types";
 import { TemplatePreview } from "../template-preview";
 
@@ -33,7 +34,7 @@ export default async function TemplateDetailPage({
       </section>
 
       <section className="px-6 pb-16 sm:px-12">
-        <TemplatePreview template={template} />
+        <TemplatePreview template={template} brandUrl={brandUrl()} />
       </section>
 
       <SiteFooter />

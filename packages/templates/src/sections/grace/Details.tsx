@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { GraceSection, Cross, Reveal, gracePalette, nameFont, DISPLAY_FONT } from "./shared";
+import { GraceSection, Cross, FoilText, Reveal, gracePalette, nameFont, DISPLAY_FONT } from "./shared";
 import { useLanguage } from "../../i18n";
 import type { CoupleInfo, DetailsContent, Theme } from "../../types";
 
@@ -120,8 +120,8 @@ export function GraceDetails({ theme, content }: GraceDetailsProps) {
     <GraceSection theme={theme} id="details" maxWidth="max-w-4xl" className="text-center">
       <Reveal>
         <Cross spray stroke={p.accent} className="mx-auto h-14 w-auto" strokeWidth={1.4} />
-        <h2 className="mt-5 text-4xl sm:text-5xl" style={{ fontFamily: headingFont, lineHeight: 1.25, color: p.accent }}>
-          {t("grace.details.heading")}
+        <h2 className="mt-5 text-5xl leading-tight sm:text-6xl" style={{ fontFamily: headingFont, color: p.accent }}>
+          <FoilText theme={theme}>{t("grace.details.heading")}</FoilText>
         </h2>
       </Reveal>
 

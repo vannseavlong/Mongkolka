@@ -17,20 +17,20 @@ export function GraceVerse({ theme, content }: GraceVerseProps) {
   if (!text) return null;
 
   return (
-    <GraceSection theme={theme} id="verse" maxWidth="max-w-2xl" className="text-center">
+    <GraceSection theme={theme} id="verse" ground="white" maxWidth="max-w-2xl" className="text-center">
       <Reveal>
         <div
           aria-hidden
           className="mx-auto flex h-28 w-28 items-center justify-center rounded-full sm:h-32 sm:w-32"
           style={{
             border: `1px solid ${p.foilLight}`,
-            boxShadow: `0 0 0 5px ${p.ground}, 0 0 0 6px ${p.foilLight}`,
+            boxShadow: `0 0 0 5px ${p.card}, 0 0 0 6px ${p.foilLight}`,
             backgroundColor: p.card,
           }}
         >
           <Cross spray stroke={p.accent} className="h-[4.5rem] w-auto sm:h-20" strokeWidth={2} />
         </div>
-        <GoldDivider theme={theme} className="mt-10" />
+        <GoldDivider theme={theme} mark="diamond" className="mt-10" />
         <figure className="m-0 mt-10">
           <blockquote
             className="m-0 whitespace-pre-line break-words text-xl leading-[1.75] sm:text-2xl sm:leading-[1.7] [overflow-wrap:anywhere]"

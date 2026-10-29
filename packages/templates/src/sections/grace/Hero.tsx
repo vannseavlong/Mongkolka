@@ -62,7 +62,7 @@ export function GraceHero({ couple, theme, content }: GraceHeroProps) {
         ) : null}
         {date ? (
           <>
-            <GoldDivider theme={theme} className="mt-4" />
+            <GoldDivider theme={theme} mark="diamond" className="mt-4" />
             <p className="mt-3 text-lg sm:text-xl" style={{ color: p.text, letterSpacing: kh ? undefined : "0.12em" }}>
               {date}
             </p>

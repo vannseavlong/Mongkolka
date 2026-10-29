@@ -3,9 +3,9 @@
 - **Repo:** packages/templates, apps/web, apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · shared package and layouts (auto picker) (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/grace-primitives/` · **Branch:** `feat/grace-primitives` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-29
+- **Claimed by:** sub-agent (Web-grace-primitives), 2026-10-29
+- **Worktree:** `Mongkolka/grace-primitives/` · **Branch:** `feat/grace-primitives`
+- **Started / updated:** 2026-10-29 / 2026-10-29
 - **Docs:** Tasks/_plans/Web-grace-wedding-template.md, docs/tasks/template.md, docs/backend-schema.md
 - **Depends on:** none
 - **Touches:** packages/templates/src/sections/grace/shared.tsx (new), packages/templates/src/sections/grace/strings/ (new, scaffold only), apps/web/src/app/layout.tsx, apps/couple/src/app/layout.tsx

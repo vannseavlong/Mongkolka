@@ -3,9 +3,9 @@
 - **Repo:** packages/templates, apps/api, apps/couple, apps/web
 - **Owner:** SNLRLONG
 - **Tier:** T2 · spans 4 places, shared package and API enums (auto picker) (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/section-keys-verse-footer/` · **Branch:** `feat/section-keys-verse-footer` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-29
+- **Claimed by:** sub-agent (Web-section-keys-verse-footer), 2026-10-29
+- **Worktree:** `Mongkolka/section-keys-verse-footer/` · **Branch:** `feat/section-keys-verse-footer`
+- **Started / updated:** 2026-10-29 / 2026-10-29
 - **Docs:** Tasks/_plans/Web-grace-wedding-template.md, docs/tasks/template.md, docs/backend-schema.md
 - **Depends on:** none
 - **Touches:** packages/templates/src/{types,registry,index}.ts + sections/verse + sections/footer (new), apps/api/schemas/{couple/website_sections,admin/section_components}.ts, apps/api/src/modules/couple-website/couple-website.service.ts (SECTION_KEYS only), apps/api/seeds/section-components.ts, apps/couple/src/features/website (data/schema.ts, workspace/section-labels.ts, section-content-dialog.tsx, lib/build-content.ts), apps/web/src/app/[slug] (buildContent), docs/backend-schema.md, docs/tasks/template.md

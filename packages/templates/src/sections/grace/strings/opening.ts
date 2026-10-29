@@ -1,5 +1,5 @@
-// Scaffold: filled in by the section task. Not wired into i18n yet.
+// Scaffold: the section task owns this file. The stub only needs the `grace.opening.stub` key.
 export const strings = {
-  en: {} as Record<string, string>,
-  kh: {} as Record<string, string>,
+  en: { "grace.opening.stub": "Opening" } as Record<string, string>,
+  kh: { "grace.opening.stub": "បើក" } as Record<string, string>,
 };

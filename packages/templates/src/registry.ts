@@ -41,6 +41,15 @@ import { RegistryLedger } from "./sections/ink/Ledger";
 import { TimelineChapters } from "./sections/ink/Chapters";
 import { MusicVinyl } from "./sections/ink/Vinyl";
 import { GuestbookWall } from "./sections/ink/Guestbook";
+import { GraceOpening } from "./sections/grace/Opening";
+import { GraceHero } from "./sections/grace/Hero";
+import { GraceVerse } from "./sections/grace/Verse";
+import { GraceStory } from "./sections/grace/Story";
+import { GraceGallery } from "./sections/grace/Gallery";
+import { GraceDetails } from "./sections/grace/Details";
+import { GraceRsvp } from "./sections/grace/Rsvp";
+import { GraceGuestbook } from "./sections/grace/Guestbook";
+import { GraceFooter } from "./sections/grace/Footer";
 import { KbachGate } from "./sections/kbach/Gate";
 import { HeroKbach } from "./sections/kbach/Hero";
 import { StoryKbach } from "./sections/kbach/Story";
@@ -61,6 +70,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     opening_envelope: Envelope,
     opening_seal: Seal,
     opening_kbach: KbachGate,
+    opening_grace: GraceOpening,
   },
   hero: {
     hero_classic: HeroClassic,
@@ -68,9 +78,11 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_fullbleed: HeroFullbleed,
     hero_folio: HeroFolio,
     hero_kbach: HeroKbach,
+    hero_grace: GraceHero,
   },
   verse: {
     verse_classic: VerseClassic,
+    verse_grace: GraceVerse,
   },
   story: {
     story_classic: StoryClassic,
@@ -78,12 +90,14 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     story_split: StorySplit,
     story_manuscript: StoryManuscript,
     story_kbach: StoryKbach,
+    story_grace: GraceStory,
   },
   gallery: {
     gallery_grid: GalleryGrid,
     gallery_masonry: GalleryMasonry,
     gallery_carousel: GalleryCarousel,
     gallery_plates: GalleryPlates,
+    gallery_grace: GraceGallery,
   },
   details: {
     details_classic: DetailsClassic,
@@ -91,12 +105,14 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     details_cards: DetailsCards,
     details_programme: DetailsProgramme,
     details_kbach: DetailsKbach,
+    details_grace: GraceDetails,
   },
   rsvp: {
     rsvp_classic: RsvpClassic,
     rsvp_card: RsvpCard,
     rsvp_minimal: RsvpMinimal,
     rsvp_reply: RsvpReply,
+    rsvp_grace: GraceRsvp,
   },
   registry: {
     registry_classic: RegistryClassic,
@@ -118,9 +134,11 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   },
   guestbook: {
     guestbook_wall: GuestbookWall,
+    guestbook_grace: GraceGuestbook,
   },
   footer: {
     footer_classic: FooterClassic,
+    footer_grace: GraceFooter,
   },
 };
 

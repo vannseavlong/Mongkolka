@@ -22,7 +22,7 @@ Split into five parallel slices, each its own task and branch when promoted to `
 - Sample content for verse and footer in the shared `SAMPLE_CONTENT`; check `pink-gold-white.<root>` and `/templates` preview.
 - Walk every section at phone, tablet and desktop, English and Khmer; contrast check on the final palette; keyboard pass on opening, gallery lightbox, RSVP and guestbook.
 - Run through the real flow: pick the template in the builder, upload assets, publish, open `?to=Name`, guest uploads a photo, couple approves it.
-- Flip the template row to `active` in the seed; owner runs the live seed (`lsdb seed seeds/site-templates.ts --upsert` and section-components) after copying the sheet.
+- Flip the template row AND the nine `grace_*` section_components rows to `active` in the seeds together (the rows are seeded inactive so couples on other templates never see unfinished variants); owner runs the live seed (`lsdb seed seeds/site-templates.ts --upsert` and section-components) after copying the sheet.
 - Owner reviews the template (the client-facing acceptance).
 
 ## Done when

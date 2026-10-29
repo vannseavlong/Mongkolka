@@ -183,7 +183,21 @@ Lives at `/website`, restructured for the two-axis model rather than adapted fro
    builder always has something to list). The body takes an optional
    `mode`: `keep_content` (default) clears every section's `component_id` and
    `color_override` plus `couple_profile.theme_override` so the new template's look
-   applies fully, but keeps section `content`; `reset_all` clears `content` too (only `content`; `enabled` and `display_order` are never touched).
+   applies fully, but keeps section `content`; `reset_all` clears `content` too. `enabled` and `display_order` are untouched, except when the template has `default_sections` (see below).
+   **Section order and flags:** a template may set `site_templates.default_sections`
+   (`[{ section_key, enabled }]`, see backend-schema.md). First pick creates rows in that
+   order with those flags (unlisted keys appended disabled). `reset_all` also resets
+   `display_order` and `enabled` from it (unlisted keys disabled at the end); `keep_content`
+   never changes them. With `default_sections` null, behavior is unchanged: fixed order,
+   all enabled on first pick, and `reset_all` leaves order/enabled alone. The catalog
+   endpoint returns it; the public by-slug response does not.
+   **Partial failure:** writes are one per section (no transaction). If one fails, the
+   others stay applied and the profile stays on the old template; the same holds if the
+   profile or the row creation fails after the section writes. Retrying the same pick is
+   idempotent (matching rows skipped, missing rows recomputed). Without a retry,
+   `listSections` appends missing keys disabled and only `reset_all` repairs the layout.
+   Two concurrent first picks can still race (known narrow window, see the dedupe in
+   `listSections`).
    Unknown or inactive templates return 404. Templates also have a public `slug`
    and `description`; `GET /public/api/site-templates/by-slug/:slug` returns
    `{ template }` (404 if unknown or inactive).

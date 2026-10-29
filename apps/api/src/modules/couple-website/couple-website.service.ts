@@ -120,6 +120,7 @@ export const CoupleWebsiteService = {
     actorSheetId: string,
     templateId: string,
     mode: ApplyTemplateMode = DEFAULT_APPLY_TEMPLATE_MODE,
+    /** undefined = read the row here; null = the template is missing. */
     templateRow?: Record<string, unknown> | null,
   ) {
     const [profile, existingSections, template] = await Promise.all([
@@ -137,11 +138,17 @@ export const CoupleWebsiteService = {
           ]),
         )
       : null;
-    // Section clears go first and are all awaited (allSettled) before anything else is
-    // written: if any fail we stop with the profile still on the old template, so the
-    // couple keeps a consistent old look instead of a new template over half-cleared
-    // sections. The adapter has no multi-row update, so this is one write per section
-    // that actually needs clearing (already-clean rows are skipped), run in parallel.
+    // Section writes go first and are all awaited (allSettled) before the profile is
+    // written. If any fail we stop with the profile still on the old template. That is NOT
+    // a fully consistent old state: sibling writes that succeeded stay applied (cleared
+    // component/color overrides and, for reset_all with default_sections, the new
+    // order/enabled flags). Retrying the same pick is idempotent: rows that already match
+    // are skipped and missing rows are recomputed from the current state. If the couple
+    // does not retry, listSections() later appends missing keys disabled and only a
+    // reset_all repairs the layout. The same applies if the profile write or createSections
+    // fails after the section writes. The adapter has no multi-row update or transaction,
+    // so this is one write per section that needs a change, run in parallel; the public
+    // cache is invalidated only after everything settled (selectTemplate's finally).
     const clearContent = mode === "reset_all";
     const resets = existingSections.flatMap((section) => {
       const patch: Record<string, unknown> = {};
@@ -323,9 +330,7 @@ export const CoupleWebsiteService = {
     try {
       await Promise.all(
         sectionIds.map((sectionId, index) =>
-          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, {
-            display_order: index,
-          }),
+          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, { display_order: index }),
         ),
       );
     } finally {

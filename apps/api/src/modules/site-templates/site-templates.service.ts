@@ -133,12 +133,15 @@ export const SiteTemplatesService = {
 
   async create(input: CreateSiteTemplateInput) {
     const slug = normalizeSlug(input.slug);
-    const defaultSections = cleanDefaultSections(input.default_sections);
+    const withSections =
+      input.default_sections !== undefined
+        ? { default_sections: cleanDefaultSections(input.default_sections) }
+        : {};
     await assertSlugAvailable(slug, input.template_id);
     try {
       const created = await SiteTemplatesModel.create({
         ...input,
-        default_sections: defaultSections,
+        ...withSections,
         slug,
         status: "active",
       });

@@ -249,6 +249,94 @@ describe("partial failure and cache", () => {
   });
 });
 
+describe("retry semantics", () => {
+  const full = () =>
+    SECTION_KEYS.map((key, i) => ({
+      section_id: `id-${key}`,
+      section_key: key,
+      display_order: i,
+      enabled: true,
+    }));
+
+  it("createSections failing after the profile write; retry creates only the missing rows", async () => {
+    sections = full().filter((s) => s.section_key !== "verse");
+    m.createSections = async () => {
+      throw new Error("append failed");
+    };
+    await assert.rejects(
+      CoupleWebsiteService.selectTemplate("sheet", "grace", "reset_all"),
+      /append failed/,
+    );
+    assert.equal(profileWrites.length, 1);
+    // retry: apply the first attempt's patches to the rows, then run again
+    for (const w of sectionWrites)
+      Object.assign(
+        sections.find((s) => s.section_id === w.id)!,
+        w.data,
+      );
+    sectionWrites = [];
+    m.createSections = async (_a: string, rows: Row[]) => {
+      createdSections.push(rows);
+    };
+    await CoupleWebsiteService.selectTemplate("sheet", "grace", "reset_all");
+    assert.deepEqual(sectionWrites, []);
+    assert.deepEqual(keys(createdSections[0]!), ["verse"]);
+    assert.equal(createdSections[0]![0]!.display_order, 1);
+  });
+
+  it("retry after a partial updateSection failure ends in the right layout without rewrites", async () => {
+    sections = full();
+    m.updateSection = async (_a: string, id: string, data: Row) => {
+      if (id === "id-story") throw new Error("sheets down");
+      Object.assign(
+        sections.find((s) => s.section_id === id)!,
+        data,
+      );
+      sectionWrites.push({ id, data });
+    };
+    await assert.rejects(
+      CoupleWebsiteService.selectTemplate("sheet", "grace", "reset_all"),
+      /sheets down/,
+    );
+    assert.equal(profileWrites.length, 0);
+    const firstPass = sectionWrites.length;
+    assert.ok(firstPass > 0);
+    m.updateSection = async (_a: string, id: string, data: Row) => {
+      Object.assign(
+        sections.find((s) => s.section_id === id)!,
+        data,
+      );
+      sectionWrites.push({ id, data });
+    };
+    sectionWrites = [];
+    await CoupleWebsiteService.selectTemplate("sheet", "grace", "reset_all");
+    assert.deepEqual(
+      sectionWrites.map((w) => w.id),
+      ["id-story"],
+      "only the row that failed is rewritten",
+    );
+    const final = [...sections].sort((a, b) => Number(a.display_order) - Number(b.display_order));
+    assert.deepEqual(keys(final), FULL_ORDER);
+    assert.deepEqual(
+      final.map((s) => s.enabled),
+      FULL_ORDER.map((k) => ["hero", "verse", "rsvp"].includes(k)),
+    );
+    assert.equal(profileWrites.length, 1);
+  });
+
+  it("duplicate rows for one key share one target index", async () => {
+    sections = [
+      { section_id: "d1", section_key: "story", display_order: 0, enabled: true },
+      { section_id: "d2", section_key: "story", display_order: 1, enabled: true },
+    ];
+    await CoupleWebsiteService.selectTemplate("sheet", "grace", "reset_all");
+    const w = new Map(sectionWrites.map((x) => [x.id, x.data]));
+    assert.deepEqual(w.get("d1"), { display_order: 2, enabled: false });
+    assert.deepEqual(w.get("d2"), { display_order: 2, enabled: false });
+    assert.ok(!keys(createdSections[0]!).includes("story"));
+  });
+});
+
 describe("admin validation", () => {
   const base = {
     template_id: "n",
@@ -263,15 +351,19 @@ describe("admin validation", () => {
     await SiteTemplatesService.create({ ...base, default_sections: DEFAULTS });
     assert.deepEqual(createdTemplates[0]!.default_sections, DEFAULTS);
   });
-  it("create without it stores null", async () => {
+  it("create without it does not write the key (unsynced sheet stays working)", async () => {
     await SiteTemplatesService.create(base);
-    assert.equal(createdTemplates[0]!.default_sections, null);
+    assert.ok(!("default_sections" in createdTemplates[0]!));
   });
   it("empty array is stored as null (create and update)", async () => {
     await SiteTemplatesService.create({ ...base, default_sections: [] });
     assert.equal(createdTemplates[0]!.default_sections, null);
     await SiteTemplatesService.update("grace", { default_sections: [] });
     assert.equal(updatedTemplates[0]!.default_sections, null);
+  });
+  it("update without it does not write the key", async () => {
+    await SiteTemplatesService.update("grace", { name: "y" });
+    assert.ok(!("default_sections" in updatedTemplates[0]!));
   });
   it("update with null clears; omitted leaves it out of the write", async () => {
     await SiteTemplatesService.update("grace", { default_sections: null });

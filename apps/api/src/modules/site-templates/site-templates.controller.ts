@@ -15,15 +15,9 @@ export const SiteTemplatesController = {
   },
 
   async create(req: Request, res: Response) {
-    const {
-      template_id,
-      name,
-      slug,
-      description,
-      default_theme,
-      default_components,
-      default_sections,
-    } = req.body ?? {};
+    const { template_id, name, slug, description, default_theme, default_components } =
+      req.body ?? {};
+    const { default_sections } = req.body ?? {};
     if (typeof template_id !== "string" || typeof name !== "string" || typeof slug !== "string") {
       res.status(400).json({ error: "template_id, name and slug are required" });
       return;
@@ -32,9 +26,7 @@ export const SiteTemplatesController = {
       (description !== undefined && typeof description !== "string") ||
       (req.body?.status !== undefined && !STATUSES.includes(req.body.status))
     ) {
-      res.status(400).json({
-        error: "description must be a string and status active or inactive",
-      });
+      res.status(400).json({ error: "description must be a string and status active or inactive" });
       return;
     }
     try {
@@ -45,7 +37,7 @@ export const SiteTemplatesController = {
         description,
         default_theme: default_theme ?? {},
         default_components: default_components ?? {},
-        default_sections,
+        ...(default_sections !== undefined ? { default_sections } : {}),
       });
       res.status(201).json({ template });
     } catch (err) {

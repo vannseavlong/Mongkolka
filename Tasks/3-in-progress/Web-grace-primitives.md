@@ -38,3 +38,8 @@ Built in commit bd01007 on `feat/grace-primitives`, not merged. `sections/grace/
 Palette: bg #fff3f6, text #4a2c35 (11.39:1), accent #8a6418 (4.95:1 on bg, 5.36:1 on white). Recorded in a comment at the top of shared.tsx for the skeleton seed.
 Not verified: photo fallback with a real photo, petal motion beyond static frames, the script font in a real couple-app run, the first `next build` once failed during a parallel tsc and passed on rerun (cause unknown), the eighth lint error in packages/templates not diffed against main. Tests deferred (pure helpers ready).
 Next: G5 review, G7, G8, G11.
+
+## Review 2026-10-29 (fresh agent, G5; tsc and web build pass; eslint same 8 errors as main, none in grace/)
+No blockers. First-build failure: no real cause found (no import cycle; most likely a race between a parallel tsc and Next's generated types).
+Sent back: 1 hydration mismatch for reduced-motion users (Petals, Reveal); 2 Reveal content invisible without JS or IntersectionObserver (and print); 3 foilTextStyle makes text invisible where color-mix is unsupported (transparent fill + dropped gradient); 4 ArchFrame has no image error fallback, no object-position, no lazy loading, alt defaults to empty, monogram may overflow at 320 px; 5 Petals animate forever off-screen, no will-change, fall distance uses vh; 6 GraceSection takes language as a prop defaulting to "en" (should read useLanguage()).
+Nits sent back: cross spray overlap check, duplicate-key warning for merged strings, server-component import comment, preload false for the couple layout font, hyphenated initials.

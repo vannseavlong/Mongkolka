@@ -7,6 +7,7 @@ export const strings = {
     "grace.gallery.close": "Close",
     "grace.gallery.prev": "Previous photo",
     "grace.gallery.next": "Next photo",
+    "grace.gallery.unavailable": "This photo is unavailable",
   } as Record<string, string>,
   kh: {
     "grace.gallery.heading": "ពេលវេលាដ៏ពិសេសរបស់យើង",
@@ -16,5 +17,6 @@ export const strings = {
     "grace.gallery.close": "បិទ",
     "grace.gallery.prev": "រូបភាពមុន",
     "grace.gallery.next": "រូបភាពបន្ទាប់",
+    "grace.gallery.unavailable": "រូបភាពនេះមិនអាចបង្ហាញបានទេ",
   } as Record<string, string>,
 };

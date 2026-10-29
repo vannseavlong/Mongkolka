@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GraceSection, GoldDivider, FoilText, Reveal, gracePalette, nameFont } from "./shared";
+import { GraceSection, GoldDivider, Reveal, gracePalette, nameFont } from "./shared";
 import { GraceLightbox, fillTemplate } from "./gallery-lightbox";
 import { useLanguage } from "../../i18n";
 import type { CoupleInfo, GalleryContent, Theme } from "../../types";
@@ -20,6 +20,8 @@ function staggerClass(i: number, total: number): string {
   const desk = i % 3 === 1 ? "lg:mt-10" : "";
   return `${phone} ${desk}`.trim();
 }
+
+const EMPTY: ReadonlySet<string> = new Set();
 
 function Tile({
   theme,
@@ -75,51 +77,69 @@ function Tile({
 
 export function GraceGallery({ theme, content }: GraceGalleryProps) {
   const { t, language } = useLanguage();
-  const [failed, setFailed] = useState<ReadonlySet<string>>(() => new Set());
-  const [open, setOpen] = useState<number | null>(null);
-  const tileRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
-  const returnTo = useRef<number>(0);
+  const p = gracePalette(theme);
+  const raw = Array.isArray(content?.photos) ? content.photos : [];
+  const all = Array.from(new Set(raw.filter((s): s is string => typeof s === "string").map((s) => s.trim()).filter(Boolean)));
+  const listKey = all.join("\n");
+  // Failed URLs are remembered per photo list: a new list starts fresh.
+  const [failedState, setFailedState] = useState<{ key: string; set: ReadonlySet<string> }>({ key: listKey, set: new Set() });
+  const failed = failedState.key === listKey ? failedState.set : EMPTY;
+  const [openSrc, setOpenSrc] = useState<string | null>(null);
+  const tileRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const returnTo = useRef<string | null>(null);
 
-  const photos = Array.from(new Set((content?.photos ?? []).filter((s) => typeof s === "string" && s.trim() !== ""))).filter(
-    (s) => !failed.has(s),
-  );
+  const photos = all.filter((s) => !failed.has(s));
   const total = photos.length;
 
-  const fail = useCallback((src: string) => setFailed((prev) => (prev.has(src) ? prev : new Set(prev).add(src))), []);
+  const fail = useCallback(
+    (src: string) =>
+      setFailedState((prev) => {
+        const base = prev.key === listKey ? prev.set : EMPTY;
+        return base.has(src) ? prev : { key: listKey, set: new Set(base).add(src) };
+      }),
+    [listKey],
+  );
 
   const close = useCallback(() => {
-    setOpen((cur) => {
+    setOpenSrc((cur) => {
       if (cur != null) returnTo.current = cur;
       return null;
     });
   }, []);
 
-  // Return focus to the tile of the photo that was last shown.
+  // Return focus to the tile of the photo that was last shown (first tile if that one was hidden).
   const wasOpen = useRef(false);
   useEffect(() => {
-    if (open != null) {
+    if (openSrc != null) {
       wasOpen.current = true;
       return;
     }
     if (wasOpen.current) {
       wasOpen.current = false;
-      const el = tileRefs.current.get(returnTo.current) ?? tileRefs.current.get(0);
+      const el = (returnTo.current ? tileRefs.current.get(returnTo.current) : undefined) ?? tileRefs.current.values().next().value;
       el?.focus();
     }
-  }, [open]);
+  }, [openSrc]);
 
-  if (total === 0) return null;
+  // Close the viewer if its photo is gone from the list (content changed).
+  useEffect(() => {
+    if (openSrc != null && !all.includes(openSrc)) setOpenSrc(null);
+  }, [openSrc, listKey]);
 
-  const alt = (n: number) => fillTemplate(t("grace.gallery.photoAlt"), { n, total });
+  if (total === 0 && openSrc == null) return null;
+
+  const alt = (n: number, count: number = total) => fillTemplate(t("grace.gallery.photoAlt"), { n, total: count });
   const widthClass = total === 1 ? "max-w-[15rem]" : total === 2 ? "max-w-xl" : "max-w-5xl";
   const colsClass = total === 1 ? "grid-cols-1" : total === 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-3";
-  const current = open != null ? Math.min(open, total - 1) : null;
+  // The viewer keeps a photo that failed while it was open, so it never silently swaps pictures.
+  const viewerPhotos = all.filter((s) => !failed.has(s) || s === openSrc);
+  const viewerIndex = openSrc != null ? viewerPhotos.indexOf(openSrc) : -1;
 
   return (
     <GraceSection theme={theme} id="gallery" className="text-center">
       <Reveal>
-        <h2 className="text-4xl sm:text-5xl" style={{ fontFamily: nameFont(language), lineHeight: 1.25 }}>
-          <FoilText theme={theme}>{t("grace.gallery.heading")}</FoilText>
+        <h2 className="text-4xl sm:text-5xl" style={{ fontFamily: nameFont(language), lineHeight: 1.25, color: p.accent }}>
+          {t("grace.gallery.heading")}
         </h2>
         <GoldDivider theme={theme} className="mt-5" />
       </Reveal>
@@ -133,29 +153,31 @@ export function GraceGallery({ theme, content }: GraceGalleryProps) {
               alt={alt(i + 1)}
               openLabel={fillTemplate(t("grace.gallery.openPhoto"), { n: i + 1, total })}
               setRef={(el) => {
-                if (el) tileRefs.current.set(i, el);
-                else tileRefs.current.delete(i);
+                if (el) tileRefs.current.set(src, el);
+                else tileRefs.current.delete(src);
               }}
-              onOpen={() => setOpen(i)}
+              onOpen={() => setOpenSrc(src)}
               onFail={() => fail(src)}
             />
           </Reveal>
         ))}
       </div>
 
-      {current != null && (
+      {viewerIndex >= 0 && (
         <GraceLightbox
           theme={theme}
-          photos={photos}
-          index={current}
-          onIndex={setOpen}
+          photos={viewerPhotos}
+          index={viewerIndex}
+          onIndex={(i) => setOpenSrc(viewerPhotos[i] ?? null)}
           onClose={close}
+          onBroken={fail}
           labels={{
             viewer: t("grace.gallery.viewer"),
             close: t("grace.gallery.close"),
             prev: t("grace.gallery.prev"),
             next: t("grace.gallery.next"),
-            alt,
+            unavailable: t("grace.gallery.unavailable"),
+            alt: (n, count) => alt(n, count),
           }}
         />
       )}

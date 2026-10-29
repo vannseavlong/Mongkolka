@@ -2,6 +2,20 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-10-29 · [API] feat(api): template default sections (order and enabled flags)
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/API-template-default-sections.md
+- Branch/PR: feat/template-default-sections (merged to main with --no-ff, local, no PR)
+- What changed: `site_templates.default_sections` (nullable JSON list of `{section_key, enabled}`): a couple's first template pick gets rows in the template's order with its enabled flags; "start fresh" (`reset_all`) also resets order and enabled; "keep content" never does; strict validation on admin writes, lenient reads; the couple catalog returns the field and the public by-slug response does not; admin writes include the field only when provided
+- Needs: schema sync for the admin `site_templates` sheet (new nullable json column) BEFORE or with the deploy; seed the Grace row only after that; rollback = revert (the extra column is harmless); a failed "start fresh" can leave sections half applied (documented, retry is safe)
+
+## 2026-10-29 · [Web] feat(templates): Grace template skeleton
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-skeleton.md
+- Branch/PR: feat/grace-skeleton (merged to main with --no-ff, local, no PR)
+- What changed: nine placeholder Grace components (opening, hero, verse, story, gallery, details, RSVP, guestbook, footer) registered and translation-wired; `grace_blush` template row ("Grace Blush & Gold", slug `pink-gold-white`) and nine component rows seeded INACTIVE so couples never see unfinished variants; seed test guards that; seeder export now honors a per-row `status`
+- Needs: do not seed until API-template-default-sections is deployed and `lsdb sync` has run; then `npx lsdb seed seeds/section-components.ts --upsert` and `... seeds/site-templates.ts --upsert` from apps/api (the seeder silently drops unknown columns and `--skip-existing` never writes `default_sections`); the final launch task flips the rows and the template to active
+
 ## 2026-10-29 · [Web] feat(templates): Grace pack primitives
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-grace-primitives.md

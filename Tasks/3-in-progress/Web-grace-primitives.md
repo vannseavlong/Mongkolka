@@ -19,7 +19,7 @@ Design primitives for the Grace pink, gold and white pack, in one new folder; no
 - Palette starting values: bg near `#fff3f6`, text `#4a2c35`, accent near `#8a6418`; adjust until text and accent are at least 4.5:1 on bg (use `contrastRatio`), and record the final values in the file and the task.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc clean for templates, web, couple; next build web passes on rerun; grace folder eslint clean; packages/templates has pre-existing lint errors)  - [ ] G3 tests (no runner)  - [~] G4 run it (throwaway preview page, headless Chrome, 320 px iframe and 1200 px, reduced motion; page deleted)
 - [ ] G5 code review  - [ ] G6 security (if auth/data/input)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -31,3 +31,9 @@ Design primitives for the Grace pink, gold and white pack, in one new folder; no
 - [ ] No registry, i18n, or seed edits in this task
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-29
+Built in commit bd01007 on `feat/grace-primitives`, not merged. `sections/grace/shared.tsx` (gracePalette, foilGradient, foilTextStyle, Cross, GoldDivider, Petals, ArchFrame, Reveal, GraceSection, initialsOf, nameFont, SCRIPT_FONT), `grace/strings/*` scaffold with GRACE_EN/GRACE_KH (not wired), `--font-script` (Great Vibes) in apps/web and apps/couple layouts (couple had no font setup at all; only the variable was added).
+Palette: bg #fff3f6, text #4a2c35 (11.39:1), accent #8a6418 (4.95:1 on bg, 5.36:1 on white). Recorded in a comment at the top of shared.tsx for the skeleton seed.
+Not verified: photo fallback with a real photo, petal motion beyond static frames, the script font in a real couple-app run, the first `next build` once failed during a parallel tsc and passed on rerun (cause unknown), the eighth lint error in packages/templates not diffed against main. Tests deferred (pure helpers ready).
+Next: G5 review, G7, G8, G11.

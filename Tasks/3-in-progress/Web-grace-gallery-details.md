@@ -14,7 +14,7 @@
 Replace the `GraceGallery` and `GraceDetails` stubs. Gallery: the couple's photos (`content.photos: string[]`) as gold-framed arch tiles on pink with tap-to-enlarge (lightbox with keyboard close, arrow keys, focus return); empty returns null; a broken image does not leave a broken tile. Details: ceremony and reception cards (time, venue, address), dress code, map link built safely from the address; missing fields omit their row.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (no runner for templates: pure helpers only)  - [ ] G4 run it
+- [x] G1 scope (owned files plus one new file gallery-lightbox.tsx)  - [x] G2 static (tsc clean templates, web, couple; eslint grace clean; next build web and couple pass)  - [x] G3 tests (API 96/96, not re-run after the final one-line lint fix; none for templates: no runner)  - [~] G4 run it (headless Chrome 320/390/820/1200 px; keyboard in a real browser; swipe simulated; reduced motion; no hydration warnings)
 - [ ] G5 code review  - [ ] G6 security (if auth/data/input)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -25,3 +25,9 @@ Replace the `GraceGallery` and `GraceDetails` stubs. Gallery: the couple's photo
 - [ ] Responsive 320px to 1200px, English and Khmer
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-29
+Built in commit d5c3a9f on `feat/grace-gallery-details`, not merged. Gallery: "Our moments" gold script heading with a gold line and small cross, arch-topped tiles with a thin double gold frame (2 columns on phones, 3 on desktop, gentle CSS stagger, fade up on scroll), lightbox (dark full screen: close, prev/next, counter "3 / 12"; Esc, arrow keys, swipe; role dialog aria-modal "Photo viewer"; focus into the viewer, Tab trapped, focus returns to the tile; page scroll locked and restored), broken URL hides its tile, empty renders nothing, 1 photo centred, 2 photos narrower layout, lazy loading, alt "Photo n of N" (en and kh). Details: "The celebration" heading under a cross-and-leaf ornament, two white double-gold-bordered cards (cross icon for the Ceremony, drawn glass for the Reception) with time, venue, address and a "Get directions" Google Maps search link (URL-encoded, new tab, rel noopener noreferrer, hidden "(opens in a new tab)" note), dress-code strip between two gold hairlines; missing fields omit rows, empty cards omitted, one card centred, nothing renders null.
+Open points: the large gold script headings use FoilText (foil gradient) whose lighter tints are not strictly 4.5:1 (large text; small gold text uses the plain accent) - owner may prefer solid gold headings; the preview needed Google Fonts network access so the dev server ran unsandboxed.
+Not verified: a real touch device, real photos (gradient data URIs used), a screen reader, contrast measured on the final page, Safari/iOS, very tall or very wide lightbox images, API tests after the final lint fix.
+Next: G5 review, G7, G8, G11.

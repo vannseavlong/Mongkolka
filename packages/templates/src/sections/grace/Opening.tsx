@@ -18,7 +18,8 @@ const FOCUS_CSS =
  * Elegant invitation gate: a tall white arched window with a double gold line on a soft pink
  * gradient. The arch is rendered twice and each copy is clipped to one half, so opening is a
  * pure transform: the two doors swing apart, then the whole gate fades and onOpen fires.
- * Only the first copy is interactive and readable; the second is inert and aria-hidden.
+ * Both door copies are inert, aria-hidden visuals; one unclipped transparent layer above them
+ * holds the real button (so the whole button is clickable and its focus ring is not clipped).
  */
 export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
   const { t, language } = useLanguage();
@@ -34,8 +35,10 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
     return () => clearTimeout(timer);
   }, [opening]);
 
+  const started = useRef(false);
   const start = () => {
-    if (opening) return;
+    if (started.current) return;
+    started.current = true;
     if (reduce) onOpenRef.current();
     else setOpening(true);
   };
@@ -51,7 +54,13 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
   const foilLine = { backgroundColor: p.accent, backgroundImage: p.foilGradient } satisfies CSSProperties;
   const archRadius = "rounded-t-[999px]";
 
-  const face = (interactive: boolean) => (
+  // mode "door": visual copy inside a clipped door half (inert, aria-hidden, pointer-events none).
+  // mode "ghost": one unclipped full-size layer above both doors; only the real <button> is
+  // interactive (the rest is invisible but keeps the heading/greeting in the accessibility tree).
+  const face = (mode: "door" | "ghost") => {
+    const interactive = mode === "ghost";
+    const ghostText: CSSProperties = interactive ? { visibility: "visible", opacity: 0 } : {};
+    return (
     <div
       className={`${archRadius} p-[2px]`}
       style={foilLine}
@@ -66,24 +75,24 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
             <Cross spray stroke={p.accent} strokeWidth={2.4} className="h-[15cqw] w-auto" />
 
             <p
-              className="mt-[7cqw] max-w-full text-[clamp(1.2rem,7.2cqw,1.9rem)] leading-snug"
-              style={{ color: p.accent, fontFamily: guest ? fontFor(guest) : nameFont(language), ...wrap }}
+              className="mt-[7cqw] max-w-full text-[clamp(0.8rem,7.2cqw,1.9rem)] leading-snug"
+              style={{ color: p.accent, fontFamily: guest ? fontFor(guest) : nameFont(language), ...wrap, ...ghostText }}
             >
               {guest ? `${t("opening.dear")} ${guest},` : t("grace.opening.invited")}
             </p>
 
             {guest && (
               <p
-                className="mt-[3cqw] text-[clamp(0.78rem,3.8cqw,0.95rem)] leading-relaxed"
-                style={{ color: p.muted, fontFamily: DISPLAY_FONT, ...track(0.04) }}
+                className="mt-[3cqw] text-[clamp(0.55rem,3.8cqw,0.95rem)] leading-relaxed"
+                style={{ color: p.muted, fontFamily: DISPLAY_FONT, ...track(0.04), ...ghostText }}
               >
                 {t("grace.opening.invitedTo")}
               </p>
             )}
 
             <h1
-              className="mt-[5cqw] max-w-full text-[clamp(2.3rem,14.5cqw,4.1rem)] leading-[1.12]"
-              style={{ fontFamily: fontFor(`${couple.partner1Name}${couple.partner2Name ?? ""}`), fontWeight: 400, ...wrap }}
+              className="mt-[5cqw] max-w-full text-[clamp(1.3rem,14.5cqw,4.1rem)] leading-[1.12]"
+              style={{ fontFamily: fontFor(`${couple.partner1Name}${couple.partner2Name ?? ""}`), fontWeight: 400, ...wrap, ...ghostText }}
             >
               <FoilText theme={theme}>{couple.partner1Name}</FoilText>
               {couple.partner2Name && (
@@ -100,8 +109,8 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
 
             {date && (
               <p
-                className="mt-[5cqw] text-[clamp(0.95rem,5cqw,1.3rem)]"
-                style={{ fontFamily: DISPLAY_FONT, color: p.text, ...track(0.08) }}
+                className="mt-[5cqw] text-[clamp(0.6rem,5cqw,1.3rem)]"
+                style={{ fontFamily: DISPLAY_FONT, color: p.text, ...track(0.08), ...ghostText }}
               >
                 {date}
               </p>
@@ -113,12 +122,15 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
                 onClick={start}
                 disabled={opening}
                 aria-label={`${t("grace.opening.openLabel")} ${names}`}
-                className="grace-open-btn mt-[8cqw] max-w-full cursor-pointer rounded-full px-[7cqw] py-[3cqw] text-[clamp(0.85rem,4.2cqw,1.05rem)] transition-colors"
+                className="grace-open-btn mt-[8cqw] max-w-full cursor-pointer rounded-full px-[7cqw] py-[3cqw] text-[clamp(0.55rem,4.2cqw,1.05rem)] transition-colors"
                 style={{
-                  border: `1px solid ${p.accent}`,
-                  color: p.accent,
+                  // The painted button is the door copy underneath; this real one only adds hover and focus.
+                  border: "1px solid transparent",
+                  color: "transparent",
                   fontFamily: DISPLAY_FONT,
                   backgroundColor: "transparent",
+                  visibility: "visible",
+                  pointerEvents: "auto",
                   ["--grace-open-accent" as string]: p.accent,
                   ["--grace-open-hover" as string]: `color-mix(in srgb, ${p.accent} 9%, transparent)`,
                   ...track(0.06),
@@ -128,7 +140,7 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
               </button>
             ) : (
               <span
-                className="mt-[8cqw] max-w-full rounded-full px-[7cqw] py-[3cqw] text-[clamp(0.85rem,4.2cqw,1.05rem)]"
+                className="mt-[8cqw] max-w-full rounded-full px-[7cqw] py-[3cqw] text-[clamp(0.55rem,4.2cqw,1.05rem)]"
                 style={{ border: `1px solid ${p.accent}`, color: p.accent, fontFamily: DISPLAY_FONT, ...track(0.06) }}
               >
                 {t("grace.opening.open")}
@@ -138,14 +150,15 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   const door = (side: "left" | "right") => (
     <motion.div
       key={side}
-      className={side === "left" ? "" : "absolute inset-0"}
+      className={side === "left" ? "pointer-events-none" : "pointer-events-none absolute inset-0"}
       style={{
-        clipPath: side === "left" ? "inset(0 50% 0 0)" : "inset(0 0 0 50%)",
+        clipPath: side === "left" ? "inset(0 calc(50% - 1px) 0 0)" : "inset(0 0 0 calc(50% - 1px))",
         transformOrigin: side === "left" ? "0% 50%" : "100% 50%",
         position: side === "left" ? "relative" : undefined,
         willChange: opening ? "transform" : undefined,
@@ -156,7 +169,7 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
         opacity: { duration: 0.4, delay: 0.65, ease: "easeIn" },
       }}
     >
-      {face(side === "left")}
+      {face("door")}
     </motion.div>
   );
 
@@ -173,10 +186,10 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
     >
       <style>{FOCUS_CSS}</style>
       <Petals theme={theme} />
-      <div className="relative flex min-h-full items-center justify-center px-4 py-8">
+      <div className="relative flex min-h-full items-center justify-center px-4 py-3">
         <div
           className="relative w-full max-w-[400px] [container-type:inline-size]"
-          style={{ perspective: "1400px", width: "min(100%, 400px)" }}
+          style={{ perspective: "1400px", width: "min(100%, 400px, calc((100dvh - 1.5rem) / 1.82))" }}
         >
           {/* Light revealed behind the doors */}
           <div
@@ -187,6 +200,12 @@ export function GraceOpening({ couple, theme, guestGreeting, onOpen }: OpeningPr
           <div className="relative">
             {door("left")}
             {door("right")}
+            <div
+              className="absolute inset-0 z-10"
+              style={{ visibility: "hidden", pointerEvents: "none", opacity: opening ? 0 : 1 }}
+            >
+              {face("ghost")}
+            </div>
           </div>
         </div>
       </div>

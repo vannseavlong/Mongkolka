@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-10-30 · [Web] feat(templates): Grace opening gate
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-opening.md
+- Branch/PR: feat/grace-opening (merged to main with --no-ff, local, no PR)
+- What changed: pink and gold invitation gate: white arched window with a double gold line and a cross at the apex, "Dear {name}" from the `?name=` / `?to=` link parameter in script type (or "You are invited"), couple names, date, one full-width "Open the invitation" button; the arch doors swing apart and the gate fades; reduced motion opens immediately; fits landscape phones; Khmer supported
+- Needs: nothing (not part of an active template yet)
+
 ## 2026-10-29 · [Web] feat(templates): Grace RSVP and guest photo wall
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-grace-rsvp-guestbook.md

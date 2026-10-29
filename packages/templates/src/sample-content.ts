@@ -20,6 +20,11 @@ export const SAMPLE_PHOTOS = [
 
 export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
   hero: { coverPhotoUrl: SAMPLE_PHOTOS[0] },
+  verse: {
+    text: "Therefore shall a man leave his father and his mother, and shall cleave unto his wife: and they shall be one flesh.",
+    reference: "Genesis 2:24",
+  },
+  footer: { message: "Thank you for celebrating with us.", hashtag: "#AlexAndSam" },
   story: {
     loveStory:
       "We met on a rainy afternoon and haven't stopped talking since. This is where our story becomes yours to celebrate with us.",

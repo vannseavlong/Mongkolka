@@ -20,12 +20,21 @@ export function VerseClassic({ theme, content }: VerseClassicProps) {
         fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
       }}
     >
-      <blockquote className="whitespace-pre-line text-lg italic leading-relaxed opacity-90">{text}</blockquote>
-      {content?.reference ? (
-        <p className="mt-4 text-sm font-medium tracking-wide" style={{ color: theme.accent_color }}>
-          {content.reference}
-        </p>
-      ) : null}
+      <figure className="m-0">
+        <blockquote className="m-0 whitespace-pre-line break-words text-lg italic leading-relaxed [overflow-wrap:anywhere]">
+          {text}
+        </blockquote>
+        {content?.reference ? (
+          <figcaption className="mt-4 break-words text-sm font-medium tracking-wide [overflow-wrap:anywhere]">
+            <span
+              aria-hidden="true"
+              className="mx-auto mb-3 block h-px w-10"
+              style={{ backgroundColor: theme.accent_color }}
+            />
+            <cite className="not-italic">{content.reference}</cite>
+          </figcaption>
+        ) : null}
+      </figure>
     </section>
   );
 }

@@ -26,6 +26,30 @@ describe("section key lists stay in sync", () => {
   const websiteEnum = listAfter(read("../schemas/couple/website_sections.ts"), /\.enum\(\[/);
   const componentEnum = listAfter(read("../schemas/admin/section_components.ts"), /\.enum\(\[/);
 
+  const couple = listAfter(
+    read("../../couple/src/features/website/data/schema.ts"),
+    /export const WEBSITE_SECTIONS = \[/,
+  );
+  const admin = listAfter(
+    read("../../admin/src/features/section-components/data/schema.ts"),
+    /export const WEBSITE_SECTIONS = \[/,
+  );
+  const apiSections = listAfter(
+    read("../src/modules/section-components/section-components.service.ts"),
+    /export const SECTIONS = \[/,
+  );
+  const labelsSrc = read("../../couple/src/features/website/workspace/section-labels.ts");
+  const labels = [...labelsSrc.slice(labelsSrc.indexOf("SECTION_LABELS")).split("};")[0]!.matchAll(/^\s+([a-z]+):\s*"/gm)].map(
+    (m) => m[1] as string,
+  );
+
+  it("couple WEBSITE_SECTIONS, SECTION_LABELS, admin WEBSITE_SECTIONS and API SECTIONS match", () => {
+    assert.deepEqual(couple, templates);
+    assert.deepEqual([...labels].sort(), [...templates].sort());
+    assert.deepEqual(admin, templates);
+    assert.deepEqual(apiSections, templates);
+  });
+
   it("includes verse and footer", () => {
     assert.ok(templates.includes("verse") && templates.includes("footer") && templates.includes("guestbook"));
   });

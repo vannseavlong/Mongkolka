@@ -363,7 +363,7 @@ their sections, so a published site doesn't change under them.
 
 New section keys `verse` and `footer`; `SECTION_KEYS` order is now opening, hero, verse, story,
 gallery, details, rsvp, registry, timeline, music, guestbook, footer. Existing couples keep
-their `display_order`; the missing keys are appended disabled by the existing mechanism. The
+their `display_order`; the missing keys are appended disabled by the existing mechanism. For existing couples verse and footer therefore sit disabled at the end, and the couple reorders and enables them. The
 couple builder also gained the previously missing `guestbook` key. The verse editor offers KJV
 preset verses (`apps/couple/src/features/website/lib/verse-presets.ts`). **Release note:** the
 `website_sections.section_key` and `section_components.section` enums changed, so a schema sync is

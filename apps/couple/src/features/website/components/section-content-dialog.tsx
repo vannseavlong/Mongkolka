@@ -493,7 +493,11 @@ function MusicContentForm({ section, onSaved }: { section: WebsiteSection; onSav
 // verse — content: { text?: string, reference?: string, textKh?: string }
 // ---------------------------------------------------------------------------
 
-const verseSchema = z.object({ text: z.string(), reference: z.string(), textKh: z.string() });
+const verseSchema = z.object({
+  text: z.string().max(600, "Max 600 characters"),
+  reference: z.string().max(60, "Max 60 characters"),
+  textKh: z.string().max(600, "Max 600 characters"),
+});
 type VerseFormValues = z.infer<typeof verseSchema>;
 
 function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
@@ -509,6 +513,8 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
     if (!preset) return;
     form.setValue("text", preset.text, { shouldDirty: true });
     form.setValue("reference", preset.reference, { shouldDirty: true });
+    // A new passage makes any existing Khmer translation stale.
+    form.setValue("textKh", "", { shouldDirty: true });
   }
 
   async function onSubmit(values: VerseFormValues) {
@@ -534,7 +540,7 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
           </label>
           <select
             id="verse-preset"
-            defaultValue=""
+            value=""
             onChange={(e) => applyPreset(e.target.value)}
             className="h-9 rounded-md border bg-transparent px-3 text-sm"
           >
@@ -599,7 +605,10 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
 // footer — content: { message?: string, hashtag?: string }
 // ---------------------------------------------------------------------------
 
-const footerSchema = z.object({ message: z.string(), hashtag: z.string() });
+const footerSchema = z.object({
+  message: z.string().max(300, "Max 300 characters"),
+  hashtag: z.string().max(60, "Max 60 characters"),
+});
 type FooterFormValues = z.infer<typeof footerSchema>;
 
 function FooterContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {

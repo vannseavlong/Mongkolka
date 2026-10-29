@@ -32,3 +32,10 @@ Built in commit 9375a5a on `feat/grace-opening`, not merged. Soft pink gradient 
 Gold text #8a6418 on white 5.36:1.
 Not verified: doors mid-swing and the final fade (coded, not seen), reduced-motion path exercised, load-time hydration warnings, 820 px, inside the builder preview box. The gate does not use GraceSection (full-screen).
 Next: G5 review, G7, G8, G11.
+
+## Review 2026-10-29 (fresh agent, G5; browser and code review only; tsc, eslint, API tests and build not rerun)
+Verdict: NOT ready for testing: one blocker.
+BLOCKER: the right half of the "Open the invitation" button is dead. Each door is clipped (`clip-path: inset`), the right door sits over the left door's right half and shows the non-interactive `<span>` copy of the button; measured with elementFromPoint: BUTTON at 10/30/45/49% of the button width, SPAN at 51/60/90%; a real click on the right half fired `onOpen` 0 times. The author's earlier "real click fired onOpen" landed on the left half. Should-fix: the focus ring is cut in half by the same clip; on landscape phones (667x375) the arch is 400x649 and the button sits below the fold (the overlay scrolls). All sent back.
+Verified OK: doors rotate to about 78 degrees and fade, gone at about 1.3 s (sampled computed style at 150 ms steps; a multi-frame GIF could not be captured); `onOpen` exactly once for a double click, Enter and Space; unmount mid-animation 500 ms in -> no `onOpen`, no errors, no leftover timers; no hydration warnings after a fresh reload; all guest text plain text (HTML, `<img onerror>`, Khmer, RTL, emoji; whitespace-only falls back to "You are invited"); single partner name shows no "&"; long names wrap at 320 px; the rest of the site is unmounted under the gate; the language toggle (z-60) stays above the gate (z-50) like the other openings; string parity; contrast gold #8a6418 5.36:1 on white and 4.95:1 on pink.
+Code only (not emulated): reduced motion opens immediately; builder preview box behaves like the other `fixed` gates.
+Nits: focus drops to body when the gate unmounts (same as the other gates).

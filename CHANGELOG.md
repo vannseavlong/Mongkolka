@@ -2,6 +2,34 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-10-29 · [Web] feat(templates): Grace RSVP and guest photo wall
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-rsvp-guestbook.md
+- Branch/PR: feat/grace-rsvp-guestbook (merged to main with --no-ff, local, no PR)
+- What changed: pink, gold and white RSVP (prefilled name, accept/decline pills, guests stepper, retry and success states, focus and error announcements) and guest photo and wish wall (upload with preview, 500-character wish counter, pending/approved messages, arch-framed masonry wall, share/directions/calendar actions); same data contract as the ink guestbook; the stepper sends plusOne and appends a fixed `Guests: N` line to the message until the API gets a structured field
+- Needs: nothing (the section components are not yet in an active template); follow-up task API-rsvp-guest-count
+
+## 2026-10-29 · [Web] feat(templates): Grace gallery (lightbox) and details sections
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-gallery-details.md
+- Branch/PR: feat/grace-gallery-details (merged to main with --no-ff, local, no PR)
+- What changed: arch-framed gallery with a keyboard and swipe lightbox (focus trap, pinch-zoom, failed-image handling) and ceremony/reception detail cards with directions links and a dress-code strip
+- Needs: nothing
+
+## 2026-10-29 · [Web] feat(templates): Grace hero and story sections
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-hero-story.md
+- Branch/PR: feat/grace-hero-story (merged to main with --no-ff, local, no PR)
+- What changed: hero with the couple's photo in a gold arch (monogram fallback), script names, date and scroll cue that fit above the fold from 320x568 to 1440x900, and a story card with a letter-only drop cap
+- Needs: nothing
+
+## 2026-10-29 · [Web] feat(templates): Grace verse and footer sections
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-verse-footer.md
+- Branch/PR: feat/grace-verse-footer (merged to main with --no-ff, local, no PR)
+- What changed: verse section with a large cross ornament and Khmer text support, and a footer with names, localized date, message, hashtag and an optional credit link (`brandUrl`, plain text when unset)
+- Needs: apps/web must pass `brandUrl` to the footer (launch task) once the production domain is settled
+
 ## 2026-10-29 · [API] feat(api): template default sections (order and enabled flags)
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/API-template-default-sections.md

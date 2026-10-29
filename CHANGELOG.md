@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-10-30 · [Cross] feat: Grace template launch prep (foil text, brand link, previews, how-to)
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-grace-qa-launch.md
+- Branch/PR: feat/grace-launch (merged to main with --no-ff, local, no PR)
+- What changed: the whole Grace page walked end to end and tidied (alternating pink/white grounds, one cross per section, unified script headings, gallery and guest-wall column counts); foil text darkened (lightest stop about 4.0:1 on pink, 4.3:1 on white); footer credit link from the web app's ROOT_DOMAIN (plain text when unset); template preview pages show all sections with a sample guest photo wall, honor `?to=` (capped at 80 characters) and the template's section order; the public by-slug template response now returns a cleaned `default_sections`; owner how-to in docs/grace-template-howto.md
+- Needs: ROOT_DOMAIN set on apps/web for the footer link; Grace template and its nine component rows are still seeded INACTIVE and have not been seeded: sync first (`npx lsdb sync`, `--all-users` for existing couple sheets), then `npx lsdb seed seeds/section-components.ts --upsert` and `npx lsdb seed seeds/site-templates.ts --upsert`, then switch active on a COPY of the dev sheet to review
+
 ## 2026-10-30 · [Web] feat(templates): Grace opening gate
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-grace-opening.md

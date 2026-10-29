@@ -4,7 +4,7 @@ Template id `grace_blush`, public slug `pink-gold-white`. Everything is seeded *
 
 ## a. Prerequisites
 1. `API-template-default-sections` is deployed (adds the `default_sections` column and the new section enums).
-2. From `apps/api`, run `npx lsdb sync` for the **admin actor** and for the **couple actor** (new enums and the `default_sections` column).
+2. From `apps/api`, run `npx lsdb sync` (it syncs every actor in lsdb.config, no actor flag; adds the new enums and the `default_sections` column). Existing couple sheets need `npx lsdb sync --all-users`; preview it first with `--dry-run`.
 
 ## b. Seed (from `apps/api`, on a COPY of the dev sheet)
 The seeders silently drop columns that are not in the schema, so sync first.
@@ -25,7 +25,7 @@ Toggle `grace_blush` and the nine section components to **active**: `opening_gra
 
 ## e. What to check, and what is unverified
 Check: opening gate (arch doors, "Dear <Name>") then hero, verse, story, gallery (tap a photo for the lightbox), details, guestbook (photo + wish, "pending" message, the wall), RSVP (prefilled name, accept, guests), footer; English and Khmer; phone, tablet, desktop.
-Known unverified: real API data and real uploads (the QA used a local stub API); real-device Safari/iOS and Android; screen-reader pass; Khmer copy has had no native-speaker review; the preview pages show every enabled section in the standard order unless the public API also returns `default_sections` (it does not yet: add `"default_sections"` to `PUBLIC_FIELDS` in `apps/api/src/modules/site-templates/site-templates.service.ts` so previews follow the Grace order and hide registry/timeline/music).
+Known unverified: real API data and real uploads (the QA used a local stub API); real-device Safari/iOS and Android; screen-reader pass; Khmer copy has had no native-speaker review.
 
 ## f. Launch (after you approve)
 Edit the seeds, update the test, re-seed:

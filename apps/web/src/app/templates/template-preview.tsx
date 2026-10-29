@@ -25,10 +25,8 @@ const ALL_SECTIONS: DefaultSections = SECTION_KEYS.map((key) => ({ section_key: 
  */
 function previewSections(defaults: unknown): SiteRendererSection[] {
   const known = new Set<string>(SECTION_KEYS);
-  const list =
-    Array.isArray(defaults) && defaults.length > 0
-      ? (defaults as DefaultSections).filter((d) => d && known.has(d.section_key))
-      : ALL_SECTIONS;
+  const usable = Array.isArray(defaults) ? (defaults as DefaultSections).filter((d) => d && known.has(d.section_key)) : [];
+  const list = usable.length > 0 ? usable : ALL_SECTIONS;
   return list.map((d, index) => ({
     section_id: d.section_key,
     section_key: d.section_key,

@@ -1,7 +1,7 @@
 import { ValidationError } from "longcelot-sheet-db";
 import { isReservedSlug, isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
 import { TtlCache } from "../../utils/ttl-cache.js";
-import { validateDefaultSections, type DefaultSection } from "../../utils/section-keys.js";
+import { parseDefaultSections, validateDefaultSections, type DefaultSection } from "../../utils/section-keys.js";
 import { SiteTemplatesModel } from "./site-templates.model.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
@@ -61,7 +61,11 @@ const PUBLIC_FIELDS = [
 ] as const;
 
 function toPublicTemplate(row: Row) {
-  return Object.fromEntries(PUBLIC_FIELDS.map((key) => [key, row[key] ?? null]));
+  // default_sections is normalised (unknown keys dropped, null when unusable); not in PUBLIC_FIELDS on purpose.
+  return {
+    ...Object.fromEntries(PUBLIC_FIELDS.map((key) => [key, row[key] ?? null])),
+    default_sections: parseDefaultSections(row.default_sections),
+  };
 }
 
 /**

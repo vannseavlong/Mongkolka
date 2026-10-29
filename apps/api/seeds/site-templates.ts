@@ -91,5 +91,53 @@ export default {
       default_components: { opening: "opening_curtain", ...defaultComponents },
       status: "active",
     },
+    // RELEASE ORDER: the seeder silently DROPS keys that are not in the schema. Seed this row only after
+    // API-template-default-sections is deployed and `lsdb sync` has added the `default_sections` column,
+    // and seed with --upsert (a --skip-existing re-seed never writes default_sections to an existing row).
+    // Stays inactive until the final Grace launch task flips it and the grace_* components to active together.
+    {
+      template_id: "grace_blush",
+      name: "Grace Blush & Gold",
+      slug: "pink-gold-white",
+      description:
+        "A pink, gold and white Christian wedding design with a cross motif, arched portraits and gold foil script.",
+      default_theme: {
+        bg_color: "#fff3f6",
+        text_color: "#4a2c35",
+        accent_color: "#8a6418",
+        font_style: "serif",
+      },
+      default_components: {
+        opening: "opening_grace",
+        hero: "hero_grace",
+        verse: "verse_grace",
+        story: "story_grace",
+        gallery: "gallery_grace",
+        details: "details_grace",
+        rsvp: "rsvp_grace",
+        guestbook: "guestbook_grace",
+        footer: "footer_grace",
+        registry: "registry_cards",
+        timeline: "timeline_vertical_line",
+        music: "music_minimal",
+      },
+      // `default_sections` column comes from API-template-default-sections (parallel task).
+      // Ordered; footer stays last.
+      default_sections: [
+        { section_key: "opening", enabled: true },
+        { section_key: "hero", enabled: true },
+        { section_key: "verse", enabled: true },
+        { section_key: "story", enabled: true },
+        { section_key: "gallery", enabled: true },
+        { section_key: "details", enabled: true },
+        { section_key: "guestbook", enabled: true },
+        { section_key: "rsvp", enabled: true },
+        { section_key: "registry", enabled: false },
+        { section_key: "timeline", enabled: false },
+        { section_key: "music", enabled: false },
+        { section_key: "footer", enabled: true },
+      ],
+      status: "inactive",
+    },
   ],
 };

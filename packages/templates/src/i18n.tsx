@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode } from "react";
+import { GRACE_EN, GRACE_KH } from "./sections/grace/strings";
 
 export type Language = "en" | "kh";
 
@@ -10,7 +11,7 @@ export type Language = "en" | "kh";
  * couple and shown as-is regardless of language; building a per-field bilingual
  * content editor is a separate, much larger feature not scoped here.
  */
-const dictionary = {
+const baseDictionary = {
   en: {
     "opening.tapToOpen": "Tap to open",
     "opening.tapToEnter": "Tap to enter",
@@ -149,7 +150,23 @@ const dictionary = {
   },
 } as const satisfies Record<Language, Record<string, string>>;
 
-export type TranslationKey = keyof (typeof dictionary)["en"];
+/** Grace pack strings are merged from sections/grace/strings (keys prefixed `grace.<section>.`). */
+const dictionary: Record<Language, Record<string, string>> = {
+  en: { ...baseDictionary.en, ...GRACE_EN },
+  kh: { ...baseDictionary.kh, ...GRACE_KH },
+};
+
+declare const process: { env: { NODE_ENV?: string } };
+const warned = new Set<string>();
+function warnMissing(language: Language, key: string) {
+  if (process.env.NODE_ENV === "production") return;
+  const id = `${language}:${key}`;
+  if (warned.has(id)) return;
+  warned.add(id);
+  console.warn(`[i18n] missing ${language} translation: ${key}`);
+}
+
+export type TranslationKey = keyof (typeof baseDictionary)["en"] | `grace.${string}`;
 
 interface LanguageContextValue {
   language: Language;
@@ -167,7 +184,12 @@ export function LanguageProvider({
   children: ReactNode;
 }) {
   const [language, setLanguage] = useState<Language>(initialLanguage);
-  const t = (key: TranslationKey) => dictionary[language][key];
+  const t = (key: TranslationKey) => {
+    const value = dictionary[language][key];
+    if (value !== undefined) return value;
+    warnMissing(language, key);
+    return key;
+  };
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

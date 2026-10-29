@@ -20,8 +20,8 @@ describe("section key lists stay in sync", () => {
     /export const SECTION_KEYS = \[/,
   );
   const service = listAfter(
-    read("../src/modules/couple-website/couple-website.service.ts"),
-    /const SECTION_KEYS = \[/,
+    read("../src/utils/section-keys.ts"),
+    /export const SECTION_KEYS = \[/,
   );
   const websiteEnum = listAfter(read("../schemas/couple/website_sections.ts"), /\.enum\(\[/);
   const componentEnum = listAfter(read("../schemas/admin/section_components.ts"), /\.enum\(\[/);

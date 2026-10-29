@@ -21,6 +21,10 @@ export default defineTable({
     default_theme: json(),
     // { [sectionKey]: componentId }, e.g. { opening: 'opening_curtain', gallery: 'gallery_grid' }
     default_components: json(),
+    // Nullable. [{ section_key, enabled }]: the template's section order and which sections
+    // start on. null/empty = fixed SECTION_KEYS order, all enabled. Validated on write in
+    // the API (utils/section-keys.ts); unknown keys are ignored on read.
+    default_sections: json(),
     status: string().enum(['active', 'inactive']).default('active'),
   },
 });

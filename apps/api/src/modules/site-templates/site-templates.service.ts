@@ -1,6 +1,7 @@
 import { ValidationError } from "longcelot-sheet-db";
 import { isReservedSlug, isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
 import { TtlCache } from "../../utils/ttl-cache.js";
+import { validateDefaultSections, type DefaultSection } from "../../utils/section-keys.js";
 import { SiteTemplatesModel } from "./site-templates.model.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
@@ -18,6 +19,7 @@ export interface CreateSiteTemplateInput {
   description?: string;
   default_theme: Theme;
   default_components: Record<string, string>;
+  default_sections?: unknown;
 }
 
 export interface UpdateSiteTemplateInput {
@@ -26,6 +28,8 @@ export interface UpdateSiteTemplateInput {
   description?: string;
   default_theme?: Theme;
   default_components?: Record<string, string>;
+  /** `null` or `[]` clears it (back to the fixed order, all enabled). */
+  default_sections?: unknown;
   status?: string;
 }
 
@@ -87,6 +91,14 @@ async function assertSlugAvailable(slug: string, templateId: string) {
   }
 }
 
+function cleanDefaultSections(value: unknown): DefaultSection[] | null {
+  try {
+    return validateDefaultSections(value);
+  } catch (err) {
+    throw new SiteTemplateInputError((err as Error).message, 400);
+  }
+}
+
 function invalidate() {
   activeCatalogCache.clear();
   PublicSiteCache.invalidateAll();
@@ -121,10 +133,12 @@ export const SiteTemplatesService = {
 
   async create(input: CreateSiteTemplateInput) {
     const slug = normalizeSlug(input.slug);
+    const defaultSections = cleanDefaultSections(input.default_sections);
     await assertSlugAvailable(slug, input.template_id);
     try {
       const created = await SiteTemplatesModel.create({
         ...input,
+        default_sections: defaultSections,
         slug,
         status: "active",
       });
@@ -138,6 +152,9 @@ export const SiteTemplatesService = {
 
   async update(templateId: string, input: UpdateSiteTemplateInput) {
     const data: Record<string, unknown> = { ...input };
+    if (input.default_sections !== undefined) {
+      data.default_sections = cleanDefaultSections(input.default_sections);
+    }
     if (input.slug !== undefined) {
       const slug = normalizeSlug(input.slug);
       await assertSlugAvailable(slug, templateId);

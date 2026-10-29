@@ -3,6 +3,11 @@ import { ValidationError } from "longcelot-sheet-db";
 import { isReservedSlug, isValidCustomSlug, normalizeSlug } from "../../utils/slug.js";
 import { CoupleWebsiteModel } from "./couple-website.model.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
+import {
+  SECTION_KEYS,
+  layoutFromDefaults,
+  parseDefaultSections,
+} from "../../utils/section-keys.js";
 import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
 
 /**
@@ -10,30 +15,17 @@ import { SiteTemplatesService } from "../site-templates/site-templates.service.j
  * - `keep_content`: clears per-section `component_id` / `color_override` and the
  *   profile `theme_override` (so the template's look applies fully) but keeps `content`.
  * - `reset_all`: also clears every section's `content`.
+ *
+ * Section order and on/off flags: when the template has `default_sections`, `reset_all`
+ * also resets every section's `display_order` and `enabled` from it (sections the
+ * template omits go disabled at the end). `keep_content` never touches them. A template
+ * without `default_sections` leaves order and flags alone in both modes.
  */
 export type ApplyTemplateMode = "keep_content" | "reset_all";
 export const APPLY_TEMPLATE_MODES: readonly ApplyTemplateMode[] = ["keep_content", "reset_all"];
 export const DEFAULT_APPLY_TEMPLATE_MODE: ApplyTemplateMode = "keep_content";
 
 export class TemplateNotAvailableError extends Error {}
-
-// Mirrors SECTION_KEYS in packages/templates/src/types.ts — kept as a plain
-// constant here since the API is framework-agnostic and shouldn't depend on the
-// React-rendering template package.
-const SECTION_KEYS = [
-  "opening",
-  "hero",
-  "verse",
-  "story",
-  "gallery",
-  "details",
-  "rsvp",
-  "registry",
-  "timeline",
-  "music",
-  "guestbook",
-  "footer",
-] as const;
 
 function toComparableTime(value: unknown): number {
   if (typeof value !== "string" || !value) return Number.POSITIVE_INFINITY;
@@ -70,7 +62,14 @@ export const CoupleWebsiteService = {
       CoupleWebsiteModel.findTemplates(),
       CoupleWebsiteModel.findComponents(),
     ]);
-    return { templates, components };
+    // default_sections is normalised on read (unknown keys dropped; null when unusable).
+    return {
+      templates: templates.map((t) => ({
+        ...t,
+        default_sections: parseDefaultSections(t.default_sections),
+      })),
+      components,
+    };
   },
 
   async getSettings(coupleId: string, actorSheetId: string) {
@@ -111,7 +110,7 @@ export const CoupleWebsiteService = {
       throw new TemplateNotAvailableError("That template isn't available");
     }
     try {
-      await CoupleWebsiteService.selectTemplateUncached(actorSheetId, templateId, mode);
+      await CoupleWebsiteService.selectTemplateUncached(actorSheetId, templateId, mode, template);
     } finally {
       PublicSiteCache.invalidateActorSheet(actorSheetId);
     }
@@ -121,11 +120,23 @@ export const CoupleWebsiteService = {
     actorSheetId: string,
     templateId: string,
     mode: ApplyTemplateMode = DEFAULT_APPLY_TEMPLATE_MODE,
+    templateRow?: Record<string, unknown> | null,
   ) {
-    const [profile, existingSections] = await Promise.all([
+    const [profile, existingSections, template] = await Promise.all([
       CoupleWebsiteModel.findProfile(actorSheetId),
       CoupleWebsiteModel.findSections(actorSheetId),
+      templateRow === undefined ? CoupleWebsiteModel.findTemplateById(templateId) : templateRow,
     ]);
+    const defaults = parseDefaultSections(template?.default_sections);
+    // key -> { position, enabled } in the template's layout; null = template has no default_sections.
+    const layout = defaults
+      ? new Map(
+          layoutFromDefaults(defaults).map((d, index) => [
+            d.section_key as string,
+            { index, enabled: d.enabled },
+          ]),
+        )
+      : null;
     // Section clears go first and are all awaited (allSettled) before anything else is
     // written: if any fail we stop with the profile still on the old template, so the
     // couple keeps a consistent old look instead of a new template over half-cleared
@@ -137,6 +148,13 @@ export const CoupleWebsiteService = {
       if (isSet(section.component_id)) patch.component_id = null;
       if (isSet(section.color_override)) patch.color_override = null;
       if (clearContent && isSet(section.content)) patch.content = null;
+      const target = clearContent ? layout?.get(section.section_key as string) : undefined;
+      if (target) {
+        if (!isSet(section.display_order) || Number(section.display_order) !== target.index) {
+          patch.display_order = target.index;
+        }
+        if (section.enabled !== target.enabled) patch.enabled = target.enabled;
+      }
       return Object.keys(patch).length > 0
         ? [CoupleWebsiteModel.updateSection(actorSheetId, section.section_id as string, patch)]
         : [];
@@ -162,22 +180,38 @@ export const CoupleWebsiteService = {
     const existingKeys = new Set(existingSections.map((section) => section.section_key as string));
     const missingKeys = SECTION_KEYS.filter((sectionKey) => !existingKeys.has(sectionKey));
     if (missingKeys.length > 0) {
-      // One batched append instead of N sequential creates — each create() was
-      // its own round trip to the Sheets API, so a couple selecting a template
-      // for the first time was paying for up to SECTION_KEYS.length (9)
-      // sequential network calls in series before the request could respond,
-      // and any single one of those calls failing/timing out took the whole
-      // request down with it. createMany() still validates each row the same
-      // way create() does — it just appends them in one call.
+      // One batched append instead of N sequential creates (each create() is its own
+      // Sheets round trip). createMany() still validates each row like create() does.
       const nextOrderStart = existingSections.length;
+      let rows: {
+        section_key: string;
+        display_order: number;
+        enabled: boolean;
+      }[];
+      if (layout && (existingSections.length === 0 || clearContent)) {
+        // Template layout: first pick (or reset_all) places rows at the template's
+        // positions with its flags; existing rows were moved to the same positions above.
+        const ordered = [...layout.entries()].filter(([key]) => !existingKeys.has(key));
+        rows = ordered.map(([key, target]) => ({
+          section_key: key,
+          display_order: target.index,
+          enabled: target.enabled,
+        }));
+      } else {
+        // No template layout: today's behavior (appended, enabled). With a layout but an
+        // existing partial set under keep_content: appended disabled, like listSections().
+        const layoutOrder = layout ? [...layout.keys()] : [...SECTION_KEYS];
+        rows = layoutOrder
+          .filter((key) => !existingKeys.has(key))
+          .map((key, offset) => ({
+            section_key: key,
+            display_order: nextOrderStart + offset,
+            enabled: !layout,
+          }));
+      }
       await CoupleWebsiteModel.createSections(
         actorSheetId,
-        missingKeys.map((sectionKey, offset) => ({
-          section_id: randomUUID(),
-          section_key: sectionKey,
-          display_order: nextOrderStart + offset,
-          enabled: true,
-        })),
+        rows.map((row) => ({ section_id: randomUUID(), ...row })),
       );
     }
   },
@@ -289,7 +323,9 @@ export const CoupleWebsiteService = {
     try {
       await Promise.all(
         sectionIds.map((sectionId, index) =>
-          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, { display_order: index }),
+          CoupleWebsiteModel.updateSection(actorSheetId, sectionId, {
+            display_order: index,
+          }),
         ),
       );
     } finally {

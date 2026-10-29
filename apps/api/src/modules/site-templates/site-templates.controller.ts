@@ -15,8 +15,15 @@ export const SiteTemplatesController = {
   },
 
   async create(req: Request, res: Response) {
-    const { template_id, name, slug, description, default_theme, default_components } =
-      req.body ?? {};
+    const {
+      template_id,
+      name,
+      slug,
+      description,
+      default_theme,
+      default_components,
+      default_sections,
+    } = req.body ?? {};
     if (typeof template_id !== "string" || typeof name !== "string" || typeof slug !== "string") {
       res.status(400).json({ error: "template_id, name and slug are required" });
       return;
@@ -25,7 +32,9 @@ export const SiteTemplatesController = {
       (description !== undefined && typeof description !== "string") ||
       (req.body?.status !== undefined && !STATUSES.includes(req.body.status))
     ) {
-      res.status(400).json({ error: "description must be a string and status active or inactive" });
+      res.status(400).json({
+        error: "description must be a string and status active or inactive",
+      });
       return;
     }
     try {
@@ -36,6 +45,7 @@ export const SiteTemplatesController = {
         description,
         default_theme: default_theme ?? {},
         default_components: default_components ?? {},
+        default_sections,
       });
       res.status(201).json({ template });
     } catch (err) {
@@ -48,7 +58,8 @@ export const SiteTemplatesController = {
   },
 
   async update(req: Request, res: Response) {
-    const { name, slug, description, default_theme, default_components, status } = req.body ?? {};
+    const { name, slug, description, default_theme, default_components, default_sections, status } =
+      req.body ?? {};
     if (
       (slug !== undefined && typeof slug !== "string") ||
       (description !== undefined && typeof description !== "string") ||
@@ -65,6 +76,7 @@ export const SiteTemplatesController = {
     if (description !== undefined) input.description = description;
     if (default_theme !== undefined) input.default_theme = default_theme;
     if (default_components !== undefined) input.default_components = default_components;
+    if (default_sections !== undefined) input.default_sections = default_sections;
     if (status !== undefined) input.status = status;
 
     try {

@@ -4,9 +4,9 @@
 - **Repo:** apps/api
 - **Owner:** SNLRLONG
 - **Tier:** T3 · changes what data couples receive when they pick a template, admin-sheet schema field (auto picker) (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/template-default-sections/` · **Branch:** `feat/template-default-sections` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-29
+- **Claimed by:** sub-agent (API-template-default-sections), 2026-10-29
+- **Worktree:** `Mongkolka/template-default-sections/` · **Branch:** `feat/template-default-sections`
+- **Started / updated:** 2026-10-29 / 2026-10-29
 - **Docs:** Tasks/_plans/Web-grace-wedding-template.md, docs/tasks/template.md, docs/backend-schema.md
 - **Depends on:** Web-section-keys-verse-footer (same service file)
 - **Touches:** apps/api/schemas/admin/site_templates.ts, apps/api/src/modules/site-templates (service, model, controller), apps/api/src/modules/couple-website/couple-website.service.ts (selectTemplateUncached, reset_all), apps/api/seeds/site-templates.ts, docs/backend-schema.md, docs/tasks/template.md

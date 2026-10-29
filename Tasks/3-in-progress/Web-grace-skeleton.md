@@ -4,9 +4,9 @@
 - **Repo:** packages/templates, apps/api seeds
 - **Owner:** SNLRLONG
 - **Tier:** T2 · registry, i18n and seed rows (auto picker) (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
-- **Worktree:** `Mongkolka/grace-skeleton/` · **Branch:** `feat/grace-skeleton` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-29
+- **Claimed by:** sub-agent (Web-grace-skeleton), 2026-10-29
+- **Worktree:** `Mongkolka/grace-skeleton/` · **Branch:** `feat/grace-skeleton`
+- **Started / updated:** 2026-10-29 / 2026-10-29
 - **Docs:** Tasks/_plans/Web-grace-wedding-template.md, docs/tasks/template.md, docs/backend-schema.md
 - **Depends on:** Web-section-keys-verse-footer, Web-grace-primitives
 - **Touches:** packages/templates/src/registry.ts, packages/templates/src/i18n.tsx, packages/templates/src/sections/grace/*.tsx (stubs), apps/api/seeds/section-components.ts, apps/api/seeds/site-templates.ts

@@ -14,7 +14,7 @@
 Make the Grace pink, gold and white template work as one whole page and ready for the owner to review: darken the shared foil text, wire the footer credit link from the web app, make the template preview pages show every section including the guest photo wall, run a whole-page QA at phone, tablet and desktop in English and Khmer, fix integration issues found, and write the owner's step-by-step to see it. Do NOT flip the template or its component rows to active (the owner does that after reviewing).
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (no runner for templates)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc clean in templates, web, couple, api, admin; eslint grace + touched web paths clean; next build web and couple pass first try)  - [x] G3 tests (API 96/96 incl. the seed guard; none for templates: no runner)  - [~] G4 run it (whole flow walked with headless Chrome over CDP against a stub API and the real pages: ?to=Sokha, open, every section, lightbox, guestbook wish + photo, RSVP; full-page screenshots at 390/820/1200 px en and kh and 667x375 landscape with reduced motion; the author read only part of the screenshots)
 - [ ] G5 code review  - [ ] G6 security (if auth/data/input)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (owner looks at the template)  - [ ] G11 changelog
 
@@ -27,3 +27,12 @@ Make the Grace pink, gold and white template work as one whole page and ready fo
 - [ ] Template and component rows still inactive in the seeds (the seed test guards it)
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-30
+Built in commit 177fd5a on `feat/grace-launch` (agent was interrupted once by a network error and resumed). Foil text: new `foilTextGradient` in shared.tsx, lightest stop 88% accent = 3.88:1 on #fff3f6 and 4.20:1 on white (before 2.29:1 and 2.48:1); `FoilText` API unchanged with the solid accent fallback. Footer credit: `apps/web/src/lib/brand-url.ts` builds the URL from ROOT_DOMAIN (http for localhost, https otherwise, undefined when unset) and passes it from [slug]/page.tsx to SiteView and extraProps("footer"); both template preview pages pass it too; footer_classic ignores it. Previews: SAMPLE_GUESTBOOK (6 photos, 4 wishes), SAMPLE_GUESTBOOK_ACTIONS and sampleGuestbookSubmit (resolves `pending`); `?to=`/`?name=` work on /templates/preview/[slug]; the preview uses the template's default_sections when present, otherwise all 12 sections.
+OPEN: the public API does not return `default_sections` (allowlist), so on the real API the preview shows registry, timeline and music (sample content exists) and puts RSVP before guestbook; fix is one line: add "default_sections" to PUBLIC_FIELDS in site-templates.service.ts (and update the test that asserts it is NOT exposed).
+Integration fixes made after looking at screenshots: five pink sections in a row (verse, gallery and footer are now white so the grounds alternate); doubled crosses (cross above heading plus a cross divider -> diamond divider); inconsistent headings unified to the script foil style; lone third gallery photo centred; gallery 3 columns from 640 px up; guestbook wall 2 columns on phones and 3 from 640 px up; footer "&" spacing.
+Contrast on the final page at 1200 px: DOM script over 65 text nodes, none below 4.5:1 (3:1 large); lowest 4.95:1 (gold on pink). The script skips aria-hidden text (hero SCROLL hint, opening gate text; the gate names are foil text, covered by the numbers above).
+Owner docs: docs/tasks/template.md (new Grace section) and docs/grace-template-howto.md (steps a-f). All seed statuses still inactive; no seeds run.
+Not verified: real API data and uploads (stub only), real iPhone/Android Safari, a screen reader, native-speaker Khmer review, the author did not read all screenshots end to end (read: English 390 px sections, English 820 px down to the guestbook, Khmer 1200 px hero/verse/story/guestbook, landscape opening and hero); stub photos repeat three images.
+Next: G5 review, G7, G8, G9 (owner looks at the template), G11.

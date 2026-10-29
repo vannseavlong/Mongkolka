@@ -21,7 +21,7 @@ Wire the whole Grace pack once, so the five section tasks only touch their own f
 - Nothing is run against live sheets; list the seed command for the owner.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
+- [x] G1 scope  - [x] G2 static (tsc clean templates, api, couple, web; eslint grace/registry/i18n and api tests clean; next build web and couple compile)  - [x] G3 tests (API 58/58 incl. the new seed test; none for templates: no runner)  - [~] G4 run it (temporary static page and SSR script rendered all nine stubs, en and kh; real /templates, preview route and builder not opened)
 - [ ] G5 code review  - [ ] G6 security (if auth/data/input)  - [ ] G7 docs sync
 - [ ] G8 PR message  - [ ] G9 human review (optional)  - [ ] G11 changelog
 
@@ -32,3 +32,9 @@ Wire the whole Grace pack once, so the five section tasks only touch their own f
 - [ ] Typecheck and build pass for templates, couple and web
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Status 2026-10-29
+Built in commit 2ef2855 on `feat/grace-skeleton`, not merged. Nine stub components in `sections/grace/` (GraceOpening, GraceHero, GraceVerse, GraceStory, GraceGallery, GraceDetails, GraceRsvp, GraceGuestbook, GraceFooter; each with a `// STUB: replaced by <task>` comment, final props contract, themed placeholder), registered in registry.ts; i18n.tsx now spreads GRACE_EN/GRACE_KH (dictionary renamed baseDictionary; TranslationKey is `keyof base.en | grace.${string}`, so non-grace keys stay strict; `t` falls back to the key); one stub string key per section in each strings file; nine section_components seed rows; `grace_blush` template row (inactive; slug pink-gold-white; default_theme #fff3f6 / #4a2c35 / #8a6418; default_components as planned; default_sections opening, hero, verse, story, gallery, details, guestbook, rsvp enabled, registry, timeline, music disabled, footer last); new `apps/api/tests/grace-template-seed.test.ts`.
+How later tasks plug in: each owns only its files in `sections/grace/` and `strings/`; keep the exported name and props; string keys must start with `grace.<section>.`; do not touch registry.ts, i18n.tsx or the seeds.
+Not verified: real /templates, preview route, builder variant browser (template inactive, needs live API), clicking through the opening, seeding (the `default_sections` column comes from API-template-default-sections; Sheets json array acceptance unknown). No seed command was found or run; the usual one is `npx lsdb seed seeds/<file>.ts --upsert` from apps/api.
+Next: G5 review, G7, G8, G11.

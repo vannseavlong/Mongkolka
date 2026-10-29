@@ -42,3 +42,9 @@ RELEASE NOTE: schema sync required for the couple `website_sections.section_key`
 Not verified: public site render, kh path of the new components, Khmer field in a browser, live API/sheets. Tests deferred for couple/templates/web.
 Process note: the builder briefly navigated another agent's shared browser tab (3058) to its own URL; no repo effect.
 Next: G5 review, G7, G8, G11.
+
+## Review 2026-10-29 (fresh agent, G5; tsc clean in 5 packages, API tests 54/54; ran the public site against a stub)
+No blockers; not ready for testing until the should-fix items are done. Verified: all key lists the author touched are consistent (templates, API mirror, both enums, couple list and labels, content-editable list, registry, seeds, docs); public site renders verse and footer end to end in English and `?lang=kh` (XSS escaped, null content safe, partial footer fine); four verses checked against bible-api.com KJV match (Genesis 2:24 and Colossians 3:14 not checked); with onSchemaMismatch 'warn' writes with the new keys still succeed before sync (the app-level enum check uses the new schema; Sheets appends RAW), every request logs a mismatch warning until `lsdb sync`.
+Sent back: 1 missed key lists (API section-components SECTIONS, admin section-components WEBSITE_SECTIONS: admin cannot create a verse or footer variant or set it as a template default; test does not cover these); 2 SAMPLE_CONTENT has no verse or footer (blank tiles and previews); 3 verse preset leaves a stale textKh and the select cannot re-apply a preset; 4 long hashtag overflows at 320 px, no max lengths.
+Nits sent back: accent small-text contrast (about 2.2:1 with a sample theme), verse semantics, footer date not localized in Khmer, docs note about ordering for existing couples. Skipped: "Partner One" fallback in the footer (same as existing hero behavior).
+Scope note: the fix touches apps/admin and apps/api/src/modules/section-components, which were not in the original Touches.

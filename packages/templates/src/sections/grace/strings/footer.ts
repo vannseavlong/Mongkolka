@@ -1,5 +1,10 @@
-// Scaffold: the section task owns this file. The stub only needs the `grace.footer.stub` key.
 export const strings = {
-  en: { "grace.footer.stub": "Footer" } as Record<string, string>,
-  kh: { "grace.footer.stub": "បាតទំព័រ" } as Record<string, string>,
+  en: {
+    "grace.footer.together": "Together with love",
+    "grace.footer.credit": "Made with Mongkolka",
+  } as Record<string, string>,
+  kh: {
+    "grace.footer.together": "ដោយក្តីស្រឡាញ់",
+    "grace.footer.credit": "បង្កើតដោយ Mongkolka",
+  } as Record<string, string>,
 };

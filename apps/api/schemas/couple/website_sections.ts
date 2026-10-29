@@ -7,7 +7,7 @@ export default defineTable({
   columns: {
     section_id: string().required().unique(),
     section_key: string()
-      .enum(['opening', 'hero', 'story', 'gallery', 'details', 'rsvp', 'registry', 'timeline', 'music', 'guestbook'])
+      .enum(['opening', 'hero', 'verse', 'story', 'gallery', 'details', 'rsvp', 'registry', 'timeline', 'music', 'guestbook', 'footer'])
       .required(),
     // Overrides the site template's default_components[section_key]. Not a ref() —
     // section_components lives in the admin sheet, a different physical spreadsheet.

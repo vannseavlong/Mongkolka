@@ -10,6 +10,7 @@ export type PartialTheme = Partial<Theme>;
 export const SECTION_KEYS = [
   "opening",
   "hero",
+  "verse",
   "story",
   "gallery",
   "details",
@@ -18,6 +19,7 @@ export const SECTION_KEYS = [
   "timeline",
   "music",
   "guestbook",
+  "footer",
 ] as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -34,6 +36,17 @@ export interface HeroContent {
 
 export interface StoryContent {
   loveStory?: string;
+}
+
+export interface VerseContent {
+  text?: string;
+  reference?: string;
+  textKh?: string;
+}
+
+export interface FooterContent {
+  message?: string;
+  hashtag?: string;
 }
 
 export interface GalleryContent {

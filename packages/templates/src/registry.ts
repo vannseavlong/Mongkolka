@@ -29,6 +29,8 @@ import { TimelineHorizontal } from "./sections/timeline/Horizontal";
 import { MusicClassic } from "./sections/music/Classic";
 import { MusicPlayerbar } from "./sections/music/Playerbar";
 import { MusicMinimal } from "./sections/music/Minimal";
+import { VerseClassic } from "./sections/verse/Classic";
+import { FooterClassic } from "./sections/footer/Classic";
 import { Seal } from "./sections/ink/Seal";
 import { HeroFolio } from "./sections/ink/Folio";
 import { StoryManuscript } from "./sections/ink/Manuscript";
@@ -66,6 +68,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_fullbleed: HeroFullbleed,
     hero_folio: HeroFolio,
     hero_kbach: HeroKbach,
+  },
+  verse: {
+    verse_classic: VerseClassic,
   },
   story: {
     story_classic: StoryClassic,
@@ -113,6 +118,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   },
   guestbook: {
     guestbook_wall: GuestbookWall,
+  },
+  footer: {
+    footer_classic: FooterClassic,
   },
 };
 

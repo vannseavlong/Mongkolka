@@ -23,6 +23,7 @@ export class TemplateNotAvailableError extends Error {}
 const SECTION_KEYS = [
   "opening",
   "hero",
+  "verse",
   "story",
   "gallery",
   "details",
@@ -31,6 +32,7 @@ const SECTION_KEYS = [
   "timeline",
   "music",
   "guestbook",
+  "footer",
 ] as const;
 
 function toComparableTime(value: unknown): number {

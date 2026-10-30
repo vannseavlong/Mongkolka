@@ -54,43 +54,52 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
           const isCurrent = variant.component_id === currentId;
           const isDefault = variant.component_id === defaultId;
           return (
-            <li key={variant.component_id}>
-              <button
-                type="button"
-                aria-pressed={isCurrent}
-                // aria-disabled, not disabled, so focus and aria-pressed survive.
-                aria-disabled={isCurrent}
-                onClick={() =>
-                  !isCurrent &&
-                  // Choosing the template's own default stores null so the
-                  // section keeps following the template if it changes.
-                  patchSection(
-                    { component_id: isDefault ? null : variant.component_id },
-                    `Could not switch to ${variant.name}`,
-                  )
-                }
-                className={cn(
-                  "flex w-full flex-col gap-2 rounded-lg border p-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                  isCurrent ? "cursor-default border-primary ring-2 ring-primary/30" : "hover:border-foreground/40",
-                )}
-              >
-                <SectionPreview
-                  section={section}
-                  componentId={variant.component_id}
-                  template={template}
-                  themeOverride={themeOverride}
-                  profile={profile}
-                />
-                <span className="flex flex-wrap items-center gap-1.5 px-0.5">
-                  <span className="text-sm font-medium">{variant.name}</span>
-                  {isCurrent && (
-                    <Badge>
-                      <Check className="size-3" /> Current
-                    </Badge>
+            <li
+              key={variant.component_id}
+              className={cn(
+                "relative flex w-full flex-col gap-2 rounded-lg border p-2 text-left transition-colors",
+                isCurrent ? "border-primary ring-2 ring-primary/30" : "hover:border-foreground/40",
+              )}
+            >
+              {/* The preview renders real template markup (which has its own
+                  buttons), so it must sit beside the card's button, not inside it. */}
+              <SectionPreview
+                section={section}
+                componentId={variant.component_id}
+                template={template}
+                themeOverride={themeOverride}
+                profile={profile}
+              />
+              <span className="flex flex-wrap items-center gap-1.5 px-0.5">
+                <button
+                  type="button"
+                  aria-pressed={isCurrent}
+                  // aria-disabled, not disabled, so focus and aria-pressed survive.
+                  aria-disabled={isCurrent}
+                  onClick={() =>
+                    !isCurrent &&
+                    // Choosing the template's own default stores null so the
+                    // section keeps following the template if it changes.
+                    patchSection(
+                      { component_id: isDefault ? null : variant.component_id },
+                      `Could not switch to ${variant.name}`,
+                    )
+                  }
+                  // The ::after stretches the hit area over the whole card.
+                  className={cn(
+                    "text-sm font-medium after:absolute after:inset-0 after:rounded-lg focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ring",
+                    isCurrent && "cursor-default after:cursor-default",
                   )}
-                  {isDefault && <Badge variant="secondary">Template default</Badge>}
-                </span>
-              </button>
+                >
+                  {variant.name}
+                </button>
+                {isCurrent && (
+                  <Badge>
+                    <Check className="size-3" /> Current
+                  </Badge>
+                )}
+                {isDefault && <Badge variant="secondary">Template default</Badge>}
+              </span>
             </li>
           );
         })}

@@ -77,6 +77,8 @@ export const SectionPreview = memo(function SectionPreview({
     <div
       ref={ref}
       aria-hidden="true"
+      // Purely visual: keeps buttons inside the template (e.g. the envelope) out of the tab order.
+      inert
       className="relative w-full overflow-hidden rounded-md border bg-muted"
       style={{ height: width * ASPECT || undefined, aspectRatio: width ? undefined : "16 / 10" }}
     >

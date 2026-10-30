@@ -134,7 +134,6 @@
       "ClaudeInChromeDomain(localhost:3781)"
     ],
     "additionalDirectories": [
-      "/Users/suntel/personal/Mongkolka/Clone-UI/src/app/components/ui",
       "/Users/suntel/personal/Mongkolka/apps/web/src/app"
     ]
   }

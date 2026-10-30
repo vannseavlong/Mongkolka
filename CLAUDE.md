@@ -10,7 +10,7 @@ pnpm + Turborepo monorepo (Node >= 20). Single repo, so root repo and product re
 ## Commands
 `pnpm dev`, `pnpm build`, `pnpm lint`, `pnpm format`
 
-Task prefixes: `Web`, `API`, `Admin`. Reference clones in `Clone-UI/` and `Clone-Admin/` are not product code.
+Task prefixes: `Web`, `API`, `Admin`.
 
 ## Agent rules
 

@@ -1,0 +1,22 @@
+{
+  "hosting": [
+    {
+      "target": "admin",
+      "public": "apps/admin/out",
+      "cleanUrls": true,
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [
+        { "source": "/_next/static/**", "headers": [{ "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }] }
+      ]
+    },
+    {
+      "target": "couple",
+      "public": "apps/couple/out",
+      "cleanUrls": true,
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [
+        { "source": "/_next/static/**", "headers": [{ "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }] }
+      ]
+    }
+  ]
+}

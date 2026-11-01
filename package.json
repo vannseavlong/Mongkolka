@@ -11,8 +11,8 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "deploy:admin": "turbo run build --filter=@mongkolka/admin && firebase deploy --only hosting:admin",
-    "deploy:couple": "turbo run build --filter=@mongkolka/couple && firebase deploy --only hosting:couple"
+    "deploy:admin": "turbo run build --filter=admin && firebase deploy --only hosting:admin",
+    "deploy:couple": "turbo run build --filter=couple && firebase deploy --only hosting:couple"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

@@ -1,0 +1,12 @@
+{
+  "projects": { "default": "longcelot-eco-system" },
+  "targets": {
+    "longcelot-eco-system": {
+      "hosting": {
+        "web": ["mongkolka"],
+        "admin": ["admin-mongkolka"],
+        "couple": ["couple-mongkolka"]
+      }
+    }
+  }
+}

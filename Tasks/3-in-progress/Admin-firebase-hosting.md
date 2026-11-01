@@ -1,5 +1,6 @@
 # Admin-firebase-hosting
 
+- **ID:** T-0035
 - **Repo:** apps/admin, apps/couple (+ root firebase config)
 - **Owner:** SNLRLONG
 - **Tier:** T3 · release/deploy files, hosting release (auto picker, see `PIPELINE.md`)

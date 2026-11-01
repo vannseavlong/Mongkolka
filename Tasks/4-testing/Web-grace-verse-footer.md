@@ -1,5 +1,6 @@
 # Web-grace-verse-footer
 
+- **ID:** T-0041
 - **Repo:** packages/templates
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new components in a shared package (auto picker, see `PIPELINE.md`)

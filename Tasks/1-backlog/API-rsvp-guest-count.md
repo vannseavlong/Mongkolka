@@ -1,5 +1,6 @@
 # API-rsvp-guest-count
 
+- **ID:** T-0034
 - **Repo:** apps/api (+ packages/templates, apps/web, apps/couple)
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new field on a public endpoint and the guests table (auto picker, see `PIPELINE.md`; T3 if it changes the guests schema or personal-data export)

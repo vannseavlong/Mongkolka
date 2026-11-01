@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-02 · [Cross] chore: Firebase Hosting for admin and couple, API on Render
+- Owner: SNLRLONG
+- Task: Tasks/6-deploy/Admin-firebase-hosting.md
+- Branch/PR: feat/firebase-hosting · #1
+- What changed: admin and couple build as static exports and deploy to admin-mongkolka.web.app and couple-mongkolka.web.app (`pnpm deploy:admin`, `pnpm deploy:couple`); `firebase.json`, `.firebaserc` and `render.yaml` added; API live on Render free at https://mongkolka-api.onrender.com (Google Sheets via lsdb, tokens in a Render Secret File)
+- Needs: web (mongkolka.web.app) and vendor not deployed yet; uploads on Render are local disk and lost on restart until R2 is set (see Tasks/2-todo/API-render-hardening.md)
+
 ## 2026-10-30 · [Cross] feat: Grace template launch prep (foil text, brand link, previews, how-to)
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-grace-qa-launch.md

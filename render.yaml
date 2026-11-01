@@ -1,0 +1,48 @@
+# Render Blueprint for the API (free plan). Secrets are set in the Render dashboard (sync: false).
+services:
+  - type: web
+    name: mongkolka-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter api build
+    startCommand: pnpm --filter api start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PHOTO_STORAGE
+        value: local
+      # Render Secret File holding the contents of apps/api/.lsdb-tokens.json
+      - key: LSDB_TOKENS_FILE
+        value: /etc/secrets/.lsdb-tokens.json
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: ADMIN_GOOGLE_REDIRECT_URI
+        sync: false
+      - key: COUPLE_GOOGLE_REDIRECT_URI
+        sync: false
+      - key: VENDOR_GOOGLE_REDIRECT_URI
+        sync: false
+      - key: ADMIN_FRONTEND_URL
+        value: https://admin-mongkolka.web.app
+      - key: COUPLE_FRONTEND_URL
+        value: https://couple-mongkolka.web.app
+      - key: VENDOR_FRONTEND_URL
+        value: https://vendor-mongkolka.web.app
+      - key: ADMIN_SHEET_ID
+        sync: false
+      - key: DEV_COUPLE_SHEET_ID
+        sync: false
+      - key: DEV_VENDOR_SHEET_ID
+        sync: false
+      - key: SUPER_ADMIN_EMAIL
+        sync: false

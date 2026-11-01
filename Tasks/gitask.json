@@ -18,5 +18,20 @@
     "6-deploy": {
       "color": "#2aa198"
     }
-  }
+  },
+  "people": [
+    {
+      "id": "snlrlong",
+      "name": "SNLRLONG"
+    },
+    {
+      "id": "longcelot",
+      "name": "LONGCELOT"
+    },
+    {
+      "id": "vann-seavlong",
+      "name": "VANN Seavlong",
+      "github": "vannseavlong"
+    }
+  ]
 }

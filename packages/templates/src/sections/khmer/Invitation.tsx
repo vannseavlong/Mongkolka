@@ -1,9 +1,15 @@
 "use client";
 
-import type { CoupleInfo, InvitationContent, InvitationParty, Theme } from "../../types";
+import type { CoupleInfo, InvitationContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
-import { pickLang } from "./skin-logic";
-import { GoldRule, StubSection, useHeadingFont } from "./stub-parts";
+import { CINZEL_FONT, MOUL_FONT } from "../../chrome/fonts";
+import { withAlpha } from "../../chrome/gold";
+import { Countdown } from "./Countdown";
+import { OrnateSection } from "./OrnateSection";
+import { buildInvitationView, type InvitationBlock } from "./invitation-logic";
+import type { FamilyView } from "./lineage";
+import { useSkinOrnaments } from "./skin-context";
+import { textFor } from "./strings";
 
 export interface InvitationKhmerProps {
   couple: CoupleInfo;
@@ -11,22 +17,34 @@ export interface InvitationKhmerProps {
   content?: InvitationContent;
 }
 
-function Family({ party, side, theme }: { party?: InvitationParty; side: "groom" | "bride"; theme: Theme }) {
-  const { t, language } = useLanguage();
-  const headingFont = useHeadingFont();
-  if (!party) return null;
-  const father = pickLang(language, party.fatherKh, party.fatherEn);
-  const mother = pickLang(language, party.motherKh, party.motherEn);
-  const name = pickLang(language, party.nameKh, party.nameEn);
+const SCRIPT = 'var(--font-script), "Great Vibes", cursive';
+
+function Family({ family, lang, theme }: { family: FamilyView | null; lang: "en" | "kh"; theme: Theme }) {
+  const sk = useSkinOrnaments();
+  if (!family) return <div />;
+  const label = textFor(lang, family.side === "groom" ? "khmer.invitation.son" : "khmer.invitation.daughter");
   return (
-    <div className="flex-1 space-y-1 text-sm leading-relaxed">
-      {father && <p className="m-0">{father}</p>}
-      {mother && <p className="m-0">{mother}</p>}
-      {name && (
+    <div className="min-w-0 space-y-1.5 text-[13px] leading-relaxed sm:text-sm">
+      {family.parents.map((line) => (
+        <p key={line} className="m-0 break-words">
+          {line}
+        </p>
+      ))}
+      {family.name && (
         <>
-          <p className="m-0 pt-2 opacity-70">{t(side === "groom" ? "khmer.invitation.son" : "khmer.invitation.daughter")}</p>
-          <p className="m-0 text-lg" style={{ fontFamily: headingFont, color: theme.accent_color }}>
-            {name}
+          <p className="m-0 pt-3 text-xs opacity-75">{label}</p>
+          <p
+            className="m-0 break-words"
+            style={{
+              ...sk.heading(theme, lang),
+              fontFamily: lang === "kh" ? MOUL_FONT : SCRIPT,
+              fontSize: lang === "kh" ? "1.05rem" : "1.7rem",
+              letterSpacing: "normal",
+              textTransform: "none",
+              lineHeight: lang === "kh" ? 1.9 : 1.25,
+            }}
+          >
+            {family.name}
           </p>
         </>
       )}
@@ -34,39 +52,83 @@ function Family({ party, side, theme }: { party?: InvitationParty; side: "groom"
   );
 }
 
+function Block({ block, theme }: { block: InvitationBlock; theme: Theme }) {
+  return (
+    <div lang={block.lang === "kh" ? "km" : "en"}>
+      <p className="m-0 mb-6 text-sm italic leading-loose opacity-90">{block.greeting}</p>
+      <div className="grid items-start gap-3" style={{ gridTemplateColumns: "minmax(0,1fr) auto minmax(0,1fr)" }}>
+        <Family family={block.groom} lang={block.lang} theme={theme} />
+        <div aria-hidden className="mx-auto h-full w-px self-stretch" style={{ minHeight: 64, backgroundImage: `linear-gradient(180deg, transparent, ${withAlpha(theme.accent_color, 0.75)}, transparent)` }} />
+        <Family family={block.bride} lang={block.lang} theme={theme} />
+      </div>
+    </div>
+  );
+}
+
 /**
- * PLACEHOLDER (Web-khmer-core-sections builds the real one): groom's family left, bride's right, lunar and
- * solar date below. Returns nothing when the couple has not filled it in. No countdown yet.
+ * The formal invitation: crest, then one block per language (yours first) with the groom's family
+ * on the left and the bride's on the right, the Khmer lunar and solar date, and a live countdown.
+ * Returns nothing until the couple has filled something in.
  */
-export function InvitationKhmer({ theme, content }: InvitationKhmerProps) {
+export function InvitationKhmer({ couple, theme, content }: InvitationKhmerProps) {
   const { t, language } = useLanguage();
-  if (!content) return null;
-  const { groom, bride } = content;
-  const greeting = pickLang(language, content.greetingKh, content.greetingEn);
-  const hasPeople = Boolean(groom || bride);
-  if (!hasPeople && !content.lunarKh && !content.solarKh && !greeting) return null;
+  const sk = useSkinOrnaments();
+  const view = buildInvitationView(content, couple, language, (lang) => textFor(lang, "khmer.invitation.formal"));
+  if (view.isEmpty) return null;
+
+  const dateLine = { fontFamily: CINZEL_FONT, letterSpacing: "0.16em" } as const;
 
   return (
-    <StubSection theme={theme} id="invitation" heading={t("khmer.invitation.heading")}>
-      {greeting && <p className="m-0 mb-6 text-sm leading-relaxed">{greeting}</p>}
-      {hasPeople && (
-        <div className="flex items-start gap-4">
-          <Family party={groom} side="groom" theme={theme} />
-          {content.monogram && (
-            <div aria-hidden className="self-center text-xl" style={{ color: theme.accent_color }}>
-              {content.monogram}
+    <OrnateSection theme={theme} id="invitation">
+      <div className={`mx-auto mb-8 w-fit ${sk.motion === "float" ? "kh-float" : ""} ${sk.motion === "shimmer" ? "kh-sweep rounded-full" : ""}`}>
+        <sk.Crest color={theme.accent_color} ground={theme.bg_color} label={view.monogram} size={116} />
+      </div>
+      <h2 className="m-0 mb-2 text-xl sm:text-2xl" style={sk.heading(theme, language)}>
+        {t("khmer.invitation.heading")}
+      </h2>
+      <div className="mb-8">
+        <sk.Divider color={theme.accent_color} />
+      </div>
+
+      {view.looseGreeting && <p className="m-0 mb-6 whitespace-pre-line text-sm leading-loose">{view.looseGreeting}</p>}
+      {view.blocks.map((block, i) => (
+        <div key={block.lang}>
+          {i > 0 && (
+            <div className="my-8">
+              <sk.Divider color={theme.accent_color} width={150} />
             </div>
           )}
-          <Family party={bride} side="bride" theme={theme} />
+          <Block block={block} theme={theme} />
+        </div>
+      ))}
+
+      {(view.lunar || view.solarKh || view.englishDate) && (
+        <div className="mt-10">
+          <sk.Divider color={theme.accent_color} />
+          <div className="mt-6 space-y-2">
+            {view.lunar && (
+              <p className="m-0 px-1 text-sm sm:text-base" style={{ ...sk.heading(theme, "kh"), fontSize: "0.95rem" }} lang="km">
+                {view.lunar}
+              </p>
+            )}
+            {view.solarKh && (
+              <p className="m-0 text-sm leading-loose" lang="km">
+                {view.solarKh}
+              </p>
+            )}
+            {view.englishDate && (
+              <p className="m-0 pt-2 text-[13px] font-semibold sm:text-sm" style={{ ...dateLine, color: theme.accent_color }}>
+                {view.englishDate}
+              </p>
+            )}
+            {(view.timeEn || view.timeKh) && (
+              <p className="m-0 text-sm opacity-85">{language === "kh" ? view.timeKh : view.timeEn}</p>
+            )}
+          </div>
         </div>
       )}
-      {(content.lunarKh || content.solarKh) && (
-        <>
-          <GoldRule accent={theme.accent_color} />
-          {content.lunarKh && <p className="m-0 text-sm leading-relaxed">{content.lunarKh}</p>}
-          {content.solarKh && <p className="m-0 text-sm leading-relaxed">{content.solarKh}</p>}
-        </>
-      )}
-    </StubSection>
+
+      {view.startsAt && <Countdown startsAt={view.startsAt} theme={theme} />}
+    </OrnateSection>
   );
 }

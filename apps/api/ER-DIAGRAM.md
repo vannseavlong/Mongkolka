@@ -99,6 +99,7 @@ erDiagram
         json default_theme
         json default_components
         json default_sections
+        json chrome
         string status
         date _created_at
         date _updated_at

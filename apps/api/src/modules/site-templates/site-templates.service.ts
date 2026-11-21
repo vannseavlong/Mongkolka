@@ -58,6 +58,7 @@ const PUBLIC_FIELDS = [
   "description",
   "default_theme",
   "default_components",
+  "chrome",
 ] as const;
 
 function toPublicTemplate(row: Row) {

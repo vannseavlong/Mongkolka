@@ -54,6 +54,13 @@ import { KbachGate } from "./sections/kbach/Gate";
 import { HeroKbach } from "./sections/kbach/Hero";
 import { StoryKbach } from "./sections/kbach/Story";
 import { DetailsKbach } from "./sections/kbach/Details";
+import { InvitationKhmer, AgendaKhmer, LettersKhmer, DetailsKhmer } from "./sections/khmer";
+import { EmeraldOpening, EmeraldHero } from "./sections/emerald";
+import { GardenOpening, GardenHero } from "./sections/garden";
+import { CreamOpening, CreamHero } from "./sections/cream";
+import { SakuraOpening, SakuraHero } from "./sections/sakura";
+import { FairytaleOpening, FairytaleHero } from "./sections/fairytale";
+import { KidsOpening, KidsHero } from "./sections/kids";
 
 // Each section's components take a different, section-specific props shape (see
 // sections/*/*.tsx), so this lookup map is necessarily `ComponentType<any>` at the
@@ -71,6 +78,12 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     opening_seal: Seal,
     opening_kbach: KbachGate,
     opening_grace: GraceOpening,
+    opening_emerald: EmeraldOpening,
+    opening_garden: GardenOpening,
+    opening_cream: CreamOpening,
+    opening_sakura: SakuraOpening,
+    opening_fairytale: FairytaleOpening,
+    opening_kids: KidsOpening,
   },
   hero: {
     hero_classic: HeroClassic,
@@ -79,10 +92,18 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_folio: HeroFolio,
     hero_kbach: HeroKbach,
     hero_grace: GraceHero,
+    hero_emerald: EmeraldHero,
+    hero_garden: GardenHero,
+    hero_cream: CreamHero,
+    hero_sakura: SakuraHero,
+    hero_fairytale: FairytaleHero,
+    hero_kids: KidsHero,
   },
   // Reserved keys: components are registered by the Web-khmer-skeleton task. Until then
   // resolveComponent() finds nothing and SiteRenderer renders nothing for these sections.
-  invitation: {},
+  invitation: {
+    invitation_khmer: InvitationKhmer,
+  },
   verse: {
     verse_classic: VerseClassic,
     verse_grace: GraceVerse,
@@ -95,7 +116,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     story_kbach: StoryKbach,
     story_grace: GraceStory,
   },
-  agenda: {},
+  agenda: {
+    agenda_khmer: AgendaKhmer,
+  },
   gallery: {
     gallery_grid: GalleryGrid,
     gallery_masonry: GalleryMasonry,
@@ -110,6 +133,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     details_programme: DetailsProgramme,
     details_kbach: DetailsKbach,
     details_grace: GraceDetails,
+    details_khmer: DetailsKhmer,
   },
   rsvp: {
     rsvp_classic: RsvpClassic,
@@ -140,7 +164,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     guestbook_wall: GuestbookWall,
     guestbook_grace: GraceGuestbook,
   },
-  letters: {},
+  letters: {
+    letters_khmer: LettersKhmer,
+  },
   footer: {
     footer_classic: FooterClassic,
     footer_grace: GraceFooter,

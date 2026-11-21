@@ -82,7 +82,7 @@ describe("Khmer e-invitation seed rows", () => {
     }
   });
 
-  it("each skin has its own opening and hero rows, inactive, and registry_khqr is not seeded here", () => {
+  it("each skin has its own opening and hero rows, inactive, and registry_khqr (Web-khqr-gift) is seeded inactive and registered", () => {
     for (const skin of ["emerald", "garden", "cream", "sakura", "fairytale", "kids"]) {
       for (const section of ["opening", "hero"]) {
         const row = componentRows.find((c) => c.component_id === `${section}_${skin}`);
@@ -94,7 +94,10 @@ describe("Khmer e-invitation seed rows", () => {
     for (const id of ["invitation_khmer", "agenda_khmer", "letters_khmer", "details_khmer"]) {
       assert.equal(componentRows.find((c) => c.component_id === id)?.status, "inactive", id);
     }
-    assert.ok(!registered.has("registry_khqr"), "registry_khqr belongs to Web-khqr-gift");
+    assert.ok(registered.has("registry_khqr"), "registry_khqr is registered by Web-khqr-gift");
+    const khqr = componentRows.find((c) => c.component_id === "registry_khqr");
+    assert.equal(khqr?.section, "registry");
+    assert.equal(khqr?.status, "inactive");
   });
 
   it("chrome config uses known particle kinds and dock sections", () => {

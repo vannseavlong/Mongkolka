@@ -23,6 +23,7 @@ import { RsvpMinimal } from "./sections/rsvp/Minimal";
 import { RegistryClassic } from "./sections/registry/Classic";
 import { RegistryCards } from "./sections/registry/Cards";
 import { RegistryList } from "./sections/registry/List";
+import { RegistryKhqr } from "./sections/registry/KhqrGift";
 import { TimelineClassic } from "./sections/timeline/Classic";
 import { TimelineVerticalLine } from "./sections/timeline/VerticalLine";
 import { TimelineHorizontal } from "./sections/timeline/Horizontal";
@@ -147,6 +148,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     registry_cards: RegistryCards,
     registry_list: RegistryList,
     registry_ledger: RegistryLedger,
+    registry_khqr: RegistryKhqr,
   },
   timeline: {
     timeline_classic: TimelineClassic,

@@ -18,6 +18,13 @@ export const SAMPLE_PHOTOS = [
   "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=60",
 ];
 
+/** Placeholder pattern (NOT a scannable code, not a real account) so the preview shows the gift card. */
+const SAMPLE_KHQR =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#222"><path d="M1 1h7v7H1zM13 1h7v7h-7zM1 13h7v7H1z"/></g><g fill="#fff"><path d="M2 2h5v5H2zM14 2h5v5h-5zM2 14h5v5H2z"/></g><g fill="#222"><path d="M3 3h3v3H3zM15 3h3v3h-3zM3 15h3v3H3zM10 1h2v2h-2zM9 4h2v2H9zM10 9h2v2h-2zM13 10h2v2h-2zM16 9h4v2h-4zM12 13h2v3h-2zM15 14h2v2h-2zM18 13h2v3h-2zM10 17h4v2h-4zM16 18h4v2h-4zM9 12h2v2H9z"/></g></svg>',
+  );
+
 export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
   hero: { coverPhotoUrl: SAMPLE_PHOTOS[0] },
   verse: {
@@ -69,6 +76,10 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
   rsvp: { customMessage: "We can't wait to celebrate with you!", deadline: "2026-11-01" },
   registry: {
     links: [{ label: "Our registry", url: "#" }],
+    khqrImageUrl: SAMPLE_KHQR,
+    bank: "ABA Bank",
+    accountName: "SUN CHANTHA",
+    accountNumber: "000 123 456",
   },
   timeline: {
     chapters: [

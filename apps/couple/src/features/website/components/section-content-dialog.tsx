@@ -20,6 +20,7 @@ import { VERSE_PRESETS } from "../lib/verse-presets";
 import { InvitationContentForm } from "./invitation-content-form";
 import { AgendaContentForm } from "./agenda-content-form";
 import { LettersContentForm } from "./letters-content-form";
+import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
 
 /** The only section keys with no other canonical content source — see
@@ -140,7 +141,7 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
 }
 
 // ---------------------------------------------------------------------------
-// registry — content: { links: { label: string, url: string }[] }
+// registry — content: { links: { label, url }[], khqrImageUrl?, bank?, accountName?, accountNumber? }
 // ---------------------------------------------------------------------------
 
 const registrySchema = z.object({
@@ -150,6 +151,15 @@ const registrySchema = z.object({
       url: z.string().min(1, "URL is required"),
     }),
   ),
+  gift: z.object({
+    khqrImageUrl: z.string(),
+    bank: z.string().max(GIFT_LIMITS.bank, `Max ${GIFT_LIMITS.bank} characters`),
+    accountName: z.string().max(GIFT_LIMITS.accountName, `Max ${GIFT_LIMITS.accountName} characters`),
+    accountNumber: z
+      .string()
+      .max(GIFT_LIMITS.accountNumber, `Max ${GIFT_LIMITS.accountNumber} characters`)
+      .refine((v) => v.trim() === "" || ACCOUNT_NUMBER_PATTERN.test(v.trim()), "Digits, spaces and hyphens only"),
+  }),
 });
 type RegistryFormValues = z.infer<typeof registrySchema>;
 
@@ -162,13 +172,14 @@ function RegistryContentForm({ section, onSaved }: { section: WebsiteSection; on
       links: initialLinks
         .filter((l): l is { label?: unknown; url?: unknown } => !!l && typeof l === "object")
         .map((l) => ({ label: String(l.label ?? ""), url: String(l.url ?? "") })),
+      gift: giftFromContent(content),
     },
   });
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "links" });
 
   async function onSubmit(values: RegistryFormValues) {
     try {
-      await saveContent(section.section_id, { links: values.links });
+      await saveContent(section.section_id, { links: values.links, ...giftToContent(values.gift) });
       toast.success("Registry updated");
       onSaved();
     } catch (err) {
@@ -222,6 +233,7 @@ function RegistryContentForm({ section, onSaved }: { section: WebsiteSection; on
         >
           <Plus className="size-3" /> Add link
         </Button>
+        <GiftContentFields form={form} />
         <DialogFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
             Save registry

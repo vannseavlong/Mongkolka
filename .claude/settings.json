@@ -131,7 +131,10 @@
       "mcp__claude-in-chrome__browser_batch",
       "ClaudeInChromeDomain(localhost:4505)",
       "ClaudeInChromeDomain(localhost:4705)",
-      "ClaudeInChromeDomain(localhost:3781)"
+      "ClaudeInChromeDomain(localhost:3781)",
+      "ClaudeInChromeDomain(raksmey-pheakdey.vercel.app)",
+      "ClaudeInChromeDomain(khmer-invite-prompt.vercel.app)",
+      "ClaudeInChromeDomain(chivitmoment.com)"
     ],
     "additionalDirectories": [
       "/Users/suntel/personal/Mongkolka/apps/web/src/app"

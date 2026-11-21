@@ -4,9 +4,9 @@
 - **Repo:** apps/web
 - **Owner:** SNLRLONG
 - **Tier:** T3 · release/deploy and hosting config, DNS (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
+- **Claimed by:** Claude session, 2026-11-21
 - **Worktree:** `Mongkolka/web-hosting-deploy/` · **Branch:** `feat/web-hosting-deploy` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-11-02
+- **Started / updated:** 2026-11-21 / 2026-11-21
 - **Docs:** Tasks/6-deploy/Admin-firebase-hosting.md, Tasks/1-backlog/Web-custom-domain-routing.md
 - **Depends on:** owner decision on hosting (below); API live
 - **Touches:** firebase.json / hosting config, apps/web/next.config.ts, apps/web/src/proxy.ts

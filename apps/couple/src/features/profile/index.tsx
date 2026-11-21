@@ -30,6 +30,14 @@ const profileFormSchema = z.object({
   reception_venue: z.string().nullable(),
   reception_address: z.string().nullable(),
   dress_code: z.string().nullable(),
+  map_url: z
+    .string()
+    .nullable()
+    .refine((v) => !v || /^https:\/\//i.test(v.trim()), "Must start with https://"),
+  venue_image_url: z
+    .string()
+    .nullable()
+    .refine((v) => !v || /^https:\/\//i.test(v.trim()), "Must start with https://"),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -56,6 +64,8 @@ export function Profile() {
           reception_venue: data.profile.reception_venue,
           reception_address: data.profile.reception_address,
           dress_code: data.profile.dress_code,
+          map_url: data.profile.map_url ?? null,
+          venue_image_url: data.profile.venue_image_url ?? null,
         }
       : undefined,
   });
@@ -144,6 +154,13 @@ export function Profile() {
               </div>
             </Section>
           </div>
+
+          <Section title="Map and venue photo" description="Optional — powers the “View location” button and venue picture on templates that show them.">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField control={form.control} name="map_url" label="Map link" placeholder="https://maps.app.goo.gl/…" hint="A Google Maps share link. https only." />
+              <TextField control={form.control} name="venue_image_url" label="Venue photo URL" placeholder="https://…" />
+            </div>
+          </Section>
 
           <Section title="Dress code" description="Optional — shown with your event details.">
             <TextField control={form.control} name="dress_code" label="Dress code" placeholder="e.g. Black tie · jewel tones welcome" />

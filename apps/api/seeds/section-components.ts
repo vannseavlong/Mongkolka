@@ -406,6 +406,38 @@ const components = [
     preview_accent_color: "#b8893b",
     font_style: "serif",
   },
+  // Khmer e-invitation sections (Tasks/_plans/Web-khmer-einvite-templates.md). INACTIVE on purpose: the components
+  // are registered by Web-khmer-skeleton and built by Web-khmer-core-sections; the QA/launch task activates them.
+  {
+    component_id: "invitation_khmer",
+    section: "invitation",
+    name: "Khmer Invitation",
+    preview_bg_color: "#fbf1de",
+    preview_text_color: "#3a2a12",
+    preview_accent_color: "#8f6a1c",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
+    component_id: "agenda_khmer",
+    section: "agenda",
+    name: "Khmer Agenda",
+    preview_bg_color: "#fbf1de",
+    preview_text_color: "#3a2a12",
+    preview_accent_color: "#8f6a1c",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
+    component_id: "letters_khmer",
+    section: "letters",
+    name: "Khmer Letters",
+    preview_bg_color: "#fbf1de",
+    preview_text_color: "#3a2a12",
+    preview_accent_color: "#8f6a1c",
+    font_style: "serif",
+    status: "inactive",
+  },
   // Grace pack: pink, gold and white Christian-wedding design (stubs until the section tasks land).
   // INACTIVE on purpose: the final Grace launch task flips these rows and the grace_blush template to active together.
   {

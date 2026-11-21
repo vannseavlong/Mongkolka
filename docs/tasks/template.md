@@ -57,7 +57,7 @@ chosen; only sections with no other canonical home need
 | `opening` | `couples.partner1_name/partner2_name/wedding_date` — no separate content needed. Personalized guest greeting comes from the `?to=` query param at render time, not from stored content (see below). |
 | `hero` | Same canonical fields + `couple_profile.cover_photo_url` — no separate content needed. |
 | `story` | `couple_profile.love_story` — no separate content needed. |
-| `details` | `couple_profile.ceremony_*` / `couple_profile.reception_*` / `dress_code` — no separate content needed. |
+| `details` | `couple_profile.ceremony_*` / `couple_profile.reception_*` / `dress_code` / `map_url` / `venue_image_url` (both https-only) — no separate content needed. |
 | `gallery` | `content: { photos: string[] }` — no canonical home for a photo list elsewhere. |
 | `rsvp` | `content: { customMessage?: string, deadline?: string }` — actual RSVP submissions write to the couple's own `guests` table (see below), this is just the section's own copy. |
 | `registry` | `content: { links: { label: string, url: string }[] }` |
@@ -65,6 +65,9 @@ chosen; only sections with no other canonical home need
 | `music` | `content: { playlistUrl?: string }` |
 | `verse` | `content: { text?: string, reference?: string, textKh?: string }` — renders nothing without `text`; `textKh` shows when the language is Khmer. |
 | `footer` | `content: { message?: string, hashtag?: string }` — names and wedding date come from the couple. |
+| `invitation` | `content: InvitationContent` — `{ groom?, bride?: { nameKh, nameEn, fatherKh, fatherEn, motherKh, motherEn }, monogram?, lunarKh?, solarKh?, startsAt? (ISO 8601 with offset, e.g. `2026-05-29T17:00:00+07:00`, rendered in Asia/Phnom_Penh), greetingKh?, greetingEn? }`. Lunar date is typed by the couple, never computed. Validated server-side. |
+| `agenda` | `content: AgendaContent` — `{ days: { date: "YYYY-MM-DD", items: { time, titleKh?, titleEn?, icon? }[] }[] }`; `icon` is one of `monk, procession, scissors, thread, ring, tea, dinner, party, cake`. Max 7 days x 20 items. Validated server-side. |
+| `letters` | `content: LettersContent` — `{ gratitudeKh?, gratitudeEn?, apologyKh?, apologyEn? }` (max 3000 characters each). Validated server-side. |
 
 RSVP submissions are guest responses, not template content — they write into the
 couple's own `guests` table (matching `status`/`plus_one` fields already in
@@ -410,3 +413,18 @@ What each section reads: opening: couple names, date, `?to=` guest name; hero: `
 `brandUrl`: the footer's "Made with Mongkolka" credit links to it. apps/web builds it in `src/lib/brand-url.ts` from `NEXT_PUBLIC_ROOT_DOMAIN` (build-time) (http for localhost, https otherwise, undefined when unset), passes it `[slug]/page.tsx` -> `SiteView` -> `extraProps("footer")`, and the template preview pages do the same. Unset means plain text. `footer_classic` ignores the extra prop.
 
 `FoilText` (gradient script text) uses `foilTextGradient`: lightest stop 90% accent (about 4.0:1 on pink, 4.35:1 on white; an earlier 88% stop measured 3.86 and 4.18); lines and borders keep the lighter `foilGradient`. Template previews use `SAMPLE_GUESTBOOK` (6 photos, 4 wishes) with a no-op submit that returns "pending". Owner steps to see it: `docs/grace-template-howto.md`.
+
+## Khmer section keys (`invitation`, `agenda`, `letters`)
+
+Added by Web-khmer-section-keys for the Khmer e-invitation templates (`Tasks/_plans/Web-khmer-einvite-templates.md`).
+`SECTION_KEYS` order is now opening, hero, invitation, verse, story, agenda, gallery, details, rsvp,
+registry, timeline, music, guestbook, letters, footer; existing couples keep their `display_order` and get
+the new keys appended disabled. Content shapes live in `packages/templates/src/types.ts` (`InvitationContent`,
+`AgendaContent`, `LettersContent`, `AGENDA_ICONS`); the API validates them in `apps/api/src/utils/section-content.ts`
+(`validateSectionContent`, called from `CoupleWebsiteService.updateSection`; unknown keys dropped, strings
+trimmed, bad input is a 400). `couple_profile` gained `map_url` and `venue_image_url` (https only) which
+`details` reads. The registry holds empty maps for the three keys and three inactive `section_components`
+rows (`invitation_khmer`, `agenda_khmer`, `letters_khmer`) are seeded; the components arrive with
+Web-khmer-skeleton and Web-khmer-core-sections. **Release note:** run `lsdb sync` (enums on `website_sections`
+and `section_components`) and `lsdb sync --all-users` (new `couple_profile` columns), preview with `--dry-run` first,
+then `lsdb seed seeds/section-components.ts --upsert`. Not run by the task.

@@ -10,8 +10,10 @@ export type PartialTheme = Partial<Theme>;
 export const SECTION_KEYS = [
   "opening",
   "hero",
+  "invitation",
   "verse",
   "story",
+  "agenda",
   "gallery",
   "details",
   "rsvp",
@@ -19,6 +21,7 @@ export const SECTION_KEYS = [
   "timeline",
   "music",
   "guestbook",
+  "letters",
   "footer",
 ] as const;
 
@@ -49,6 +52,78 @@ export interface FooterContent {
   hashtag?: string;
 }
 
+/** One side of a formal Khmer invitation (groom, bride, or the honoured child). Every field is optional. */
+export interface InvitationParty {
+  nameKh?: string;
+  nameEn?: string;
+  fatherKh?: string;
+  fatherEn?: string;
+  motherKh?: string;
+  motherEn?: string;
+}
+
+/**
+ * `invitation` section: formal family invitation, Khmer lunar + solar date and the
+ * countdown target. Birthday and house-blessing templates may fill only `groom`
+ * (as the honoured person) or neither. Stored in `website_sections.content`.
+ */
+export interface InvitationContent {
+  groom?: InvitationParty;
+  bride?: InvitationParty;
+  /** Crest text, e.g. "C&C" (max 8 characters). */
+  monogram?: string;
+  /** Typed by the couple, e.g. "ថ្ងៃពុធ ៣កើត ខែភទ្របទ ឆ្នាំរោង ឆស័ក ព.ស. ២៥៦៨". Never computed. */
+  lunarKh?: string;
+  /** e.g. "ត្រូវនឹងថ្ងៃទី២៩ ខែឧសភា ឆ្នាំ២០២៦". */
+  solarKh?: string;
+  /** Countdown target: ISO 8601 with an offset ("2026-05-29T17:00:00+07:00"). Render in Asia/Phnom_Penh. */
+  startsAt?: string;
+  greetingKh?: string;
+  greetingEn?: string;
+}
+
+/** Ritual/party icons the agenda can show. A fixed list so templates can ship one line-icon each. */
+export const AGENDA_ICONS = [
+  "monk",
+  "procession",
+  "scissors",
+  "thread",
+  "ring",
+  "tea",
+  "dinner",
+  "party",
+  "cake",
+] as const;
+
+export type AgendaIcon = (typeof AGENDA_ICONS)[number];
+
+export interface AgendaItem {
+  /** Free text as printed on the card, e.g. "07:00" or "ម៉ោង ៧:០០ ព្រឹក" (max 20 characters). */
+  time: string;
+  titleKh?: string;
+  titleEn?: string;
+  icon?: AgendaIcon;
+}
+
+export interface AgendaDay {
+  /** Calendar day, "YYYY-MM-DD". Days are shown in the order stored. */
+  date: string;
+  items: AgendaItem[];
+}
+
+/** `agenda` section: vertical timeline grouped by day (up to 7 days of 20 items). */
+export interface AgendaContent {
+  days: AgendaDay[];
+}
+
+/** `letters` section: the gratitude and apology notes, each in Khmer and English. */
+export interface LettersContent {
+  gratitudeKh?: string;
+  gratitudeEn?: string;
+  apologyKh?: string;
+  apologyEn?: string;
+}
+
 export interface GalleryContent {
   photos: string[];
 }
@@ -61,6 +136,10 @@ export interface DetailsContent {
   receptionVenue?: string;
   receptionAddress?: string;
   dressCode?: string;
+  /** https map link for the "view location" button (couple_profile.map_url). */
+  mapUrl?: string;
+  /** https venue photo (couple_profile.venue_image_url). */
+  venueImageUrl?: string;
 }
 
 export interface RsvpContent {

@@ -171,7 +171,7 @@ interchangeable component variants (e.g. `opening_curtain`, `opening_door`,
 | Column | Type | Notes |
 |---|---|---|
 | `component_id` | string, PK | Globally unique by convention (prefixed with its section, e.g. `opening_curtain`, `gallery_grid`) — matches the key in the `packages/templates` registry, the only link between this row and actual rendering code. |
-| `section` | enum(opening, hero, verse, story, gallery, details, rsvp, registry, timeline, music, guestbook, footer) | Which section type this component renders. `opening` is new — see [docs/tasks/template.md](tasks/template.md#the-opening-section). |
+| `section` | enum(opening, hero, invitation, verse, story, agenda, gallery, details, rsvp, registry, timeline, music, guestbook, letters, footer) | Which section type this component renders. `opening` is new — see [docs/tasks/template.md](tasks/template.md#the-opening-section). |
 | `name` | string | Display name, e.g. "Sliding Curtain". |
 | `preview_bg_color` / `preview_text_color` / `preview_accent_color` / `font_style` | string | Admin catalog preview only — the real component controls its own styling; these just let admin see a swatch without loading the actual component. |
 | `status` | enum(active, inactive) | Admin can retire a variant from new selection without breaking couples already using it. |
@@ -241,6 +241,7 @@ actor, not just unique within one actor's sheet (the vendor sheet has its own
 | `ceremony_time` / `ceremony_venue` / `ceremony_address` | string | |
 | `reception_time` / `reception_venue` / `reception_address` | string | |
 | `dress_code` | string, nullable | |
+| `map_url` / `venue_image_url` | string, nullable | https only (validated server-side in `couple-profile.service`); feed `DetailsContent.mapUrl` / `venueImageUrl`. Needs `lsdb sync --all-users` to add the columns to existing couple sheets. |
 | `site_template_id` | string, nullable | Which `site_templates` row this couple picked. Not a `ref()` — cross-sheet, see the note on `website_sections.component_id` below. |
 | `theme_override` | json, nullable | `Partial<Theme>` — the couple's whole-site color override, applied on top of the selected template's `default_theme`. Partial by design: a couple can override just `accent_color` and inherit the rest. `null` means "use the template's theme as-is." |
 
@@ -252,7 +253,7 @@ Replaces `WebsiteBuilder.tsx`'s client-only `selectedSections` / `sectionTemplat
 | Column | Type | Notes |
 |---|---|---|
 | `section_id` | string, PK | |
-| `section_key` | enum(opening, hero, verse, story, gallery, details, rsvp, registry, timeline, music, guestbook, footer) | |
+| `section_key` | enum(opening, hero, invitation, verse, story, agenda, gallery, details, rsvp, registry, timeline, music, guestbook, letters, footer) | |
 | `component_id` | string, nullable | Overrides the site template's `default_components[section_key]` for this one section — e.g. the couple picked "Door" for `opening` instead of the template's default "Curtain". `null` means "use the template's default." **Not** a `ref()` — the admin sheet's `section_components` lives in a different physical spreadsheet, so this is a logical link only, validated at the application layer (check the id exists, `status = active`, and `section` matches before saving), not by the database. Same cross-sheet reasoning applies to `couple_profile.site_template_id` above. |
 | `color_override` | json, nullable | `Partial<Theme>` for this section only — takes precedence over `couple_profile.theme_override`, which takes precedence over the template's `default_theme`. See [Template color & component resolution](#template-color--component-resolution). |
 | `display_order` | number | |

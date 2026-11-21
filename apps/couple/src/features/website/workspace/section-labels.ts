@@ -4,8 +4,10 @@ import type { WebsiteSectionKey } from "../data/schema";
 export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
   opening: "Opening",
   hero: "Hero",
+  invitation: "Invitation",
   verse: "Verse",
   story: "Our story",
+  agenda: "Agenda",
   gallery: "Gallery",
   details: "Event details",
   rsvp: "RSVP",
@@ -13,6 +15,7 @@ export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
   timeline: "Timeline",
   music: "Music",
   guestbook: "Guestbook",
+  letters: "Thank-you letters",
   footer: "Footer",
 };
 

@@ -18,6 +18,8 @@ export interface PublicSiteResponse {
     reception_venue: string | null;
     reception_address: string | null;
     dress_code: string | null;
+    map_url?: string | null;
+    venue_image_url?: string | null;
     site_template_id: string | null;
     theme_override: PartialTheme | null;
   } | null;

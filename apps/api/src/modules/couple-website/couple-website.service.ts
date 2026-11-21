@@ -8,6 +8,7 @@ import {
   layoutFromDefaults,
   parseDefaultSections,
 } from "../../utils/section-keys.js";
+import { validateSectionContent } from "../../utils/section-content.js";
 import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
 
 /**
@@ -26,6 +27,7 @@ export const APPLY_TEMPLATE_MODES: readonly ApplyTemplateMode[] = ["keep_content
 export const DEFAULT_APPLY_TEMPLATE_MODE: ApplyTemplateMode = "keep_content";
 
 export class TemplateNotAvailableError extends Error {}
+export class ContentValidationError extends Error {}
 
 function toComparableTime(value: unknown): number {
   if (typeof value !== "string" || !value) return Number.POSITIVE_INFINITY;
@@ -318,6 +320,18 @@ export const CoupleWebsiteService = {
   },
 
   async updateSection(actorSheetId: string, sectionId: string, input: Record<string, unknown>) {
+    if (input.content !== undefined && input.content !== null) {
+      // Khmer sections (invitation/agenda/letters) are validated server-side; throws a
+      // ContentValidationError the controller maps to 400. Other sections pass through.
+      const existing = await CoupleWebsiteModel.findSectionById(actorSheetId, sectionId);
+      if (existing) {
+        try {
+          input = { ...input, content: validateSectionContent(existing.section_key as string, input.content) };
+        } catch (err) {
+          throw new ContentValidationError((err as Error).message);
+        }
+      }
+    }
     try {
       await CoupleWebsiteModel.updateSection(actorSheetId, sectionId, input);
     } finally {

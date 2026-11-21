@@ -80,6 +80,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_kbach: HeroKbach,
     hero_grace: GraceHero,
   },
+  // Reserved keys: components are registered by the Web-khmer-skeleton task. Until then
+  // resolveComponent() finds nothing and SiteRenderer renders nothing for these sections.
+  invitation: {},
   verse: {
     verse_classic: VerseClassic,
     verse_grace: GraceVerse,
@@ -92,6 +95,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     story_kbach: StoryKbach,
     story_grace: GraceStory,
   },
+  agenda: {},
   gallery: {
     gallery_grid: GalleryGrid,
     gallery_masonry: GalleryMasonry,
@@ -136,6 +140,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     guestbook_wall: GuestbookWall,
     guestbook_grace: GraceGuestbook,
   },
+  letters: {},
   footer: {
     footer_classic: FooterClassic,
     footer_grace: GraceFooter,

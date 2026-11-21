@@ -3,8 +3,10 @@ import { SectionComponentsModel } from "./section-components.model.js";
 export const SECTIONS = [
   "opening",
   "hero",
+  "invitation",
   "verse",
   "story",
+  "agenda",
   "gallery",
   "details",
   "rsvp",
@@ -12,6 +14,7 @@ export const SECTIONS = [
   "timeline",
   "music",
   "guestbook",
+  "letters",
   "footer",
 ] as const;
 

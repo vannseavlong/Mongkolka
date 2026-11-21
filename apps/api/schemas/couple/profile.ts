@@ -15,6 +15,9 @@ export default defineTable({
     reception_venue: string(),
     reception_address: string(),
     dress_code: string(),
+    // https link to the venue on a map, and a venue photo; validated in couple-profile.service.
+    map_url: string(),
+    venue_image_url: string(),
     // Which site_templates row this couple picked. Not a ref() — cross-sheet, same
     // reasoning as website_sections.component_id.
     site_template_id: string(),

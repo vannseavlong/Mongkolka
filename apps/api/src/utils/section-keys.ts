@@ -4,8 +4,10 @@
 export const SECTION_KEYS = [
   "opening",
   "hero",
+  "invitation",
   "verse",
   "story",
+  "agenda",
   "gallery",
   "details",
   "rsvp",
@@ -13,6 +15,7 @@ export const SECTION_KEYS = [
   "timeline",
   "music",
   "guestbook",
+  "letters",
   "footer",
 ] as const;
 

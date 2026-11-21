@@ -19,6 +19,8 @@ export const coupleProfileSchema = z.object({
   reception_venue: z.string().nullable(),
   reception_address: z.string().nullable(),
   dress_code: z.string().nullable(),
+  map_url: z.string().nullable().optional(),
+  venue_image_url: z.string().nullable().optional(),
   photo_uploads: z.enum(["off", "auto", "pending"]).nullable().optional(),
   photo_max_per_guest: z.number().nullable().optional(),
   photo_max_size_mb: z.number().nullable().optional(),

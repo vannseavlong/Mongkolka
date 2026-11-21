@@ -3,6 +3,7 @@ import type { CoupleRequest } from "../../middlewares/couple-context.middleware.
 import {
   APPLY_TEMPLATE_MODES,
   CoupleWebsiteService,
+  ContentValidationError,
   DEFAULT_APPLY_TEMPLATE_MODE,
   TemplateNotAvailableError,
   type ApplyTemplateMode,
@@ -75,11 +76,20 @@ export const CoupleWebsiteController = {
   },
 
   async updateSection(req: CoupleRequest, res: Response) {
-    const section = await CoupleWebsiteService.updateSection(
-      req.coupleActorSheetId as string,
-      req.params.sectionId as string,
-      req.body ?? {},
-    );
+    let section;
+    try {
+      section = await CoupleWebsiteService.updateSection(
+        req.coupleActorSheetId as string,
+        req.params.sectionId as string,
+        req.body ?? {},
+      );
+    } catch (err) {
+      if (err instanceof ContentValidationError) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      throw err;
+    }
     if (!section) {
       res.status(404).json({ error: "Section not found" });
       return;

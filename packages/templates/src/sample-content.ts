@@ -24,6 +24,32 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
     text: "Therefore shall a man leave his father and his mother, and shall cleave unto his wife: and they shall be one flesh.",
     reference: "Genesis 2:24",
   },
+  invitation: {
+    groom: { nameKh: "សុខា", nameEn: "Sokha", fatherKh: "លោក សុខ វិសាល", fatherEn: "Mr. Sok Visal", motherKh: "លោកស្រី ចាន់ ស្រីមុំ", motherEn: "Mrs. Chan Sreymom" },
+    bride: { nameKh: "ដារ៉ា", nameEn: "Dara", fatherKh: "លោក គង់ វណ្ណា", fatherEn: "Mr. Kong Vanna", motherKh: "លោកស្រី ហេង សុភា", motherEn: "Mrs. Heng Sopha" },
+    monogram: "S&D",
+    lunarKh: "ថ្ងៃសុក្រ ១៥កើត ខែពិសាខ ឆ្នាំម្សាញ់ សប្តស័ក ព.ស. ២៥៧០",
+    solarKh: "ត្រូវនឹងថ្ងៃទី២៩ ខែឧសភា ឆ្នាំ២០២៦",
+    startsAt: "2026-12-12T17:00:00+07:00",
+    greetingEn: "Together with their families, request the honour of your presence at the wedding of their children.",
+  },
+  agenda: {
+    days: [
+      {
+        date: "2026-12-12",
+        items: [
+          { time: "07:00", titleKh: "ពិធីហែជំនូន", titleEn: "Procession", icon: "procession" },
+          { time: "09:00", titleKh: "ពិធីកាត់សក់បង្កក់សិរី", titleEn: "Hair-cutting", icon: "scissors" },
+          { time: "11:00", titleKh: "ពិធីសែនចងដៃ", titleEn: "Wrist-tying blessing", icon: "thread" },
+          { time: "17:00", titleKh: "ពិធីជប់លៀង", titleEn: "Reception", icon: "dinner" },
+        ],
+      },
+    ],
+  },
+  letters: {
+    gratitudeEn: "With heartfelt gratitude, we thank everyone who joined us and shared this day.",
+    apologyEn: "We apologise if a printed invitation did not reach you; please accept this one with our warmest welcome.",
+  },
   footer: { message: "Thank you for celebrating with us.", hashtag: "#AlexAndSam" },
   story: {
     loveStory:
@@ -38,6 +64,7 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
     receptionVenue: "The Grand Hall",
     receptionAddress: "456 Grand Blvd, Phnom Penh",
     dressCode: "Formal — soft pastels welcome",
+    mapUrl: "https://maps.google.com/?q=Riverside+Garden+Phnom+Penh",
   },
   rsvp: { customMessage: "We can't wait to celebrate with you!", deadline: "2026-11-01" },
   registry: {

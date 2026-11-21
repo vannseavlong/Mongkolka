@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-21 · [Cross] feat: configurable image upload limits with WebP conversion
+- Owner: SNLRLONG
+- Task: Tasks/5-done/API-asset-upload-limits.md
+- Branch/PR: feat/asset-upload-limits · #3
+- What changed: [API] image library limits (max MB, max pixels, images per couple) read from env `ASSET_MAX_MB`, `ASSET_MAX_DIMENSION`, `ASSET_MAX_PER_COUPLE` and overridable by an admin through the new `platform_settings` sheet table (30 s cache, clamped to ceilings of 100 MB, 16383 px, 1000 images); new `GET/PATCH /admin/api/settings/uploads` and `GET /couple/api/website/assets/limits`. [Admin] new Settings page (Image uploads). [Web] the couple image library reads the limits from the API and converts JPEG/PNG to WebP at quality 1.0 in the browser before upload (keeps the original if WebP is larger or the browser cannot encode it)
+- Needs: run `pnpm exec lsdb sync` in apps/api for the new `platform_settings` table, then deploy API before the apps; set `ASSET_MAX_MB` (or use Admin > Settings) to fit photos over 8 MB; G4 browser check, code review and security review not yet run
+
 ## 2026-11-02 · [Cross] chore: Firebase Hosting for admin and couple, API on Render
 - Owner: SNLRLONG
 - Task: Tasks/6-deploy/Admin-firebase-hosting.md

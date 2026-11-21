@@ -8,7 +8,7 @@ import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { api, ApiError } from "@/lib/api";
-import { siteOrigin } from "@/lib/site-url";
+import { templatePreviewUrl } from "@/lib/site-url";
 import { cn } from "@mongkolka/ui/utils";
 import type { SiteTemplate } from "../data/schema";
 import { TemplateApplyDialog, type ApplyMode } from "./template-apply-dialog";
@@ -140,7 +140,7 @@ export function TemplatePicker({
               <div className="mt-auto flex flex-wrap gap-2">
                 {template.slug && (
                   <Button variant="outline" size="sm" asChild>
-                    <a href={siteOrigin(template.slug)} target="_blank" rel="noopener noreferrer">
+                    <a href={templatePreviewUrl(template.slug)} target="_blank" rel="noopener noreferrer">
                       Preview <ExternalLink className="size-3.5" />
                       <span className="sr-only"> {template.name} (opens in a new tab)</span>
                     </a>

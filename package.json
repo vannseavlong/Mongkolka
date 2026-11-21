@@ -11,6 +11,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "deploy:web": "turbo run build --filter=web && firebase deploy --only hosting:web",
     "deploy:admin": "turbo run build --filter=admin && firebase deploy --only hosting:admin",
     "deploy:couple": "turbo run build --filter=couple && firebase deploy --only hosting:couple"
   },

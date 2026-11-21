@@ -1,24 +1,23 @@
+"use client";
+
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { fetchJson } from "@/lib/api";
+import { PageLoading, PageMessage } from "@/components/loading-state";
+import { useApi } from "@/lib/use-api";
 import type { SiteTemplatesResponse } from "./types";
 
-// Subdomain previews need ROOT_DOMAIN (wildcard DNS). Without it (plain local
-// dev) cards fall back to the /templates/[id] path preview. Deliberately no
-// "localhost:3000" default here (unlike proxy.ts, which defaults so local hosts
-// parse): an unset value must mean "no subdomain links".
-const ROOT_DOMAIN = process.env.ROOT_DOMAIN;
-
+// Full-page preview of a template at /templates/preview/<slug>; templates without a slug fall back
+// to the framed preview at /templates/<id>.
 function previewHref(template: { template_id: string; slug?: string }) {
-  if (!ROOT_DOMAIN || !template.slug) return `/templates/${template.template_id}`;
-  const protocol = ROOT_DOMAIN.startsWith("localhost") ? "http" : "https";
-  return `${protocol}://${template.slug}.${ROOT_DOMAIN}`;
+  return template.slug ? `/templates/preview/${template.slug}` : `/templates/${template.template_id}`;
 }
 
-export default async function TemplatesPage() {
-  const data = await fetchJson<SiteTemplatesResponse>("/public/api/site-templates");
-  const templates = data?.templates ?? [];
+export default function TemplatesPage() {
+  const state = useApi<SiteTemplatesResponse>("/public/api/site-templates");
+  if (state.status === "loading") return <PageLoading />;
+  if (state.status !== "ready") return <PageMessage title="Couldn't load templates" body="Please try again in a moment." />;
+  const templates = state.data.templates ?? [];
 
   return (
     <main className="flex min-h-screen flex-col">

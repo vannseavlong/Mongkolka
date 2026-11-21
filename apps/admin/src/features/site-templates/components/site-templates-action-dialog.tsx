@@ -187,7 +187,7 @@ export function SiteTemplatesActionDialog({
                     <Input placeholder="botanical-romance" autoComplete="off" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Preview URL: {field.value || "your-slug"}.{ROOT_DOMAIN}
+                    Preview URL: {ROOT_DOMAIN}/templates/preview/{field.value || "your-slug"}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

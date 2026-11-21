@@ -38,7 +38,11 @@ describe("Khmer section content validation", () => {
       assert.equal(validateStartsAt("", "startsAt"), undefined);
     });
     it("rejects no offset, wrong shape and impossible dates", () => {
-      for (const bad of ["2026-05-29T17:00:00", "2026-05-29", "tomorrow", "2026-13-40T10:00:00+07:00", 12345]) {
+      for (const bad of [
+        "2026-05-29T17:00:00", "2026-05-29", "tomorrow", "2026-13-40T10:00:00+07:00", 12345,
+        "2026-02-31T10:00:00+07:00", "2025-02-29T10:00+07:00", "2026-05-29T24:00:00+07:00",
+        "2026-05-29T23:60:00+07:00", "2026-05-29T10:00:60Z", "2026-05-29T10:00+25:00",
+      ]) {
         assert.throws(() => validateStartsAt(bad, "startsAt"), /startsAt/, String(bad));
       }
     });
@@ -52,11 +56,12 @@ describe("Khmer section content validation", () => {
   describe("https URLs", () => {
     it("accepts https and empty", () => {
       assert.equal(validateHttpsUrl(" https://maps.app.goo.gl/abc ", "map_url"), "https://maps.app.goo.gl/abc");
+      assert.equal(validateHttpsUrl("https://x.com", "map_url"), "https://x.com/", "stores the normalised href");
       assert.equal(validateHttpsUrl("", "map_url"), undefined);
       assert.equal(validateHttpsUrl(null, "map_url"), undefined);
     });
     it("rejects http, javascript:, data:, garbage, over-length", () => {
-      for (const bad of ["http://x.com", "javascript:alert(1)", "data:text/html,hi", "not a url", `https://x.com/${"a".repeat(LIMITS.url)}`]) {
+      for (const bad of ["http://x.com", "javascript:alert(1)", "data:text/html,hi", "not a url", "https://user:pass@x.com/a", "https://u@x.com", `https://x.com/${"a".repeat(LIMITS.url)}`]) {
         assert.throws(() => validateHttpsUrl(bad, "map_url"), /map_url/, bad.slice(0, 30));
       }
       assert.throws(() => validateHttpsUrl(42, "map_url"), /string/);
@@ -179,6 +184,27 @@ describe("section content wiring", () => {
     ]);
   });
 
+  it("ignores section_key / section_id in the body so validation cannot be bypassed", async () => {
+    rows.s_story = { section_id: "s_story", section_key: "story", content: null };
+    const evil = { khqrImageUrl: "http://x", accountNumber: "<script>", bank: "b".repeat(10000) };
+    // content is checked against the STORED key (story: pass-through) but must be written as story,
+    // never re-typed to registry, so the registry rules cannot be skipped.
+    await CoupleWebsiteService.updateSection("sheet", "s_story", {
+      section_key: "registry",
+      section_id: "other",
+      created_at: "x",
+      content: evil,
+    });
+    assert.deepEqual(writes, [{ id: "s_story", data: { content: evil } }]);
+    // and a registry section stays strictly validated even when the body claims another key
+    rows.s_reg = { section_id: "s_reg", section_key: "registry", content: null };
+    await assert.rejects(
+      CoupleWebsiteService.updateSection("sheet", "s_reg", { section_key: "story", content: evil }),
+      ContentValidationError,
+    );
+    assert.equal(writes.length, 1);
+  });
+
   it("controller maps a validation error to 400 over http", async () => {
     const app = express();
     app.use(express.json());
@@ -213,13 +239,21 @@ describe("section content wiring", () => {
   });
 });
 
+describe("Agenda dates", () => {
+  it("rejects the same date twice", () => {
+    const day = { date: "2026-05-29", items: [{ time: "09:00" }] };
+    assert.throws(() => validateSectionContent("agenda", { days: [day, { ...day }] }), /listed twice/);
+    assert.doesNotThrow(() => validateSectionContent("agenda", { days: [day, { ...day, date: "2026-05-30" }] }));
+  });
+});
+
 describe("Registry gift content validation", () => {
   const ok = { khqrImageUrl: " https://cdn.test/qr.png ", bank: " ABA ", accountName: " Sun Chantha ", accountNumber: " 000 123-456 " };
 
   it("trims, keeps links untouched and drops unknown keys", () => {
-    const links = [{ label: "Shop", url: "https://shop.test" }];
+    const links = [{ label: " Shop ", url: "https://shop.test/x" }];
     assert.deepEqual(validateSectionContent("registry", { ...ok, links, extra: 1 }), {
-      links,
+      links: [{ label: "Shop", url: "https://shop.test/x" }],
       khqrImageUrl: "https://cdn.test/qr.png",
       bank: "ABA",
       accountName: "Sun Chantha",
@@ -228,8 +262,27 @@ describe("Registry gift content validation", () => {
   });
 
   it("legacy links-only content still passes", () => {
-    const links = [{ label: "A", url: "https://a.test" }];
+    const links = [{ label: "A", url: "https://a.test/" }];
     assert.deepEqual(validateSectionContent("registry", { links }), { links });
+  });
+
+  it("validates registry links: https only, shape, label and count caps", () => {
+    for (const bad of ["javascript:alert(1)", "http://a.test", "data:text/html,x", "https://u:p@a.test"]) {
+      assert.throws(() => validateSectionContent("registry", { links: [{ label: "x", url: bad }] }), /links\[0\]\.url/, bad);
+    }
+    assert.throws(() => validateSectionContent("registry", { links: "nope" }), /links must be an array/);
+    assert.throws(() => validateSectionContent("registry", { links: ["str"] }), /links\[0\] must be an object/);
+    assert.throws(() => validateSectionContent("registry", { links: [{ label: "x" }] }), /url is required/);
+    assert.throws(
+      () => validateSectionContent("registry", { links: [{ label: "x".repeat(LIMITS.linkLabel + 1), url: "https://a.test" }] }),
+      /label/,
+    );
+    const many = Array.from({ length: LIMITS.registryLinks + 1 }, () => ({ label: "a", url: "https://a.test" }));
+    assert.throws(() => validateSectionContent("registry", { links: many }), /at most 20/);
+    // empty rows are dropped, a missing label falls back to the url
+    assert.deepEqual(validateSectionContent("registry", { links: [{ label: "", url: "" }, { url: "https://a.test/p" }] }), {
+      links: [{ label: "https://a.test/p", url: "https://a.test/p" }],
+    });
   });
 
   it("rejects non-https images and bad account numbers", () => {

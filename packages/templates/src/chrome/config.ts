@@ -48,21 +48,52 @@ export interface ResolvedChrome {
   reveal: boolean;
 }
 
-/** Returns null when nothing is switched on, so callers can skip every chrome code path. */
+const PARTICLE_KINDS: readonly ParticleKind[] = ["petals", "butterflies", "dust", "bokeh"];
+const DENSITIES: readonly ParticleDensity[] = ["low", "normal", "high"];
+
+function isObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+function strings(v: unknown): string[] | undefined {
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : undefined;
+}
+
+/**
+ * Returns null when nothing is switched on, so callers can skip every chrome code path.
+ * The config comes from a JSON column that is not validated on write, so every field is
+ * checked here: malformed data turns a feature off, it never throws during render.
+ */
 export function resolveChrome(config: ChromeConfig | null | undefined): ResolvedChrome | null {
-  if (!config) return null;
-  const dock = config.dock ? (config.dock === true ? {} : { include: config.dock.include }) : null;
-  const musicIn = config.music;
+  if (!isObject(config)) return null;
+  const c = config as Record<string, unknown>;
+
+  const dockIn = c.dock;
+  const dock = dockIn ? (isObject(dockIn) ? { include: strings(dockIn.include) } : {}) : null;
+
+  const musicIn = c.music;
+  const musicObj = isObject(musicIn) ? musicIn : undefined;
   const music = musicIn
     ? {
-        src: musicIn === true ? undefined : musicIn.src,
-        icon: (musicIn === true ? undefined : musicIn.icon) ?? "disc",
-        corner: (musicIn === true ? undefined : musicIn.corner) ?? "top-right",
+        src: typeof musicObj?.src === "string" ? musicObj.src : undefined,
+        icon: (musicObj?.icon === "waves" ? "waves" : "disc") as MusicIcon,
+        corner: (musicObj?.corner === "top-left" ? "top-left" : "top-right") as MusicCorner,
       }
     : null;
-  const p = config.particles;
-  const particles = p && p.kinds.length > 0 ? { kinds: [...new Set(p.kinds)], density: p.density ?? "normal", colors: p.colors } : null;
+
+  const p = isObject(c.particles) ? c.particles : undefined;
+  const kinds = p && Array.isArray(p.kinds)
+    ? [...new Set((p.kinds as unknown[]).filter((k): k is ParticleKind => PARTICLE_KINDS.includes(k as ParticleKind)))]
+    : [];
+  const particles = p && kinds.length > 0
+    ? {
+        kinds,
+        density: DENSITIES.includes(p.density as ParticleDensity) ? (p.density as ParticleDensity) : ("normal" as const),
+        colors: strings(p.colors),
+      }
+    : null;
+
   // `reveal` defaults on, but on its own it only counts when asked for explicitly.
-  if (!dock && !music && !particles && config.reveal !== true) return null;
-  return { dock, music, particles, reveal: config.reveal ?? true };
+  if (!dock && !music && !particles && c.reveal !== true) return null;
+  return { dock, music, particles, reveal: c.reveal !== false };
 }

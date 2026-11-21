@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, type MouseEvent } from "react";
-import { resolveMusicSrc } from "./audio";
+import { resolveMusicSrc, shouldPrimeMusic } from "./audio";
 import { resolveChrome, type ChromeConfig, type ResolvedChrome } from "./config";
 import { useBackgroundMusic, type BackgroundMusic } from "./use-background-music";
 
@@ -18,8 +18,8 @@ export interface SiteChromeState {
   resolved: ResolvedChrome | null;
   music: BackgroundMusic;
   /**
-   * Put on the opening gate's wrapper as `onClickCapture`. The first tap on a button or link inside
-   * the gate starts the music right there, inside the user's tap, which is the only moment mobile
+   * Put on the opening gate's wrapper as `onClickCapture`. A tap on the gate's primary action
+   * (`data-mk-open`, else any button or link not marked `data-mk-no-music`) starts the music right there, inside the user's tap, which is the only moment mobile
    * browsers allow it (the gate's own open animation runs later, on a timer).
    */
   primeMusicOnTap: (event: MouseEvent) => void;
@@ -40,8 +40,7 @@ export function useSiteChrome({ config, musicSrc, musicSectionUrl }: UseSiteChro
 
   const primeMusicOnTap = useCallback(
     (event: MouseEvent) => {
-      const target = event.target as Element | null;
-      if (target?.closest?.('button, a, [role="button"]')) play();
+      if (shouldPrimeMusic(event.target as Element | null)) play();
     },
     [play],
   );

@@ -20,6 +20,15 @@ unless a table deliberately opts out — assume `timestamps: true` on everything
 
 ---
 
+## Release order for schema changes (read before deploying)
+
+sheet-db silently drops columns that are not in the sheet, so a deploy that runs before the sync returns 200 and loses the data. Always, in this order:
+
+1. `lsdb sync --dry-run`, then `lsdb sync` (admin sheet: e.g. `site_templates.chrome`).
+2. `lsdb sync --all-users` for every existing couple sheet (e.g. `couple_profile.map_url`, `couple_profile.venue_image_url`).
+3. Deploy the API, then seed with `--upsert` (a `--skip-existing` seed never writes new columns to existing rows).
+4. Read back after the first save: open the row (or `GET` it) and confirm the new field is stored, not just that the call returned 200.
+
 ## Admin sheet
 
 ### `users` (exists, revise)

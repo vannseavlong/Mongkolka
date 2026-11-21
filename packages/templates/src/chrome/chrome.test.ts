@@ -4,7 +4,7 @@ import { getCountdown, isCountdownLive, formatCountdownUnit } from "./countdown"
 import { buildDockItems, sectionAnchorId } from "./dock-items";
 import { pickActiveId, isAtBottom } from "./scroll-spy";
 import { shouldDeferReveal } from "./reveal";
-import { isDirectAudioUrl, resolveMusicSrc, musicReducer, toggleIntent } from "./audio";
+import { isDirectAudioUrl, resolveMusicSrc, musicReducer, toggleIntent, shouldPrimeMusic } from "./audio";
 import { buildParticles, particleCount, isLowPowerDevice } from "./particles";
 import { mixHex, parseHex, goldStops, goldGradient, withAlpha } from "./gold";
 import { resolveChrome } from "./config";
@@ -199,4 +199,40 @@ test("chrome theme: CSS variables derive from the 4 theme colors", async () => {
   const colors = defaultParticleColors("#d4af37");
   assert.equal(colors.length, 3);
   assert.equal(colors[2], "#d4af37");
+});
+
+test("resolveChrome: malformed stored JSON never throws and turns the feature off", () => {
+  const bad = [
+    "oops", 42, [], { particles: {} }, { particles: "x" }, { particles: { kinds: "petals" } },
+    { particles: { kinds: [1, null, "snow"] } }, { dock: { include: "a" } }, { music: 5 },
+    { music: { icon: 3, corner: {}, src: 9 } }, { reveal: "yes" },
+  ];
+  for (const config of bad) {
+    assert.doesNotThrow(() => resolveChrome(config as never), JSON.stringify(config));
+  }
+  assert.equal(resolveChrome({ particles: {} } as never), null);
+  assert.equal(resolveChrome({ particles: { kinds: ["snow"] } } as never), null);
+  assert.deepEqual(resolveChrome({ particles: { kinds: ["petals", "snow", "petals"], density: "huge" } } as never)?.particles, {
+    kinds: ["petals"], density: "normal", colors: undefined,
+  });
+  assert.deepEqual(resolveChrome({ dock: { include: ["a", 3] } } as never)?.dock, { include: ["a"] });
+  const m = resolveChrome({ music: { icon: 3, corner: {}, src: 9 } } as never)?.music;
+  assert.deepEqual(m, { src: undefined, icon: "disc", corner: "top-right" });
+});
+
+test("music: a src change resets the status to idle", () => {
+  assert.equal(musicReducer("playing", "reset"), "idle");
+  assert.equal(musicReducer("blocked", "reset"), "idle");
+});
+
+test("music: only the primary open action (or a non-opted-out button) primes playback", () => {
+  const fake = (matches: Record<string, boolean>) => ({
+    closest: (sel: string) => (matches[sel] ? ({} as never) : null),
+  });
+  assert.equal(shouldPrimeMusic(null), false);
+  assert.equal(shouldPrimeMusic(fake({})), false, "a tap on plain gate artwork");
+  assert.equal(shouldPrimeMusic(fake({ 'button, a, [role="button"]': true })), true, "fallback: any button");
+  assert.equal(shouldPrimeMusic(fake({ "[data-mk-open]": true })), true);
+  assert.equal(shouldPrimeMusic(fake({ "[data-mk-no-music]": true, 'button, a, [role="button"]': true })), false, "language switch");
+  assert.equal(shouldPrimeMusic(fake({ "[data-mk-no-music]": true, "[data-mk-open]": true })), false);
 });

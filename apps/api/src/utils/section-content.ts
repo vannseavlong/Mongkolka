@@ -30,6 +30,8 @@ export const LIMITS = {
   bank: 80,
   accountName: 120,
   accountNumber: 34,
+  registryLinks: 20,
+  linkLabel: 80,
 } as const;
 
 type Obj = Record<string, unknown>;
@@ -69,7 +71,9 @@ export function validateHttpsUrl(value: unknown, field: string): string | undefi
     throw new Error(`${field} must be a valid https URL`);
   }
   if (url.protocol !== "https:") throw new Error(`${field} must start with https://`);
-  return trimmed;
+  if (url.username !== "" || url.password !== "") throw new Error(`${field} must not contain credentials`);
+  // url.href is the normalised form: control characters and odd spellings do not survive.
+  return url.href;
 }
 
 const ISO_WITH_OFFSET = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/;
@@ -79,10 +83,23 @@ export function validateStartsAt(value: unknown, path: string): string | undefin
   if (value === undefined || value === null || value === "") return undefined;
   if (typeof value !== "string") throw new Error(`${path} must be a string`);
   const trimmed = value.trim();
-  if (!ISO_WITH_OFFSET.test(trimmed) || Number.isNaN(Date.parse(trimmed))) {
+  if (!ISO_WITH_OFFSET.test(trimmed) || Number.isNaN(Date.parse(trimmed)) || !isRealDateTime(trimmed)) {
     throw new Error(`${path} must be an ISO 8601 date-time with an offset, e.g. 2026-05-29T17:00:00+07:00`);
   }
   return trimmed;
+}
+
+/** Date.parse rolls 2026-02-31 over to March and accepts T24:00, so check each part by hand. */
+function isRealDateTime(iso: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d{1,3})?(?:Z|[+-](\d{2}):(\d{2}))$/.exec(iso);
+  if (!m) return false;
+  const [y, mo, d, h, mi] = [m[1], m[2], m[3], m[4], m[5]].map(Number) as [number, number, number, number, number];
+  const sec = m[6] === undefined ? 0 : Number(m[6]);
+  const day = new Date(Date.UTC(y, mo - 1, d));
+  if (day.getUTCFullYear() !== y || day.getUTCMonth() !== mo - 1 || day.getUTCDate() !== d) return false;
+  if (h > 23 || mi > 59 || sec > 59) return false;
+  if (m[7] !== undefined && (Number(m[7]) > 23 || Number(m[8]) > 59)) return false;
+  return true;
 }
 
 function validateDay(value: string, path: string): string {
@@ -125,6 +142,7 @@ function cleanAgenda(content: Obj): Obj {
   const days = content.days ?? [];
   if (!Array.isArray(days)) throw new Error("days must be an array");
   if (days.length > LIMITS.agendaDays) throw new Error(`days must have at most ${LIMITS.agendaDays} entries`);
+  const seenDates = new Set<string>();
   return {
     days: days.map((rawDay, d) => {
       const dayPath = `days[${d}]`;
@@ -135,8 +153,12 @@ function cleanAgenda(content: Obj): Obj {
       if (items.length > LIMITS.agendaItemsPerDay) {
         throw new Error(`${dayPath}.items must have at most ${LIMITS.agendaItemsPerDay} entries`);
       }
+      const date = validateDay(day.date.trim(), `${dayPath}.date`);
+      // One entry per date: the page keys days by date, and two blocks for one day make no sense.
+      if (seenDates.has(date)) throw new Error(`${dayPath}.date ${date} is listed twice`);
+      seenDates.add(date);
       return {
-        date: validateDay(day.date.trim(), `${dayPath}.date`),
+        date,
         items: items.map((rawItem, i) => {
           const itemPath = `${dayPath}.items[${i}]`;
           const item = asObject(rawItem, itemPath);
@@ -172,10 +194,25 @@ function cleanLetters(content: Obj): Obj {
 /** Account numbers: digits, spaces and hyphens only (covers IBAN-free Cambodian bank numbers and phone-style wallets). */
 const ACCOUNT_NUMBER = /^[0-9][0-9 -]*$/;
 
+/** Registry links: {label, url}; https only, capped. Entries with neither a label nor a url are dropped. */
+function cleanLinks(value: unknown): Obj[] | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (!Array.isArray(value)) throw new Error("links must be an array");
+  if (value.length > LIMITS.registryLinks) throw new Error(`links must have at most ${LIMITS.registryLinks} entries`);
+  return value.flatMap((raw, i) => {
+    const path = `links[${i}]`;
+    const link = asObject(raw, path);
+    const label = optString(link, "label", LIMITS.linkLabel, path);
+    const url = validateHttpsUrl(link.url, `${path}.url`);
+    if (!label && !url) return [];
+    if (!url) throw new Error(`${path}.url is required`);
+    return [{ label: label ?? url, url }];
+  });
+}
+
 /**
- * Registry content: the gift fields (KHQR image, bank, account name, account number) are validated;
- * `links` is carried over exactly as before so existing registries keep working. Display data only:
- * no amounts, nothing is collected or processed.
+ * Registry content: the gift fields (KHQR image, bank, account name, account number) and `links`
+ * are validated. Display data only: no amounts, nothing is collected or processed.
  */
 function cleanRegistry(content: Obj): Obj {
   const accountNumber = optString(content, "accountNumber", LIMITS.accountNumber, "content");
@@ -183,7 +220,7 @@ function cleanRegistry(content: Obj): Obj {
     throw new Error("content.accountNumber may contain only digits, spaces and hyphens");
   }
   return compact({
-    links: Array.isArray(content.links) ? content.links : undefined,
+    links: cleanLinks(content.links),
     khqrImageUrl: validateHttpsUrl(content.khqrImageUrl, "khqrImageUrl"),
     bank: optString(content, "bank", LIMITS.bank, "content"),
     accountName: optString(content, "accountName", LIMITS.accountName, "content"),

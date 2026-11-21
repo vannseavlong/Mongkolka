@@ -58,6 +58,9 @@ function isSet(value: unknown): boolean {
   return true;
 }
 
+/** Columns a couple may change through PATCH /sections/:id. */
+const PATCHABLE_SECTION_FIELDS = ["component_id", "color_override", "display_order", "enabled", "content"] as const;
+
 export const CoupleWebsiteService = {
   async getCatalog() {
     const [templates, components] = await Promise.all([
@@ -319,9 +322,15 @@ export const CoupleWebsiteService = {
     return deduped.sort(compareByDisplayOrder);
   },
 
-  async updateSection(actorSheetId: string, sectionId: string, input: Record<string, unknown>) {
+  async updateSection(actorSheetId: string, sectionId: string, rawInput: Record<string, unknown>) {
+    // Only these columns are patchable. `section_key`, `section_id` and friends are ignored, so a
+    // body cannot re-type a section after its content was validated for the stored key.
+    let input: Record<string, unknown> = {};
+    for (const key of PATCHABLE_SECTION_FIELDS) {
+      if (rawInput[key] !== undefined) input[key] = rawInput[key];
+    }
     if (input.content !== undefined && input.content !== null) {
-      // Khmer sections (invitation/agenda/letters) are validated server-side; throws a
+      // Khmer sections (invitation/agenda/letters/registry) are validated server-side; throws a
       // ContentValidationError the controller maps to 400. Other sections pass through.
       const existing = await CoupleWebsiteModel.findSectionById(actorSheetId, sectionId);
       if (existing) {

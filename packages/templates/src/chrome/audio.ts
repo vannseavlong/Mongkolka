@@ -32,7 +32,7 @@ export function resolveMusicSrc(input: {
  * play() (autoplay policy), so the toggle should invite a tap.
  */
 export type MusicStatus = "idle" | "playing" | "paused" | "blocked";
-export type MusicEvent = "started" | "blocked" | "paused";
+export type MusicEvent = "started" | "blocked" | "paused" | "reset";
 
 export function musicReducer(state: MusicStatus, event: MusicEvent): MusicStatus {
   switch (event) {
@@ -40,6 +40,9 @@ export function musicReducer(state: MusicStatus, event: MusicEvent): MusicStatus
       return "playing";
     case "paused":
       return "paused";
+    case "reset":
+      // The audio element was discarded (new source): nothing is playing any more.
+      return "idle";
     case "blocked":
       // A refusal after the user already paused must not flip the toggle back to a "hint" state.
       return state === "paused" ? state : "blocked";
@@ -49,4 +52,20 @@ export function musicReducer(state: MusicStatus, event: MusicEvent): MusicStatus
 /** What a tap on the toggle should do next. */
 export function toggleIntent(status: MusicStatus): "play" | "pause" {
   return status === "playing" ? "pause" : "play";
+}
+
+interface ClosestTarget {
+  closest?: (selector: string) => ClosestTarget | null;
+}
+
+/**
+ * Whether a tap inside the opening gate should start the music. Openings that mark their primary
+ * action with `data-mk-open` prime only from it; otherwise any button or link counts, except ones
+ * marked `data-mk-no-music` (a language switch, a help link). Pure so it is testable without a DOM.
+ */
+export function shouldPrimeMusic(target: ClosestTarget | null | undefined): boolean {
+  const closest = target?.closest?.bind(target);
+  if (!closest) return false;
+  if (closest("[data-mk-no-music]")) return false;
+  return Boolean(closest("[data-mk-open]") ?? closest('button, a, [role="button"]'));
 }

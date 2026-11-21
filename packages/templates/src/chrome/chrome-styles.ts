@@ -22,12 +22,13 @@ export const CHROME_CSS = `
 .mk-dock-btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1 1 0;min-width:48px;min-height:50px;padding:6px 5px 5px;
   border:0;border-radius:22px;background:transparent;color:var(--mk-gold);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .25s ease}
 .mk-dock-btn svg{width:23px;height:23px;flex:none;overflow:visible;opacity:.72;transition:opacity .25s ease,transform .3s cubic-bezier(.3,1.4,.5,1);filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
-.mk-dock-btn span{font-size:10px;line-height:1.15;font-weight:500;letter-spacing:.05em;white-space:nowrap;color:var(--mk-gold);opacity:.78;transition:opacity .25s ease}
+.mk-dock-btn span{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:10px;line-height:1.15;font-weight:500;letter-spacing:.05em;white-space:nowrap;color:var(--mk-gold);opacity:.78;transition:opacity .25s ease}
 .mk-dock-btn[aria-current="true"]::before{content:"";position:absolute;inset:0;border-radius:inherit;
   background:radial-gradient(120% 90% at 50% 18%,var(--mk-glow),transparent 72%);box-shadow:inset 0 0 0 1px var(--mk-glow)}
 .mk-dock-btn[aria-current="true"] svg{opacity:1;transform:translateY(-1px) scale(1.08)}
 .mk-dock-btn[aria-current="true"] span{opacity:1;font-weight:600}
 .mk-dock-btn:active{transform:scale(.94)}
+@media (max-width:400px){.mk-dock-btn{min-width:0;padding:6px 2px 5px}.mk-dock-btn span{font-size:9px;letter-spacing:0}}
 .mk-dock-btn:focus-visible,.mk-music:focus-visible{outline:2px solid var(--mk-gold-hi);outline-offset:2px}
 @media (hover:hover){.mk-dock-btn:hover svg{opacity:1}.mk-dock-btn:hover span{opacity:1}}
 @keyframes mk-dock-in{from{opacity:0;transform:translate3d(0,26px,0)}to{opacity:1;transform:none}}

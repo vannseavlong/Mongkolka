@@ -93,6 +93,7 @@ export function useBackgroundMusic(src: string | undefined): BackgroundMusic {
         audio.load();
       }
       audioRef.current = null;
+      dispatch("reset");
     },
     [src],
   );

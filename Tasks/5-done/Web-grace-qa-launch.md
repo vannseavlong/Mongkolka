@@ -46,3 +46,6 @@ Not verified: real-device Safari, a 320 px guestbook wall, a screen reader.
 
 ## Merged to main 2026-10-30
 Merged locally with --no-ff after review and fixes; combined typecheck (templates, web, couple, api, admin), grace lint, API tests (96/96), couple lint (0 errors) and production builds of web, couple, admin and api pass. Moved to 4-testing, not 5-done: G9 is the owner looking at the template on a running app (not done), the fix commit was not re-reviewed by a fresh agent, the 90 percent foil stop (about 4.01:1 on pink, 4.34:1 on white, recomputed by hand) was not re-measured in a browser, no tests for templates (no runner), real-device Safari, a screen reader and the Khmer copy review are not done. The template and its nine component rows stay inactive until the owner approves (flip in the seed files and update the guard test, see docs/grace-template-howto.md step f).
+
+## Closed 2026-11-21
+Code already merged to main (commit above is an ancestor of main); moved to done in a board cleanup. Skipped G5, G6, G9: never run before merge.

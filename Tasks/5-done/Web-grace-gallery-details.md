@@ -46,3 +46,6 @@ Not verified: a real touch device and pinch-zoom, screen readers, Safari/iOS, a 
 
 ## Merged to main 2026-10-29
 Merged locally with --no-ff after review and fixes; combined typecheck (templates, web, couple, api, admin), grace lint, API tests (96/96), couple lint (0 errors) and production builds of web, couple and admin pass. Moved to 4-testing, not 5-done: no tests for templates (no runner), no fresh re-review of the fix commits, not yet seen in a real template on a running app (template and component rows are still inactive and not seeded), reduced motion and some Safari/real-device checks not done.
+
+## Closed 2026-11-21
+Code already merged to main (commit above is an ancestor of main); moved to done in a board cleanup. Skipped G5, G6, G9: never run before merge.

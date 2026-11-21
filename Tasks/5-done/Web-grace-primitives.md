@@ -52,3 +52,6 @@ No fresh re-review of this fix commit yet; the section tasks consume these primi
 
 ## Merged to main 2026-10-29
 Merged locally with --no-ff after review and fixes; combined typecheck (api, couple, web, admin, templates), API tests (55/55) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done: no tests for couple/templates/web (no runner), no fresh re-review of the fix commits, live schema sync and seeding not done (see CHANGELOG Needs).
+
+## Closed 2026-11-21
+Code already merged to main (commit above is an ancestor of main); moved to done in a board cleanup. Skipped G5, G6, G9: never run before merge.

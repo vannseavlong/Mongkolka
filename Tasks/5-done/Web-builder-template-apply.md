@@ -46,3 +46,6 @@ Next: re-review of the fix commit (optional for T2 if the owner accepts), G3 dec
 
 ## Merged to main 2026-10-28
 Merged locally with --no-ff after review and fixes; combined typecheck, API tests (49/49) and production builds of couple, web and admin pass. Moved to 4-testing, not 5-done, because open items remain: G3 tests (couple-app tasks have no runner; merged without them at the owner's request), live runs against the real API and sheets, G9/G10 for T3 tasks, schema sync and slug backfill (see CHANGELOG Needs).
+
+## Closed 2026-11-21
+Code already merged to main (commit above is an ancestor of main); moved to done in a board cleanup. Skipped G5, G6, G9: never run before merge.

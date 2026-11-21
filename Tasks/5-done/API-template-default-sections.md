@@ -53,3 +53,6 @@ Still open: real sheet run (json round trip), live app run, G9, G10, G11, a fres
 
 ## Merged to main 2026-10-29
 Merged locally with --no-ff after review and fixes; combined typecheck (api, couple, web, admin, templates), API tests (96/96), couple lint (0 errors) and production builds of couple, web, admin and api pass. Moved to 4-testing, not 5-done: no tests for templates/couple/web (no runner), no fresh re-review of the fix commits, live schema sync and seeding not done and never run against a real sheet or a running app (see CHANGELOG Needs); G9/G10 for the T3 task.
+
+## Closed 2026-11-21
+Code already merged to main (commit above is an ancestor of main); moved to done in a board cleanup. Skipped G5, G6, G9: never run before merge.

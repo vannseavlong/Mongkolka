@@ -48,3 +48,6 @@ Not verified: a real mouse click under reduced motion (branch unchanged), a reco
 
 ## Merged to main 2026-10-30
 Merged locally with --no-ff after review and the blocker fix; combined typecheck (templates, web, couple, api, admin), grace lint, API tests (96/96) and production builds of web (second run: the first failed fetching a Google font over the network), couple and admin pass. Moved to 4-testing, not 5-done: no fresh independent re-review of the fix commit (the first review caught a dead half of the button that the author own click test missed), no tests for templates (no runner), not seen in a real template on a running app, reduced motion with a real click and the builder preview box unchecked.
+
+## Closed 2026-11-21
+Code already merged to main (commit above is an ancestor of main); moved to done in a board cleanup. Skipped G5, G6, G9: never run before merge.

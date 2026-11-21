@@ -20,7 +20,14 @@ const KH_MONTHS = [
   "ធ្នូ",
 ] as const;
 
-const toKhmerDigits = (n: number) => String(n).replace(/\d/g, (d) => "០១២៣៤៥៦៧៨៩"[Number(d)] ?? d);
+/** Western digits to Khmer numerals (០១២៣៤៥៦៧៨៩). Non-digits pass through unchanged. */
+export const toKhmerDigits = (n: number | string): string =>
+  String(n).replace(/\d/g, (d) => "០១២៣៤៥៦៧៨៩"[Number(d)] ?? d);
+
+/** Digits in the page language: Khmer numerals for `kh`, unchanged for `en`. */
+export function localizeDigits(value: number | string, language: "en" | "kh"): string {
+  return language === "kh" ? toKhmerDigits(value) : String(value);
+}
 
 /**
  * `language` is optional so existing callers keep the runtime default locale.

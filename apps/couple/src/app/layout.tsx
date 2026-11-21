@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Great_Vibes } from "next/font/google";
+import { Great_Vibes, Moul, Battambang, Cinzel, Fredoka } from "next/font/google";
 import { Toaster } from "@mongkolka/ui/sonner";
 import "./globals.css";
 
 // Only --font-script is set up here (the other pack fonts fall back) so the builder preview matches the public site.
 const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "swap", preload: false });
+
+// Same Khmer e-invitation faces as apps/web so the builder preview matches the public site (preload off: downloaded only when used).
+const moul = Moul({ subsets: ["khmer", "latin"], weight: "400", variable: "--font-moul", display: "swap", preload: false });
+const battambang = Battambang({ subsets: ["khmer", "latin"], weight: ["300", "400", "700"], variable: "--font-battambang", display: "swap", preload: false });
+const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel", display: "swap", preload: false });
+const rounded = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-rounded", display: "swap", preload: false });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -76,7 +82,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={script.variable}>
+      <body className={`${script.variable} ${moul.variable} ${battambang.variable} ${cinzel.variable} ${rounded.variable}`}>
         {themeStyle && <style>{themeStyle}</style>}
         {children}
         <Toaster />

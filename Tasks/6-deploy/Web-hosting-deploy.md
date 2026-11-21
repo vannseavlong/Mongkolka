@@ -33,3 +33,7 @@ The web app needs a server: `/[slug]` renders per request with `cache: no-store`
 - [ ] Web deployed; `/`, `/templates`, `/marketplace` and a couple `/[slug]` page load against the live API
 - [ ] Root `CHANGELOG.md` entry added
 - [ ] Worktree and branch removed after merge
+
+## Outcome 2026-11-21
+Decision: static export on Firebase Hosting (free Spark), couple sites at `mongkolka.web.app/<slug>` (no wildcard subdomains). Merged to main from `feat/web-hosting-deploy` (a08a6f9). Web deployed and API redeployed on Render by the owner. Checked live: `/`, `/templates`, `/marketplace` return 200; `/public/api/site-by-domain/:host` returns the app's own 404 for an unknown host.
+Not checked: a real couple `/[slug]` page, custom domain end to end. Skipped G5, G6, G10 (never run before release).

@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-21 · [Web] feat: public site as static export on Firebase Hosting
+- Owner: SNLRLONG
+- Task: Tasks/6-deploy/Web-hosting-deploy.md
+- Branch/PR: feat/web-hosting-deploy (merged to main, no PR)
+- What changed: apps/web is a static export at mongkolka.web.app; couple sites use path URLs (`/<slug>`) instead of wildcard subdomains and load data client-side; `proxy.ts` removed; new `GET /public/api/site-by-domain/:host` for custom domains; reserved slugs extended; admin and couple build path-based preview URLs
+- Needs: check a real couple page and a custom domain; code and security review were not run
+
 ## 2026-11-21 · [Cross] feat: configurable image upload limits with WebP conversion
 - Owner: SNLRLONG
 - Task: Tasks/5-done/API-asset-upload-limits.md

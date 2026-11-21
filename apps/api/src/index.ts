@@ -58,10 +58,14 @@ app.use("/public/api", publicApiRouter);
 
 // Express identifies error-handling middleware by arity; `next` must stay unused.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+app.use((err: unknown, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   // body-parser errors (payload too large, malformed JSON) carry their own 4xx status.
   const status = (err as { status?: number; statusCode?: number })?.status ?? (err as { statusCode?: number })?.statusCode;
   if (typeof status === "number" && status >= 400 && status < 500) {
+    // The client only sees "bad_request", so log the real cause. Some upstream errors (e.g. a Google
+    // Sheets "Unable to parse range" for a table that was never synced) also carry a 4xx status.
+    // Method, path (no query string) and message only: never the body or headers.
+    console.warn(`[api] ${req.method} ${req.path} -> ${status}: ${err instanceof Error ? err.message : String(err)}`);
     res.status(status).json({ error: status === 413 ? "too_large" : "bad_request" });
     return;
   }

@@ -1,6 +1,6 @@
 # Web-grace-hero-story
 
-- **ID:** T-0037
+- **ID:** T-0043
 - **Repo:** packages/templates
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new components in a shared package (auto picker, see `PIPELINE.md`)

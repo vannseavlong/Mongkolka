@@ -212,3 +212,43 @@ describe("section content wiring", () => {
     assert.equal(profileWrites.length, 1);
   });
 });
+
+describe("Registry gift content validation", () => {
+  const ok = { khqrImageUrl: " https://cdn.test/qr.png ", bank: " ABA ", accountName: " Sun Chantha ", accountNumber: " 000 123-456 " };
+
+  it("trims, keeps links untouched and drops unknown keys", () => {
+    const links = [{ label: "Shop", url: "https://shop.test" }];
+    assert.deepEqual(validateSectionContent("registry", { ...ok, links, extra: 1 }), {
+      links,
+      khqrImageUrl: "https://cdn.test/qr.png",
+      bank: "ABA",
+      accountName: "Sun Chantha",
+      accountNumber: "000 123-456",
+    });
+  });
+
+  it("legacy links-only content still passes", () => {
+    const links = [{ label: "A", url: "https://a.test" }];
+    assert.deepEqual(validateSectionContent("registry", { links }), { links });
+  });
+
+  it("rejects non-https images and bad account numbers", () => {
+    assert.throws(() => validateSectionContent("registry", { khqrImageUrl: "http://x.test/a.png" }), /https/);
+    assert.throws(() => validateSectionContent("registry", { khqrImageUrl: "javascript:alert(1)" }), /khqrImageUrl/);
+    assert.throws(() => validateSectionContent("registry", { khqrImageUrl: "data:image/png;base64,AA" }), /khqrImageUrl/);
+    assert.throws(() => validateSectionContent("registry", { accountNumber: "12AB34" }), /digits, spaces and hyphens/);
+    assert.throws(() => validateSectionContent("registry", { accountNumber: "<script>" }), /digits, spaces and hyphens/);
+    assert.throws(() => validateSectionContent("registry", { accountNumber: "1".repeat(LIMITS.accountNumber + 1) }), /at most/);
+  });
+
+  it("enforces length caps and types", () => {
+    assert.throws(() => validateSectionContent("registry", { bank: "x".repeat(LIMITS.bank + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("registry", { accountName: "x".repeat(LIMITS.accountName + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("registry", { bank: 5 }), /must be a string/);
+    assert.throws(() => validateSectionContent("registry", "nope"), /must be an object/);
+  });
+
+  it("empty strings drop the field (clearing the gift block)", () => {
+    assert.deepEqual(validateSectionContent("registry", { bank: "", accountNumber: " ", khqrImageUrl: "" }), {});
+  });
+});

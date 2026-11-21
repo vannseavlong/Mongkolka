@@ -27,6 +27,9 @@ export const LIMITS = {
   agendaTime: 20,
   agendaTitle: 120,
   url: 2000,
+  bank: 80,
+  accountName: 120,
+  accountNumber: 34,
 } as const;
 
 type Obj = Record<string, unknown>;
@@ -166,7 +169,29 @@ function cleanLetters(content: Obj): Obj {
   });
 }
 
-export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters"] as const;
+/** Account numbers: digits, spaces and hyphens only (covers IBAN-free Cambodian bank numbers and phone-style wallets). */
+const ACCOUNT_NUMBER = /^[0-9][0-9 -]*$/;
+
+/**
+ * Registry content: the gift fields (KHQR image, bank, account name, account number) are validated;
+ * `links` is carried over exactly as before so existing registries keep working. Display data only:
+ * no amounts, nothing is collected or processed.
+ */
+function cleanRegistry(content: Obj): Obj {
+  const accountNumber = optString(content, "accountNumber", LIMITS.accountNumber, "content");
+  if (accountNumber !== undefined && !ACCOUNT_NUMBER.test(accountNumber)) {
+    throw new Error("content.accountNumber may contain only digits, spaces and hyphens");
+  }
+  return compact({
+    links: Array.isArray(content.links) ? content.links : undefined,
+    khqrImageUrl: validateHttpsUrl(content.khqrImageUrl, "khqrImageUrl"),
+    bank: optString(content, "bank", LIMITS.bank, "content"),
+    accountName: optString(content, "accountName", LIMITS.accountName, "content"),
+    accountNumber,
+  });
+}
+
+export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry"] as const;
 
 /**
  * Validates and cleans `website_sections.content` for the Khmer sections. Returns the
@@ -180,5 +205,6 @@ export function validateSectionContent(sectionKey: string, content: unknown): un
   const obj = asObject(content, "content");
   if (sectionKey === "invitation") return cleanInvitation(obj);
   if (sectionKey === "agenda") return cleanAgenda(obj);
+  if (sectionKey === "registry") return cleanRegistry(obj);
   return cleanLetters(obj);
 }

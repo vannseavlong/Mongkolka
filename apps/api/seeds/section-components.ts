@@ -530,6 +530,17 @@ const components = [
     font_style: "serif",
     status: "inactive",
   },
+  // INACTIVE on purpose: the Khmer templates launch task activates this row together with its template.
+  {
+    component_id: "registry_khqr",
+    section: "registry",
+    name: "KHQR Gift Card",
+    preview_bg_color: "#0d2b1d",
+    preview_text_color: "#f3e5ab",
+    preview_accent_color: "#d4af37",
+    font_style: "serif",
+    status: "inactive",
+  },
 ];
 
 export default {

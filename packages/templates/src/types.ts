@@ -149,6 +149,12 @@ export interface RsvpContent {
 
 export interface RegistryContent {
   links: { label: string; url: string }[];
+  /** Gift (KHQR) block, display only: no amounts, nothing is collected. */
+  khqrImageUrl?: string;
+  bank?: string;
+  accountName?: string;
+  /** Digits, spaces and hyphens only (validated server-side). */
+  accountNumber?: string;
 }
 
 export interface TimelineContent {

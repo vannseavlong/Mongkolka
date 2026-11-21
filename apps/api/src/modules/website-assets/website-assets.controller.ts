@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import type { CoupleRequest } from "../../middlewares/couple-context.middleware.js";
 import type { MultipartRequest } from "../../middlewares/multipart-upload.middleware.js";
+import { PlatformSettingsService } from "../platform-settings/platform-settings.service.js";
 import { WebsiteAssetsService } from "./website-assets.service.js";
 
 type Req = CoupleRequest & MultipartRequest;
@@ -10,6 +11,11 @@ function tenant(req: CoupleRequest) {
 }
 
 export const WebsiteAssetsController = {
+  /** The limits the server enforces, so the portal can show and pre-check them instead of hardcoding. */
+  async limits(_req: CoupleRequest, res: Response) {
+    res.json({ limits: await PlatformSettingsService.getAssetLimits() });
+  },
+
   async list(req: CoupleRequest, res: Response) {
     res.json({ assets: await WebsiteAssetsService.list(tenant(req)) });
   },

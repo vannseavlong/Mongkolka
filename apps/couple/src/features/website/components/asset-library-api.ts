@@ -1,13 +1,15 @@
 import { API_URL, ApiError } from "@/lib/api";
 import { clearToken, getToken } from "@/lib/auth";
 import {
-  ASSET_MAX_BYTES,
+  DEFAULT_ASSET_LIMITS,
+  type AssetLimits,
   ASSET_UPLOAD_TIMEOUT_MS,
   uploadErrorMessage,
   type WebsiteAsset,
 } from "./asset-library-logic";
 
 export const ASSETS_KEY = "/couple/api/website/assets";
+export const ASSET_LIMITS_KEY = "/couple/api/website/assets/limits";
 export const PROFILE_KEY = "/couple/api/profile";
 
 /** Reads an image's pixel size in the browser; null when it cannot be decoded (the server then decides). */
@@ -39,6 +41,7 @@ export function uploadAsset(
   onProgress: (percent: number) => void,
   signal: AbortSignal,
   timeoutMs = ASSET_UPLOAD_TIMEOUT_MS,
+  limits: AssetLimits = DEFAULT_ASSET_LIMITS,
 ): Promise<WebsiteAsset> {
   return new Promise((resolve, reject) => {
     if (signal.aborted) return reject(new ApiError("Cancelled", UPLOAD_CANCELLED));
@@ -65,7 +68,7 @@ export function uploadAsset(
     xhr.onerror = () => {
       done();
       // A connection reset right after sending a very large body is usually the server refusing it.
-      const msg = file.size > ASSET_MAX_BYTES ? uploadErrorMessage(413) : uploadErrorMessage(0);
+      const msg = file.size > limits.maxBytes ? uploadErrorMessage(413, undefined, limits) : uploadErrorMessage(0);
       reject(new ApiError(msg, 0));
     };
     xhr.onload = () => {
@@ -81,7 +84,7 @@ export function uploadAsset(
         clearToken();
         if (window.location.pathname !== "/") window.location.assign("/");
       }
-      reject(new ApiError(uploadErrorMessage(xhr.status, body.error), xhr.status));
+      reject(new ApiError(uploadErrorMessage(xhr.status, body.error, limits), xhr.status));
     };
     const form = new FormData();
     form.append("file", file);

@@ -15,8 +15,19 @@ export interface AssetUsage {
   cover: boolean;
 }
 
-export const ASSET_QUOTA = 100;
-export const ASSET_MAX_BYTES = 8 * 1024 * 1024;
+/** Limits enforced by the API (GET /couple/api/website/assets/limits). The server is the source of truth. */
+export interface AssetLimits {
+  maxPerCouple: number;
+  maxBytes: number;
+  maxDimension: number;
+}
+
+/** Shown only until the real limits load; they match the API defaults. */
+export const DEFAULT_ASSET_LIMITS: AssetLimits = {
+  maxPerCouple: 100,
+  maxBytes: 8 * 1024 * 1024,
+  maxDimension: 12000,
+};
 export const ASSET_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 export const ASSET_ACCEPT = ASSET_TYPES.join(",");
 
@@ -26,25 +37,29 @@ export function formatBytes(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** Friendly message for a file the server would reject, or null when it looks fine. */
+/** Friendly message for a file that can never be uploaded (wrong type or empty), or null. Size is checked after optimizing. */
 export function validateAssetFile(file: { name: string; type: string; size: number }): string | null {
   if (!ASSET_TYPES.includes(file.type)) return `${file.name}: only JPEG, PNG, WebP or GIF images are supported.`;
   if (file.size === 0) return `${file.name}: the file is empty.`;
-  if (file.size > ASSET_MAX_BYTES) {
-    return `${file.name}: ${formatBytes(file.size)} is over the ${formatBytes(ASSET_MAX_BYTES)} limit.`;
-  }
   return null;
 }
 
+/** Message when the file (after optimizing) is over the server size limit, else null. */
+export function sizeError(file: { name: string; size: number }, limits: AssetLimits): string | null {
+  return file.size > limits.maxBytes
+    ? `${file.name}: ${formatBytes(file.size)} is over the ${formatBytes(limits.maxBytes)} limit, even after converting to WebP.`
+    : null;
+}
+
 /** Friendly message for an upload failure from the API. */
-export function uploadErrorMessage(status: number, fallback?: string): string {
+export function uploadErrorMessage(status: number, fallback?: string, limits: AssetLimits = DEFAULT_ASSET_LIMITS): string {
   switch (status) {
     case 400:
       return "That file could not be read. Try a different image.";
     case 409:
-      return `Your library is full (${ASSET_QUOTA} images). Delete some to upload more.`;
+      return `Your library is full (${limits.maxPerCouple} images). Delete some to upload more.`;
     case 413:
-      return `Too large. Images must be under ${formatBytes(ASSET_MAX_BYTES)} and 12000 pixels on the longest side.`;
+      return `Too large. Images must be under ${formatBytes(limits.maxBytes)} and ${limits.maxDimension} pixels on the longest side.`;
     case 415:
       return "Unsupported file type. Use JPEG, PNG, WebP or GIF.";
     case 502:
@@ -60,14 +75,15 @@ export function uploadErrorMessage(status: number, fallback?: string): string {
 export function planUploads<F extends { name: string; type: string; size: number }>(
   files: F[],
   existingCount: number,
+  limits: AssetLimits = DEFAULT_ASSET_LIMITS,
 ): { accepted: F[]; rejected: string[] } {
   const accepted: F[] = [];
   const rejected: string[] = [];
-  let room = Math.max(0, ASSET_QUOTA - existingCount);
+  let room = Math.max(0, limits.maxPerCouple - existingCount);
   for (const file of files) {
     const problem = validateAssetFile(file);
     if (problem) rejected.push(problem);
-    else if (room <= 0) rejected.push(`${file.name}: your library is full (${ASSET_QUOTA} images).`);
+    else if (room <= 0) rejected.push(`${file.name}: your library is full (${limits.maxPerCouple} images).`);
     else {
       accepted.push(file);
       room -= 1;
@@ -96,13 +112,12 @@ export function togglePhoto(photos: string[], url: string): string[] {
   return photos.includes(url) ? photos.filter((p) => p !== url) : [...photos, url];
 }
 
-export const ASSET_MAX_DIMENSION = 12000;
 export const ASSET_UPLOAD_TIMEOUT_MS = 60_000;
 
 /** Message when an image is larger than the server accepts on its longest side, else null. */
-export function dimensionsError(name: string, width: number, height: number): string | null {
-  return Math.max(width, height) > ASSET_MAX_DIMENSION
-    ? `${name}: ${width}x${height} pixels is over the ${ASSET_MAX_DIMENSION} pixel limit. Resize it and try again.`
+export function dimensionsError(name: string, width: number, height: number, limits: AssetLimits = DEFAULT_ASSET_LIMITS): string | null {
+  return Math.max(width, height) > limits.maxDimension
+    ? `${name}: ${width}x${height} pixels is over the ${limits.maxDimension} pixel limit. Resize it and try again.`
     : null;
 }
 

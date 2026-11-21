@@ -16,6 +16,7 @@ import statsSchema from "../../schemas/admin/stats.js";
 import contactMessagesSchema from "../../schemas/admin/contact_messages.js";
 import sectionComponentsSchema from "../../schemas/admin/section_components.js";
 import bookingsSchema from "../../schemas/admin/bookings.js";
+import platformSettingsSchema from "../../schemas/admin/platform_settings.js";
 
 import coupleProfileSchema from "../../schemas/couple/profile.js";
 import websiteSectionsSchema from "../../schemas/couple/website_sections.js";
@@ -70,6 +71,7 @@ adapter.registerSchemas([
   contactMessagesSchema,
   sectionComponentsSchema,
   bookingsSchema,
+  platformSettingsSchema,
   coupleProfileSchema,
   websiteSectionsSchema,
   guestsSchema,

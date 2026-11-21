@@ -7,3 +7,4 @@ export * from "./site-renderer";
 export * from "./guest-context";
 export * from "./sample-content";
 export * from "./theme-presets";
+export * from "./chrome";

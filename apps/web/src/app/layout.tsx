@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Noto_Serif_Khmer, Jost, Great_Vibes } from "next/font/google";
+import { Cormorant_Garamond, Noto_Serif_Khmer, Jost, Great_Vibes, Moul, Battambang, Cinzel, Fredoka } from "next/font/google";
 import "./globals.css";
 import { fetchJson } from "@/lib/api";
 
@@ -16,6 +16,14 @@ const khmer = Noto_Serif_Khmer({ subsets: ["khmer"], variable: "--font-khmer", d
 const label = Jost({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-label", display: "swap" });
 // Script font for couple names in the "Grace" pack (Latin only; Khmer names use --font-khmer).
 const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "swap" });
+
+// Khmer e-invitation templates (packages/templates/src/chrome/fonts.ts reads these variables).
+// preload is off for all four: a face is only downloaded by a page whose text actually uses it,
+// so the rounded kids face (Fredoka) costs nothing on a wedding template.
+const moul = Moul({ subsets: ["khmer", "latin"], weight: "400", variable: "--font-moul", display: "swap", preload: false });
+const battambang = Battambang({ subsets: ["khmer", "latin"], weight: ["300", "400", "700"], variable: "--font-battambang", display: "swap", preload: false });
+const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel", display: "swap", preload: false });
+const rounded = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-rounded", display: "swap", preload: false });
 
 export const metadata: Metadata = {
   title: "Mongkolka",
@@ -84,7 +92,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${display.variable} ${khmer.variable} ${label.variable} ${script.variable}`}>
+      <body
+        className={`${display.variable} ${khmer.variable} ${label.variable} ${script.variable} ${moul.variable} ${battambang.variable} ${cinzel.variable} ${rounded.variable}`}
+      >
         {themeStyle && <style>{themeStyle}</style>}
         {children}
       </body>

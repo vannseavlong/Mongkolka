@@ -15,8 +15,19 @@ export interface MultipartRequest extends Request {
  * Reads exactly one file part named `field` into memory, capped at `maxBytes`.
  * The client filename is dropped on purpose; callers must not trust it.
  */
-export function singleFileUpload(field: string, maxBytes: number) {
+export function singleFileUpload(field: string, limit: number | (() => number | Promise<number>)) {
   return (req: MultipartRequest, res: Response, next: NextFunction) => {
+    if (typeof limit === "number") return handle(req, res, next, limit);
+    // A getter lets the cap follow settings an admin can change at runtime.
+    Promise.resolve()
+      .then(limit)
+      .then(
+        (maxBytes) => handle(req, res, next, maxBytes),
+        (err) => next(err),
+      );
+  };
+
+  function handle(req: MultipartRequest, res: Response, next: NextFunction, maxBytes: number) {
     if (!req.is("multipart/form-data")) {
       res.status(415).json({ error: "unsupported_type" });
       return;
@@ -86,5 +97,5 @@ export function singleFileUpload(field: string, maxBytes: number) {
       }),
     );
     req.pipe(bb);
-  };
+  }
 }

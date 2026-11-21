@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { KeyedLock } from "../../utils/keyed-lock.js";
 import { matchesSignature, readImageSize } from "../../utils/image-signature.js";
-import { ALLOWED_MIME, ASSET_LIMITS } from "./website-assets.limits.js";
+import { ALLOWED_MIME, ASSET_LIMITS, type AssetLimits } from "./website-assets.limits.js";
 
 /** Minimal shapes the core needs; the real model/storage satisfy them, tests fake them. */
 export interface AssetRecord {
@@ -40,6 +40,8 @@ export interface Deps {
   model: AssetModel;
   storageFor: (coupleId: string) => AssetStorage;
   invalidateCouple: (coupleId: string) => void;
+  /** Current limits (env defaults plus admin overrides). Omitted in tests, which use the env defaults. */
+  getLimits?: () => Promise<AssetLimits>;
 }
 export interface Tenant {
   coupleId: string;
@@ -135,21 +137,22 @@ export function createWebsiteAssetsCore(deps: Deps) {
 
     async upload(t: Tenant, input: { body: Buffer; mimeType: string }): Promise<UploadResult> {
       if (input.body.length === 0) return { ok: false, status: 400, error: "empty" };
+      const limits = (await deps.getLimits?.()) ?? ASSET_LIMITS;
       const ext = ALLOWED_MIME[input.mimeType];
       if (!ext || !matchesSignature(input.mimeType, input.body)) {
         return { ok: false, status: 415, error: "unsupported_type" };
       }
-      if (input.body.length > ASSET_LIMITS.maxBytes) return { ok: false, status: 413, error: "too_large" };
+      if (input.body.length > limits.maxBytes) return { ok: false, status: 413, error: "too_large" };
 
       // Count-check and insert are serialised per couple so parallel uploads can't overshoot the quota.
       const size = readImageSize(input.mimeType, input.body);
-      if (size && (size.width > ASSET_LIMITS.maxDimension || size.height > ASSET_LIMITS.maxDimension)) {
+      if (size && (size.width > limits.maxDimension || size.height > limits.maxDimension)) {
         return { ok: false, status: 413, error: "image_too_large" };
       }
 
       return lock.run(t.coupleId, async (): Promise<UploadResult> => {
         const existing = await model.findMany(t.actorSheetId);
-        if (existing.length >= ASSET_LIMITS.maxPerCouple) {
+        if (existing.length >= limits.maxPerCouple) {
           return { ok: false, status: 409, error: "quota_exceeded" };
         }
         const assetId = randomUUID();

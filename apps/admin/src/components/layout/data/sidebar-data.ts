@@ -10,6 +10,7 @@ import {
   BarChart3,
   MessageSquare,
   Users,
+  Settings,
 } from "lucide-react";
 import type { SidebarNavData } from "@mongkolka/ui/layout/nav-types";
 
@@ -29,6 +30,7 @@ export const sidebarData: SidebarNavData = {
         { title: "Stats", href: "/stats", icon: BarChart3 },
         { title: "Messages", href: "/messages", icon: MessageSquare },
         { title: "All users", href: "/users", icon: Users },
+        { title: "Settings", href: "/settings", icon: Settings },
       ],
     },
   ],

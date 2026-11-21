@@ -36,5 +36,11 @@ export const env = {
   // Public/CDN base URL objects are readable from, e.g. https://photos.example.com
   S3_PUBLIC_BASE_URL: process.env.S3_PUBLIC_BASE_URL ?? "",
 
+  // Website image library limits (couple portal uploads). Read through
+  // modules/website-assets/website-assets.limits.ts, which clamps them to safe ceilings.
+  ASSET_MAX_MB: process.env.ASSET_MAX_MB ?? "",
+  ASSET_MAX_DIMENSION: process.env.ASSET_MAX_DIMENSION ?? "",
+  ASSET_MAX_PER_COUPLE: process.env.ASSET_MAX_PER_COUPLE ?? "",
+
   LSDB_TOKENS_FILE: process.env.LSDB_TOKENS_FILE ?? ".lsdb-tokens.json",
 };

@@ -23,11 +23,13 @@ import { useApiQuery } from "@/lib/use-api-query";
 import { SECTIONS_KEY } from "../lib/keys";
 import { sectionLabel } from "../workspace/section-labels";
 import type { WebsiteSectionKey } from "../data/schema";
-import { ASSETS_KEY, PROFILE_KEY, readImageSize, uploadAsset, UPLOAD_CANCELLED } from "./asset-library-api";
+import { ASSET_LIMITS_KEY, ASSETS_KEY, PROFILE_KEY, readImageSize, uploadAsset, UPLOAD_CANCELLED } from "./asset-library-api";
+import { optimizeImage } from "./asset-optimize";
 import {
+  type AssetLimits,
   ASSET_ACCEPT,
-  ASSET_MAX_BYTES,
-  ASSET_QUOTA,
+  DEFAULT_ASSET_LIMITS,
+  sizeError,
   dimensionsError,
   formatBytes,
   planUploads,
@@ -63,6 +65,8 @@ interface AssetLibraryProps {
 export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true }: AssetLibraryProps) {
   const { data, loading, error, refetch } = useApiQuery<{ assets: WebsiteAsset[] }>(ASSETS_KEY);
   const assets = data?.assets ?? [];
+  const { data: limitsData } = useApiQuery<{ limits: AssetLimits }>(ASSET_LIMITS_KEY);
+  const limits = limitsData?.limits ?? DEFAULT_ASSET_LIMITS;
   const [uploads, setUploads] = useState<UploadItem[]>([]);
   const [dragging, setDragging] = useState(false);
   const [notes, setNotes] = useState<string[]>([]);
@@ -78,7 +82,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
     return () => map.forEach((c) => c.abort());
   }, []);
 
-  const full = assets.length >= ASSET_QUOTA;
+  const full = assets.length >= limits.maxPerCouple;
   const busy = uploads.some((u) => u.status === "uploading" || u.status === "queued");
 
   function patchUpload(id: number, patch: Partial<UploadItem>) {
@@ -88,7 +92,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
   async function handleFiles(list: FileList | File[]) {
     const files = Array.from(list);
     if (files.length === 0) return;
-    const { accepted, rejected } = planUploads(files, assets.length);
+    const { accepted, rejected } = planUploads(files, assets.length, limits);
     setNotes(rejected);
     const items = accepted.map((file) => ({ file, id: nextUploadId++ }));
     for (const { id } of items) controllers.current.set(id, new AbortController());
@@ -111,10 +115,14 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         patchUpload(id, { status: "uploading" });
         try {
           const size = await readImageSize(file);
-          const tooBig = size && dimensionsError(file.name, size.width, size.height);
+          const tooBig = size && dimensionsError(file.name, size.width, size.height, limits);
           if (tooBig) throw new ApiError(tooBig, 0);
+          // Convert to WebP at max quality first, so large photos fit the limit without visible loss.
+          const { file: optimized } = await optimizeImage(file);
+          const tooLarge = sizeError(optimized, limits);
+          if (tooLarge) throw new ApiError(tooLarge, 0);
           if (signal.aborted) throw new ApiError("Cancelled", UPLOAD_CANCELLED);
-          const asset = await uploadAsset(file, (percent) => patchUpload(id, { percent }), signal);
+          const asset = await uploadAsset(optimized, (percent) => patchUpload(id, { percent }), signal, undefined, limits);
           patchUpload(id, { status: "done", percent: 100 });
           mutate(ASSETS_KEY, (cur?: { assets: WebsiteAsset[] }) => ({ assets: [asset, ...(cur?.assets ?? [])] }), {
             revalidate: false,
@@ -147,7 +155,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium">Image library</h3>
         <p className={cn("text-xs", full ? "font-medium text-destructive" : "text-muted-foreground")} aria-live="polite">
-          {data ? `${assets.length}/${ASSET_QUOTA} images${full ? " (full)" : ""}` : " "}
+          {data ? `${assets.length}/${limits.maxPerCouple} images${full ? " (full)" : ""}` : " "}
         </p>
       </div>
 
@@ -196,10 +204,10 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         </Button>
         {full && (
           <p id="asset-full-hint" className="text-xs text-destructive">
-            Your library is full ({ASSET_QUOTA} images). Delete some to upload more.
+            Your library is full ({limits.maxPerCouple} images). Delete some to upload more.
           </p>
         )}
-        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(ASSET_MAX_BYTES)} each.</p>
+        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(limits.maxBytes)} each. JPEG and PNG are converted to WebP at full quality.</p>
       </div>
 
       {notes.length > 0 && (

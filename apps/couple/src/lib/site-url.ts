@@ -1,20 +1,23 @@
-// Builds URLs for a couple's public wedding site. The site is served as a
-// subdomain of ROOT_DOMAIN (e.g. "vutha-nita.mongkolka.app") via middleware
-// in apps/web that rewrites {slug}.{ROOT_DOMAIN} to the internal /[slug]
-// route — see apps/web/src/middleware.ts. Falls back to "localhost:3000" for
-// local dev, where "*.localhost" already resolves without any hosts-file
-// changes in modern browsers.
+// Builds URLs for a couple's public wedding site. Sites are served by path on the main site
+// (e.g. "mongkolka.web.app/vutha-nita"); apps/web is a static export and Firebase Hosting
+// rewrites /<slug> to its client-rendered site shell. NEXT_PUBLIC_ROOT_DOMAIN must be set in
+// production builds (see .env.production); it falls back to "localhost:3000" for local dev.
 export const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "localhost:3000";
 const PROTOCOL = ROOT_DOMAIN.startsWith("localhost") ? "http" : "https";
 
-/** The couple's site host, e.g. "vutha-nita.mongkolka.app". */
+/** The couple's site address without protocol, e.g. "mongkolka.web.app/vutha-nita". */
 export function siteHost(slug: string): string {
-  return `${slug}.${ROOT_DOMAIN}`;
+  return `${ROOT_DOMAIN}/${slug}`;
 }
 
-/** The couple's site origin, e.g. "https://vutha-nita.mongkolka.app". */
+/** The couple's site URL, e.g. "https://mongkolka.web.app/vutha-nita". */
 export function siteOrigin(slug: string): string {
   return `${PROTOCOL}://${siteHost(slug)}`;
+}
+
+/** Full-page preview of a template, e.g. "https://mongkolka.web.app/templates/preview/grace". */
+export function templatePreviewUrl(slug: string): string {
+  return `${PROTOCOL}://${ROOT_DOMAIN}/templates/preview/${slug}`;
 }
 
 // Query values read as "spaces, not %20" — encodeURIComponent still escapes
@@ -26,10 +29,10 @@ function encodeQueryValue(value: string): string {
 
 /**
  * A guest's personalized invitation link, e.g.
- * "https://vutha-nita.mongkolka.app/?name=Guest+1,Chea". Multiple names
+ * "https://mongkolka.web.app/vutha-nita?name=Guest+1,Chea". Multiple names
  * (a guest plus their plus-one) are comma-joined into the one `name` param.
  */
 export function buildInviteLink(slug: string, names: string[]): string {
   const value = names.filter(Boolean).map(encodeQueryValue).join(",");
-  return `${siteOrigin(slug)}/?name=${value}`;
+  return `${siteOrigin(slug)}?name=${value}`;
 }

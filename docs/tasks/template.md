@@ -355,9 +355,11 @@ component swap, and a section enable/disable reflected on the public site.
 
 ### Known gaps
 
-- The builder shows the site URL as `{slug}.localhost:3000`; `apps/web/src/proxy.ts`
-  rewrites that host to `/{slug}`, and the plain `/{slug}` path also works. (Custom
-  domains — `couples.custom_domain` — are still not resolved.)
+- The builder shows the site URL as `mongkolka.web.app/{slug}` (path-based; `proxy.ts` and
+  wildcard subdomains are gone). apps/web is a static export; Firebase rewrites `/{slug}` to a
+  client-rendered shell. A host that is not a main host is looked up through
+  `GET /public/api/site-by-domain/:host` (`couples.custom_domain`); the Firebase domain mapping
+  and the portal field to set it are still to do (Web-custom-domain-routing).
 - The opening gate's preview box in the builder is short, so the seal's caption sits at
   the very bottom edge.
 - RSVP saves take 5–8s (Sheets schema checks + quota); see Phase 8.
@@ -405,6 +407,6 @@ Pink (#fff3f6), white and gold (#8a6418) Christian-wedding design with a cross m
 
 What each section reads: opening: couple names, date, `?to=` guest name; hero: `coverPhotoUrl`, names, date; verse: `text`, `textKh`, `reference`; story: `loveStory`; gallery: `photos[]` (lightbox on tap); details: ceremony and reception time/venue/address, `dressCode`; guestbook: `guestbook` data, `actions`, `onSubmit` (apps/web supplies them); rsvp: `customMessage`, `deadline`, `onSubmit`, prefilled guest name; footer: `message`, `hashtag`, optional `brandUrl`.
 
-`brandUrl`: the footer's "Made with Mongkolka" credit links to it. apps/web builds it server-side in `src/lib/brand-url.ts` from `ROOT_DOMAIN` (http for localhost, https otherwise, undefined when unset), passes it `[slug]/page.tsx` -> `SiteView` -> `extraProps("footer")`, and the template preview pages do the same. Unset means plain text. `footer_classic` ignores the extra prop.
+`brandUrl`: the footer's "Made with Mongkolka" credit links to it. apps/web builds it in `src/lib/brand-url.ts` from `NEXT_PUBLIC_ROOT_DOMAIN` (build-time) (http for localhost, https otherwise, undefined when unset), passes it `[slug]/page.tsx` -> `SiteView` -> `extraProps("footer")`, and the template preview pages do the same. Unset means plain text. `footer_classic` ignores the extra prop.
 
 `FoilText` (gradient script text) uses `foilTextGradient`: lightest stop 90% accent (about 4.0:1 on pink, 4.35:1 on white; an earlier 88% stop measured 3.86 and 4.18); lines and borders keep the lighter `foilGradient`. Template previews use `SAMPLE_GUESTBOOK` (6 photos, 4 wishes) with a no-op submit that returns "pending". Owner steps to see it: `docs/grace-template-howto.md`.

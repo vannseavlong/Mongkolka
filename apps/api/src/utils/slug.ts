@@ -53,6 +53,15 @@ export const RESERVED_SLUGS: ReadonlySet<string> = new Set([
   "staging",
   "test",
   "mongkolka",
+  // Static routes of the public web app (served at mongkolka.web.app/<slug>)
+  "about",
+  "contact",
+  "marketplace",
+  "_next",
+  "favicon",
+  // Static files Firebase serves before the slug shell (404.html, index.html)
+  "404",
+  "index",
 ]);
 
 export function isReservedSlug(slug: string): boolean {

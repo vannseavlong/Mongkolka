@@ -70,6 +70,7 @@ export function SlugEditor({ slug }: { slug: string | null }) {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <span className="text-sm text-muted-foreground">{ROOT_DOMAIN}/</span>
       <Input
         autoFocus
         value={value}
@@ -78,7 +79,6 @@ export function SlugEditor({ slug }: { slug: string | null }) {
         className="h-8 w-32 max-w-full"
         disabled={saving}
       />
-      <span className="text-sm text-muted-foreground">.{ROOT_DOMAIN}</span>
       <Button size="sm" onClick={save} disabled={saving}>
         Save
       </Button>

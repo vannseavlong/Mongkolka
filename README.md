@@ -7,7 +7,7 @@ Wedding planning platform monorepo, managed with [Turborepo](https://turbo.build
 ```
 apps/
   web/      Next.js — mongkolka.com landing/marketing + public couple wedding sites
-            (wildcard subdomains and custom domains, host-based routing via middleware)
+            (static export on Firebase Hosting; couple sites at `mongkolka.web.app/<slug>`, custom domains resolved by host)
   admin/    Next.js — admin.mongkolka.com (login required)
   couple/   Next.js — couple.mongkolka.com (login required)
   vendor/   Next.js — vendor.mongkolka.com (login required)

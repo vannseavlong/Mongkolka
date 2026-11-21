@@ -31,9 +31,9 @@ started).
 
 Each portal is its own Next.js app talking to `apps/api` (Express) over HTTP; there's
 no shared session between them beyond the identical JWT-in-localStorage pattern.
-Public wedding sites are **path-based** (`mongkolka.com/{slug}`), not
-subdomain/custom-domain routed — `couples.custom_domain` exists in the schema but
-nothing resolves it yet (see [TODO.md](./TODO.md) Phase 6).
+Public wedding sites are **path-based** (`mongkolka.web.app/{slug}`), not
+subdomain routed; a custom domain resolves by host (`/public/api/site-by-domain`) but the
+Firebase mapping and the portal field to set `couples.custom_domain` are not built yet (see [TODO.md](./TODO.md) Phase 6).
 
 Admin manages couples & vendors (approve/reject/suspend) and the template/component
 catalog. Couple plans their wedding (checklist, budget, milestones), manages guests,

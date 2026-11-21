@@ -21,7 +21,7 @@ Toggle `grace_blush` and the nine section components to **active**: `opening_gra
 - `/templates` (catalog) and `/templates/<template_id>` (framed preview).
 - `/templates/preview/pink-gold-white` (full page). Add `?to=Name` for the opening greeting and `?lang=kh` for Khmer. Preview uses sample couple data, a sample guest wall and a no-op RSVP/guestbook (nothing is sent). Tap "Open the invitation" to enter.
 - As a couple: in the builder pick the template, upload a cover photo and gallery images, fill the story/verse/footer, publish, then open `<slug>.<root>/?to=Name`.
-- Footer credit link: set `ROOT_DOMAIN` on apps/web (the same env proxy.ts uses). Unset = plain text "Made with Mongkolka", no link.
+- Footer credit link: set `NEXT_PUBLIC_ROOT_DOMAIN` on apps/web (`.env.production`; apps/web is a static export, so it is a build-time value). Unset = plain text "Made with Mongkolka", no link.
 
 ## e. What to check, and what is unverified
 Check: opening gate (arch doors, "Dear <Name>") then hero, verse, story, gallery (tap a photo for the lightbox), details, guestbook (photo + wish, "pending" message, the wall), RSVP (prefilled name, accept, guests), footer; English and Khmer; phone, tablet, desktop.

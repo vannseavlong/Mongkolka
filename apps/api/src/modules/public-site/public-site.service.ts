@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PublicSiteModel } from "./public-site.model.js";
+import { TtlCache } from "../../utils/ttl-cache.js";
 import { PublicSiteCache, type CachedSite } from "./public-site.cache.js";
 
 export interface RsvpSubmissionInput {
@@ -8,6 +9,13 @@ export interface RsvpSubmissionInput {
   plusOne: boolean;
   message?: string;
 }
+
+// Custom-domain lookups are public and unauthenticated, so they are cached (hits briefly, misses
+// shorter) to keep a scanner from turning into one Sheets read per request. The short hit TTL is
+// the invalidation: a changed domain or unpublished site stops resolving within a minute.
+const DOMAIN_HIT_TTL_MS = 60 * 1000;
+const DOMAIN_MISS_TTL_MS = 20 * 1000;
+const domainCache = new TtlCache<{ slug: string | null }>(DOMAIN_HIT_TTL_MS, 500);
 
 async function findPublishedCoupleBySlug(slug: string) {
   const couple = await PublicSiteModel.findCoupleBySlug(slug);
@@ -57,6 +65,20 @@ export const PublicSiteService = {
   /** The cached entry (site body + couple/sheet ids) — shared with other public modules. */
   resolve(slug: string) {
     return PublicSiteCache.getOrLoad(slug, () => loadSite(slug));
+  },
+
+  /** Slug of the published site mapped to a custom domain, or null (unknown host, unpublished). */
+  async slugForDomain(domain: string): Promise<string | null> {
+    const entry = await domainCache.getOrLoad(
+      domain,
+      async () => {
+        const couple = await PublicSiteModel.findCoupleByDomain(domain);
+        const published = couple && couple.status === "active" && couple.website_status === "published";
+        return { slug: published ? ((couple.slug as string) ?? null) : null };
+      },
+      (e) => (e.slug ? DOMAIN_HIT_TTL_MS : DOMAIN_MISS_TTL_MS),
+    );
+    return entry.slug;
   },
 
   async getSite(slug: string) {

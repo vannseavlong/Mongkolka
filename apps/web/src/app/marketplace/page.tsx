@@ -1,33 +1,42 @@
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { fetchJson } from "@/lib/api";
+import { PageLoading, PageMessage } from "@/components/loading-state";
+import { useApi } from "@/lib/use-api";
 import { VendorFilters } from "./vendor-filters";
 import type { VendorCategoriesResponse, VendorsListResponse } from "./types";
 
-export default async function MarketplacePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const query = await searchParams;
-  const category = typeof query.category === "string" ? query.category : undefined;
-  const search = typeof query.search === "string" ? query.search : undefined;
-  const page = typeof query.page === "string" ? query.page : "1";
+export default function MarketplacePage() {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <Marketplace />
+    </Suspense>
+  );
+}
+
+function Marketplace() {
+  const query = useSearchParams();
+  const category = query.get("category") ?? undefined;
+  const search = query.get("search") ?? undefined;
+  const page = query.get("page") ?? "1";
 
   const params = new URLSearchParams();
   if (category) params.set("category", category);
   if (search) params.set("search", search);
   params.set("page", page);
 
-  const [categoriesRes, vendorsRes] = await Promise.all([
-    fetchJson<VendorCategoriesResponse>("/public/api/vendor-categories"),
-    fetchJson<VendorsListResponse>(`/public/api/vendors?${params.toString()}`),
-  ]);
+  const categoriesRes = useApi<VendorCategoriesResponse>("/public/api/vendor-categories");
+  const vendorsRes = useApi<VendorsListResponse>(`/public/api/vendors?${params.toString()}`);
+  if (vendorsRes.status === "loading" || categoriesRes.status === "loading") return <PageLoading />;
+  if (vendorsRes.status !== "ready") return <PageMessage title="Couldn't load vendors" body="Please try again in a moment." />;
 
-  const categories = categoriesRes?.categories ?? [];
-  const vendors = vendorsRes?.vendors ?? [];
+  const categories = categoriesRes.status === "ready" ? categoriesRes.data.categories : [];
+  const vendors = vendorsRes.data.vendors ?? [];
   const categoryLabel = (categoryId: string | null) =>
     categories.find((c) => c.category_id === categoryId)?.label_en ?? null;
 

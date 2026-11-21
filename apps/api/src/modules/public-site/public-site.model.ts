@@ -5,6 +5,10 @@ export const PublicSiteModel = {
     return adminContext().table("couples").findOne({ where: { slug } });
   },
 
+  findCoupleByDomain(domain: string) {
+    return adminContext().table("couples").findOne({ where: { custom_domain: domain } });
+  },
+
   findProfile(actorSheetId: string) {
     return coupleContext(actorSheetId).table("couple_profile").findOne();
   },

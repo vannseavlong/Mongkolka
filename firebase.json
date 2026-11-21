@@ -1,21 +1,84 @@
 {
   "hosting": [
     {
+      "target": "web",
+      "public": "apps/web/out",
+      "cleanUrls": true,
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "headers": [
+        {
+          "source": "/_next/static/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public,max-age=31536000,immutable"
+            }
+          ]
+        }
+      ],
+      "rewrites": [
+        {
+          "source": "/marketplace/**",
+          "destination": "/marketplace/_.html"
+        },
+        {
+          "source": "/templates/preview/**",
+          "destination": "/templates/preview/_.html"
+        },
+        {
+          "source": "/templates/**",
+          "destination": "/templates/_.html"
+        },
+        {
+          "source": "**",
+          "destination": "/_.html"
+        }
+      ]
+    },
+    {
       "target": "admin",
       "public": "apps/admin/out",
       "cleanUrls": true,
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
       "headers": [
-        { "source": "/_next/static/**", "headers": [{ "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }] }
+        {
+          "source": "/_next/static/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public,max-age=31536000,immutable"
+            }
+          ]
+        }
       ]
     },
     {
       "target": "couple",
       "public": "apps/couple/out",
       "cleanUrls": true,
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
       "headers": [
-        { "source": "/_next/static/**", "headers": [{ "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }] }
+        {
+          "source": "/_next/static/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public,max-age=31536000,immutable"
+            }
+          ]
+        }
       ]
     }
   ]

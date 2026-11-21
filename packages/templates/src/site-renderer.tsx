@@ -7,6 +7,8 @@ import { ChromeSection } from "./chrome/ChromeSection";
 import { SiteChrome } from "./chrome/SiteChrome";
 import type { ChromeConfig } from "./chrome/config";
 import { useSiteChrome } from "./chrome/use-site-chrome";
+import { SkinProvider } from "./sections/khmer/skin-context";
+import { skinFromComponents } from "./sections/khmer/skin-resolve";
 import { resolveTheme } from "./theme";
 import type { CoupleInfo, PartialTheme, SectionKey, Theme } from "./types";
 
@@ -95,6 +97,7 @@ export function SiteRenderer({
     musicSectionUrl: musicContent?.playlistUrl,
   });
 
+  const skin = skinFromComponents(template.default_components);
   const ordered = [...sections].filter((s) => s.enabled).sort((a, b) => a.display_order - b.display_order);
   const opening = ordered.find((s) => s.section_key === "opening");
   const rest = ordered.filter((s) => s.section_key !== "opening");
@@ -123,6 +126,7 @@ export function SiteRenderer({
 
   return (
     <GuestProvider name={guestGreeting}>
+      <SkinProvider skin={skin}>
       {rest.map((section) => {
         const theme = resolveTheme(template.default_theme, themeOverride, section.color_override);
         const Component = resolveComponent(
@@ -149,6 +153,7 @@ export function SiteRenderer({
         }
         return wrapSection ? <Fragment key={section.section_id}>{wrapSection(section, node)}</Fragment> : node;
       })}
+      </SkinProvider>
       {chrome.resolved && (
         <SiteChrome
           resolved={chrome.resolved}

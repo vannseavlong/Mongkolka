@@ -362,8 +362,8 @@ export default {
         story: "story_letter",
         agenda: "agenda_khmer",
         details: "details_khmer",
-        gallery: "gallery_masonry",
-        registry: "registry_cards",
+        gallery: "gallery_fairytale",
+        registry: "registry_khqr",
         letters: "letters_khmer",
         guestbook: "guestbook_wall",
         rsvp: "rsvp_card",
@@ -388,7 +388,12 @@ export default {
         { section_key: "music", enabled: false },
         { section_key: "footer", enabled: true },
       ],
-      chrome: { dock: true, music: { icon: "disc" }, particles: { kinds: ["butterflies", "bokeh"], density: "normal", colors: ["#2f4b8a", "#f4c2c9", "#ffffff"] } },
+      chrome: {
+        dock: true,
+        music: { icon: "waves" },
+        // blue morpho-style butterflies and light motes (no bokeh discs: they read as flat blobs on the sky); colours are royal blue, pastel pink and white
+        particles: { kinds: ["butterflies", "dust"], density: "normal", colors: ["#2f4b8a", "#6db5ff", "#f4c2c9", "#ffffff"] },
+      },
       status: "inactive",
     },
     {

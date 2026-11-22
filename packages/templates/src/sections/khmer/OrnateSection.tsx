@@ -39,7 +39,7 @@ export function OrnateSection({ theme, id, heading, children }: OrnateSectionPro
     <section
       id={id}
       data-mk-lang={language}
-      className="px-4 py-14 text-center sm:px-6"
+      className={sk.Backdrop ? "relative overflow-hidden px-4 py-14 text-center sm:px-6" : "px-4 py-14 text-center sm:px-6"}
       style={{
         color: theme.text_color,
         fontFamily: KHMER_BODY_FONT,
@@ -51,6 +51,11 @@ export function OrnateSection({ theme, id, heading, children }: OrnateSectionPro
       <style href="mk-khmer-css" precedence="mk-khmer">
         {KHMER_CSS}
       </style>
+      {sk.Backdrop && (
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <sk.Backdrop color={theme.accent_color} ground={theme.bg_color} />
+        </div>
+      )}
       <div className="relative mx-auto w-full max-w-xl px-6 py-14 sm:px-12" style={{ borderRadius: sk.radius, ...sk.surface(theme) }}>
         {sk.inset > 0 && (
           <div

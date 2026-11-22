@@ -623,6 +623,16 @@ const components = [
     status: "inactive",
   },
   {
+    component_id: "gallery_fairytale",
+    section: "gallery",
+    name: "Storybook Polaroids",
+    preview_bg_color: "#bfd7ea",
+    preview_text_color: "#1c2d5a",
+    preview_accent_color: "#2f4b8a",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
     component_id: "hero_fairytale",
     section: "hero",
     name: "Storybook Portrait",

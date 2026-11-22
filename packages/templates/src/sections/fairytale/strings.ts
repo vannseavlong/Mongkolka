@@ -4,10 +4,12 @@ export const strings = {
     "fairytale.greeting": "You are invited to our fairytale",
     "fairytale.open": "Tap to open the book",
     "fairytale.tagline": "Once upon a time",
+    "fairytale.book": "Storybook invitation",
   },
   kh: {
     "fairytale.greeting": "សូមអញ្ជើញចូលរួមរឿងនិទានរបស់យើង",
     "fairytale.open": "សូមចុចបើកសំបុត្រ",
     "fairytale.tagline": "កាលពីព្រេងនាយ",
+    "fairytale.book": "សៀវភៅនិទានសំបុត្រអញ្ជើញ",
   },
 } as const;

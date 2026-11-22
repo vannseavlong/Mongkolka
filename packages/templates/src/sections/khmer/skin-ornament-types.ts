@@ -44,6 +44,8 @@ export interface BackdropProps {
   color: string;
   /** The section ground colour. */
   ground: string;
+  /** The section id, so a backdrop can vary from section to section (optional). */
+  id?: string;
 }
 
 export interface SkinOrnaments {

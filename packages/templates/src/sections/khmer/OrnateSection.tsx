@@ -53,7 +53,7 @@ export function OrnateSection({ theme, id, heading, children }: OrnateSectionPro
       </style>
       {sk.Backdrop && (
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <sk.Backdrop color={theme.accent_color} ground={theme.bg_color} />
+          <sk.Backdrop color={theme.accent_color} ground={theme.bg_color} id={id} />
         </div>
       )}
       <div className="relative mx-auto w-full max-w-xl px-6 py-14 sm:px-12" style={{ borderRadius: sk.radius, ...sk.surface(theme) }}>

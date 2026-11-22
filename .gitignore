@@ -54,3 +54,6 @@ uploads/
 web-hosting-deploy/
 UI-Temp/
 .firebase/hosting.YXBwcy93ZWIvb3V0.cache
+/mongkolka-*/
+.DS_Store
+khmer-einvite-reference/images/

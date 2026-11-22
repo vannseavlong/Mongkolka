@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-22 · [Cross] feat: six Khmer e-invitation templates (inactive)
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-khmer-*.md, Web-khqr-gift.md, Web-skinned-sections-*.md (plan: Tasks/_plans/Web-khmer-einvite-templates.md)
+- Branch/PR: feat/khmer-einvite-integration (merged to main, no PR)
+- What changed: [Web] shared chrome (dock, music toggle, particles, reveals), new `invitation`, `agenda`, `letters` sections, KHQR gift card on `registry`, skin-aware gallery, guestbook, story, details, RSVP and footer, and six original skins (`emerald_kbach`, `royal_garden`, `royal_cream`, `sakura_romance`, `fairytale_storybook`, `kids_fantasy_birthday`). [API] section schemas, server-side validation (https-only map/link URLs, ISO `startsAt`, length caps), nullable `site_templates.chrome` column, inactive template and component seed rows
+- Needs: before deploying the API run `lsdb sync --dry-run`, `lsdb sync`, then `lsdb sync --all-users`, then deploy and seed with `--upsert`; read back the first saved `chrome` and gift values; templates stay inactive until the QA task (`Web-khmer-templates-waves`) passes; browser check (360px to desktop), code review and human review of the two T3 tasks (KHQR gift, review fixes) were not run
+
 ## 2026-11-21 · [Web] feat: public site as static export on Firebase Hosting
 - Owner: SNLRLONG
 - Task: Tasks/6-deploy/Web-hosting-deploy.md

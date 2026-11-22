@@ -6,7 +6,7 @@ import { LanguageProvider, type Language } from "../../i18n";
 import { sectionRegistry } from "../../registry";
 import { SAMPLE_CONTENT, SAMPLE_COUPLE } from "../../sample-content";
 import { AGENDA_ICONS, type Theme } from "../../types";
-import { SKIN_ORNAMENTS, ornamentsFor, DEFAULT_ORNAMENTS } from "../khmer";
+import { SKIN_ORNAMENTS, ornamentsFor } from "../khmer";
 import { SkinProvider } from "../khmer/skin-context";
 import { Skyline, skylinePath } from "./art/Backdrop";
 import { EMERALD_ORNAMENTS } from "./ornaments";
@@ -73,10 +73,10 @@ describe("opening logic", () => {
 });
 
 describe("emerald skin", () => {
-  it("registers its own ornament set and leaves the other skins on the default", () => {
+  it("registers its own ornament set, not shared with other skins", () => {
     assert.equal(ornamentsFor("emerald"), EMERALD_ORNAMENTS);
     assert.equal(SKIN_ORNAMENTS.emerald.id, "emerald");
-    assert.equal(SKIN_ORNAMENTS.garden, DEFAULT_ORNAMENTS);
+    for (const skin of ["garden", "cream", "sakura", "fairytale", "kids"] as const) assert.notEqual(SKIN_ORNAMENTS[skin], EMERALD_ORNAMENTS, skin);
   });
   it("ornament set is complete: nine ritual icons, surface, heading, backdrop", () => {
     for (const icon of AGENDA_ICONS) assert.equal(typeof EMERALD_ORNAMENTS.icons[icon], "function", icon);

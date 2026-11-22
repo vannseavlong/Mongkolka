@@ -3,7 +3,7 @@ export const strings = {
   en: {
     "sakura.greeting": "Together with their families, you are invited",
     "sakura.open": "Tap to open the invitation",
-    "sakura.tagline": "Save the date",
+    "sakura.tagline": "Save the Date",
   },
   kh: {
     "sakura.greeting": "សិរីមង្គលអាពាហ៍ពិពាហ៍ សូមគោរពអញ្ជើញ",

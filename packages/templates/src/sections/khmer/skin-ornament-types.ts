@@ -59,4 +59,9 @@ export interface SkinOrnaments {
   /** Stroke width of the line icons. */
   iconStroke: number;
   motion: MotionFlavour;
+  /**
+   * Optional scene art behind the card: background layers for the whole section (vines, hedges,
+   * glows). Applied last, so it replaces the default glows. Must be pure CSS (no DOM, no JS).
+   */
+  sectionBackground?: (theme: Theme) => CSSProperties;
 }

@@ -216,7 +216,7 @@ export default {
         agenda: "agenda_khmer",
         details: "details_khmer",
         gallery: "gallery_masonry",
-        registry: "registry_cards",
+        registry: "registry_khqr",
         letters: "letters_khmer",
         guestbook: "guestbook_wall",
         rsvp: "rsvp_card",
@@ -241,7 +241,7 @@ export default {
         { section_key: "music", enabled: false },
         { section_key: "footer", enabled: true },
       ],
-      chrome: { dock: true, music: { icon: "disc" }, particles: { kinds: ["petals", "dust"], density: "low", colors: ["#ffffff", "#d8a7a7", "#9caf88"] } },
+      chrome: { dock: true, music: { icon: "waves", corner: "top-right" }, particles: { kinds: ["petals", "dust"], density: "low", colors: ["#ffffff", "#d8a7a7", "#9caf88"] } },
       status: "inactive",
     },
     {

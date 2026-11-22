@@ -1,5 +1,6 @@
 import type { SkinId } from "../skins";
 import { DEFAULT_ORNAMENTS } from "./ornaments/default-ornaments";
+import { GARDEN_ORNAMENTS } from "../garden/ornaments";
 import type { SkinOrnaments } from "./skin-ornament-types";
 
 /**
@@ -9,7 +10,7 @@ import type { SkinOrnaments } from "./skin-ornament-types";
  */
 export const SKIN_ORNAMENTS: Record<SkinId, SkinOrnaments> = {
   emerald: DEFAULT_ORNAMENTS,
-  garden: DEFAULT_ORNAMENTS,
+  garden: GARDEN_ORNAMENTS,
   cream: DEFAULT_ORNAMENTS,
   sakura: DEFAULT_ORNAMENTS,
   fairytale: DEFAULT_ORNAMENTS,

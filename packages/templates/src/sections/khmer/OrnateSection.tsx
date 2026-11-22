@@ -45,6 +45,7 @@ export function OrnateSection({ theme, id, heading, children }: OrnateSectionPro
         fontFamily: KHMER_BODY_FONT,
         backgroundColor: theme.bg_color,
         backgroundImage: `radial-gradient(120% 60% at 50% 0%, ${glow}, transparent 70%), radial-gradient(100% 50% at 50% 100%, ${withAlpha(mixHex(theme.accent_color, theme.bg_color, 50), dark ? 0.12 : 0.08)}, transparent 70%)`,
+        ...sk.sectionBackground?.(theme),
       }}
     >
       <style href="mk-khmer-css" precedence="mk-khmer">

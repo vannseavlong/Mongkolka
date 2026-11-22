@@ -46,6 +46,8 @@ export interface SkinOrnaments {
   Divider: ComponentType<DividerProps>;
   Crest: ComponentType<CrestProps>;
   icons: IconSet;
+  /** Optional layer painted behind a shared section (washes, florals, scene art); cards sit on top of it. */
+  Backdrop?: ComponentType<{ theme: Theme }>;
   /** Corner ornaments shown on the card frame. */
   corners: boolean;
   /** Distance in px of the inner pin-stripe from the card edge; 0 = no pin-stripe. */

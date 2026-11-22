@@ -24,7 +24,7 @@ const KHMER_IDS = [
   "kids_fantasy_birthday",
 ];
 const PARTICLE_KINDS = ["petals", "butterflies", "dust", "bokeh"];
-const DOCK_KEYS = ["invitation", "agenda", "details", "gallery", "registry", "guestbook", "rsvp"];
+const DOCK_KEYS = ["invitation", "story", "agenda", "details", "gallery", "registry", "guestbook", "rsvp"];
 
 type Tpl = {
   template_id: string;
@@ -98,6 +98,33 @@ describe("Khmer e-invitation seed rows", () => {
     const khqr = componentRows.find((c) => c.component_id === "registry_khqr");
     assert.equal(khqr?.section, "registry");
     assert.equal(khqr?.status, "inactive");
+  });
+
+  it("default page is the standard sections on the skin; the Khmer-specific ones exist but are off", () => {
+    const ON = ["opening", "hero", "story", "gallery", "details", "rsvp", "guestbook", "footer"];
+    const OFF = ["invitation", "verse", "agenda", "registry", "timeline", "music", "letters"];
+    for (const t of templates as Tpl[]) {
+      const on = t.default_sections.filter((x) => x.enabled).map((x) => x.section_key);
+      assert.deepEqual(on, ON, `${t.template_id} enabled sections, in order`);
+      const off = t.default_sections.filter((x) => !x.enabled).map((x) => x.section_key);
+      assert.deepEqual([...off].sort(), [...OFF].sort(), `${t.template_id} optional sections`);
+      assert.equal(t.default_components.story, "story_skin", t.template_id);
+      assert.equal(t.default_components.rsvp, "rsvp_skin", t.template_id);
+      assert.equal(t.default_components.footer, "footer_skin", t.template_id);
+      assert.equal(t.default_components.details, t.template_id === "kids_fantasy_birthday" ? "details_kids" : "details_skin", t.template_id);
+      const include = typeof t.chrome.dock === "object" ? (t.chrome.dock.include ?? []) : [];
+      for (const k of include) assert.ok(on.includes(k), `${t.template_id} dock ${k} is on by default`);
+    }
+  });
+
+  it("skinned section components are seeded inactive and registered", () => {
+    for (const [id, section] of [["story_skin", "story"], ["details_skin", "details"], ["rsvp_skin", "rsvp"], ["footer_skin", "footer"]] as const) {
+      const row = componentRows.find((c) => c.component_id === id);
+      assert.ok(row, `${id} seeded`);
+      assert.equal(row.section, section);
+      assert.equal(row.status, "inactive");
+      assert.ok(registered.has(id), `${id} registered`);
+    }
   });
 
   it("chrome config uses known particle kinds and dock sections", () => {

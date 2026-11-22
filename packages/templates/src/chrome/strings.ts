@@ -9,6 +9,7 @@ const STRINGS = {
   en: {
     "dock.label": "Jump to a section",
     "dock.invitation": "Invitation",
+    "dock.story": "Story",
     "dock.agenda": "Agenda",
     "dock.map": "Location",
     "dock.gallery": "Gallery",
@@ -25,6 +26,7 @@ const STRINGS = {
   kh: {
     "dock.label": "រំកិលទៅផ្នែកផ្សេងៗ",
     "dock.invitation": "សំបុត្រ",
+    "dock.story": "រឿង",
     "dock.agenda": "កម្មវិធី",
     "dock.map": "ទីតាំង",
     "dock.gallery": "រូបភាព",

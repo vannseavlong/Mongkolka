@@ -3,7 +3,8 @@
 import {
   LanguageProvider,
   LanguageToggle,
-  SAMPLE_CONTENT,
+  sampleContentFor,
+  skinFromComponents,
   SAMPLE_COUPLE,
   SAMPLE_GUESTBOOK,
   SAMPLE_GUESTBOOK_ACTIONS,
@@ -52,12 +53,13 @@ export function TemplatePreview({
   /** Main-site URL for the footer credit link (undefined = plain text). */
   brandUrl?: string;
 }) {
+  const sample = sampleContentFor(skinFromComponents(template.default_components));
   const site = (
     <SiteRenderer
       template={template}
       sections={previewSections(template.default_sections)}
       couple={SAMPLE_COUPLE}
-      buildContent={(sectionKey) => SAMPLE_CONTENT[sectionKey] ?? {}}
+      buildContent={(sectionKey) => sample[sectionKey] ?? {}}
       guestGreeting={guestGreeting}
       extraProps={(sectionKey) => {
         // Sample data only: nothing is sent anywhere from a template preview.

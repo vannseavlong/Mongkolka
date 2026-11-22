@@ -1,3 +1,4 @@
+import type { SkinId } from "./sections/skins";
 import type { CoupleInfo, GuestbookActions, GuestbookData, GuestbookResult, SectionKey } from "./types";
 
 /**
@@ -89,6 +90,23 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
     ],
   },
 };
+
+/**
+ * Sample content for a template preview, per skin. Every skin shows the wedding sample except the birthday one,
+ * whose story, RSVP note and footer would otherwise read as a wedding.
+ */
+const KIDS_SAMPLE_OVERRIDES: Partial<Record<SectionKey, unknown>> = {
+  story: {
+    loveStory:
+      "Our little star is turning one! Twelve months of giggles, first steps and sleepy cuddles. Come and celebrate with cake, music and lots of balloons.",
+  },
+  rsvp: { customMessage: "Please let us know if you can join the party!", deadline: "2026-11-01" },
+  footer: { message: "Thank you for sharing our little one's big day.", hashtag: "#AlexTurnsOne" },
+};
+
+export function sampleContentFor(skin: SkinId | null | undefined): Partial<Record<SectionKey, unknown>> {
+  return skin === "kids" ? { ...SAMPLE_CONTENT, ...KIDS_SAMPLE_OVERRIDES } : SAMPLE_CONTENT;
+}
 
 /** A sample guest wall (6 photos, 4 wishes) so the preview shows what a guestbook looks like. Not real guests. */
 export const SAMPLE_GUESTBOOK: GuestbookData = {

@@ -1,7 +1,7 @@
 "use client";
 
 import type { CoupleInfo, DetailsContent, Theme } from "../../types";
-import { useLanguage } from "../../i18n";
+import { useLanguage, type TranslationKey } from "../../i18n";
 import { CINZEL_FONT } from "../../chrome/fonts";
 import { withAlpha } from "../../chrome/gold";
 import { OrnateSection } from "./OrnateSection";
@@ -13,6 +13,8 @@ export interface DetailsKhmerProps {
   couple: CoupleInfo;
   theme: Theme;
   content?: DetailsContent;
+  /** Heading dictionary key; defaults to the Khmer "Location" heading. The skinned details pass the standard "Event Details". */
+  headingKey?: TranslationKey;
 }
 
 function PinIcon({ color }: { color: string }) {
@@ -29,7 +31,7 @@ function PinIcon({ color }: { color: string }) {
  * icon, dress code, and a gold button to an https map link. A map embed and QR are not included
  * (an embed loads a third party; a QR needs an encoder dependency).
  */
-export function DetailsKhmer({ theme, content }: DetailsKhmerProps) {
+export function DetailsKhmer({ theme, content, headingKey = "khmer.details.heading" }: DetailsKhmerProps) {
   const { t } = useLanguage();
   const sk = useSkinOrnaments();
   if (!content) return null;
@@ -43,7 +45,7 @@ export function DetailsKhmer({ theme, content }: DetailsKhmerProps) {
   if (rows.length === 0 && !map && !image && !dress) return null;
 
   return (
-    <OrnateSection theme={theme} id="details" heading={t("khmer.details.heading")}>
+    <OrnateSection theme={theme} id="details" heading={t(headingKey)}>
       {image && (
         <div
           className="mx-auto mb-8 w-full max-w-sm overflow-hidden"
@@ -67,7 +69,7 @@ export function DetailsKhmer({ theme, content }: DetailsKhmerProps) {
                 <div className="mx-auto mb-3 w-fit">
                   <Icon color={theme.accent_color} size={34} strokeWidth={sk.iconStroke} />
                 </div>
-                <p className="m-0 text-sm" style={{ ...sk.heading(theme, "en"), fontSize: "0.85rem", fontFamily: "inherit", textTransform: "none", letterSpacing: "normal" }}>
+                <p className="m-0 text-sm font-semibold" style={{ color: theme.accent_color }}>
                   {r.label}
                 </p>
                 {r.time && (

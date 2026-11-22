@@ -32,8 +32,11 @@ describe("kids_fantasy_birthday seed", () => {
       assert.equal(row.status, "inactive");
     }
   });
-  it("is a birthday: invitation, party plan, location, gift and wishes sections are on", () => {
+  it("default page is the standard sections; the party invitation, party plan and gift are optional and off", () => {
     const on = new Set(kids.default_sections.filter((s) => s.enabled).map((s) => s.section_key));
-    for (const k of ["opening", "hero", "invitation", "agenda", "details", "gallery", "registry", "guestbook", "footer"]) assert.ok(on.has(k), k);
+    for (const k of ["opening", "hero", "story", "gallery", "details", "rsvp", "guestbook", "footer"]) assert.ok(on.has(k), k);
+    for (const k of ["invitation", "agenda", "registry", "letters"]) {
+      assert.ok(kids.default_sections.some((s) => s.section_key === k && !s.enabled), `${k} present but off`);
+    }
   });
 });

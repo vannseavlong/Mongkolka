@@ -3,6 +3,7 @@ import type { Theme } from "../../types";
 import { ROUNDED_FONT } from "../../chrome/fonts";
 import { mixHex, withAlpha } from "../../chrome/gold";
 import type { CrestProps, DividerProps, OrnamentProps, SkinOrnaments } from "../khmer/skin-ornament-types";
+import { KIDS_MEDIA } from "./media";
 import { KidsSectionBackdrop } from "./art/Backdrop";
 import { KIDS_ICONS } from "./art/icons";
 import { KIDS_PASTELS } from "./art/palette";
@@ -108,5 +109,6 @@ export const KIDS_ORNAMENTS: SkinOrnaments = {
   heading,
   iconStroke: 2.2,
   motion: "float",
+  media: KIDS_MEDIA,
   Backdrop: KidsSectionBackdrop,
 };

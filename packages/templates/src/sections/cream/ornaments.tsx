@@ -4,6 +4,7 @@ import { MOUL_FONT } from "../../chrome/fonts";
 import { goldStops, mixHex, withAlpha } from "../../chrome/gold";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import type { BackdropProps, CrestProps, DividerProps, OrnamentProps, SkinOrnaments } from "../khmer/skin-ornament-types";
+import { CREAM_MEDIA } from "./media";
 import { SectionBackdrop } from "./art/Compositions";
 import { Shield } from "./art/Shield";
 import { CREAM_ICONS } from "./icons";
@@ -159,4 +160,5 @@ export const CREAM_ORNAMENTS: SkinOrnaments = {
   heading,
   iconStroke: 1.4,
   motion: "float",
+  media: CREAM_MEDIA,
 };

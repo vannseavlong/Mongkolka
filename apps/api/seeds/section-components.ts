@@ -623,6 +623,27 @@ const components = [
     status: "inactive",
   },
   {
+    component_id: "gallery_skin",
+    section: "gallery",
+    name: "Skin Gallery",
+    preview_bg_color: "#0d2b1d",
+    preview_text_color: "#f3e5ab",
+    preview_accent_color: "#d4af37",
+    font_style: "serif",
+    // INACTIVE on purpose: the Khmer template pack launch flips it with the six templates.
+    status: "inactive",
+  },
+  {
+    component_id: "guestbook_skin",
+    section: "guestbook",
+    name: "Skin Guestbook",
+    preview_bg_color: "#0d2b1d",
+    preview_text_color: "#f3e5ab",
+    preview_accent_color: "#d4af37",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
     component_id: "gallery_fairytale",
     section: "gallery",
     name: "Storybook Polaroids",

@@ -1,4 +1,4 @@
-import type { ComponentType, CSSProperties } from "react";
+import type { ComponentType, CSSProperties, ReactNode } from "react";
 import type { AgendaIcon, Theme } from "../../types";
 
 /**
@@ -48,6 +48,41 @@ export interface BackdropProps {
   id?: string;
 }
 
+export interface MediaFrameProps {
+  theme: Theme;
+  /** Stable tile index: frames vary tint, sticker and corner from it. */
+  index: number;
+  /** `gallery` tiles are larger; `wall` photos sit inside a guest note; `preview` is the chosen-photo thumbnail. */
+  variant: "gallery" | "wall" | "preview";
+  /** Aspect-ratio class for the photo box (a wall photo gets a per-item aspect); defaults to the skin's `media.aspect`. */
+  aspect?: string;
+  /** The `<img>`, already absolutely positioned to fill the photo box. */
+  children: ReactNode;
+}
+
+/**
+ * How a skin frames photos and styles the guest form. Used by the skin-aware gallery and guestbook
+ * (`gallery_skin`, `guestbook_skin`). Optional: a skin without `media` gets a neutral gold frame.
+ */
+export interface SkinMedia {
+  /** Draws the whole decorative frame (mat, ornaments, stickers) around the photo box. */
+  Frame: ComponentType<MediaFrameProps>;
+  /** Default photo aspect class, e.g. "aspect-[4/5]". */
+  aspect: string;
+  /** Body font for labels, notes and fields (defaults to the Khmer-friendly body stack). */
+  fontFamily?: string;
+  /** Extra top/bottom padding (px) inside the form card for skins whose card art hangs into it (blossom branches, a flower bed). */
+  cardPad?: { top?: number; bottom?: number };
+  /** Rotation in degrees for a tile (polaroid and sticker skins); omitted = upright. */
+  tilt?: (index: number) => number;
+  /** A guest wish note on the wall. */
+  note: (theme: Theme) => CSSProperties;
+  /** Text input and textarea. */
+  field: (theme: Theme, invalid?: boolean) => CSSProperties;
+  /** The primary (submit) button. */
+  button: (theme: Theme) => CSSProperties;
+}
+
 export interface SkinOrnaments {
   id: string;
   /** Optional scene art drawn behind the card of every shared section (clipped to the section; decorative). */
@@ -72,4 +107,6 @@ export interface SkinOrnaments {
   /** Stroke width of the line icons. */
   iconStroke: number;
   motion: MotionFlavour;
+  /** Photo frames and form styling for the skin-aware gallery and guestbook. */
+  media?: SkinMedia;
 }

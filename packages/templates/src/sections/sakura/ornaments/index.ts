@@ -1,4 +1,5 @@
 import type { SkinOrnaments } from "../../khmer/skin-ornament-types";
+import { SAKURA_MEDIA } from "../media";
 import { sakuraHeading, sakuraSurface } from "../sakura-style";
 import { SakuraCorner } from "./Corner";
 import { SakuraCrest } from "./Crest";
@@ -23,4 +24,5 @@ export const SAKURA_ORNAMENTS: SkinOrnaments = {
   heading: sakuraHeading,
   iconStroke: 1.5,
   motion: "float",
+  media: SAKURA_MEDIA,
 };

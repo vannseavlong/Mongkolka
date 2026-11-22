@@ -6,6 +6,7 @@ import { GoldGradientDef, useSvgId } from "../khmer/ornaments/Corner";
 import { DEFAULT_ICONS } from "../khmer/ornaments/icons";
 import { foilTextGradient } from "../khmer/foil";
 import type { CrestProps, DividerProps, IconProps, IconSet, OrnamentProps, SkinOrnaments } from "../khmer/skin-ornament-types";
+import { EMERALD_MEDIA } from "./media";
 import { Medallion } from "./art/Medallion";
 import { emeraldPalette, latticeDataUri } from "./palette";
 
@@ -130,4 +131,5 @@ export const EMERALD_ORNAMENTS: SkinOrnaments = {
   sectionBackground,
   iconStroke: 1.5,
   motion: "shimmer",
+  media: EMERALD_MEDIA,
 };

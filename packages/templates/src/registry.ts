@@ -51,6 +51,8 @@ import { GraceDetails } from "./sections/grace/Details";
 import { GraceRsvp } from "./sections/grace/Rsvp";
 import { GraceGuestbook } from "./sections/grace/Guestbook";
 import { GraceFooter } from "./sections/grace/Footer";
+import { SkinGallery } from "./sections/skinned/GallerySkin";
+import { SkinGuestbook } from "./sections/skinned/GuestbookSkin";
 import { KbachGate } from "./sections/kbach/Gate";
 import { HeroKbach } from "./sections/kbach/Hero";
 import { StoryKbach } from "./sections/kbach/Story";
@@ -129,6 +131,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     gallery_carousel: GalleryCarousel,
     gallery_plates: GalleryPlates,
     gallery_grace: GraceGallery,
+    gallery_skin: SkinGallery,
   },
   details: {
     details_classic: DetailsClassic,
@@ -169,6 +172,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   guestbook: {
     guestbook_wall: GuestbookWall,
     guestbook_grace: GraceGuestbook,
+    guestbook_skin: SkinGuestbook,
   },
   letters: {
     letters_khmer: LettersKhmer,

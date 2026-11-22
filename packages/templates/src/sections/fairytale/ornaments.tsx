@@ -3,6 +3,7 @@ import type { Theme } from "../../types";
 import { CINZEL_FONT, MOUL_FONT } from "../../chrome/fonts";
 import { mixHex, withAlpha } from "../../chrome/gold";
 import type { CrestProps, DividerProps, IconProps, IconSet, OrnamentProps, SkinOrnaments } from "../khmer/skin-ornament-types";
+import { FAIRYTALE_MEDIA } from "./media";
 import { Hydrangea, Leaf, Morpho, Sprig, useUid } from "./art";
 import { PINK, PINK_DEEP, bloomsFor } from "./fairytale-logic";
 import { Backdrop } from "./Backdrop";
@@ -205,5 +206,6 @@ export const FAIRYTALE_ORNAMENTS: SkinOrnaments = {
   heading,
   iconStroke: 1.5,
   motion: "float",
+  media: FAIRYTALE_MEDIA,
   Backdrop,
 };

@@ -4,6 +4,7 @@ import { CINZEL_FONT, MOUL_FONT } from "../../chrome/fonts";
 import { mixHex, withAlpha } from "../../chrome/gold";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import type { SkinOrnaments } from "../khmer/skin-ornament-types";
+import { GARDEN_MEDIA } from "./media";
 import { gardenPalette } from "./palette";
 import { GardenCorner } from "./ornaments/GardenCorner";
 import { GardenCrest } from "./ornaments/GardenCrest";
@@ -60,5 +61,6 @@ export const GARDEN_ORNAMENTS: SkinOrnaments = {
   heading,
   iconStroke: 1.5,
   motion: "float",
+  media: GARDEN_MEDIA,
   sectionBackground: gardenSectionBackground,
 };

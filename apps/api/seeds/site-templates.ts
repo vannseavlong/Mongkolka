@@ -314,7 +314,7 @@ export default {
         agenda: "agenda_khmer",
         details: "details_khmer",
         gallery: "gallery_masonry",
-        registry: "registry_cards",
+        registry: "registry_khqr",
         letters: "letters_khmer",
         guestbook: "guestbook_wall",
         rsvp: "rsvp_card",

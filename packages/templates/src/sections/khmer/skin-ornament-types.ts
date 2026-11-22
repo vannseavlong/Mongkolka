@@ -56,6 +56,8 @@ export interface SkinOrnaments {
   surface: (theme: Theme) => CSSProperties;
   /** Style of a section heading (foil text, font, spacing). */
   heading: (theme: Theme, language: "en" | "kh") => CSSProperties;
+  /** Optional layered backdrop painted behind each section's card (lattice, glow). Merged over the default glow. */
+  sectionBackground?: (theme: Theme) => CSSProperties;
   /** Stroke width of the line icons. */
   iconStroke: number;
   motion: MotionFlavour;

@@ -4,7 +4,7 @@
  * `invitation` and `agenda`, work without a change in this file.
  */
 
-export type DockIconName = "invitation" | "agenda" | "map" | "gallery" | "gift" | "wishes" | "rsvp";
+export type DockIconName = "invitation" | "story" | "agenda" | "map" | "gallery" | "gift" | "wishes" | "rsvp";
 export type DockLabelKey = `dock.${DockIconName}`;
 
 export interface DockTarget {
@@ -14,6 +14,7 @@ export interface DockTarget {
 
 export const DOCK_TARGETS: Readonly<Record<string, DockTarget>> = {
   invitation: { icon: "invitation", labelKey: "dock.invitation" },
+  story: { icon: "story", labelKey: "dock.story" },
   agenda: { icon: "agenda", labelKey: "dock.agenda" },
   details: { icon: "map", labelKey: "dock.map" },
   gallery: { icon: "gallery", labelKey: "dock.gallery" },

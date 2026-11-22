@@ -53,6 +53,7 @@ import { GraceGuestbook } from "./sections/grace/Guestbook";
 import { GraceFooter } from "./sections/grace/Footer";
 import { SkinGallery } from "./sections/skinned/GallerySkin";
 import { SkinGuestbook } from "./sections/skinned/GuestbookSkin";
+import { StorySkin, DetailsSkin, RsvpSkin, FooterSkin } from "./sections/skinned";
 import { KbachGate } from "./sections/kbach/Gate";
 import { HeroKbach } from "./sections/kbach/Hero";
 import { StoryKbach } from "./sections/kbach/Story";
@@ -119,6 +120,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     story_manuscript: StoryManuscript,
     story_kbach: StoryKbach,
     story_grace: GraceStory,
+    story_skin: StorySkin,
   },
   agenda: {
     agenda_khmer: AgendaKhmer,
@@ -140,6 +142,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     details_programme: DetailsProgramme,
     details_kbach: DetailsKbach,
     details_grace: GraceDetails,
+    details_skin: DetailsSkin,
     details_khmer: DetailsKhmer,
     details_kids: DetailsKids,
   },
@@ -149,6 +152,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     rsvp_minimal: RsvpMinimal,
     rsvp_reply: RsvpReply,
     rsvp_grace: GraceRsvp,
+    rsvp_skin: RsvpSkin,
   },
   registry: {
     registry_classic: RegistryClassic,
@@ -180,6 +184,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   footer: {
     footer_classic: FooterClassic,
     footer_grace: GraceFooter,
+    footer_skin: FooterSkin,
   },
 };
 

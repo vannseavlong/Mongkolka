@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { CoupleProfileModel } from "./couple-profile.model.js";
 import { PHOTO_UPLOAD_MODES, clampPhotoSetting } from "../guest-photos/guest-photos.limits.js";
+import { validateHttpsUrl } from "../../utils/section-content.js";
 import { PublicSiteCache } from "../public-site/public-site.cache.js";
 
 export interface CoupleProfileUpdateInput {
@@ -17,10 +18,23 @@ export interface CoupleProfileUpdateInput {
   reception_venue?: string;
   reception_address?: string;
   dress_code?: string;
+  map_url?: string | null;
+  venue_image_url?: string | null;
   photo_uploads?: string;
   photo_max_per_guest?: number;
   photo_max_size_mb?: number;
   photo_rate_per_ip_per_hour?: number;
+}
+
+export class ProfileInputError extends Error {}
+
+/** validateHttpsUrl throws a plain Error; the controller maps ProfileInputError to a 400. */
+function httpsUrlOrNull(value: unknown, field: string): string | null {
+  try {
+    return validateHttpsUrl(value, field) ?? null;
+  } catch (err) {
+    throw new ProfileInputError((err as Error).message);
+  }
 }
 
 export const CoupleProfileService = {
@@ -53,6 +67,10 @@ export const CoupleProfileService = {
     if (input.reception_address !== undefined)
       profileFields.reception_address = input.reception_address;
     if (input.dress_code !== undefined) profileFields.dress_code = input.dress_code;
+    // https only (a map link and a venue photo are rendered as href/src on the public site).
+    if (input.map_url !== undefined) profileFields.map_url = httpsUrlOrNull(input.map_url, "map_url");
+    if (input.venue_image_url !== undefined)
+      profileFields.venue_image_url = httpsUrlOrNull(input.venue_image_url, "venue_image_url");
     if (input.photo_uploads !== undefined) {
       if (!(PHOTO_UPLOAD_MODES as readonly string[]).includes(input.photo_uploads)) {
         throw new Error("photo_uploads must be off, auto or pending");

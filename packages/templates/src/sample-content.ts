@@ -1,3 +1,4 @@
+import type { SkinId } from "./sections/skins";
 import type { CoupleInfo, GuestbookActions, GuestbookData, GuestbookResult, SectionKey } from "./types";
 
 /**
@@ -18,11 +19,44 @@ export const SAMPLE_PHOTOS = [
   "https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=60",
 ];
 
+/** Placeholder pattern (NOT a scannable code, not a real account) so the preview shows the gift card. */
+const SAMPLE_KHQR =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"/><g fill="#222"><path d="M1 1h7v7H1zM13 1h7v7h-7zM1 13h7v7H1z"/></g><g fill="#fff"><path d="M2 2h5v5H2zM14 2h5v5h-5zM2 14h5v5H2z"/></g><g fill="#222"><path d="M3 3h3v3H3zM15 3h3v3h-3zM3 15h3v3H3zM10 1h2v2h-2zM9 4h2v2H9zM10 9h2v2h-2zM13 10h2v2h-2zM16 9h4v2h-4zM12 13h2v3h-2zM15 14h2v2h-2zM18 13h2v3h-2zM10 17h4v2h-4zM16 18h4v2h-4zM9 12h2v2H9z"/></g></svg>',
+  );
+
 export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
   hero: { coverPhotoUrl: SAMPLE_PHOTOS[0] },
   verse: {
     text: "Therefore shall a man leave his father and his mother, and shall cleave unto his wife: and they shall be one flesh.",
     reference: "Genesis 2:24",
+  },
+  invitation: {
+    groom: { nameKh: "សុខា", nameEn: "Sokha", fatherKh: "លោក សុខ វិសាល", fatherEn: "Mr. Sok Visal", motherKh: "លោកស្រី ចាន់ ស្រីមុំ", motherEn: "Mrs. Chan Sreymom" },
+    bride: { nameKh: "ដារ៉ា", nameEn: "Dara", fatherKh: "លោក គង់ វណ្ណា", fatherEn: "Mr. Kong Vanna", motherKh: "លោកស្រី ហេង សុភា", motherEn: "Mrs. Heng Sopha" },
+    monogram: "S&D",
+    lunarKh: "ថ្ងៃសុក្រ ១៥កើត ខែពិសាខ ឆ្នាំម្សាញ់ សប្តស័ក ព.ស. ២៥៧០",
+    solarKh: "ត្រូវនឹងថ្ងៃទី២៩ ខែឧសភា ឆ្នាំ២០២៦",
+    startsAt: "2026-12-12T17:00:00+07:00",
+    greetingEn: "Together with their families, request the honour of your presence at the wedding of their children.",
+  },
+  agenda: {
+    days: [
+      {
+        date: "2026-12-12",
+        items: [
+          { time: "07:00", titleKh: "ពិធីហែជំនូន", titleEn: "Procession", icon: "procession" },
+          { time: "09:00", titleKh: "ពិធីកាត់សក់បង្កក់សិរី", titleEn: "Hair-cutting", icon: "scissors" },
+          { time: "11:00", titleKh: "ពិធីសែនចងដៃ", titleEn: "Wrist-tying blessing", icon: "thread" },
+          { time: "17:00", titleKh: "ពិធីជប់លៀង", titleEn: "Reception", icon: "dinner" },
+        ],
+      },
+    ],
+  },
+  letters: {
+    gratitudeEn: "With heartfelt gratitude, we thank everyone who joined us and shared this day.",
+    apologyEn: "We apologise if a printed invitation did not reach you; please accept this one with our warmest welcome.",
   },
   footer: { message: "Thank you for celebrating with us.", hashtag: "#AlexAndSam" },
   story: {
@@ -38,10 +72,15 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
     receptionVenue: "The Grand Hall",
     receptionAddress: "456 Grand Blvd, Phnom Penh",
     dressCode: "Formal — soft pastels welcome",
+    mapUrl: "https://maps.google.com/?q=Riverside+Garden+Phnom+Penh",
   },
   rsvp: { customMessage: "We can't wait to celebrate with you!", deadline: "2026-11-01" },
   registry: {
     links: [{ label: "Our registry", url: "#" }],
+    khqrImageUrl: SAMPLE_KHQR,
+    bank: "ABA Bank",
+    accountName: "SUN CHANTHA",
+    accountNumber: "000 123 456",
   },
   timeline: {
     chapters: [
@@ -51,6 +90,23 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
     ],
   },
 };
+
+/**
+ * Sample content for a template preview, per skin. Every skin shows the wedding sample except the birthday one,
+ * whose story, RSVP note and footer would otherwise read as a wedding.
+ */
+const KIDS_SAMPLE_OVERRIDES: Partial<Record<SectionKey, unknown>> = {
+  story: {
+    loveStory:
+      "Our little star is turning one! Twelve months of giggles, first steps and sleepy cuddles. Come and celebrate with cake, music and lots of balloons.",
+  },
+  rsvp: { customMessage: "Please let us know if you can join the party!", deadline: "2026-11-01" },
+  footer: { message: "Thank you for sharing our little one's big day.", hashtag: "#AlexTurnsOne" },
+};
+
+export function sampleContentFor(skin: SkinId | null | undefined): Partial<Record<SectionKey, unknown>> {
+  return skin === "kids" ? { ...SAMPLE_CONTENT, ...KIDS_SAMPLE_OVERRIDES } : SAMPLE_CONTENT;
+}
 
 /** A sample guest wall (6 photos, 4 wishes) so the preview shows what a guestbook looks like. Not real guests. */
 export const SAMPLE_GUESTBOOK: GuestbookData = {

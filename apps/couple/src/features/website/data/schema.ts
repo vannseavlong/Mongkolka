@@ -3,8 +3,10 @@ import { z } from "zod";
 export const WEBSITE_SECTIONS = [
   "opening",
   "hero",
+  "invitation",
   "verse",
   "story",
+  "agenda",
   "gallery",
   "details",
   "rsvp",
@@ -12,6 +14,7 @@ export const WEBSITE_SECTIONS = [
   "timeline",
   "music",
   "guestbook",
+  "letters",
   "footer",
 ] as const;
 

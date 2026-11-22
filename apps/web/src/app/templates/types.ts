@@ -1,4 +1,4 @@
-import type { SectionKey, Theme } from "@mongkolka/templates";
+import type { ChromeConfig, SectionKey, Theme } from "@mongkolka/templates";
 
 export interface SiteTemplateSummary {
   template_id: string;
@@ -7,6 +7,8 @@ export interface SiteTemplateSummary {
   description?: string;
   default_theme: Theme;
   default_components: Partial<Record<SectionKey, string>>;
+  /** Shared chrome switches (music, dock, particles); null/absent = none. */
+  chrome?: ChromeConfig | null;
   /** Normalised by the public API (null when the template has none); the preview uses its order and on/off flags. */
   default_sections?: { section_key: SectionKey; enabled: boolean }[] | null;
   status: string;

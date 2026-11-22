@@ -99,6 +99,7 @@ erDiagram
         json default_theme
         json default_components
         json default_sections
+        json chrome
         string status
         date _created_at
         date _updated_at
@@ -257,6 +258,8 @@ erDiagram
         string reception_venue
         string reception_address
         string dress_code
+        string map_url
+        string venue_image_url
         string site_template_id
         json theme_override
         string photo_uploads

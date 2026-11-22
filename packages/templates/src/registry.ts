@@ -23,6 +23,7 @@ import { RsvpMinimal } from "./sections/rsvp/Minimal";
 import { RegistryClassic } from "./sections/registry/Classic";
 import { RegistryCards } from "./sections/registry/Cards";
 import { RegistryList } from "./sections/registry/List";
+import { RegistryKhqr } from "./sections/registry/KhqrGift";
 import { TimelineClassic } from "./sections/timeline/Classic";
 import { TimelineVerticalLine } from "./sections/timeline/VerticalLine";
 import { TimelineHorizontal } from "./sections/timeline/Horizontal";
@@ -50,10 +51,20 @@ import { GraceDetails } from "./sections/grace/Details";
 import { GraceRsvp } from "./sections/grace/Rsvp";
 import { GraceGuestbook } from "./sections/grace/Guestbook";
 import { GraceFooter } from "./sections/grace/Footer";
+import { SkinGallery } from "./sections/skinned/GallerySkin";
+import { SkinGuestbook } from "./sections/skinned/GuestbookSkin";
+import { StorySkin, DetailsSkin, RsvpSkin, FooterSkin } from "./sections/skinned";
 import { KbachGate } from "./sections/kbach/Gate";
 import { HeroKbach } from "./sections/kbach/Hero";
 import { StoryKbach } from "./sections/kbach/Story";
 import { DetailsKbach } from "./sections/kbach/Details";
+import { InvitationKhmer, AgendaKhmer, LettersKhmer, DetailsKhmer } from "./sections/khmer";
+import { EmeraldOpening, EmeraldHero } from "./sections/emerald";
+import { GardenOpening, GardenHero } from "./sections/garden";
+import { CreamOpening, CreamHero } from "./sections/cream";
+import { SakuraOpening, SakuraHero } from "./sections/sakura";
+import { FairytaleOpening, FairytaleHero, FairytaleGallery } from "./sections/fairytale";
+import { KidsOpening, KidsHero, InvitationKids, AgendaKids, DetailsKids } from "./sections/kids";
 
 // Each section's components take a different, section-specific props shape (see
 // sections/*/*.tsx), so this lookup map is necessarily `ComponentType<any>` at the
@@ -71,6 +82,12 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     opening_seal: Seal,
     opening_kbach: KbachGate,
     opening_grace: GraceOpening,
+    opening_emerald: EmeraldOpening,
+    opening_garden: GardenOpening,
+    opening_cream: CreamOpening,
+    opening_sakura: SakuraOpening,
+    opening_fairytale: FairytaleOpening,
+    opening_kids: KidsOpening,
   },
   hero: {
     hero_classic: HeroClassic,
@@ -79,6 +96,18 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_folio: HeroFolio,
     hero_kbach: HeroKbach,
     hero_grace: GraceHero,
+    hero_emerald: EmeraldHero,
+    hero_garden: GardenHero,
+    hero_cream: CreamHero,
+    hero_sakura: SakuraHero,
+    hero_fairytale: FairytaleHero,
+    hero_kids: KidsHero,
+  },
+  // Reserved keys: components are registered by the Web-khmer-skeleton task. Until then
+  // resolveComponent() finds nothing and SiteRenderer renders nothing for these sections.
+  invitation: {
+    invitation_khmer: InvitationKhmer,
+    invitation_kids: InvitationKids,
   },
   verse: {
     verse_classic: VerseClassic,
@@ -91,13 +120,20 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     story_manuscript: StoryManuscript,
     story_kbach: StoryKbach,
     story_grace: GraceStory,
+    story_skin: StorySkin,
+  },
+  agenda: {
+    agenda_khmer: AgendaKhmer,
+    agenda_kids: AgendaKids,
   },
   gallery: {
+    gallery_fairytale: FairytaleGallery,
     gallery_grid: GalleryGrid,
     gallery_masonry: GalleryMasonry,
     gallery_carousel: GalleryCarousel,
     gallery_plates: GalleryPlates,
     gallery_grace: GraceGallery,
+    gallery_skin: SkinGallery,
   },
   details: {
     details_classic: DetailsClassic,
@@ -106,6 +142,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     details_programme: DetailsProgramme,
     details_kbach: DetailsKbach,
     details_grace: GraceDetails,
+    details_skin: DetailsSkin,
+    details_khmer: DetailsKhmer,
+    details_kids: DetailsKids,
   },
   rsvp: {
     rsvp_classic: RsvpClassic,
@@ -113,12 +152,14 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     rsvp_minimal: RsvpMinimal,
     rsvp_reply: RsvpReply,
     rsvp_grace: GraceRsvp,
+    rsvp_skin: RsvpSkin,
   },
   registry: {
     registry_classic: RegistryClassic,
     registry_cards: RegistryCards,
     registry_list: RegistryList,
     registry_ledger: RegistryLedger,
+    registry_khqr: RegistryKhqr,
   },
   timeline: {
     timeline_classic: TimelineClassic,
@@ -135,10 +176,15 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   guestbook: {
     guestbook_wall: GuestbookWall,
     guestbook_grace: GraceGuestbook,
+    guestbook_skin: SkinGuestbook,
+  },
+  letters: {
+    letters_khmer: LettersKhmer,
   },
   footer: {
     footer_classic: FooterClassic,
     footer_grace: GraceFooter,
+    footer_skin: FooterSkin,
   },
 };
 

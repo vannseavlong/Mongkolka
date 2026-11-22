@@ -15,7 +15,7 @@ export default defineTable({
   columns: {
     component_id: string().required().unique(),
     section: string()
-      .enum(['opening', 'hero', 'verse', 'story', 'gallery', 'details', 'rsvp', 'registry', 'timeline', 'music', 'guestbook', 'footer'])
+      .enum(['opening', 'hero', 'invitation', 'verse', 'story', 'agenda', 'gallery', 'details', 'rsvp', 'registry', 'timeline', 'music', 'guestbook', 'letters', 'footer'])
       .required(),
     name: string().required(),
     preview_bg_color: string(),

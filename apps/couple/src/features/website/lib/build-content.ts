@@ -18,6 +18,8 @@ export interface PreviewProfile {
   reception_venue: string | null;
   reception_address: string | null;
   dress_code: string | null;
+  map_url?: string | null;
+  venue_image_url?: string | null;
 }
 
 /**
@@ -42,6 +44,8 @@ export function buildPreviewContent(sectionKey: SectionKey, profile: PreviewProf
         receptionVenue: profile.reception_venue ?? undefined,
         receptionAddress: profile.reception_address ?? undefined,
         dressCode: profile.dress_code ?? undefined,
+        mapUrl: profile.map_url ?? undefined,
+        venueImageUrl: profile.venue_image_url ?? undefined,
       };
     default:
       return {};

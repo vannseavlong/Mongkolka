@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { GRACE_EN, GRACE_KH } from "./sections/grace/strings";
+import { SKIN_EN, SKIN_KH } from "./sections/skin-strings";
+import type { SkinKey } from "./sections/skins";
 
 export type Language = "en" | "kh";
 
@@ -150,10 +152,10 @@ const baseDictionary = {
   },
 } as const satisfies Record<Language, Record<string, string>>;
 
-/** Grace pack strings are merged from sections/grace/strings (keys prefixed `grace.<section>.`). */
+/** Grace pack strings are merged from sections/grace/strings (keys prefixed `grace.<section>.`); the Khmer skin packs from sections/skin-strings (keys prefixed `khmer.` or `<skin>.`). */
 const dictionary: Record<Language, Record<string, string>> = {
-  en: { ...baseDictionary.en, ...GRACE_EN },
-  kh: { ...baseDictionary.kh, ...GRACE_KH },
+  en: { ...baseDictionary.en, ...GRACE_EN, ...SKIN_EN },
+  kh: { ...baseDictionary.kh, ...GRACE_KH, ...SKIN_KH },
 };
 
 declare const process: { env: { NODE_ENV?: string } };
@@ -166,7 +168,7 @@ function warnMissing(language: Language, key: string) {
   console.warn(`[i18n] missing ${language} translation: ${key}`);
 }
 
-export type TranslationKey = keyof (typeof baseDictionary)["en"] | `grace.${string}`;
+export type TranslationKey = keyof (typeof baseDictionary)["en"] | `grace.${string}` | SkinKey;
 
 interface LanguageContextValue {
   language: Language;

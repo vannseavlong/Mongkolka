@@ -25,6 +25,10 @@ export default defineTable({
     // start on. null/empty = fixed SECTION_KEYS order, all enabled. Validated on write in
     // the API (utils/section-keys.ts); unknown keys are ignored on read.
     default_sections: json(),
+    // Nullable. Shared "chrome" switches for the Khmer e-invitation skins (music toggle, bottom dock, ambient
+    // particles, scroll reveals): { dock?, music?, particles?, reveal? }, see packages/templates/src/chrome/config.ts.
+    // null = none (the template renders exactly as before). Seed-only for now; no admin UI.
+    chrome: json(),
     status: string().enum(['active', 'inactive']).default('active'),
   },
 });

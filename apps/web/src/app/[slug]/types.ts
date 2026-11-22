@@ -1,4 +1,4 @@
-import type { PartialTheme, SectionKey, Theme } from "@mongkolka/templates";
+import type { ChromeConfig, PartialTheme, SectionKey, Theme } from "@mongkolka/templates";
 
 export interface PublicSiteResponse {
   couple: {
@@ -18,6 +18,8 @@ export interface PublicSiteResponse {
     reception_venue: string | null;
     reception_address: string | null;
     dress_code: string | null;
+    map_url?: string | null;
+    venue_image_url?: string | null;
     site_template_id: string | null;
     theme_override: PartialTheme | null;
   } | null;
@@ -26,6 +28,8 @@ export interface PublicSiteResponse {
     name: string;
     default_theme: Theme;
     default_components: Partial<Record<SectionKey, string>>;
+    /** Shared chrome switches (music, dock, particles); null/absent = none. */
+    chrome?: ChromeConfig | null;
     status: string;
   } | null;
   sections: {

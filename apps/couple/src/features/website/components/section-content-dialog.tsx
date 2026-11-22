@@ -4,7 +4,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { mutate } from "swr";
 import { ArrowDown, ArrowUp, ImagePlus, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@mongkolka/ui/button";
@@ -12,12 +11,16 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
 import { Input } from "@mongkolka/ui/input";
 import { Textarea } from "@mongkolka/ui/textarea";
-import { api, ApiError } from "@/lib/api";
-import { SECTIONS_KEY } from "../lib/keys";
+import { ApiError } from "@/lib/api";
+import { asRecord, saveContent } from "../lib/section-content-save";
 import type { WebsiteSection, WebsiteSectionKey } from "../data/schema";
 import { AssetPicker } from "./asset-picker";
 import { newUrlsOnly } from "./asset-library-logic";
 import { VERSE_PRESETS } from "../lib/verse-presets";
+import { InvitationContentForm } from "./invitation-content-form";
+import { AgendaContentForm } from "./agenda-content-form";
+import { LettersContentForm } from "./letters-content-form";
+import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
 
 /** The only section keys with no other canonical content source — see
@@ -30,16 +33,11 @@ export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
   "music",
   "verse",
   "footer",
+  "invitation",
+  "agenda",
+  "letters",
 ];
 
-function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
-}
-
-async function saveContent(sectionId: string, content: Record<string, unknown>) {
-  await api.patch(`/couple/api/website/sections/${sectionId}`, { content });
-  mutate(SECTIONS_KEY);
-}
 
 // ---------------------------------------------------------------------------
 // gallery — content: { photos: string[] }
@@ -143,7 +141,7 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
 }
 
 // ---------------------------------------------------------------------------
-// registry — content: { links: { label: string, url: string }[] }
+// registry — content: { links: { label, url }[], khqrImageUrl?, bank?, accountName?, accountNumber? }
 // ---------------------------------------------------------------------------
 
 const registrySchema = z.object({
@@ -153,6 +151,15 @@ const registrySchema = z.object({
       url: z.string().min(1, "URL is required"),
     }),
   ),
+  gift: z.object({
+    khqrImageUrl: z.string(),
+    bank: z.string().max(GIFT_LIMITS.bank, `Max ${GIFT_LIMITS.bank} characters`),
+    accountName: z.string().max(GIFT_LIMITS.accountName, `Max ${GIFT_LIMITS.accountName} characters`),
+    accountNumber: z
+      .string()
+      .max(GIFT_LIMITS.accountNumber, `Max ${GIFT_LIMITS.accountNumber} characters`)
+      .refine((v) => v.trim() === "" || ACCOUNT_NUMBER_PATTERN.test(v.trim()), "Digits, spaces and hyphens only"),
+  }),
 });
 type RegistryFormValues = z.infer<typeof registrySchema>;
 
@@ -165,13 +172,14 @@ function RegistryContentForm({ section, onSaved }: { section: WebsiteSection; on
       links: initialLinks
         .filter((l): l is { label?: unknown; url?: unknown } => !!l && typeof l === "object")
         .map((l) => ({ label: String(l.label ?? ""), url: String(l.url ?? "") })),
+      gift: giftFromContent(content),
     },
   });
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "links" });
 
   async function onSubmit(values: RegistryFormValues) {
     try {
-      await saveContent(section.section_id, { links: values.links });
+      await saveContent(section.section_id, { links: values.links, ...giftToContent(values.gift) });
       toast.success("Registry updated");
       onSaved();
     } catch (err) {
@@ -225,6 +233,7 @@ function RegistryContentForm({ section, onSaved }: { section: WebsiteSection; on
         >
           <Plus className="size-3" /> Add link
         </Button>
+        <GiftContentFields form={form} />
         <DialogFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
             Save registry
@@ -683,6 +692,9 @@ const SECTION_LABELS: Partial<Record<WebsiteSectionKey, string>> = {
   music: "playlist",
   verse: "verse",
   footer: "footer",
+  invitation: "invitation",
+  agenda: "agenda",
+  letters: "thank-you letters",
 };
 
 export function SectionContentDialog({
@@ -722,6 +734,15 @@ export function SectionContentDialog({
             )}
             {section.section_key === "footer" && (
               <FooterContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
+            )}
+            {section.section_key === "invitation" && (
+              <InvitationContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
+            )}
+            {section.section_key === "agenda" && (
+              <AgendaContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
+            )}
+            {section.section_key === "letters" && (
+              <LettersContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
             )}
           </>
         )}

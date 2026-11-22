@@ -29,8 +29,13 @@ function buildContent(sectionKey: SectionKey, profile: PublicSiteResponse["profi
         receptionVenue: profile?.reception_venue ?? undefined,
         receptionAddress: profile?.reception_address ?? undefined,
         dressCode: profile?.dress_code ?? undefined,
+        mapUrl: profile?.map_url ?? undefined,
+        venueImageUrl: profile?.venue_image_url ?? undefined,
       };
     case "verse":
+    case "invitation":
+    case "agenda":
+    case "letters":
     case "footer":
       // Owned by website_sections.content; nothing derived from the profile.
       return {};

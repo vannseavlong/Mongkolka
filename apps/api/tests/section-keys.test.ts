@@ -50,8 +50,8 @@ describe("section key lists stay in sync", () => {
     assert.deepEqual(apiSections, templates);
   });
 
-  it("includes verse and footer", () => {
-    assert.ok(templates.includes("verse") && templates.includes("footer") && templates.includes("guestbook"));
+  it("includes verse, footer and the Khmer sections", () => {
+    for (const key of ["verse", "footer", "guestbook", "invitation", "agenda", "letters"]) assert.ok(templates.includes(key), key);
   });
   it("API service mirrors the templates SECTION_KEYS (order too)", () => {
     assert.deepEqual(service, templates);

@@ -61,7 +61,7 @@ import { GardenOpening, GardenHero } from "./sections/garden";
 import { CreamOpening, CreamHero } from "./sections/cream";
 import { SakuraOpening, SakuraHero } from "./sections/sakura";
 import { FairytaleOpening, FairytaleHero } from "./sections/fairytale";
-import { KidsOpening, KidsHero } from "./sections/kids";
+import { KidsOpening, KidsHero, InvitationKids, AgendaKids, DetailsKids } from "./sections/kids";
 
 // Each section's components take a different, section-specific props shape (see
 // sections/*/*.tsx), so this lookup map is necessarily `ComponentType<any>` at the
@@ -104,6 +104,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   // resolveComponent() finds nothing and SiteRenderer renders nothing for these sections.
   invitation: {
     invitation_khmer: InvitationKhmer,
+    invitation_kids: InvitationKids,
   },
   verse: {
     verse_classic: VerseClassic,
@@ -119,6 +120,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   },
   agenda: {
     agenda_khmer: AgendaKhmer,
+    agenda_kids: AgendaKids,
   },
   gallery: {
     gallery_grid: GalleryGrid,
@@ -135,6 +137,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     details_kbach: DetailsKbach,
     details_grace: GraceDetails,
     details_khmer: DetailsKhmer,
+    details_kids: DetailsKids,
   },
   rsvp: {
     rsvp_classic: RsvpClassic,

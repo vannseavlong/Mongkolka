@@ -59,4 +59,9 @@ export interface SkinOrnaments {
   /** Stroke width of the line icons. */
   iconStroke: number;
   motion: MotionFlavour;
+  /**
+   * Optional painted scene behind the card of every shared section (clouds, blobs, stars...). Rendered by
+   * `OrnateSection` inside the section, under the card; it must be decorative (aria-hidden) and pointer-events-none.
+   */
+  Backdrop?: ComponentType<{ theme: Theme; id?: string }>;
 }

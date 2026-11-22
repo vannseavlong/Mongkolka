@@ -39,8 +39,17 @@ export type IconSet = Record<AgendaIcon, ComponentType<IconProps>>;
 /** `shimmer` = a slow light sweep over crest and countdown tiles; `float` = the crest drifts; `still` = none. */
 export type MotionFlavour = "shimmer" | "float" | "still";
 
+export interface BackdropProps {
+  /** The theme accent. */
+  color: string;
+  /** The section ground colour. */
+  ground: string;
+}
+
 export interface SkinOrnaments {
   id: string;
+  /** Optional scene art drawn behind the card of every shared section (clipped to the section; decorative). */
+  Backdrop?: ComponentType<BackdropProps>;
   /** Drawn for the top-left corner; the frame mirrors it into the other three. */
   Corner: ComponentType<OrnamentProps>;
   Divider: ComponentType<DividerProps>;

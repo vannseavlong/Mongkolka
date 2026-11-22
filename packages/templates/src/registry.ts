@@ -60,7 +60,7 @@ import { EmeraldOpening, EmeraldHero } from "./sections/emerald";
 import { GardenOpening, GardenHero } from "./sections/garden";
 import { CreamOpening, CreamHero } from "./sections/cream";
 import { SakuraOpening, SakuraHero } from "./sections/sakura";
-import { FairytaleOpening, FairytaleHero } from "./sections/fairytale";
+import { FairytaleOpening, FairytaleHero, FairytaleGallery } from "./sections/fairytale";
 import { KidsOpening, KidsHero } from "./sections/kids";
 
 // Each section's components take a different, section-specific props shape (see
@@ -121,6 +121,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     agenda_khmer: AgendaKhmer,
   },
   gallery: {
+    gallery_fairytale: FairytaleGallery,
     gallery_grid: GalleryGrid,
     gallery_masonry: GalleryMasonry,
     gallery_carousel: GalleryCarousel,

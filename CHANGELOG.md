@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-24 · [Web] feat: couple builder edit buttons and in-builder editing
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-couple-builder-edit.md
+- Branch/PR: feat/couple-builder-edit (merged to main, no PR)
+- What changed: [Web] the section panel opens on Content; pencil Edit button on every section row and in the canvas header; hero, story and details open an edit dialog that saves to the couple profile (names, date, love story, times, venues, addresses, dress code, map link, venue photo); details gets an Assets tab for the venue photo; `tsx` dev dependency and `test` script in apps/couple
+- Needs: browser check (360px, keyboard, real upload) and code review not run
+
 ## 2026-11-22 · [Cross] feat: six Khmer e-invitation templates (inactive)
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-khmer-*.md, Web-khqr-gift.md, Web-skinned-sections-*.md (plan: Tasks/_plans/Web-khmer-einvite-templates.md)

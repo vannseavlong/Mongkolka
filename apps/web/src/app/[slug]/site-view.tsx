@@ -5,11 +5,14 @@ import {
   LanguageProvider,
   LanguageToggle,
   SiteRenderer,
+  guestSubRoute,
+  skinFromComponents,
   type CoupleInfo,
   type GuestbookData,
   type SectionKey,
 } from "@mongkolka/templates";
 import { buildActions, fetchGuestbook, submitGuestbook } from "./guestbook";
+import { carryQuery } from "./wall-client";
 import type { PublicSiteResponse } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -33,6 +36,7 @@ function buildContent(sectionKey: SectionKey, profile: PublicSiteResponse["profi
         venueImageUrl: profile?.venue_image_url ?? undefined,
       };
     case "verse":
+    case "video":
     case "invitation":
     case "agenda":
     case "letters":
@@ -84,6 +88,12 @@ export function SiteView({
     weddingDate: site.couple.wedding_date ?? undefined,
   };
 
+  // The Covenant template turns the RSVP note into a wish on the wishes page (under the couple's own guestbook rules).
+  const wishFromRsvp = skinFromComponents(site.template.default_components) === "covenant" && hasGuestbook;
+  const query = carryQuery(guestGreeting, initialLanguage);
+  const photosHref = guestSubRoute(slug, "photos");
+  const wishesHref = guestSubRoute(slug, "wishes");
+
   async function submitRsvp(submission: {
     name: string;
     attending: boolean;
@@ -98,6 +108,12 @@ export function SiteView({
     // fetch() only rejects on network errors — without this a 4xx/5xx would still
     // show the guest the "thank you" state even though nothing was saved.
     if (!res.ok) throw new Error(`RSVP failed (${res.status})`);
+    if (wishFromRsvp && submission.message?.trim()) {
+      // Best effort: the RSVP is already saved; a closed or full guestbook must not fail it.
+      submitGuestbook(slug, { name: submission.name, message: submission.message.trim() })
+        .then(() => fetchGuestbook(slug).then(setGuestbook))
+        .catch(() => undefined);
+    }
   }
 
   return (
@@ -115,6 +131,8 @@ export function SiteView({
           if (sectionKey === "guestbook") {
             return {
               guestbook,
+              photosHref: photosHref ? `${photosHref}${query}` : undefined,
+              wishesHref: wishesHref ? `${wishesHref}${query}` : undefined,
               actions: buildActions(site, [couple.partner1Name, couple.partner2Name].filter(Boolean).join(" & ")),
               onSubmit: async (input: Parameters<typeof submitGuestbook>[1]) => {
                 const result = await submitGuestbook(slug, input);

@@ -8,6 +8,7 @@ export const SECTIONS = [
   "story",
   "agenda",
   "gallery",
+  "video",
   "details",
   "rsvp",
   "registry",

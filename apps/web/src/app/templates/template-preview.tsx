@@ -65,7 +65,7 @@ export function TemplatePreview({
         // Sample data only: nothing is sent anywhere from a template preview.
         if (sectionKey === "rsvp") return { onSubmit: async () => {} };
         if (sectionKey === "guestbook") {
-          return { guestbook: SAMPLE_GUESTBOOK, actions: SAMPLE_GUESTBOOK_ACTIONS, onSubmit: sampleGuestbookSubmit };
+          return { guestbook: SAMPLE_GUESTBOOK, photosHref: "#guestbook", wishesHref: "#guestbook", actions: SAMPLE_GUESTBOOK_ACTIONS, onSubmit: sampleGuestbookSubmit };
         }
         if (sectionKey === "footer") return { brandUrl };
         return {};

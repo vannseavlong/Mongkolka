@@ -9,6 +9,7 @@ export const SECTION_KEYS = [
   "story",
   "agenda",
   "gallery",
+  "video",
   "details",
   "rsvp",
   "registry",

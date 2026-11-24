@@ -64,6 +64,7 @@ import { GardenOpening, GardenHero } from "./sections/garden";
 import { CreamOpening, CreamHero } from "./sections/cream";
 import { SakuraOpening, SakuraHero } from "./sections/sakura";
 import { FairytaleOpening, FairytaleHero, FairytaleGallery } from "./sections/fairytale";
+import { CovenantOpening, CovenantHero, CovenantVerse, CovenantVideo, CovenantMemories } from "./sections/covenant";
 import { KidsOpening, KidsHero, InvitationKids, AgendaKids, DetailsKids } from "./sections/kids";
 
 // Each section's components take a different, section-specific props shape (see
@@ -88,6 +89,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     opening_sakura: SakuraOpening,
     opening_fairytale: FairytaleOpening,
     opening_kids: KidsOpening,
+    opening_covenant: CovenantOpening,
   },
   hero: {
     hero_classic: HeroClassic,
@@ -102,6 +104,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_sakura: SakuraHero,
     hero_fairytale: FairytaleHero,
     hero_kids: KidsHero,
+    hero_covenant: CovenantHero,
   },
   // Reserved keys: components are registered by the Web-khmer-skeleton task. Until then
   // resolveComponent() finds nothing and SiteRenderer renders nothing for these sections.
@@ -112,6 +115,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   verse: {
     verse_classic: VerseClassic,
     verse_grace: GraceVerse,
+    verse_covenant: CovenantVerse,
   },
   story: {
     story_classic: StoryClassic,
@@ -134,6 +138,9 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     gallery_plates: GalleryPlates,
     gallery_grace: GraceGallery,
     gallery_skin: SkinGallery,
+  },
+  video: {
+    video_skin: CovenantVideo,
   },
   details: {
     details_classic: DetailsClassic,
@@ -177,6 +184,7 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     guestbook_wall: GuestbookWall,
     guestbook_grace: GraceGuestbook,
     guestbook_skin: SkinGuestbook,
+    guestbook_covenant: CovenantMemories,
   },
   letters: {
     letters_khmer: LettersKhmer,

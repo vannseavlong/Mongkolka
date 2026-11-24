@@ -7,6 +7,7 @@ import { GARDEN_ORNAMENTS } from "../garden/ornaments";
 import { KIDS_ORNAMENTS } from "../kids/ornaments";
 import type { SkinOrnaments } from "./skin-ornament-types";
 import { EMERALD_ORNAMENTS } from "../emerald/ornaments";
+import { COVENANT_ORNAMENTS } from "../covenant/ornaments";
 
 /**
  * One entry per skin. Until a skin task replaces its own line with a set imported from its own
@@ -20,6 +21,7 @@ export const SKIN_ORNAMENTS: Record<SkinId, SkinOrnaments> = {
   sakura: SAKURA_ORNAMENTS,
   fairytale: FAIRYTALE_ORNAMENTS,
   kids: KIDS_ORNAMENTS,
+  covenant: COVENANT_ORNAMENTS,
 };
 
 export function ornamentsFor(skin: SkinId | null | undefined): SkinOrnaments {

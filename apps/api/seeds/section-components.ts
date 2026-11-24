@@ -775,6 +775,58 @@ const components = [
     font_style: "serif",
     status: "active",
   },
+  // Covenant (Christian gold/white/pink) rows: INACTIVE until the template is reviewed and launched with its template row.
+  {
+    component_id: "opening_covenant",
+    section: "opening",
+    name: "Covenant Blessing Intro",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
+    component_id: "hero_covenant",
+    section: "hero",
+    name: "Covenant Cross Reveal",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
+    component_id: "verse_covenant",
+    section: "verse",
+    name: "Covenant Verse Card",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
+    // Shared, skin-aware (like story_skin): any Khmer template can turn the Video section on. Needs the API `video` key deployed first.
+    component_id: "video_skin",
+    section: "video",
+    name: "Skin Video",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "active",
+  },
+  {
+    component_id: "guestbook_covenant",
+    section: "guestbook",
+    name: "Covenant Memories",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
 ];
 
 export default {

@@ -10,3 +10,5 @@ export * from "./theme-presets";
 export * from "./chrome";
 export { SkinProvider, useSkinOrnaments, SKIN_ORNAMENTS, ornamentsFor, skinFromComponents, componentOwner, variantsForSkin, DEFAULT_ORNAMENTS } from "./sections/khmer";
 export type { SkinOrnaments, OrnamentProps, DividerProps, CrestProps, IconProps, IconSet, MotionFlavour } from "./sections/khmer";
+export { CovenantWishesPage, CovenantPhotosPage, subRoute as guestSubRoute } from "./sections/covenant";
+export type { WallStatus } from "./sections/covenant";

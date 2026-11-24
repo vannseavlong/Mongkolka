@@ -100,11 +100,11 @@ describe("Khmer e-invitation seed rows", () => {
     assert.equal(khqr?.status, "active");
   });
 
-  it("default page turns on the invitation, agenda, gift and (not for kids) letters; verse, timeline and music stay optional and off", () => {
+  it("default page turns on the invitation, agenda, gift and (not for kids) letters; verse, video, timeline and music stay optional and off", () => {
     for (const t of templates as Tpl[]) {
       const kids = t.template_id === "kids_fantasy_birthday";
       const ON = ["opening", "hero", "invitation", "story", "agenda", "gallery", "details", "rsvp", "registry", "guestbook", ...(kids ? [] : ["letters"]), "footer"];
-      const OFF = ["verse", "timeline", "music", ...(kids ? ["letters"] : [])];
+      const OFF = ["verse", "video", "timeline", "music", ...(kids ? ["letters"] : [])];
       const on = t.default_sections.filter((x) => x.enabled).map((x) => x.section_key);
       assert.deepEqual(on, ON, `${t.template_id} enabled sections, in order`);
       const off = t.default_sections.filter((x) => !x.enabled).map((x) => x.section_key);

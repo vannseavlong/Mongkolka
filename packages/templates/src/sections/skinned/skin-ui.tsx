@@ -7,6 +7,7 @@ import { isDarkColor } from "../khmer/foil";
 import type { SkinUi } from "./skin-ui-types";
 import { BlossomMark, HydrangeaMark, LozengeMark, PeonyMark, RoseMark, StarHeartMark } from "./marks";
 import { baseField, foilButton, onColor, roundStepper } from "./ui-shared";
+import { CrossMark } from "../covenant/cross";
 
 /**
  * Form controls and the signature mark for each skin. A skin that is not listed here gets DEFAULT_UI
@@ -133,6 +134,17 @@ const KIDS_UI: SkinUi = {
   labelColor: (t) => t.text_color,
 };
 
+const COVENANT_UI: SkinUi = {
+  id: "covenant",
+  // Soft pink and white with a gold pill: round, warm, a small cross as the mark.
+  button: (t) => foilButton(t, { radius: 999, shadow: "0 12px 26px -12px rgba(184,92,122,0.55)" }),
+  field: (t, bad) => baseField(t, bad, { radius: 16, background: "#ffffff", border: mixHex(t.accent_color, "#f4bccb", 55) }),
+  chip: (t, on, bad) => chipFace(t, on, bad, { radius: 999, border: mixHex(t.accent_color, "#f4bccb", 55), idle: "#ffffff" }),
+  stepper: (t) => roundStepper(t, t.accent_color, "#ffffff"),
+  Mark: CrossMark,
+  labelColor: (t) => t.text_color,
+};
+
 export const SKIN_UI: Record<SkinId, SkinUi> = {
   emerald: EMERALD_UI,
   garden: GARDEN_UI,
@@ -140,6 +152,7 @@ export const SKIN_UI: Record<SkinId, SkinUi> = {
   sakura: SAKURA_UI,
   fairytale: FAIRYTALE_UI,
   kids: KIDS_UI,
+  covenant: COVENANT_UI,
 };
 
 export function uiFor(id: string | null | undefined): SkinUi {

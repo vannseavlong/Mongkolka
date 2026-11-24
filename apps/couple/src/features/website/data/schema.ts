@@ -8,6 +8,7 @@ export const WEBSITE_SECTIONS = [
   "story",
   "agenda",
   "gallery",
+  "video",
   "details",
   "rsvp",
   "registry",

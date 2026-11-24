@@ -64,6 +64,7 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
       "We met on a rainy afternoon and haven't stopped talking since. This is where our story becomes yours to celebrate with us.",
   },
   gallery: { photos: SAMPLE_PHOTOS },
+  video: { url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ", title: "Our story in moving pictures" },
   details: {
     ceremonyTime: "4:00 PM",
     ceremonyVenue: "Riverside Garden",

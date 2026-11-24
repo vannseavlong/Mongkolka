@@ -5,6 +5,7 @@ import { isProfileSection } from "./profile-section-fields";
  * See docs/tasks/template.md's "Where each section's content comes from" table. */
 export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
   "gallery",
+  "video",
   "registry",
   "timeline",
   "rsvp",

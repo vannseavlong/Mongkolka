@@ -30,7 +30,8 @@ describe("skin and Khmer section stubs", () => {
         assert.ok(!opening.includes(`${skin}.open`), `opening_${skin} has no missing translation key`);
         assert.ok(opening.includes("Dara"), `opening_${skin} greets the guest`);
         const hero = render("hero", `hero_${skin}`, language, SAMPLE_CONTENT.hero);
-        assert.ok(hero.includes("Alex") && hero.includes("<img"), `hero_${skin}`);
+        // covenant mounts its photo only after it has loaded (cross reveal), so server markup has the names but no <img>.
+        assert.ok(hero.includes("Alex") && (skin === "covenant" || hero.includes("<img")), `hero_${skin}`);
         assert.ok(!hero.includes(`${skin}.greeting`), `hero_${skin} has no missing translation key`);
       }
     });

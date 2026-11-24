@@ -15,6 +15,7 @@ export const SECTION_KEYS = [
   "story",
   "agenda",
   "gallery",
+  "video",
   "details",
   "rsvp",
   "registry",
@@ -122,6 +123,13 @@ export interface LettersContent {
   gratitudeEn?: string;
   apologyKh?: string;
   apologyEn?: string;
+}
+
+/** `video` section: one YouTube link. Only the 11-character id is ever used, so any youtube.com / youtu.be form works. */
+export interface VideoContent {
+  url?: string;
+  /** Optional caption under the player. */
+  title?: string;
 }
 
 export interface GalleryContent {

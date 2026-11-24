@@ -5,8 +5,9 @@ import { strings as cream } from "./cream/strings";
 import { strings as sakura } from "./sakura/strings";
 import { strings as fairytale } from "./fairytale/strings";
 import { strings as kids } from "./kids/strings";
+import { strings as covenant } from "./covenant/strings";
 
-const PACKS = [khmer, emerald, garden, cream, sakura, fairytale, kids];
+const PACKS = [khmer, emerald, garden, cream, sakura, fairytale, kids, covenant];
 
 /** Merged strings of the shared `khmer.` pack and the six skins, merged into the i18n dictionary. Keys are prefixed per pack. */
 export const SKIN_EN: Record<string, string> = Object.assign({}, ...PACKS.map((p) => p.en));

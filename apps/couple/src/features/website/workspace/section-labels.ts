@@ -9,6 +9,7 @@ export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
   story: "Our story",
   agenda: "Agenda",
   gallery: "Gallery",
+  video: "Video",
   details: "Event details",
   rsvp: "RSVP",
   registry: "Registry",

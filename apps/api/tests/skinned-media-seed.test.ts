@@ -36,7 +36,7 @@ describe("skin-aware gallery and guestbook seed", () => {
     }
   });
   it("does not change the gallery or guestbook of any other template", () => {
-    for (const t of templates.filter((x) => !IDS.includes(x.template_id))) {
+    for (const t of templates.filter((x) => !IDS.includes(x.template_id) && x.template_id !== "covenant_gold")) {
       assert.notEqual(t.default_components.gallery, "gallery_skin", t.template_id);
       assert.notEqual(t.default_components.guestbook, "guestbook_skin", t.template_id);
     }

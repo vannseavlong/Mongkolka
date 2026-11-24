@@ -6,7 +6,7 @@ import type { WebsiteSettings } from "../../data/schema";
 import { resolveTheme } from "@mongkolka/templates";
 import { Button } from "@mongkolka/ui/button";
 import { SectionColorPopover } from "../../components/section-color-popover";
-import { CONTENT_EDITABLE_SECTIONS } from "../../components/section-content-dialog";
+import { canEditSection } from "../../lib/section-editors";
 import type { SectionPanelTab } from "./types";
 
 export const tab: SectionPanelTab = {
@@ -24,13 +24,13 @@ export const tab: SectionPanelTab = {
     const effectiveTheme = resolveTheme(template.default_theme, saved, null);
     return (
       <div className="flex flex-col items-start gap-4">
-        {CONTENT_EDITABLE_SECTIONS.includes(section.section_key) ? (
+        {canEditSection(section.section_key) ? (
           <Button variant="outline" onClick={openContentEditor}>
             <Pencil className="size-4" /> Edit content
           </Button>
         ) : (
           <p className="text-sm text-muted-foreground">
-            This section uses your profile details. Edit them on the Profile page.
+            Nothing to edit in this section. Change how it looks on the Style tab.
           </p>
         )}
         <SectionColorPopover section={section} effectiveTheme={effectiveTheme} />

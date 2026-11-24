@@ -23,20 +23,7 @@ import { LettersContentForm } from "./letters-content-form";
 import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
 
-/** The only section keys with no other canonical content source — see
- * docs/tasks/template.md's "Where each section's content comes from" table. */
-export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
-  "gallery",
-  "registry",
-  "timeline",
-  "rsvp",
-  "music",
-  "verse",
-  "footer",
-  "invitation",
-  "agenda",
-  "letters",
-];
+export { CONTENT_EDITABLE_SECTIONS } from "../lib/section-editors";
 
 
 // ---------------------------------------------------------------------------

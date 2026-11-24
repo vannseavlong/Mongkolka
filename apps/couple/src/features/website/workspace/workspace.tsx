@@ -5,7 +5,9 @@ import type { PartialTheme } from "@mongkolka/templates";
 import { cn } from "@mongkolka/ui/utils";
 import type { SectionComponent, SiteTemplate, WebsiteSection } from "../data/schema";
 import type { PreviewProfile } from "../lib/build-content";
+import { ProfileSectionDialog } from "../components/profile-section-dialog";
 import { SectionContentDialog } from "../components/section-content-dialog";
+import { isProfileSection } from "../lib/profile-section-fields";
 import { SectionPanel } from "./section-panel";
 import { SectionRail } from "./section-rail";
 import { SiteCanvas } from "./site-canvas";
@@ -36,6 +38,10 @@ export function Workspace({
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [editing, setEditing] = useState<WebsiteSection | null>(null);
   const [pane, setPane] = useState<"sections" | "preview">("sections");
+  const openEditor = (section: WebsiteSection) => {
+    setPickedId(section.section_id);
+    setEditing(section);
+  };
   const { patchSection, move, reordering, pending, announcement } = useSectionActions(ordered);
 
   // Falls back to the first section until one is picked (or if it was removed).
@@ -74,6 +80,7 @@ export function Workspace({
             onSelect={setPickedId}
             onMove={move}
             onToggle={(section, enabled) => patchSection(section.section_id, { enabled })}
+            onEdit={openEditor}
           />
           <p role="status" aria-live="polite" className="sr-only">
             {announcement}
@@ -93,6 +100,7 @@ export function Workspace({
             themeOverride={themeOverride}
             profile={profile}
             onSelect={setPickedId}
+            onEdit={openEditor}
             active={pane === "preview"}
           />
         </div>
@@ -121,8 +129,15 @@ export function Workspace({
         </div>
       </div>
 
+      <ProfileSectionDialog
+        section={editing && isProfileSection(editing.section_key) ? editing : null}
+        profile={profile}
+        onOpenChange={(open) => {
+          if (!open) setEditing(null);
+        }}
+      />
       <SectionContentDialog
-        section={editing}
+        section={editing && !isProfileSection(editing.section_key) ? editing : null}
         onOpenChange={(open) => {
           if (!open) setEditing(null);
         }}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mongkolka/ui/tabs";
+import { defaultTabId } from "../lib/panel-defaults";
 import { sectionLabel } from "./section-labels";
 import { sectionPanelTabs } from "./panel-tabs/registry";
 import type { SectionPanelContext } from "./panel-tabs/types";
@@ -9,8 +10,8 @@ import type { SectionPanelContext } from "./panel-tabs/types";
 /** Tabbed editor for the selected section; tabs come from panel-tabs/registry.ts. */
 export function SectionPanel({ context }: { context: SectionPanelContext }) {
   const tabs = sectionPanelTabs.filter((t) => t.appliesTo?.(context.section) ?? true);
-  const [active, setActive] = useState(tabs[0]?.id);
-  const value = tabs.some((t) => t.id === active) ? active : tabs[0]?.id;
+  const [active, setActive] = useState(() => defaultTabId(tabs.map((t) => t.id)));
+  const value = tabs.some((t) => t.id === active) ? active : defaultTabId(tabs.map((t) => t.id));
 
   return (
     <div className="flex flex-col gap-3">

@@ -472,7 +472,7 @@ export default {
         font_style: "serif",
       },
       default_components: {
-        opening: "opening_covenant",
+        opening: "opening_card_covenant",
         hero: "hero_covenant",
         verse: "verse_covenant",
         invitation: "invitation_khmer",

@@ -94,3 +94,15 @@ export const COVENANT_CSS = `
 .is-reveal .cv-photo-full,.is-reveal .cv-window,.is-reveal .cv-scrim,.is-reveal .cv-hero-text>*,.is-reveal .cv-scroll{animation:none}
 }
 `;
+
+/** The invitation-card opening (card-art.tsx). Reuses the animation classes above. */
+export const CARD_CSS = `
+.cv-cardstage{position:relative;min-height:100svh;padding:12px;background:var(--cv-band);display:flex}
+.cv-card{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:clamp(52px,9svh,84px) clamp(30px,9vw,64px);text-align:center;background:radial-gradient(90% 55% at 50% 0%,rgba(255,255,255,.9),transparent 70%),var(--cv-cream);box-shadow:0 0 0 2px var(--cv-lo),0 0 0 5px var(--cv-cream),0 0 0 6.5px var(--cv-mid);max-width:620px;margin:0 auto;width:100%}
+.cv-card .cv-content{max-width:100%;gap:clamp(8px,1.6svh,16px)}
+.cv-cardcorner{position:absolute;opacity:0;animation:cv-pop .9s cubic-bezier(.2,.8,.2,1) calc(var(--at) + var(--ms) * .8) both;pointer-events:none}
+.cv-cardedge{position:absolute;left:50%;opacity:0;animation:cv-fadein 1s ease calc(var(--at) + var(--ms)) forwards;pointer-events:none}
+.cv-guestbox{position:relative;width:100%;padding:clamp(14px,2.6svh,22px) 18px;border:1.5px solid var(--cv-mid);box-shadow:inset 0 0 0 4px var(--cv-cream),inset 0 0 0 5.5px var(--cv-mid);background:rgba(255,255,255,.55)}
+.cv-petals{position:absolute;left:-30px;top:6%;bottom:6%;pointer-events:none;opacity:0;animation:cv-fadein 1.4s ease 1s forwards}
+@media (prefers-reduced-motion:reduce){.cv-cardcorner,.cv-cardedge,.cv-petals{animation:none;opacity:1}}
+`;

@@ -50,18 +50,12 @@ export function hasKhmer(text: string): boolean {
   return /[ក-៿᧠-᧿]/.test(text);
 }
 
-const JOINER = /(\s&\s|\s+and\s+|\sនិង|និង\s|,|\+)/i;
-
 /**
- * The guest as printed on the invitation: "សុខា" -> "សុខា និងភរិយា". A guest who already names more than one
- * person ("Sokha & Dara", "A, B", "សុខា និង ដារ៉ា") is shown as given, so the spouse line is never doubled.
- * Returns "" when no name was supplied.
+ * The guest as set in the invitation link, exactly as given (whitespace tidied). Nothing is added to it.
+ * Returns "" when no name was supplied; the opening then shows the default address from the strings.
  */
-export function guestLine(name: string | undefined, spouseText: string): string {
-  const n = (name ?? "").replace(/\s+/g, " ").trim();
-  if (!n) return "";
-  if (JOINER.test(n)) return n;
-  return `${n} ${spouseText}`;
+export function guestLine(name: string | undefined): string {
+  return (name ?? "").replace(/\s+/g, " ").trim();
 }
 
 /** Deterministic pseudo-random in [0,1) from an integer; no Math.random, so server and client markup agree. */

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 
 /**
@@ -9,7 +10,15 @@ import { usePathname } from "next/navigation";
  * Returns undefined while the path is not yet the real one (build placeholder).
  */
 export function useRouteParam(skip: string[] = []): string | undefined {
-  const pathname = usePathname() ?? "";
+  const routed = usePathname() ?? "";
+  // Under `next dev` the dev rewrites in next.config.ts serve the "_" shell, and usePathname() may report the shell
+  // path; the browser's own path is the real URL. null while rendering on the server, so there is no hydration mismatch.
+  const browserPath = useSyncExternalStore(
+    () => () => {},
+    () => window.location.pathname,
+    () => null,
+  );
+  const pathname = browserPath ?? routed;
   const parts = pathname.split("/").filter(Boolean);
   const value = parts[skip.length];
   if (!value || value === "_") return undefined;

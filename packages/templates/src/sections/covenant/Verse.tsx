@@ -27,6 +27,7 @@ export function CovenantVerse({ theme, content }: CovenantVerseProps) {
   const text = (kh && content?.textKh?.trim()) || content?.text?.trim();
   if (!text) return null;
   const reference = content?.reference?.trim();
+  const meaning = (kh && content?.meaningKh?.trim()) || content?.meaning?.trim();
   const vars = { "--cv-ground": theme.bg_color, fontFamily: KHMER_BODY_FONT, color: theme.text_color } as CSSProperties;
 
   return (
@@ -54,6 +55,11 @@ export function CovenantVerse({ theme, content }: CovenantVerseProps) {
               <span aria-hidden className="mx-auto mb-3 block h-px w-14" style={{ backgroundImage: `linear-gradient(90deg, transparent, ${theme.accent_color}, transparent)` }} />
               <cite className="not-italic">{reference}</cite>
             </figcaption>
+          )}
+          {meaning && (
+            <p className="m-0 mt-4 text-sm leading-relaxed opacity-80" style={{ fontFamily: KHMER_BODY_FONT }}>
+              {meaning}
+            </p>
           )}
         </figure>
       </div>

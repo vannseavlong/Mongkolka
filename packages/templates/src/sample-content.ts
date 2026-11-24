@@ -13,6 +13,19 @@ export const SAMPLE_COUPLE: CoupleInfo = {
   weddingDate: "2026-12-12",
 };
 
+/** Preview couple for the Covenant template: names exactly as the client wants them in each language. */
+export const COVENANT_SAMPLE_COUPLE: CoupleInfo = {
+  partner1Name: "Vutha",
+  partner2Name: "Nita",
+  partner1NameKh: "វុត្ថា",
+  partner2NameKh: "នីតា",
+  weddingDate: "2026-12-12",
+};
+
+export function sampleCoupleFor(skin: SkinId | null | undefined): CoupleInfo {
+  return skin === "covenant" ? COVENANT_SAMPLE_COUPLE : SAMPLE_COUPLE;
+}
+
 export const SAMPLE_PHOTOS = [
   "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=60",
   "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=800&q=60",
@@ -29,8 +42,9 @@ const SAMPLE_KHQR =
 export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
   hero: { coverPhotoUrl: SAMPLE_PHOTOS[0] },
   verse: {
-    text: "Therefore shall a man leave his father and his mother, and shall cleave unto his wife: and they shall be one flesh.",
-    reference: "Genesis 2:24",
+    text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.",
+    reference: "1 Corinthians 13:4–8",
+    meaning: "True love is patient, kind, and enduring.",
   },
   invitation: {
     groom: { nameKh: "សុខា", nameEn: "Sokha", fatherKh: "លោក សុខ វិសាល", fatherEn: "Mr. Sok Visal", motherKh: "លោកស្រី ចាន់ ស្រីមុំ", motherEn: "Mrs. Chan Sreymom" },

@@ -31,6 +31,9 @@ export type SectionKey = (typeof SECTION_KEYS)[number];
 export interface CoupleInfo {
   partner1Name: string;
   partner2Name?: string;
+  /** Khmer spelling of each name, for templates that show names in the viewer's language (Covenant). Falls back to partner1Name / partner2Name. */
+  partner1NameKh?: string;
+  partner2NameKh?: string;
   weddingDate?: string;
 }
 
@@ -46,6 +49,9 @@ export interface VerseContent {
   text?: string;
   reference?: string;
   textKh?: string;
+  /** Optional one-line meaning shown under the reference by templates that support it (Covenant). */
+  meaning?: string;
+  meaningKh?: string;
 }
 
 export interface FooterContent {
@@ -177,6 +183,8 @@ export interface OpeningProps {
   couple: CoupleInfo;
   theme: Theme;
   guestGreeting?: string;
+  /** Venue and time for openings that print them on the cover (the couple's details content). */
+  details?: DetailsContent;
   onOpen: () => void;
 }
 

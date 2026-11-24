@@ -4,13 +4,14 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
-import { formatCoupleNames, formatWeddingDate } from "../../format";
+import { formatWeddingDate } from "../../format";
 import { KHMER_BODY_FONT, MOUL_FONT } from "../../chrome/fonts";
 import { withAlpha } from "../../chrome/gold";
 import { foilTextGradient } from "../khmer/foil";
 import { COVENANT_CSS } from "./covenant-styles";
 import { Cross } from "./cross";
 import { nextHeroPhase, PHOTO_WAIT_MS, usablePhoto, type HeroPhase } from "./hero-logic";
+import { joinNames, coupleNamesFor } from "./names";
 import { hasKhmer } from "./intro-logic";
 import { covenantPalette, PINK } from "./palette";
 
@@ -59,7 +60,7 @@ export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
     };
   }, [photo]);
 
-  const names = formatCoupleNames(couple);
+  const names = joinNames(coupleNamesFor(couple, language));
   const date = formatWeddingDate(couple.weddingDate, language);
   const kh = language === "kh";
   const khmerNames = hasKhmer(names);

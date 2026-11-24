@@ -10,7 +10,7 @@ import { useSiteChrome } from "./chrome/use-site-chrome";
 import { SkinProvider } from "./sections/khmer/skin-context";
 import { skinFromComponents } from "./sections/khmer/skin-resolve";
 import { resolveTheme } from "./theme";
-import type { CoupleInfo, PartialTheme, SectionKey, Theme } from "./types";
+import type { CoupleInfo, DetailsContent, PartialTheme, SectionKey, Theme } from "./types";
 
 export interface SiteRendererSection {
   section_id: string;
@@ -111,6 +111,7 @@ export function SiteRenderer({
         couple={couple}
         theme={theme}
         guestGreeting={guestGreeting}
+        details={buildContent("details") as DetailsContent | undefined}
         onOpen={() => setOpeningDismissed(true)}
       />
     );

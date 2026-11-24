@@ -9,6 +9,7 @@ import { withAlpha } from "../../chrome/gold";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import { COVENANT_CSS } from "./covenant-styles";
 import { Cross } from "./cross";
+import { coupleNamesFor } from "./names";
 import { guestLine, hasKhmer, introFor, petals } from "./intro-logic";
 import { COVENANT_ORNAMENTS } from "./ornaments";
 import { covenantPalette, PINK } from "./palette";
@@ -22,8 +23,8 @@ const at = (start: number, ms: number): Vars => ({ "--at": `${start}ms`, "--ms":
 
 /**
  * Covenant cover. Without a tap it plays by itself: a gold frame draws around the page, the Khmer blessing
- * is written, the couple's names arrive from either side, then the guest is addressed ("សូមគោរពអញ្ចើញ <name> និងភរិយា",
- * the name read from the invitation link). The open button appears at the end; a tap earlier skips ahead.
+ * is written, the couple's names arrive from either side, then the guest is addressed ("សូមគោរពអញ្ចើញ <name>",
+ * the name read from the invitation link, shown exactly as set; "អស់លោក​លោកស្រី" when there is none). The open button appears at the end; a tap earlier skips ahead.
  * Opening shows a glowing cross, then hands over to the hero. Reduced motion shows everything at once.
  */
 export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
@@ -51,9 +52,8 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
   }, [crossing, tl.crossMs]);
 
   const petalList = useMemo(() => petals(14), []);
-  const first = couple.partner1Name;
-  const second = couple.partner2Name;
-  const guest = guestLine(guestGreeting, t("covenant.andWife"));
+  const { first, second } = coupleNamesFor(couple, language);
+    const guest = guestLine(guestGreeting) || t("covenant.guestDefault");
   const kh = language === "kh";
   const blessing = t("covenant.blessing");
   const accent = theme.accent_color;

@@ -11,7 +11,7 @@ export interface CoverTiming {
   revealMs: number;
 }
 
-export const COVER_TIMING: CoverTiming = { playMs: 4500, revealMs: 1300 };
+export const COVER_TIMING: CoverTiming = { playMs: 6200, revealMs: 1600 };
 /** Reduced motion: a still cover, auto-advancing after a short read, with a brief cross-fade. */
 export const COVER_TIMING_REDUCED: CoverTiming = { playMs: 2500, revealMs: 200 };
 

@@ -12,7 +12,7 @@ import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
 import { youtubeId } from "./video-logic";
-import { BUTTERFLIES, butterflyEntry, FLOWERS } from "./cover-logic";
+import { BUTTERFLIES, butterflyEntry, FLOWERS, FLYERS, initialOf, SPARKLES, VINE, wreath } from "./cover-logic";
 
 const theme: Theme = { bg_color: "#fff3f6", text_color: "#4a2c35", accent_color: "#8a6418", font_style: "serif" };
 
@@ -144,7 +144,7 @@ describe("covenant covers", () => {
         const html = render("cover", id, language, { onReveal: noop, onDone: noop });
         assert.ok(html.includes("data-mk-cover"));
         assert.ok(html.includes(language === "kh" ? "ចុចដើម្បីរំលង" : "Tap to skip"));
-        assert.ok(html.includes("cvc-names"));
+        assert.ok(html.includes("cvc-center") && html.includes("cvc-ringbox"));
       });
     }
   }
@@ -152,5 +152,24 @@ describe("covenant covers", () => {
     for (const b of BUTTERFLIES) assert.ok(b.x >= 0 && b.x <= 100 && b.y >= 0 && b.y <= 100 && b.size > 0);
     for (const f of FLOWERS) assert.ok(f.x >= 0 && f.x <= 100 && f.y >= 0 && f.y <= 102 && f.size > 0);
     for (const b of BUTTERFLIES) assert.equal(Math.abs(butterflyEntry(b).dx), 70);
+  });
+  it("a wreath is evenly spaced around the centre", () => {
+    const w = wreath(12, 50);
+    assert.equal(w.length, 12);
+    assert.ok(Math.abs(w[0]!.x - 50) < 1e-9 && Math.abs(w[0]!.y - 0) < 1e-9);
+    for (const pt of w) assert.ok(Math.abs(Math.hypot(pt.x - 50, pt.y - 50) - 50) < 1e-9);
+    assert.equal(wreath(0, 50).length, 0);
+    assert.equal(wreath(-3, 50).length, 0);
+  });
+  it("the monogram takes the first letter, Khmer included", () => {
+    assert.equal(initialOf("  bong"), "B");
+    assert.equal(initialOf("ឧត្តម"), "ឧ");
+    assert.equal(initialOf(undefined), "");
+    assert.equal(initialOf("   "), "");
+  });
+  it("ambient tables are well formed", () => {
+    for (const s of SPARKLES) assert.ok(s.x >= 0 && s.x <= 100 && s.y >= 0 && s.y <= 100 && s.duration > 0);
+    assert.ok(FLYERS.every((f) => f.size > 0 && f.duration > 0));
+    assert.ok(VINE.leaves.length > 4 && VINE.stem.startsWith("M"));
   });
 });

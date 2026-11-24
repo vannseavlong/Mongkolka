@@ -305,3 +305,16 @@ describe("Registry gift content validation", () => {
     assert.deepEqual(validateSectionContent("registry", { bank: "", accountNumber: " ", khqrImageUrl: "" }), {});
   });
 });
+
+describe("video section content", () => {
+  it("accepts YouTube https links and trims", () => {
+    assert.deepEqual(validateSectionContent("video", { url: " https://youtu.be/aqz-KE-bpKQ ", title: " Film " }), { url: "https://youtu.be/aqz-KE-bpKQ", title: "Film" });
+    assert.deepEqual(validateSectionContent("video", { url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ" }), { url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ" });
+    assert.deepEqual(validateSectionContent("video", {}), {});
+  });
+  it("rejects other hosts, http, scripts and links without a video id", () => {
+    for (const url of ["https://evil.com/watch?v=aqz-KE-bpKQ", "http://youtu.be/aqz-KE-bpKQ", "javascript:alert(1)", "https://youtube.com/watch?v=short", "https://youtube.com.evil.com/watch?v=aqz-KE-bpKQ", "https://www.youtube.com/"]) {
+      assert.throws(() => validateSectionContent("video", { url }), /YouTube/, url);
+    }
+  });
+});

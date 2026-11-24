@@ -32,6 +32,7 @@ export const LIMITS = {
   accountNumber: 34,
   registryLinks: 20,
   linkLabel: 80,
+  videoTitle: 120,
 } as const;
 
 type Obj = Record<string, unknown>;
@@ -228,7 +229,33 @@ function cleanRegistry(content: Obj): Obj {
   });
 }
 
-export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry"] as const;
+const YOUTUBE_HOSTS = new Set(["youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com", "youtu.be"]);
+const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
+
+/** True for a youtube.com / youtu.be link that carries an 11-character video id (mirrors youtubeId in the templates package). */
+export function isYoutubeUrl(value: string): boolean {
+  let u: URL;
+  try {
+    u = new URL(value);
+  } catch {
+    return false;
+  }
+  if (u.protocol !== "https:") return false;
+  const host = u.hostname.toLowerCase().replace(/^www\./, "");
+  if (!YOUTUBE_HOSTS.has(host)) return false;
+  const parts = u.pathname.split("/").filter(Boolean);
+  const id = host === "youtu.be" ? parts[0] : parts[0] === "watch" ? u.searchParams.get("v") : ["embed", "shorts", "live", "v"].includes(parts[0] ?? "") ? parts[1] : undefined;
+  return !!id && YOUTUBE_ID.test(id);
+}
+
+/** `video` section: one YouTube link (https, YouTube hosts only, with a real video id) and an optional caption. */
+function cleanVideo(content: Obj): Obj {
+  const url = optString(content, "url", LIMITS.url, "content");
+  if (url !== undefined && !isYoutubeUrl(url)) throw new Error("content.url must be a YouTube video link (https)");
+  return compact({ url, title: optString(content, "title", LIMITS.videoTitle, "content") });
+}
+
+export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry", "video"] as const;
 
 /**
  * Validates and cleans `website_sections.content` for the Khmer sections. Returns the
@@ -243,5 +270,6 @@ export function validateSectionContent(sectionKey: string, content: unknown): un
   if (sectionKey === "invitation") return cleanInvitation(obj);
   if (sectionKey === "agenda") return cleanAgenda(obj);
   if (sectionKey === "registry") return cleanRegistry(obj);
+  if (sectionKey === "video") return cleanVideo(obj);
   return cleanLetters(obj);
 }

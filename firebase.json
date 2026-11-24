@@ -34,6 +34,14 @@
           "destination": "/templates/_.html"
         },
         {
+          "source": "/*/wishes",
+          "destination": "/_/wishes.html"
+        },
+        {
+          "source": "/*/photos",
+          "destination": "/_/photos.html"
+        },
+        {
           "source": "**",
           "destination": "/_.html"
         }

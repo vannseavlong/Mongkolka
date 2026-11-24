@@ -1,0 +1,96 @@
+/** Pure timing, text and particle maths for the Covenant opening. No JSX, no timers. */
+
+export interface IntroTimeline {
+  /** Gold frame draws itself. */
+  frameMs: number;
+  /** When the blessing starts / how long it takes to write. */
+  blessingAt: number;
+  blessingMs: number;
+  namesAt: number;
+  namesMs: number;
+  guestAt: number;
+  guestMs: number;
+  /** The open button appears and the intro waits for a tap. */
+  readyAt: number;
+  /** After the tap: the cross shows, then `onOpen` fires. */
+  crossMs: number;
+}
+
+export const INTRO: IntroTimeline = {
+  frameMs: 1400,
+  blessingAt: 900,
+  blessingMs: 2200,
+  namesAt: 3200,
+  namesMs: 1600,
+  guestAt: 4900,
+  guestMs: 1200,
+  readyAt: 6300,
+  crossMs: 1500,
+};
+
+/** Reduced motion: everything is there at once, the cross beat is short. */
+export const INTRO_REDUCED: IntroTimeline = {
+  frameMs: 0,
+  blessingAt: 0,
+  blessingMs: 0,
+  namesAt: 0,
+  namesMs: 0,
+  guestAt: 0,
+  guestMs: 0,
+  readyAt: 0,
+  crossMs: 200,
+};
+
+export function introFor(reducedMotion: boolean): IntroTimeline {
+  return reducedMotion ? INTRO_REDUCED : INTRO;
+}
+
+/** True when the text contains Khmer script (U+1780-17FF, U+19E0-19FF). Latin text reads better in the script face. */
+export function hasKhmer(text: string): boolean {
+  return /[ក-៿᧠-᧿]/.test(text);
+}
+
+const JOINER = /(\s&\s|\s+and\s+|\sនិង|និង\s|,|\+)/i;
+
+/**
+ * The guest as printed on the invitation: "សុខា" -> "សុខា និងភរិយា". A guest who already names more than one
+ * person ("Sokha & Dara", "A, B", "សុខា និង ដារ៉ា") is shown as given, so the spouse line is never doubled.
+ * Returns "" when no name was supplied.
+ */
+export function guestLine(name: string | undefined, spouseText: string): string {
+  const n = (name ?? "").replace(/\s+/g, " ").trim();
+  if (!n) return "";
+  if (JOINER.test(n)) return n;
+  return `${n} ${spouseText}`;
+}
+
+/** Deterministic pseudo-random in [0,1) from an integer; no Math.random, so server and client markup agree. */
+export function unit(i: number, salt = 0): number {
+  const x = Math.sin((i + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+export interface Petal {
+  /** Horizontal start, percent of the stage. */
+  x: number;
+  /** Width in px. */
+  size: number;
+  /** Seconds. */
+  delay: number;
+  duration: number;
+  /** Sideways sway in px. */
+  drift: number;
+  /** Start rotation, deg. */
+  spin: number;
+}
+
+export function petals(count: number): Petal[] {
+  return Array.from({ length: Math.max(0, Math.floor(count)) }, (_, i) => ({
+    x: Math.round(unit(i, 1) * 100),
+    size: 10 + Math.round(unit(i, 2) * 10),
+    delay: Math.round(unit(i, 3) * 100) / 10,
+    duration: 9 + Math.round(unit(i, 4) * 70) / 10,
+    drift: Math.round((unit(i, 5) - 0.5) * 90),
+    spin: Math.round(unit(i, 6) * 360),
+  }));
+}

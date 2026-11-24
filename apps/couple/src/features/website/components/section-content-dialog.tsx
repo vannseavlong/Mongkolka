@@ -20,6 +20,7 @@ import { VERSE_PRESETS } from "../lib/verse-presets";
 import { InvitationContentForm } from "./invitation-content-form";
 import { AgendaContentForm } from "./agenda-content-form";
 import { LettersContentForm } from "./letters-content-form";
+import { VideoContentForm } from "./video-content-form";
 import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
 
@@ -682,6 +683,7 @@ const SECTION_LABELS: Partial<Record<WebsiteSectionKey, string>> = {
   invitation: "invitation",
   agenda: "agenda",
   letters: "thank-you letters",
+  video: "video",
 };
 
 export function SectionContentDialog({
@@ -727,6 +729,9 @@ export function SectionContentDialog({
             )}
             {section.section_key === "agenda" && (
               <AgendaContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
+            )}
+            {section.section_key === "video" && (
+              <VideoContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
             )}
             {section.section_key === "letters" && (
               <LettersContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />

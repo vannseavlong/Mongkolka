@@ -18,6 +18,7 @@ const SKINS: Array<{ skin: SkinId; theme: Theme; marker: string }> = [
   { skin: "sakura", theme: { bg_color: "#f7d6e0", text_color: "#4a1f35", accent_color: "#b01553", font_style: "serif" }, marker: "rounded-[22px]" },
   { skin: "fairytale", theme: { bg_color: "#bfd7ea", text_color: "#1c2d5a", accent_color: "#2f4b8a", font_style: "serif" }, marker: "♡ ♡ ♡" },
   { skin: "kids", theme: { bg_color: "#fff8f0", text_color: "#5a1a33", accent_color: "#c82a62", font_style: "sans" }, marker: "♥" },
+  { skin: "covenant", theme: { bg_color: "#fff3f6", text_color: "#4a2c35", accent_color: "#8a6418", font_style: "serif" }, marker: "999px 999px 16px 16px" },
 ];
 
 function render(id: "gallery" | "guestbook", skin: SkinId, theme: Theme, language: Language, extra: Record<string, unknown> = {}): string {

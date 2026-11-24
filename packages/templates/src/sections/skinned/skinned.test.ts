@@ -24,6 +24,7 @@ const THEMES: Record<SkinId, Theme> = {
   sakura: { bg_color: "#f7d6e0", text_color: "#4a1230", accent_color: "#b01553", font_style: "serif" },
   fairytale: { bg_color: "#bfd7ea", text_color: "#1c2d5a", accent_color: "#2f4b8a", font_style: "sans" },
   kids: { bg_color: "#fff8f0", text_color: "#5a1630", accent_color: "#c82a62", font_style: "sans" },
+  covenant: { bg_color: "#fff3f6", text_color: "#4a2c35", accent_color: "#8a6418", font_style: "serif" },
 };
 
 function render(section: SectionKey, id: string, skin: SkinId, language: Language, props: Record<string, unknown>): string {

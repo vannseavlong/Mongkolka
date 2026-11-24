@@ -44,42 +44,40 @@ export function PublishPanel({ settings }: { settings: WebsiteSettings }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex min-w-0 items-center gap-x-3">
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2" title={isPublished ? undefined : "Your site is only visible to you until you publish it."}>
           <Badge variant={isPublished ? "default" : "outline"} className="capitalize">
             {settings.website_status}
           </Badge>
           <SlugEditor slug={settings.slug} />
         </div>
-        {!isPublished && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your site is only visible to you until you publish it.
-          </p>
-        )}
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
         {isPublished && url && (
-          <>
-            <Button asChild variant="outline" className="flex-1 sm:flex-none">
-              <a href={url} target="_blank" rel="noreferrer">
-                <ExternalLink className="size-4" /> View site
-              </a>
-            </Button>
-            <Button variant="outline" size="icon" onClick={copyLink}>
-              <Copy className="size-4" />
-              <span className="sr-only">Copy site link</span>
-            </Button>
-          </>
+          <Button variant="outline" size="icon" onClick={copyLink}>
+            <Copy className="size-4" />
+            <span className="sr-only">Copy site link</span>
+          </Button>
         )}
-        <Button
-          onClick={toggle}
-          disabled={busy}
-          variant={isPublished ? "outline" : "default"}
-          className="w-full sm:w-auto"
-        >
-          {isPublished ? "Unpublish" : "Publish site"}
-        </Button>
+        {isPublished && (
+          <Button onClick={toggle} disabled={busy} variant="outline">
+            Unpublish
+          </Button>
+        )}
+        {isPublished && url ? (
+          <Button asChild>
+            <a href={url} target="_blank" rel="noreferrer">
+              <ExternalLink className="size-4" /> View site
+            </a>
+          </Button>
+        ) : (
+          !isPublished && (
+            <Button onClick={toggle} disabled={busy}>
+              Publish site
+            </Button>
+          )
+        )}
       </div>
     </div>
   );

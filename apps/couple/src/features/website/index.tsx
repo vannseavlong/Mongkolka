@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@mongkolka/ui/card";
-import { Main } from "@mongkolka/ui/layout/main";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@mongkolka/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@mongkolka/ui/collapsible";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { CoupleProfile } from "@/features/profile/data/schema";
-import { PublishPanel } from "./components/publish-panel";
-import { TemplatePicker } from "./components/template-picker";
+import { BuilderToolbar } from "./components/builder-toolbar";
+import { TemplateDialog } from "./components/template-dialog";
 import { ThemeEditor } from "./components/theme-editor";
 import { Workspace } from "./workspace/workspace";
 import type { SectionComponent, SiteTemplate, Theme, WebsiteSection, WebsiteSettings } from "./data/schema";
@@ -26,7 +21,12 @@ export function Website() {
   const selectedTemplate =
     catalogData?.templates.find((t) => t.template_id === settings?.site_template_id) ?? null;
 
-  // Unsaved color edits from ThemeEditor, kept here so WebsitePreview can
+  // `null` = follow the state (open while no template is chosen); a boolean
+  // is the couple's explicit choice.
+  const [templateDialog, setTemplateDialog] = useState<boolean | null>(null);
+  const templateDialogOpen = templateDialog ?? (!!settings && !selectedTemplate);
+
+  // Unsaved color edits from ThemeEditor, kept here so the preview can
   // reflect them immediately instead of the couple having to Save and wait
   // for a refetch just to see whether a color works. Reset whenever the
   // persisted theme or the selected template changes, so a completed save
@@ -46,52 +46,12 @@ export function Website() {
   }
 
   return (
-    <Main>
-      <div className="flex flex-col gap-6">
-        <h1 className="text-2xl font-bold tracking-tight">Website builder</h1>
+    // Fills the screen under the fixed app header; the page itself never
+    // scrolls, each panel scrolls on its own.
+    <div className="flex h-[calc(100svh-4rem)] min-h-0 flex-col overflow-hidden border-t">
+      <BuilderToolbar settings={settings} />
 
-        {settings && <PublishPanel settings={settings} />}
-
-        <Collapsible defaultOpen={!selectedTemplate}>
-          <CollapsibleTrigger asChild>
-            <Button variant="outline" size="sm" className="group">
-              Template and colors
-              <ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Template</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <TemplatePicker
-                  templates={catalogData?.templates ?? []}
-                  selectedTemplateId={settings ? settings.site_template_id : undefined}
-                  templatesLoading={catalogLoading}
-                  settingsError={settings ? null : settingsError}
-                  onRetry={refetchSettings}
-                />
-              </CardContent>
-            </Card>
-
-            {selectedTemplate && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Colors</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ThemeEditor
-                    theme={{ ...selectedTemplate.default_theme, ...(settings?.theme_override ?? {}) }}
-                    templateDefault={selectedTemplate.default_theme}
-                    onPreview={setDraftTheme}
-                  />
-                </CardContent>
-              </Card>
-            )}
-          </CollapsibleContent>
-        </Collapsible>
-
+      <div className="flex min-h-0 flex-1 flex-col">
         {selectedTemplate ? (
           profileData &&
           sectionsData && (
@@ -102,14 +62,32 @@ export function Website() {
               template={selectedTemplate}
               themeOverride={draftTheme ?? settings?.theme_override ?? null}
               profile={profileData.profile}
+              onChooseTemplate={() => setTemplateDialog(true)}
+              colors={
+                <ThemeEditor
+                  theme={{ ...selectedTemplate.default_theme, ...(settings?.theme_override ?? {}) }}
+                  templateDefault={selectedTemplate.default_theme}
+                  onPreview={setDraftTheme}
+                />
+              }
             />
           )
         ) : (
-          <div className="flex h-60 items-center justify-center rounded-lg border text-muted-foreground">
+          <div className="m-4 flex flex-1 items-center justify-center rounded-lg border text-muted-foreground">
             Choose a template to start building
           </div>
         )}
       </div>
-    </Main>
+
+      <TemplateDialog
+        open={templateDialogOpen}
+        onOpenChange={setTemplateDialog}
+        templates={catalogData?.templates ?? []}
+        selectedTemplateId={settings ? settings.site_template_id : undefined}
+        templatesLoading={catalogLoading}
+        settingsError={settings ? null : settingsError}
+        onRetry={refetchSettings}
+      />
+    </div>
   );
 }

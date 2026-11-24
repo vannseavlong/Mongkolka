@@ -83,11 +83,11 @@ export function ThemeEditor({
   const current = form.getValues();
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 text-sm font-medium">Palettes</legend>
           <p className="text-xs text-muted-foreground">Hover or focus a palette to preview it on the page. Click to use it, then Save.</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2">
             {THEME_PRESETS.map((preset) => {
               const active = COLOR_KEYS.every((k) => sameColor(String(current[k]), preset.theme[k]));
               return (
@@ -121,6 +121,7 @@ export function ThemeEditor({
             })}
           </div>
         </fieldset>
+        <div className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -193,6 +194,7 @@ export function ThemeEditor({
           <Button type="button" variant="outline" onClick={resetToTemplate}>
             Reset to template
           </Button>
+        </div>
         </div>
       </form>
     </Form>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mongkolka/ui/tabs";
 import { defaultTabId } from "../lib/panel-defaults";
-import { sectionLabel } from "./section-labels";
+import { ACTIVE_TAB } from "./tab-style";
 import { sectionPanelTabs } from "./panel-tabs/registry";
 import type { SectionPanelContext } from "./panel-tabs/types";
 
@@ -15,11 +15,10 @@ export function SectionPanel({ context }: { context: SectionPanelContext }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold">{sectionLabel(context.section.section_key)}</h2>
       <Tabs value={value} onValueChange={setActive}>
         <TabsList className="flex-wrap">
           {tabs.map((t) => (
-            <TabsTrigger key={t.id} value={t.id}>
+            <TabsTrigger key={t.id} value={t.id} className={ACTIVE_TAB}>
               {t.label}
             </TabsTrigger>
           ))}

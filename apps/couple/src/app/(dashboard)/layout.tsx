@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarInset } from "@mongkolka/ui/sidebar";
 import { Header } from "@mongkolka/ui/layout/header";
 import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
+import { HeaderSlot } from "@/components/layout/header-slot";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { getToken, clearToken } from "@/lib/auth";
 import { useApiQuery } from "@/lib/use-api-query";
@@ -133,7 +134,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <Header fixed />
+          <Header fixed>
+            <HeaderSlot />
+          </Header>
           {children}
         </SidebarInset>
       </SidebarProvider>

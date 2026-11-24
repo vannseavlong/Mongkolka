@@ -1,11 +1,10 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Pencil } from "lucide-react";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
 import { Switch } from "@mongkolka/ui/switch";
 import { cn } from "@mongkolka/ui/utils";
 import type { WebsiteSection } from "../data/schema";
-import { canEditSection } from "../lib/section-editors";
 import { sectionLabel } from "./section-labels";
 
 /** Ordered list of sections: select, reorder, and turn on/off. */
@@ -17,7 +16,6 @@ export function SectionRail({
   onSelect,
   onMove,
   onToggle,
-  onEdit,
 }: {
   sections: WebsiteSection[];
   selectedId: string | null;
@@ -27,11 +25,9 @@ export function SectionRail({
   onSelect: (sectionId: string) => void;
   onMove: (index: number, direction: -1 | 1) => void;
   onToggle: (section: WebsiteSection, enabled: boolean) => void;
-  /** Selects the section and opens its editor. */
-  onEdit: (section: WebsiteSection) => void;
 }) {
   return (
-    <ul className="flex flex-col gap-1.5" aria-label="Website sections">
+    <ul className="flex flex-col gap-1" aria-label="Website sections">
       {sections.map((section, index) => {
         const selected = section.section_id === selectedId;
         const name = sectionLabel(section.section_key);
@@ -40,9 +36,9 @@ export function SectionRail({
         return (
           <li
             key={section.section_id}
-            className={cn("flex items-center gap-1 rounded-lg border p-1.5", selected && "border-primary bg-accent")}
+            className={cn("flex items-center gap-0.5 rounded-lg border p-1", selected && "border-primary bg-accent")}
           >
-            <div className="flex flex-col">
+            <div className="flex">
               <Button
                 size="icon"
                 variant="ghost"
@@ -76,12 +72,6 @@ export function SectionRail({
             >
               {name}
             </button>
-            {canEditSection(section.section_key) && (
-              <Button size="icon" variant="ghost" className="size-8 max-sm:size-9" onClick={() => onEdit(section)}>
-                <Pencil className="size-3.5" />
-                <span className="sr-only">Edit {name}</span>
-              </Button>
-            )}
             <Switch
               checked={section.enabled}
               disabled={pending.has(section.section_id)}

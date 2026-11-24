@@ -1,4 +1,4 @@
-/** The tab a section panel opens on: Content (where Edit lives) when the section has it, else the first. */
+/** The tab the section dock opens on: Style when the section has it, else the first. */
 export function defaultTabId(tabIds: readonly string[]): string | undefined {
-  return tabIds.includes("content") ? "content" : tabIds[0];
+  return tabIds.includes("style") ? "style" : tabIds[0];
 }

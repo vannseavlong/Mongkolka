@@ -7,13 +7,13 @@ import { toast } from "sonner";
 import { ArrowDown, ArrowUp, ImagePlus, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Button } from "@mongkolka/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@mongkolka/ui/dialog";
+import { DialogFooter } from "@mongkolka/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
 import { Input } from "@mongkolka/ui/input";
 import { Textarea } from "@mongkolka/ui/textarea";
 import { ApiError } from "@/lib/api";
 import { asRecord, saveContent } from "../lib/section-content-save";
-import type { WebsiteSection, WebsiteSectionKey } from "../data/schema";
+import type { WebsiteSection } from "../data/schema";
 import { AssetPicker } from "./asset-picker";
 import { newUrlsOnly } from "./asset-library-logic";
 import { VERSE_PRESETS } from "../lib/verse-presets";
@@ -672,73 +672,18 @@ function FooterContentForm({ section, onSaved }: { section: WebsiteSection; onSa
 
 // ---------------------------------------------------------------------------
 
-const SECTION_LABELS: Partial<Record<WebsiteSectionKey, string>> = {
-  gallery: "gallery photos",
-  registry: "registry links",
-  timeline: "timeline chapters",
-  rsvp: "RSVP details",
-  music: "playlist",
-  verse: "verse",
-  footer: "footer",
-  invitation: "invitation",
-  agenda: "agenda",
-  letters: "thank-you letters",
-  video: "video",
-};
-
-export function SectionContentDialog({
-  section,
-  onOpenChange,
-}: {
-  section: WebsiteSection | null;
-  onOpenChange: (open: boolean) => void;
-}) {
-  return (
-    <Dialog open={!!section} onOpenChange={onOpenChange}>
-      <DialogContent>
-        {section && (
-          <>
-            <DialogHeader>
-              <DialogTitle className="capitalize">
-                Edit {SECTION_LABELS[section.section_key] ?? section.section_key}
-              </DialogTitle>
-            </DialogHeader>
-            {section.section_key === "gallery" && (
-              <GalleryContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "registry" && (
-              <RegistryContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "timeline" && (
-              <TimelineContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "rsvp" && (
-              <RsvpContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "music" && (
-              <MusicContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "verse" && (
-              <VerseContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "footer" && (
-              <FooterContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "invitation" && (
-              <InvitationContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "agenda" && (
-              <AgendaContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "video" && (
-              <VideoContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-            {section.section_key === "letters" && (
-              <LettersContentForm key={section.section_id} section={section} onSaved={() => onOpenChange(false)} />
-            )}
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
+/** Edit form for a content-backed section, shown inline in the builder's content panel. */
+export function SectionContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+  if (section.section_key === "gallery") return <GalleryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "registry") return <RegistryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "timeline") return <TimelineContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "rsvp") return <RsvpContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "music") return <MusicContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "verse") return <VerseContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "footer") return <FooterContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "invitation") return <InvitationContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "agenda") return <AgendaContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "video") return <VideoContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "letters") return <LettersContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  return null;
 }

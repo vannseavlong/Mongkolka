@@ -52,7 +52,7 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
       {variants.length === 1 && (
         <p className="text-sm text-muted-foreground">This section has one style for now. More are coming.</p>
       )}
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label={`${sectionLabel(section.section_key)} styles`}>
+      <ul className="grid grid-cols-2 gap-3 md:grid-cols-4 2xl:grid-cols-6" aria-label={`${sectionLabel(section.section_key)} styles`}>
         {variants.map((variant) => {
           const isCurrent = variant.component_id === currentId;
           const isDefault = variant.component_id === defaultId;

@@ -22,6 +22,7 @@ export const themeTokensSchema = z.object({
   accent: z.string().optional(),
   accentForeground: z.string().optional(),
   border: z.string().optional(),
+  input: z.string().optional(),
   inputBackground: z.string().optional(),
   ring: z.string().optional(),
   sidebar: z.string().optional(),

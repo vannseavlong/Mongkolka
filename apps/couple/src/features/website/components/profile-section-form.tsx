@@ -5,22 +5,19 @@ import { toast } from "sonner";
 import { mutate } from "swr";
 import { ImagePlus } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@mongkolka/ui/dialog";
+import { DialogFooter } from "@mongkolka/ui/dialog";
 import { Input } from "@mongkolka/ui/input";
 import { Label } from "@mongkolka/ui/label";
 import { Textarea } from "@mongkolka/ui/textarea";
 import { api, ApiError } from "@/lib/api";
-import type { WebsiteSection } from "../data/schema";
 import type { PreviewProfile } from "../lib/build-content";
 import {
-  isProfileSection,
   profileSectionErrors,
   profileSectionPayload,
   profileSectionValues,
   type ProfileSectionKey,
   type ProfileSectionValues,
 } from "../lib/profile-section-fields";
-import { sectionLabel } from "../workspace/section-labels";
 import { PROFILE_KEY } from "./asset-library-api";
 import { AssetPicker } from "./asset-picker";
 
@@ -46,35 +43,8 @@ const FIELDS: Record<ProfileSectionKey, FieldSpec[]> = {
   ],
 };
 
-/** Edit dialog for hero, story and details. Saves to the couple profile (their canonical home) and refreshes the canvas. */
-export function ProfileSectionDialog({
-  section,
-  profile,
-  onOpenChange,
-}: {
-  section: WebsiteSection | null;
-  profile: PreviewProfile;
-  onOpenChange: (open: boolean) => void;
-}) {
-  const key = section && isProfileSection(section.section_key) ? section.section_key : null;
-  return (
-    <Dialog open={!!key} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        {section && key && (
-          <>
-            <DialogHeader>
-              <DialogTitle>Edit {sectionLabel(section.section_key)}</DialogTitle>
-              <DialogDescription>These details are shared with your profile and every template.</DialogDescription>
-            </DialogHeader>
-            <ProfileSectionForm key={section.section_id} sectionKey={key} profile={profile} onSaved={() => onOpenChange(false)} />
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function ProfileSectionForm({ sectionKey, profile, onSaved }: { sectionKey: ProfileSectionKey; profile: PreviewProfile; onSaved: () => void }) {
+/** Edit form for hero, story and details. Saves to the couple profile (their canonical home) and refreshes the canvas. */
+export function ProfileSectionForm({ sectionKey, profile, onSaved }: { sectionKey: ProfileSectionKey; profile: PreviewProfile; onSaved: () => void }) {
   const [values, setValues] = useState<ProfileSectionValues>(() => profileSectionValues(sectionKey, profile));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);

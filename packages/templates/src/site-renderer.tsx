@@ -66,6 +66,8 @@ export interface SiteRendererProps {
    * because fixed overlays would escape the builder canvas.
    */
   musicSrc?: string | null;
+  /** Fired when the guest opens the opening gate (the builder preview uses it to reveal the page). */
+  onOpened?: () => void;
 }
 
 /**
@@ -84,6 +86,7 @@ export function SiteRenderer({
   extraProps,
   wrapSection,
   musicSrc,
+  onOpened,
 }: SiteRendererProps) {
   const [openingDismissed, setOpeningDismissed] = useState(false);
 
@@ -112,7 +115,10 @@ export function SiteRenderer({
         theme={theme}
         guestGreeting={guestGreeting}
         details={buildContent("details") as DetailsContent | undefined}
-        onOpen={() => setOpeningDismissed(true)}
+        onOpen={() => {
+          setOpeningDismissed(true);
+          onOpened?.();
+        }}
       />
     );
     // `display: contents` keeps the gate's layout untouched; the wrapper only listens for the tap.

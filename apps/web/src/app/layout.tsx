@@ -46,6 +46,7 @@ type ActiveThemeTokens = {
   accent: string;
   accentForeground: string;
   border: string;
+  input: string;
   inputBackground: string;
   ring: string;
   sidebar: string;

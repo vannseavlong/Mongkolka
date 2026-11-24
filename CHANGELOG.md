@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-24 · [Cross] feat: Covenant Gold & Blush Christian wedding template (inactive)
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-covenant-template.md
+- Branch/PR: feat/covenant-template (merged to main, no PR)
+- What changed: [Web] new `covenant` skin: animated Khmer blessing, names and guest intro, cross reveal into a full-screen hero, verse card, memories (latest guest photos and wishes), `/<slug>/photos` and `/<slug>/wishes` pages; [Cross] new `video` section (YouTube, server-validated, couple portal form, Firebase rewrites); `covenant_gold` template and component rows seeded inactive
+- Needs: deploy API, `lsdb sync`, `lsdb seed --upsert`, then activate in admin; Khmer, tablet/desktop and real-API check, code review not run
+
 ## 2026-11-24 · [Web] feat: couple builder edit buttons and in-builder editing
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-couple-builder-edit.md

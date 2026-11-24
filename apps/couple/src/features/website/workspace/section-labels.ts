@@ -2,6 +2,7 @@ import type { WebsiteSectionKey } from "../data/schema";
 
 /** Couple-facing names for section keys. */
 export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
+  cover: "Cover",
   opening: "Opening",
   hero: "Hero",
   invitation: "Invitation",

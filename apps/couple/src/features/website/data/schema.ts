@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const WEBSITE_SECTIONS = [
+  "cover",
   "opening",
   "hero",
   "invitation",

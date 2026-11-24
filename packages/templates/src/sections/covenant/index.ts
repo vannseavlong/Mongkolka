@@ -1,5 +1,6 @@
 export { CovenantOpening } from "./Opening";
 export { CovenantCardOpening } from "./CardOpening";
+export { CovenantButterflyCover, CovenantGardenCover } from "./Cover";
 export { CovenantHero } from "./Hero";
 export { CovenantVerse } from "./Verse";
 export { CovenantVideo } from "./Video";

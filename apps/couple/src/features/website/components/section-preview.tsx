@@ -95,6 +95,7 @@ export const SectionPreview = memo(function SectionPreview({
               couple={couple}
               buildContent={() => content}
               guestGreeting="Guest"
+              coverPreview
               extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : {})}
             />
           </LanguageProvider>

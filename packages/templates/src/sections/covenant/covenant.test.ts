@@ -12,6 +12,7 @@ import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
 import { youtubeId } from "./video-logic";
+import { BUTTERFLIES, butterflyEntry, FLOWERS } from "./cover-logic";
 
 const theme: Theme = { bg_color: "#fff3f6", text_color: "#4a2c35", accent_color: "#8a6418", font_style: "serif" };
 
@@ -132,5 +133,24 @@ describe("covenant fit scale", () => {
     assert.equal(fitScale(100, 1000), 0.3);
     assert.equal(fitScale(0, 500), 1);
     assert.equal(fitScale(500, 0), 1);
+  });
+});
+
+describe("covenant covers", () => {
+  const noop = () => {};
+  for (const id of ["cover_covenant_butterflies", "cover_covenant_garden"]) {
+    for (const language of ["en", "kh"] as const) {
+      it(`${id} renders the couple's names and a skip hint in ${language}`, () => {
+        const html = render("cover", id, language, { onReveal: noop, onDone: noop });
+        assert.ok(html.includes("data-mk-cover"));
+        assert.ok(html.includes(language === "kh" ? "ចុចដើម្បីរំលង" : "Tap to skip"));
+        assert.ok(html.includes("cvc-names"));
+      });
+    }
+  }
+  it("butterflies and flowers sit inside the screen or just off its edge,", () => {
+    for (const b of BUTTERFLIES) assert.ok(b.x >= 0 && b.x <= 100 && b.y >= 0 && b.y <= 100 && b.size > 0);
+    for (const f of FLOWERS) assert.ok(f.x >= 0 && f.x <= 100 && f.y >= 0 && f.y <= 102 && f.size > 0);
+    for (const b of BUTTERFLIES) assert.equal(Math.abs(butterflyEntry(b).dx), 70);
   });
 });

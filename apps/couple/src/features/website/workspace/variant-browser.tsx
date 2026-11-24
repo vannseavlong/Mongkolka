@@ -5,9 +5,25 @@ import { sectionRegistry, skinFromComponents, variantsForSkin } from "@mongkolka
 import { Badge } from "@mongkolka/ui/badge";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { cn } from "@mongkolka/ui/utils";
+import type { SectionComponent, WebsiteSectionKey } from "../data/schema";
 import { sectionLabel } from "./section-labels";
 import { SectionPreview } from "../components/section-preview";
 import type { SectionPanelContext } from "./panel-tabs/types";
+
+/** Display stand-in for a registered style that has no catalog row: "opening_card_covenant" -> "Card covenant". */
+function fallbackVariant(sectionKey: WebsiteSectionKey, componentId: string): Omit<SectionComponent, "status"> {
+  const words = componentId.replace(new RegExp(`^${sectionKey}_?`), "").split("_").filter(Boolean).join(" ");
+  const name = words ? words.charAt(0).toUpperCase() + words.slice(1) : componentId;
+  return {
+    component_id: componentId,
+    section: sectionKey,
+    name,
+    preview_bg_color: null,
+    preview_text_color: null,
+    preview_accent_color: null,
+    font_style: null,
+  };
+}
 
 /**
  * Every active variant of one section, each rendered with the couple's own
@@ -31,7 +47,14 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
     (c) => c.section === section.section_key && registered[c.component_id] && (c.status === "active" || c.component_id === currentId),
   );
   const fits = new Set(variantsForSkin(candidates, skinFromComponents(template.default_components)).map((c) => c.component_id));
-  const variants = candidates.filter((c) => fits.has(c.component_id) || c.component_id === currentId);
+  const listed = candidates.filter((c) => fits.has(c.component_id) || c.component_id === currentId);
+  // The live catalog may have no row for the style the template ships with (e.g. a template
+  // launched before its rows were seeded). The couple must still see what they have, so it is
+  // shown from the registry id instead of silently missing.
+  const variants: SectionComponent[] =
+    currentId && !listed.some((c) => c.component_id === currentId)
+      ? [{ ...fallbackVariant(section.section_key, currentId), status: "active" }, ...listed]
+      : listed;
 
   if (catalogLoading) {
     return (

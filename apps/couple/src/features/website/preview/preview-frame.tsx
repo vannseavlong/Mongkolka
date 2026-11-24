@@ -34,7 +34,8 @@ export function PreviewFrame() {
   }, []);
 
   const selected = state?.sections.find((s) => s.section_id === state.selectedId) ?? null;
-  const selectedIsOpening = selected?.section_key === "opening";
+  // The cover and the opening gate are both full-screen intros, previewed as a whole sequence.
+  const selectedIsOpening = selected?.section_key === "opening" || selected?.section_key === "cover";
 
   // Selecting the opening, switching mode or replaying starts the gate over (adjusted during render).
   // In page mode the gate belongs to the whole page, so picking sections must not restart it.
@@ -105,6 +106,7 @@ export function PreviewFrame() {
         buildContent={(sectionKey) => buildPreviewContent(sectionKey, profile)}
         guestGreeting="Guest"
         onOpened={() => setOpened(true)}
+        onCoverRevealed={() => setOpened(true)}
         extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : {})}
         wrapSection={(section, node) => (
           <div

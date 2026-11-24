@@ -777,6 +777,26 @@ const components = [
   },
   // Covenant (Christian gold/white/pink) rows: INACTIVE until the template is reviewed and launched with its template row.
   {
+    component_id: "cover_covenant_butterflies",
+    section: "cover",
+    name: "Butterflies",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
+    component_id: "cover_covenant_garden",
+    section: "cover",
+    name: "Garden bloom",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
+  {
     component_id: "opening_card_covenant",
     section: "opening",
     name: "Covenant Invitation Card",

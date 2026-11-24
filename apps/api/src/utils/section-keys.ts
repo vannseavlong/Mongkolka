@@ -2,6 +2,7 @@
 // constant here since the API is framework-agnostic and shouldn't depend on the
 // React-rendering template package. tests/section-keys.test.ts guards drift.
 export const SECTION_KEYS = [
+  "cover",
   "opening",
   "hero",
   "invitation",

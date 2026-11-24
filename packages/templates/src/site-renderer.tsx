@@ -68,6 +68,10 @@ export interface SiteRendererProps {
   musicSrc?: string | null;
   /** Fired when the guest opens the opening gate (the builder preview uses it to reveal the page). */
   onOpened?: () => void;
+  /** Fired when the cover starts fading away and the opening gate appears beneath it (builder preview). */
+  onCoverRevealed?: () => void;
+  /** Thumbnail mode: the cover keeps playing and never reveals (builder style picker). */
+  coverPreview?: boolean;
 }
 
 /**
@@ -76,7 +80,36 @@ export interface SiteRendererProps {
  * the real public site so the two never drift — assumes it's already inside a
  * LanguageProvider (the section components call useLanguage() internally).
  */
-export function SiteRenderer({
+export function SiteRenderer(props: SiteRendererProps) {
+  const { template, sections, themeOverride, couple, guestGreeting, onCoverRevealed, coverPreview } = props;
+  // The cover plays first. The rest of the site (opening gate included) mounts only when it starts to
+  // reveal, so nothing underneath animates before the guest can see it.
+  const [coverPhase, setCoverPhase] = useState<"play" | "revealing" | "done">("play");
+  const cover = sections.find((s) => s.section_key === "cover" && s.enabled);
+  const Cover = cover ? resolveComponent("cover", cover.component_id, template.default_components.cover) : undefined;
+  const holding = !!Cover && coverPhase === "play";
+
+  return (
+    <>
+      {!holding && <SiteRendererBody {...props} />}
+      {cover && Cover && coverPhase !== "done" && (
+        <Cover
+          couple={couple}
+          theme={resolveTheme(template.default_theme, themeOverride, cover.color_override)}
+          guestGreeting={guestGreeting}
+          preview={coverPreview}
+          onReveal={() => {
+            setCoverPhase("revealing");
+            onCoverRevealed?.();
+          }}
+          onDone={() => setCoverPhase("done")}
+        />
+      )}
+    </>
+  );
+}
+
+function SiteRendererBody({
   template,
   sections,
   themeOverride,
@@ -103,7 +136,7 @@ export function SiteRenderer({
   const skin = skinFromComponents(template.default_components);
   const ordered = [...sections].filter((s) => s.enabled).sort((a, b) => a.display_order - b.display_order);
   const opening = ordered.find((s) => s.section_key === "opening");
-  const rest = ordered.filter((s) => s.section_key !== "opening");
+  const rest = ordered.filter((s) => s.section_key !== "opening" && s.section_key !== "cover");
 
   if (opening && !openingDismissed) {
     const theme = resolveTheme(template.default_theme, themeOverride, opening.color_override);

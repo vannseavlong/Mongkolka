@@ -72,13 +72,14 @@ describe("Khmer e-invitation seed rows", () => {
     }
   });
 
-  it("each template covers every section once, opening first, footer last, and has a default component for each", () => {
+  it("each template covers every section once, cover then opening first, footer last, and has a default component for each (cover is optional)", () => {
     for (const t of templates as Tpl[]) {
       const keys = t.default_sections.map((s) => s.section_key);
       assert.deepEqual([...keys].sort(), [...SECTION_KEYS].sort(), `${t.template_id} default_sections`);
-      assert.equal(keys[0], "opening");
+      assert.equal(keys[0], "cover");
+      assert.equal(keys[1], "opening");
       assert.equal(keys[keys.length - 1], "footer");
-      for (const k of keys) assert.ok(k in t.default_components, `${t.template_id}: ${k} has no default component`);
+      for (const k of keys) assert.ok(k === "cover" || k in t.default_components, `${t.template_id}: ${k} has no default component`);
     }
   });
 
@@ -104,7 +105,7 @@ describe("Khmer e-invitation seed rows", () => {
     for (const t of templates as Tpl[]) {
       const kids = t.template_id === "kids_fantasy_birthday";
       const ON = ["opening", "hero", "invitation", "story", "agenda", "gallery", "details", "rsvp", "registry", "guestbook", ...(kids ? [] : ["letters"]), "footer"];
-      const OFF = ["verse", "video", "timeline", "music", ...(kids ? ["letters"] : [])];
+      const OFF = ["cover", "verse", "video", "timeline", "music", ...(kids ? ["letters"] : [])];
       const on = t.default_sections.filter((x) => x.enabled).map((x) => x.section_key);
       assert.deepEqual(on, ON, `${t.template_id} enabled sections, in order`);
       const off = t.default_sections.filter((x) => !x.enabled).map((x) => x.section_key);

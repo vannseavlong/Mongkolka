@@ -124,6 +124,7 @@ export default {
       // `default_sections` column comes from API-template-default-sections (parallel task).
       // Ordered; footer stays last.
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "verse", enabled: true },
@@ -177,6 +178,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "invitation", enabled: true },
@@ -228,6 +230,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "invitation", enabled: true },
@@ -279,6 +282,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "invitation", enabled: true },
@@ -330,6 +334,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "invitation", enabled: true },
@@ -381,6 +386,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "invitation", enabled: true },
@@ -437,6 +443,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: false },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "invitation", enabled: true },
@@ -472,6 +479,7 @@ export default {
         font_style: "serif",
       },
       default_components: {
+        cover: "cover_covenant_butterflies",
         opening: "opening_card_covenant",
         hero: "hero_covenant",
         verse: "verse_covenant",
@@ -490,6 +498,7 @@ export default {
         footer: "footer_skin",
       },
       default_sections: [
+        { section_key: "cover", enabled: true },
         { section_key: "opening", enabled: true },
         { section_key: "hero", enabled: true },
         { section_key: "verse", enabled: true },

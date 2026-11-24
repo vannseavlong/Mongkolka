@@ -8,6 +8,7 @@ export interface Theme {
 export type PartialTheme = Partial<Theme>;
 
 export const SECTION_KEYS = [
+  "cover",
   "opening",
   "hero",
   "invitation",
@@ -177,6 +178,18 @@ export interface TimelineContent {
 
 export interface MusicContent {
   playlistUrl?: string;
+}
+
+export interface CoverProps {
+  couple: CoupleInfo;
+  theme: Theme;
+  guestGreeting?: string;
+  /** Fires once when the cover starts fading away; the renderer mounts the opening gate beneath at that moment. */
+  onReveal: () => void;
+  /** Fires once when the cover is fully gone and can be removed. */
+  onDone: () => void;
+  /** Thumbnail mode (builder style picker): keep playing the scene, never reveal or finish. */
+  preview?: boolean;
 }
 
 export interface OpeningProps {

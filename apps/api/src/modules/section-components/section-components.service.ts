@@ -1,6 +1,7 @@
 import { SectionComponentsModel } from "./section-components.model.js";
 
 export const SECTIONS = [
+  "cover",
   "opening",
   "hero",
   "invitation",

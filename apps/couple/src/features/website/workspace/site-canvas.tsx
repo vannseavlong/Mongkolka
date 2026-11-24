@@ -94,7 +94,7 @@ export function SiteCanvas({
   });
 
   const selected = sections.find((s) => s.section_id === selectedId) ?? null;
-  const hasOpening = sections.some((s) => s.section_key === "opening" && s.enabled);
+  const hasOpening = sections.some((s) => (s.section_key === "opening" || s.section_key === "cover") && s.enabled);
 
   // Size of the stage the frame must fit in.
   useEffect(() => {
@@ -143,9 +143,9 @@ export function SiteCanvas({
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b bg-background px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
           {hasOpening && (
-            <Button size="icon" variant="outline" className="size-9" onClick={() => setReplay((n) => n + 1)} title="Replay opening">
+            <Button size="icon" variant="outline" className="size-9" onClick={() => setReplay((n) => n + 1)} title="Replay intro">
               <RotateCcw className="size-4" />
-              <span className="sr-only">Replay opening</span>
+              <span className="sr-only">Replay intro (cover and opening)</span>
             </Button>
           )}
           <Button variant="outline" onClick={onChooseTemplate} className="min-w-0">

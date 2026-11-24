@@ -58,6 +58,6 @@ describe("grace_blush seed rows", () => {
     const keys = grace.default_sections.map((s) => s.section_key);
     assert.equal(new Set(keys).size, keys.length);
     assert.equal(keys[keys.length - 1], "footer");
-    for (const k of keys) assert.ok(k in grace.default_components, `${k} has no default component`);
+    for (const k of keys) assert.ok(k === "cover" || k in grace.default_components, `${k} has no default component`);
   });
 });

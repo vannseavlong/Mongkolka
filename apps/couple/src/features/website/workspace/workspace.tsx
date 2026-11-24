@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import type { PartialTheme } from "@mongkolka/templates";
 import { cn } from "@mongkolka/ui/utils";
-import type { SectionComponent, SiteTemplate, WebsiteSection } from "../data/schema";
+import type { SectionComponent, SiteLanguage, SiteTemplate, WebsiteSection } from "../data/schema";
 import type { PreviewProfile } from "../lib/build-content";
 import { ContentPanel } from "./content-panel";
 import { Inspector, type InspectorTab } from "./inspector";
@@ -37,6 +37,7 @@ export function Workspace({
   profile,
   colors,
   onChooseTemplate,
+  defaultLanguage,
 }: {
   sections: WebsiteSection[];
   components: SectionComponent[];
@@ -48,6 +49,7 @@ export function Workspace({
   /** Site-wide colors / palette editor, shown on the Colors tab. */
   colors: ReactNode;
   onChooseTemplate: () => void;
+  defaultLanguage: SiteLanguage;
 }) {
   const ordered = [...sections].sort((a, b) => a.display_order - b.display_order);
   const [pickedId, setPickedId] = useState<string | null>(null);
@@ -127,6 +129,7 @@ export function Workspace({
             onSelect={pickFromCanvas}
             templateName={template.name}
             onChooseTemplate={onChooseTemplate}
+            defaultLanguage={defaultLanguage}
           />
         </section>
 

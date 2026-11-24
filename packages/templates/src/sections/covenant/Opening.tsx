@@ -9,6 +9,7 @@ import { withAlpha } from "../../chrome/gold";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import { COVENANT_CSS } from "./covenant-styles";
 import { coupleNamesFor } from "./names";
+import { openingText } from "./opening-text";
 import { guestLine, hasKhmer, introFor, petals } from "./intro-logic";
 import { COVENANT_ORNAMENTS } from "./ornaments";
 import { covenantPalette, PINK } from "./palette";
@@ -26,7 +27,7 @@ const at = (start: number, ms: number): Vars => ({ "--at": `${start}ms`, "--ms":
  * the name read from the invitation link, shown exactly as set; "អស់លោក​លោកស្រី" when there is none). The open button appears at the end; it cannot be skipped.
  * A tap fades the card out and hands over to the hero. Reduced motion shows everything at once.
  */
-export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
+export function CovenantOpening({ couple, theme, guestGreeting, content, onOpen }: OpeningProps) {
   const { t, language } = useLanguage();
   const reduce = useReducedMotion() ?? false;
   const tl = introFor(reduce);
@@ -53,7 +54,7 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
   const { first, second } = coupleNamesFor(couple, language);
     const guest = guestLine(guestGreeting) || t("covenant.guestDefault");
   const kh = language === "kh";
-  const blessing = t("covenant.blessing");
+  const blessing = openingText(content, "blessing", language, t("covenant.blessing"));
   const accent = theme.accent_color;
   const foil: CSSProperties = {
     backgroundImage: foilTextGradient(accent, isDarkColor(theme.bg_color) ? theme.bg_color : "#ffffff"),
@@ -168,7 +169,7 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
         {guest && (
           <div className="cv-rise flex flex-col items-center gap-1" style={at(tl.guestAt, tl.guestMs)}>
             <p className="m-0 text-sm" style={{ color: p.gold.mid, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, letterSpacing: kh ? "normal" : "0.18em", textTransform: kh ? "none" : "uppercase", lineHeight: 1.9 }}>
-              {t("covenant.invite")}
+              {openingText(content, "invite", language, t("covenant.invite"))}
             </p>
             <p
               className="m-0 break-words"
@@ -182,7 +183,7 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
         <div style={{ minHeight: 56 }}>
           {ready && (
             <button type="button" className="cv-cta cv-ready cv-pulse" data-mk-open onClick={begin} disabled={crossing} style={{ fontFamily: kh ? MOUL_FONT : CINZEL_FONT, fontSize: kh ? "0.9rem" : "0.85rem", letterSpacing: kh ? "normal" : "0.16em", textTransform: kh ? "none" : "uppercase" }}>
-              {t("covenant.open")}
+              {openingText(content, "open", language, t("covenant.open"))}
             </button>
           )}
         </div>

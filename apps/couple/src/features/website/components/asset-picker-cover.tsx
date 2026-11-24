@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@mongkolka/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@mongkolka/ui/collapsible";
 import { Input } from "@mongkolka/ui/input";
-import type { SectionPanelContext } from "../workspace/panel-tabs/types";
+import type { PreviewProfile } from "../lib/build-content";
 import { AssetLibrary } from "./asset-library";
 import { isHttpUrl, URL_ERROR } from "./asset-library-logic";
 import { saveProfileImage } from "./profile-image-save";
@@ -12,8 +12,8 @@ import { saveProfileImage } from "./profile-image-save";
 const saveCover = (url: string | null) => saveProfileImage("cover_photo_url", url, "Could not update the cover photo");
 
 /** Hero cover photo: current cover, library to pick from, raw URL as an advanced option. */
-export function CoverAssets({ context }: { context: SectionPanelContext }) {
-  const cover = context.profile.cover_photo_url || null;
+export function CoverAssets({ profile }: { profile: PreviewProfile }) {
+  const cover = profile.cover_photo_url || null;
   const [rawUrl, setRawUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
 

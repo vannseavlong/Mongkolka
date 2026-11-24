@@ -13,6 +13,8 @@ export interface PreviewState {
   profile: PreviewProfile;
   selectedId: string | null;
   mode: PreviewMode;
+  /** Language the preview is shown in (the couple can flip it to check both). */
+  language: "en" | "kh";
   /** Bumped by "Replay opening" to restart the gate. */
   replay: number;
 }

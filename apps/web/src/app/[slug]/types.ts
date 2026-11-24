@@ -22,6 +22,8 @@ export interface PublicSiteResponse {
     venue_image_url?: string | null;
     site_template_id: string | null;
     theme_override: PartialTheme | null;
+    /** Language the site opens in; null/absent = Khmer. */
+    default_language?: "en" | "kh" | null;
   } | null;
   template: {
     template_id: string;

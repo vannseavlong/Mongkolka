@@ -95,7 +95,7 @@ export function PreviewFrame() {
     state.mode === "page" ? sections : selected ? (selectedIsOpening && opened ? sections : [selected]) : [];
 
   return (
-    <LanguageProvider>
+    <LanguageProvider key={state.language} initialLanguage={state.language}>
       {/* key: restarts the gate when selecting it again, switching mode or replaying */}
       <SiteRenderer
         key={gateKey}

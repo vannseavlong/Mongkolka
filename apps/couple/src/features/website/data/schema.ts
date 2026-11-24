@@ -70,11 +70,15 @@ export const websiteSectionSchema = z.object({
 
 export type WebsiteSection = z.infer<typeof websiteSectionSchema>;
 
+export type SiteLanguage = "en" | "kh";
+
 export const websiteSettingsSchema = z.object({
   slug: z.string().nullable(),
   website_status: z.enum(["draft", "published"]),
   site_template_id: z.string().nullable(),
   theme_override: themeSchema.partial().nullable(),
+  /** Language the public site opens in. Khmer unless the couple chose English. */
+  default_language: z.enum(["en", "kh"]),
 });
 
 export type WebsiteSettings = z.infer<typeof websiteSettingsSchema>;

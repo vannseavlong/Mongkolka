@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { LanguageProvider, type Language } from "../../i18n";
+import { LanguageProvider, resolveInitialLanguage, type Language } from "../../i18n";
 import { SkinProvider } from "../khmer/skin-context";
 import { sectionRegistry } from "../../registry";
 import { COVENANT_SAMPLE_COUPLE as SAMPLE_COUPLE, SAMPLE_CONTENT, SAMPLE_GUESTBOOK } from "../../sample-content";
@@ -12,6 +12,7 @@ import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
 import { youtubeId } from "./video-logic";
+import { openingText } from "./opening-text";
 import { BUTTERFLIES, bloomCluster, butterflyEntry, DOVES, FLYERS, FOLIAGE_REGIONS, leafCluster, SPARKLES } from "./cover-logic";
 
 const theme: Theme = { bg_color: "#fff3f6", text_color: "#4a2c35", accent_color: "#8a6418", font_style: "serif" };
@@ -168,5 +169,35 @@ describe("covenant covers", () => {
     for (const s of SPARKLES) assert.ok(s.x >= 0 && s.x <= 100 && s.y >= 0 && s.y <= 100 && s.duration > 0);
     assert.ok(FLYERS.every((f) => f.size > 0 && f.duration > 0));
     assert.ok(DOVES.length >= 1 && DOVES.every((d) => d.size > 0 && d.duration > 0));
+  });
+});
+
+describe("covenant opening wording", () => {
+  it("uses the couple's text for the viewer's language and the built-in text when empty", () => {
+    const content = { inviteKh: " ជូនពរ ", openEn: "Come in", titleEn: "   " };
+    assert.equal(openingText(content, "invite", "kh", "default"), "ជូនពរ");
+    assert.equal(openingText(content, "invite", "en", "default"), "default");
+    assert.equal(openingText(content, "open", "en", "default"), "Come in");
+    assert.equal(openingText(content, "title", "en", "Invitation"), "Invitation");
+    assert.equal(openingText(undefined, "blessing", "kh", "built-in"), "built-in");
+  });
+  it("renders the couple's wording on both Covenant openings", () => {
+    const content = { inviteEn: "Together with joy we invite", openEn: "Come in", blessingEn: "Grace upon grace" };
+    for (const id of ["opening_card_covenant", "opening_covenant"]) {
+      const html = render("opening", id, "en", { guestGreeting: "Sokha", onOpen: () => {}, content });
+      assert.ok(html.includes("Together with joy we invite") || html.includes("Grace upon grace"), id);
+    }
+  });
+});
+
+describe("initial site language", () => {
+  it("an explicit ?lang= wins, then the couple's default, and Khmer when neither is set", () => {
+    assert.equal(resolveInitialLanguage("en", "kh"), "en");
+    assert.equal(resolveInitialLanguage("kh", "en"), "kh");
+    assert.equal(resolveInitialLanguage(null, "en"), "en");
+    assert.equal(resolveInitialLanguage(null, "kh"), "kh");
+    assert.equal(resolveInitialLanguage(null, null), "kh");
+    assert.equal(resolveInitialLanguage(undefined, undefined), "kh");
+    assert.equal(resolveInitialLanguage("fr", "en"), "en");
   });
 });

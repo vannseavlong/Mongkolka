@@ -39,7 +39,15 @@ export interface CoupleInfo {
 }
 
 export interface HeroContent {
+  /**
+   * The photo to show. SiteRenderer resolves it for the viewer's screen from the portrait and landscape
+   * banners below (falling back to the profile cover photo), so every hero just reads this.
+   */
   coverPhotoUrl?: string;
+  /** Banner for tall screens (phones). */
+  portraitUrl?: string;
+  /** Banner for wide screens (desktop, tablet on its side). */
+  landscapeUrl?: string;
 }
 
 export interface StoryContent {
@@ -192,12 +200,37 @@ export interface CoverProps {
   preview?: boolean;
 }
 
+/**
+ * The opening's own wording and event details. Empty or missing fields use the template's built-in text,
+ * or (names, date, time, venue) the couple's profile. The cover reads the same names and date.
+ */
+export interface OpeningContent {
+  name1Kh?: string;
+  name1En?: string;
+  name2Kh?: string;
+  name2En?: string;
+  /** YYYY-MM-DD */
+  date?: string;
+  time?: string;
+  venue?: string;
+  blessingKh?: string;
+  blessingEn?: string;
+  inviteKh?: string;
+  inviteEn?: string;
+  titleKh?: string;
+  titleEn?: string;
+  openKh?: string;
+  openEn?: string;
+}
+
 export interface OpeningProps {
   couple: CoupleInfo;
   theme: Theme;
   guestGreeting?: string;
   /** Venue and time for openings that print them on the cover (the couple's details content). */
   details?: DetailsContent;
+  /** Couple-written wording (builder form); only some openings (Covenant) use it. */
+  content?: OpeningContent;
   onOpen: () => void;
 }
 

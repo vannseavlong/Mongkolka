@@ -1,6 +1,6 @@
 "use client";
 
-import { useFieldArray, useForm, type Control } from "react-hook-form";
+import { Controller, useFieldArray, useForm, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
 import { DialogFooter } from "@mongkolka/ui/dialog";
 import { Form } from "@mongkolka/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { AGENDA_ICONS } from "@mongkolka/templates";
 import { ApiError } from "@/lib/api";
 import type { WebsiteSection } from "../data/schema";
@@ -15,6 +16,8 @@ import { AGENDA_ICON_LABELS, agendaToContent, agendaToForm, type AgendaFormValue
 import { saveContent } from "../lib/section-content-save";
 import { TextRow } from "./section-form-fields";
 
+/** Select items cannot have an empty value, so "no icon" is this sentinel in the dropdown and "" in the form. */
+const NO_ICON = "none";
 const MAX_DAYS = 7;
 const MAX_ITEMS = 20;
 
@@ -36,7 +39,7 @@ const schema = z.object({
     .max(MAX_DAYS),
 });
 
-function DayItems({ control, day, register }: { control: Control<AgendaFormValues>; day: number; register: ReturnType<typeof useForm<AgendaFormValues>>["register"] }) {
+function DayItems({ control, day }: { control: Control<AgendaFormValues>; day: number }) {
   const { fields, append, remove } = useFieldArray({ control, name: `days.${day}.items` });
   return (
     <div className="flex flex-col gap-3">
@@ -47,17 +50,28 @@ function DayItems({ control, day, register }: { control: Control<AgendaFormValue
           <TextRow control={control} name={`days.${day}.items.${i}.titleKh`} label="Title (Khmer)" />
           <TextRow control={control} name={`days.${day}.items.${i}.titleEn`} label="Title (English)" />
           <div className="flex items-end gap-1">
-            <label className="flex flex-col gap-1 text-sm font-medium">
+            <div className="flex flex-col gap-1 text-sm font-medium">
               Icon
-              <select className="h-9 rounded-md border bg-background px-2 text-sm font-normal" {...register(`days.${day}.items.${i}.icon`)}>
-                <option value="">None</option>
-                {AGENDA_ICONS.map((icon) => (
-                  <option key={icon} value={icon}>
-                    {AGENDA_ICON_LABELS[icon]}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <Controller
+                control={control}
+                name={`days.${day}.items.${i}.icon`}
+                render={({ field: iconField }) => (
+                  <Select value={iconField.value || NO_ICON} onValueChange={(next) => iconField.onChange(next === NO_ICON ? "" : next)}>
+                    <SelectTrigger className="w-32 font-normal" aria-label="Icon">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_ICON}>None</SelectItem>
+                      {AGENDA_ICONS.map((icon) => (
+                        <SelectItem key={icon} value={icon}>
+                          {AGENDA_ICON_LABELS[icon]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
             <Button type="button" size="icon" variant="ghost" aria-label="Remove item" onClick={() => remove(i)}>
               <Trash2 className="size-3" />
             </Button>
@@ -111,7 +125,7 @@ export function AgendaContentForm({ section, onSaved }: { section: WebsiteSectio
                 <Trash2 className="size-3" />
               </Button>
             </div>
-            <DayItems control={form.control} day={d} register={form.register} />
+            <DayItems control={form.control} day={d} />
           </fieldset>
         ))}
         <Button

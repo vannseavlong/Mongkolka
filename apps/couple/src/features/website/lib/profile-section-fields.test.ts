@@ -57,9 +57,9 @@ describe("profile section fields", () => {
 });
 
 describe("defaultTabId", () => {
-  it("prefers content, else the first tab, else undefined", () => {
-    assert.equal(defaultTabId(["style", "content", "assets"]), "content");
-    assert.equal(defaultTabId(["style", "assets"]), "style");
+  it("prefers style, else the first tab, else undefined", () => {
+    assert.equal(defaultTabId(["assets", "style", "colors"]), "style");
+    assert.equal(defaultTabId(["assets", "colors"]), "assets");
     assert.equal(defaultTabId([]), undefined);
   });
 });

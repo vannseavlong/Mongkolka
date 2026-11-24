@@ -1,6 +1,7 @@
 "use client";
 
 import type { WebsiteSection } from "../data/schema";
+import { HeroBannerAssets } from "../components/hero-banner-assets";
 import { ProfileSectionForm } from "../components/profile-section-form";
 import { SectionContentForm } from "../components/section-content-forms";
 import type { PreviewProfile } from "../lib/build-content";
@@ -24,7 +25,15 @@ export function ContentPanel({ section, profile }: { section: WebsiteSection; pr
           Nothing to edit in this section. Change how it looks in the Style tab below.
         </p>
       ) : isProfileSection(section.section_key) ? (
-        <ProfileSectionForm key={section.section_id} sectionKey={section.section_key} profile={profile} onSaved={() => {}} />
+        <>
+          {section.section_key === "hero" && (
+            <section aria-label="Hero banners" className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold">Hero banners</h3>
+              <HeroBannerAssets key={section.section_id} section={section} profile={profile} />
+            </section>
+          )}
+          <ProfileSectionForm key={section.section_id} sectionKey={section.section_key} profile={profile} onSaved={() => {}} />
+        </>
       ) : (
         <SectionContentForm key={section.section_id} section={section} onSaved={() => {}} />
       )}

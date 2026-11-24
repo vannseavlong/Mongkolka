@@ -5,7 +5,7 @@ import { FileText, LayoutTemplate, Monitor, Rows3, RotateCcw, Smartphone } from 
 import type { PartialTheme, SiteRendererTemplate } from "@mongkolka/templates";
 import { Button } from "@mongkolka/ui/button";
 import { cn } from "@mongkolka/ui/utils";
-import type { WebsiteSection } from "../data/schema";
+import type { SiteLanguage, WebsiteSection } from "../data/schema";
 import type { PreviewProfile } from "../lib/build-content";
 import { computeFit, DEVICE_SIZE, type Device } from "../preview/fit";
 import {
@@ -27,7 +27,7 @@ function Segment<T extends string>({
   label: string;
   value: T;
   onChange: (v: T) => void;
-  items: readonly (readonly [T, typeof Monitor, string])[];
+  items: readonly (readonly [T, typeof Monitor | null, string])[];
 }) {
   return (
     <div className="flex gap-1 rounded-lg bg-muted p-1" role="group" aria-label={label}>
@@ -42,7 +42,7 @@ function Segment<T extends string>({
             value === v ? "bg-background shadow-sm" : "text-muted-foreground",
           )}
         >
-          <Icon className="size-4" /> {text}
+          {Icon && <Icon className="size-4" />} {text}
         </button>
       ))}
     </div>
@@ -64,6 +64,7 @@ export function SiteCanvas({
   onSelect,
   templateName,
   onChooseTemplate,
+  defaultLanguage,
 }: {
   template: SiteRendererTemplate;
   sections: WebsiteSection[];
@@ -73,10 +74,15 @@ export function SiteCanvas({
   onSelect: (sectionId: string) => void;
   templateName: string | null;
   onChooseTemplate: () => void;
+  /** The site's default language: what the preview starts in. */
+  defaultLanguage: SiteLanguage;
 }) {
   const [device, setDevice] = useState<Device>("desktop");
   const [mode, setMode] = useState<PreviewMode>("section");
   const [replay, setReplay] = useState(0);
+  // null = follow the site's default language; the couple can flip it to check the other one.
+  const [pickedLanguage, setPickedLanguage] = useState<SiteLanguage | null>(null);
+  const language = pickedLanguage ?? defaultLanguage;
   const [stage, setStage] = useState({ width: 0, height: 0 });
   const [content, setContent] = useState<{ selectedId: string | null; device: Device; value: number }>({
     selectedId: null,
@@ -128,10 +134,10 @@ export function SiteCanvas({
   // Push the current state into the frame whenever anything it draws changes.
   useEffect(() => {
     if (!ready) return;
-    const state: PreviewState = { template, sections, themeOverride, profile, selectedId, mode, replay };
+    const state: PreviewState = { template, sections, themeOverride, profile, selectedId, mode, replay, language };
     const message: HostMessage = { source: HOST_SOURCE, state };
     frameRef.current?.contentWindow?.postMessage(message, window.location.origin);
-  }, [ready, template, sections, themeOverride, profile, selectedId, mode, replay]);
+  }, [ready, template, sections, themeOverride, profile, selectedId, mode, replay, language]);
 
   // A height report only counts for the section and device it was measured on.
   const contentHeight = content.selectedId === selectedId && content.device === device ? content.value : 0;
@@ -154,6 +160,15 @@ export function SiteCanvas({
           </Button>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
+          <Segment
+            label="Preview language"
+            value={language}
+            onChange={setPickedLanguage}
+            items={[
+              ["kh", null, "ខ្មែរ"],
+              ["en", null, "EN"],
+            ]}
+          />
           <Segment
             label="Preview scope"
             value={mode}

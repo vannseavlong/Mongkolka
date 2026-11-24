@@ -9,6 +9,7 @@ import {
   parseDefaultSections,
 } from "../../utils/section-keys.js";
 import { validateSectionContent } from "../../utils/section-content.js";
+import { resolveSiteLanguage, type SiteLanguage } from "../../utils/language.js";
 import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
 
 /**
@@ -87,6 +88,7 @@ export const CoupleWebsiteService = {
       website_status: couple?.website_status ?? "draft",
       site_template_id: profile?.site_template_id ?? null,
       theme_override: profile?.theme_override ?? null,
+      default_language: resolveSiteLanguage(profile?.default_language),
     };
   },
 
@@ -231,6 +233,20 @@ export const CoupleWebsiteService = {
   async updateTheme(actorSheetId: string, themeOverride: Record<string, unknown>) {
     try {
       await CoupleWebsiteService.updateThemeUncached(actorSheetId, themeOverride);
+    } finally {
+      PublicSiteCache.invalidateActorSheet(actorSheetId);
+    }
+  },
+
+  /** Sets the language the public site opens in. Creates the profile row if the couple has none yet. */
+  async updateLanguage(actorSheetId: string, language: SiteLanguage) {
+    try {
+      const profile = await CoupleWebsiteModel.findProfile(actorSheetId);
+      if (profile) {
+        await CoupleWebsiteModel.updateProfile(actorSheetId, profile.profile_id as string, { default_language: language });
+      } else {
+        await CoupleWebsiteModel.createProfile(actorSheetId, { profile_id: randomUUID(), default_language: language });
+      }
     } finally {
       PublicSiteCache.invalidateActorSheet(actorSheetId);
     }

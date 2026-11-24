@@ -7,6 +7,7 @@ import {
   CovenantWishesPage,
   LanguageProvider,
   LanguageToggle,
+  resolveInitialLanguage,
   resolveTheme,
   type GuestbookData,
   type WallStatus,
@@ -22,7 +23,8 @@ import type { PublicSiteResponse } from "./types";
 export function carryQuery(guest: string | undefined, lang: "en" | "kh"): string {
   const q = new URLSearchParams();
   if (guest) q.set("to", guest);
-  if (lang === "kh") q.set("lang", "kh");
+  // Always carried: the site may open in Khmer or English by default, so the link must say which the guest is reading.
+  q.set("lang", lang);
   const s = q.toString();
   return s ? `?${s}` : "";
 }
@@ -55,7 +57,7 @@ export function WallClient({ page }: { page: "wishes" | "photos" }) {
   const { data } = site;
   if (!data.template) return <PageMessage withChrome={false} title="Not ready yet" body="This wedding website isn't ready yet." />;
   const guest = guestGreetingFrom(Object.fromEntries(query.entries()));
-  const lang = query.get("lang") === "kh" ? "kh" : "en";
+  const lang = resolveInitialLanguage(query.get("lang"), data.profile?.default_language);
   const theme = resolveTheme(data.template.default_theme, data.profile?.theme_override, null);
   const couple = {
     partner1Name: data.couple.partner1_name ?? "Partner One",

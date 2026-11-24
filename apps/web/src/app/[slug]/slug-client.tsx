@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
+import { resolveInitialLanguage } from "@mongkolka/templates";
 import { PageLoading, PageMessage } from "@/components/loading-state";
 import { API_URL } from "@/lib/api";
 import { brandUrl } from "@/lib/brand-url";
@@ -56,6 +57,6 @@ export function SlugClient() {
 
   // `name` (or the alias `to`) may hold several guests, comma-separated; capped at 80 characters.
   const guestGreeting = guestGreetingFrom(Object.fromEntries(query.entries()));
-  const lang = query.get("lang") === "kh" ? "kh" : "en";
+  const lang = resolveInitialLanguage(query.get("lang"), state.data.profile?.default_language);
   return <SiteView site={state.data} guestGreeting={guestGreeting} initialLanguage={lang} brandUrl={brandUrl()} />;
 }

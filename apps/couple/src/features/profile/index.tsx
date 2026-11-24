@@ -14,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@mongkolka/ui/form";
+import { DatePicker } from "@mongkolka/ui/date-picker";
 import { Input } from "@mongkolka/ui/input";
 import { Textarea } from "@mongkolka/ui/textarea";
 import { Main } from "@mongkolka/ui/layout/main";
@@ -353,12 +354,16 @@ function TextField({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input
-              type={type}
-              placeholder={placeholder}
-              {...field}
-              value={(field.value as string | null) ?? ""}
-            />
+            {type === "date" ? (
+              <DatePicker value={field.value as string | null} onChange={field.onChange} />
+            ) : (
+              <Input
+                type={type}
+                placeholder={placeholder}
+                {...field}
+                value={(field.value as string | null) ?? ""}
+              />
+            )}
           </FormControl>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
           <FormMessage />

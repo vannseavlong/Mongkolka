@@ -11,6 +11,7 @@ import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import { Butterfly, EdgePetals, FlourishCorner, FlourishEdge, Hearts } from "./card-art";
 import { CARD_CSS, COVENANT_CSS } from "./covenant-styles";
 import { coupleNamesFor } from "./names";
+import { openingText } from "./opening-text";
 import { useFitScale } from "./use-fit-scale";
 import { guestLine, hasKhmer, introFor } from "./intro-logic";
 import { covenantPalette, PINK } from "./palette";
@@ -25,7 +26,7 @@ const at = (start: number, ms: number): Vars => ({ "--at": `${start}ms`, "--ms":
  * framed box, then the date and venue. Plays by itself like the other Covenant opening (tap to open,
  * cross, hero). Venue and time come from the couple's details; lines without data are left out.
  */
-export function CovenantCardOpening({ couple, theme, guestGreeting, details, onOpen }: OpeningProps) {
+export function CovenantCardOpening({ couple, theme, guestGreeting, details, content, onOpen }: OpeningProps) {
   const { t, language } = useLanguage();
   const reduce = useReducedMotion() ?? false;
   const tl = introFor(reduce);
@@ -125,10 +126,10 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
 
           <div className="cv-wipe" style={at(tl.blessingAt, tl.blessingMs)}>
             <p className="m-0" style={{ ...foil, fontFamily: MOUL_FONT, fontSize: "clamp(1.05rem,5.4vw,1.5rem)", lineHeight: 1.9 }}>
-              {t("covenant.blessingKh")}
+              {openingText(content, "blessing", "kh", t("covenant.blessingKh"))}
             </p>
             <p className="m-0" style={{ ...foil, fontFamily: SCRIPT, fontSize: "clamp(1.1rem,5vw,1.5rem)", lineHeight: 1.4 }}>
-              {t("covenant.blessingEn")}
+              {openingText(content, "blessing", "en", t("covenant.blessingEn"))}
             </p>
           </div>
 
@@ -151,10 +152,10 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
 
           <div className="cv-rise flex w-full flex-col items-center" style={at(tl.guestAt, tl.guestMs)}>
             <p className="m-0" style={label("", "clamp(.95rem,4.6vw,1.25rem)")}>
-              {t("covenant.invite")}
+              {openingText(content, "invite", language, t("covenant.invite"))}
             </p>
             <p className="m-0" style={{ ...foil, fontFamily: CINZEL_FONT, fontWeight: 700, fontSize: "clamp(1rem,5vw,1.3rem)", letterSpacing: "0.04em" }}>
-              {t("covenant.inviteEn").toUpperCase()}
+              {openingText(content, "title", language, t("covenant.inviteEn")).toUpperCase()}
             </p>
             {guest && (
               <div className="cv-guestbox mt-3">
@@ -193,7 +194,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
                 started.current = true;
                 setCrossing(true);
               }} disabled={crossing} style={{ fontFamily: kh ? MOUL_FONT : CINZEL_FONT, fontSize: kh ? "0.9rem" : "0.85rem", letterSpacing: kh ? "normal" : "0.16em", textTransform: kh ? "none" : "uppercase" }}>
-                {t("covenant.open")}
+                {openingText(content, "open", language, t("covenant.open"))}
               </button>
             )}
           </div>

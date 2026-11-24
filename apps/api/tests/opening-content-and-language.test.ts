@@ -1,0 +1,77 @@
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { LIMITS, validateSectionContent } from "../src/utils/section-content.js";
+import { DEFAULT_SITE_LANGUAGE, resolveSiteLanguage, validateSiteLanguage } from "../src/utils/language.js";
+
+describe("opening content validation", () => {
+  it("keeps the wording per language, trimmed, and drops empty fields and unknown keys", () => {
+    const out = validateSectionContent("opening", {
+      blessingKh: "  សិរីសួស្ដី ",
+      blessingEn: "Blessed",
+      inviteEn: "",
+      openKh: "បើក",
+      junk: "dropped",
+    });
+    assert.deepEqual(out, { blessingKh: "សិរីសួស្ដី", blessingEn: "Blessed", openKh: "បើក" });
+  });
+  it("rejects non-strings, non-objects and over-long values", () => {
+    assert.throws(() => validateSectionContent("opening", { openEn: 5 }), /must be a string/);
+    assert.throws(() => validateSectionContent("opening", "nope"), /must be an object/);
+    assert.throws(() => validateSectionContent("opening", { blessingEn: "x".repeat(LIMITS.openingBlessing + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("opening", { titleEn: "x".repeat(LIMITS.openingTitle + 1) }), /at most/);
+  });
+  it("passes null through (clearing the content)", () => {
+    assert.equal(validateSectionContent("opening", null), null);
+  });
+});
+
+describe("opening event details", () => {
+  it("keeps names, a valid date, time and venue, trimmed", () => {
+    assert.deepEqual(
+      validateSectionContent("opening", { name1En: " Vutha ", name2Kh: "សុនីតា", date: "2027-01-07", time: " 5:00 PM ", venue: " Sen Sok City " }),
+      { name1En: "Vutha", name2Kh: "សុនីតា", date: "2027-01-07", time: "5:00 PM", venue: "Sen Sok City" },
+    );
+  });
+  it("rejects malformed and impossible dates", () => {
+    for (const date of ["07/01/2027", "2027-1-7", "2027-02-31", "2027-13-01", "tomorrow", "2027-01-07T10:00"]) {
+      assert.throws(() => validateSectionContent("opening", { date }), /YYYY-MM-DD|at most/, date);
+    }
+    assert.deepEqual(validateSectionContent("opening", { date: "" }), {});
+  });
+  it("caps name, time and venue length", () => {
+    assert.throws(() => validateSectionContent("opening", { name1En: "x".repeat(LIMITS.name + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("opening", { time: "x".repeat(LIMITS.openingTime + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("opening", { venue: "x".repeat(LIMITS.openingVenue + 1) }), /at most/);
+  });
+});
+
+describe("hero banners", () => {
+  it("keeps portrait and landscape image links, trimmed; empty ones are dropped", () => {
+    assert.deepEqual(
+      validateSectionContent("hero", { portraitUrl: " https://cdn.x/p.jpg ", landscapeUrl: "", junk: 1 }),
+      { portraitUrl: "https://cdn.x/p.jpg" },
+    );
+    assert.deepEqual(validateSectionContent("hero", { landscapeUrl: "http://localhost:4000/uploads/l.webp" }), { landscapeUrl: "http://localhost:4000/uploads/l.webp" });
+  });
+  it("rejects scripts, data URLs, junk and non-strings", () => {
+    for (const portraitUrl of ["javascript:alert(1)", "data:image/png;base64,AAAA", "ftp://x/y.jpg", "not a url"]) {
+      assert.throws(() => validateSectionContent("hero", { portraitUrl }), /image URL|https:\/\//, portraitUrl);
+    }
+    assert.throws(() => validateSectionContent("hero", { landscapeUrl: 5 }), /must be a string/);
+    assert.throws(() => validateSectionContent("hero", "nope"), /must be an object/);
+  });
+});
+
+describe("site language", () => {
+  it("accepts only en or kh", () => {
+    assert.equal(validateSiteLanguage("en"), "en");
+    assert.equal(validateSiteLanguage("kh"), "kh");
+    for (const bad of ["EN", "km", "", null, undefined, 3]) assert.throws(() => validateSiteLanguage(bad), /'en' or 'kh'/);
+  });
+  it("opens in Khmer when nothing usable is stored", () => {
+    assert.equal(DEFAULT_SITE_LANGUAGE, "kh");
+    for (const stored of [undefined, null, "", "fr", 1]) assert.equal(resolveSiteLanguage(stored), "kh");
+    assert.equal(resolveSiteLanguage("en"), "en");
+    assert.equal(resolveSiteLanguage("kh"), "kh");
+  });
+});

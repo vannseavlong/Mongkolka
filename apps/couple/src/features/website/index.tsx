@@ -63,6 +63,7 @@ export function Website() {
               themeOverride={draftTheme ?? settings?.theme_override ?? null}
               profile={profileData.profile}
               onChooseTemplate={() => setTemplateDialog(true)}
+              defaultLanguage={settings?.default_language ?? "kh"}
               colors={
                 <ThemeEditor
                   theme={{ ...selectedTemplate.default_theme, ...(settings?.theme_override ?? {}) }}

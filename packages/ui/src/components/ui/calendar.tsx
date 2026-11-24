@@ -6,6 +6,7 @@ import { DayPicker } from "react-day-picker";
 
 import { cn } from "./utils";
 import { buttonVariants } from "./button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 
 function Calendar({
   className,
@@ -22,6 +23,8 @@ function Calendar({
         month: "flex flex-col gap-4",
         caption: "flex justify-center pt-1 relative items-center w-full",
         caption_label: "text-sm font-medium",
+        caption_dropdowns: "flex items-center gap-1.5",
+        vhidden: "sr-only",
         nav: "flex items-center gap-1",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
@@ -60,6 +63,27 @@ function Calendar({
         ...classNames,
       }}
       components={{
+        // Month and year dropdowns use the shadcn Select instead of the browser's native <select>.
+        Dropdown: ({ value, onChange, children }) => {
+          const options = React.Children.toArray(children) as React.ReactElement<{ value: string | number; children: string; disabled?: boolean }>[];
+          return (
+            <Select
+              value={String(value)}
+              onValueChange={(next) => onChange?.({ target: { value: next } } as React.ChangeEvent<HTMLSelectElement>)}
+            >
+              <SelectTrigger className="h-7 gap-1 px-2 text-sm font-medium shadow-none">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {options.map((option) => (
+                  <SelectItem key={String(option.props.value)} value={String(option.props.value)} disabled={option.props.disabled}>
+                    {option.props.children}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          );
+        },
         IconLeft: ({ className, ...props }) => (
           <ChevronLeft className={cn("size-4", className)} {...props} />
         ),

@@ -9,8 +9,11 @@ import type { ChromeConfig } from "./chrome/config";
 import { useSiteChrome } from "./chrome/use-site-chrome";
 import { SkinProvider } from "./sections/khmer/skin-context";
 import { skinFromComponents } from "./sections/khmer/skin-resolve";
+import { heroContentFor } from "./hero-photo";
+import { applyOpeningOverrides } from "./opening-overrides";
+import { useOrientation } from "./use-orientation";
 import { resolveTheme } from "./theme";
-import type { CoupleInfo, DetailsContent, PartialTheme, SectionKey, Theme } from "./types";
+import type { CoupleInfo, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
 export interface SiteRendererSection {
   section_id: string;
@@ -88,13 +91,16 @@ export function SiteRenderer(props: SiteRendererProps) {
   const cover = sections.find((s) => s.section_key === "cover" && s.enabled);
   const Cover = cover ? resolveComponent("cover", cover.component_id, template.default_components.cover) : undefined;
   const holding = !!Cover && coverPhase === "play";
+  // The cover shows the same names and date the couple typed in the Opening section.
+  const openingContent = sections.find((s) => s.section_key === "opening")?.content as OpeningContent | undefined;
+  const introCouple = applyOpeningOverrides(couple, undefined, openingContent).couple;
 
   return (
     <>
       {!holding && <SiteRendererBody {...props} />}
       {cover && Cover && coverPhase !== "done" && (
         <Cover
-          couple={couple}
+          couple={introCouple}
           theme={resolveTheme(template.default_theme, themeOverride, cover.color_override)}
           guestGreeting={guestGreeting}
           preview={coverPreview}
@@ -122,6 +128,7 @@ function SiteRendererBody({
   onOpened,
 }: SiteRendererProps) {
   const [openingDismissed, setOpeningDismissed] = useState(false);
+  const orientation = useOrientation();
 
   const musicSection = sections.find((s) => s.section_key === "music" && s.enabled);
   const musicContent = musicSection
@@ -142,12 +149,15 @@ function SiteRendererBody({
     const theme = resolveTheme(template.default_theme, themeOverride, opening.color_override);
     const Component = resolveComponent("opening", opening.component_id, template.default_components.opening);
     if (!Component) return null;
+    const openingContent = (opening.content ?? buildContent("opening")) as OpeningContent | undefined;
+    const intro = applyOpeningOverrides(couple, buildContent("details") as DetailsContent | undefined, openingContent);
     const gate = (
       <Component
-        couple={couple}
+        couple={intro.couple}
         theme={theme}
         guestGreeting={guestGreeting}
-        details={buildContent("details") as DetailsContent | undefined}
+        details={intro.details}
+        content={openingContent}
         onOpen={() => {
           setOpeningDismissed(true);
           onOpened?.();
@@ -180,7 +190,11 @@ function SiteRendererBody({
             key={section.section_id}
             couple={couple}
             theme={theme}
-            content={section.content ?? buildContent(section.section_key)}
+            content={
+              section.section_key === "hero"
+                ? heroContentFor(buildContent("hero"), section.content, orientation)
+                : (section.content ?? buildContent(section.section_key))
+            }
             {...extraProps?.(section.section_key)}
           />
         );

@@ -1,5 +1,6 @@
 import type { Response } from "express";
 import type { CoupleRequest } from "../../middlewares/couple-context.middleware.js";
+import { validateSiteLanguage } from "../../utils/language.js";
 import {
   APPLY_TEMPLATE_MODES,
   CoupleWebsiteService,
@@ -63,6 +64,22 @@ export const CoupleWebsiteController = {
       return;
     }
     await CoupleWebsiteService.updateTheme(req.coupleActorSheetId as string, themeOverride);
+    const settings = await CoupleWebsiteService.getSettings(
+      req.coupleId as string,
+      req.coupleActorSheetId as string,
+    );
+    res.json({ settings });
+  },
+
+  async updateLanguage(req: CoupleRequest, res: Response) {
+    let language;
+    try {
+      language = validateSiteLanguage(req.body?.language);
+    } catch (err) {
+      res.status(400).json({ error: (err as Error).message });
+      return;
+    }
+    await CoupleWebsiteService.updateLanguage(req.coupleActorSheetId as string, language);
     const settings = await CoupleWebsiteService.getSettings(
       req.coupleId as string,
       req.coupleActorSheetId as string,

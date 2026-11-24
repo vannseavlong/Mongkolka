@@ -57,6 +57,12 @@ import { StorySkin, DetailsSkin, RsvpSkin, FooterSkin } from "./sections/skinned
 import { KbachGate } from "./sections/kbach/Gate";
 import { HeroKbach } from "./sections/kbach/Hero";
 import { StoryKbach } from "./sections/kbach/Story";
+import { HeroCinematic } from "./sections/hero/Cinematic";
+import { HeroEditorial } from "./sections/hero/Editorial";
+import { HeroFramed } from "./sections/hero/Framed";
+import { HeroGiftBox } from "./sections/hero/GiftBox";
+import { HeroEnvelope } from "./sections/hero/Envelope";
+import { HeroBook } from "./sections/hero/Book";
 import { DetailsKbach } from "./sections/kbach/Details";
 import { InvitationKhmer, AgendaKhmer, LettersKhmer, DetailsKhmer } from "./sections/khmer";
 import { EmeraldOpening, EmeraldHero } from "./sections/emerald";
@@ -100,6 +106,12 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     hero_classic: HeroClassic,
     hero_polaroid: HeroPolaroid,
     hero_fullbleed: HeroFullbleed,
+    hero_cinematic: HeroCinematic,
+    hero_editorial: HeroEditorial,
+    hero_framed: HeroFramed,
+    hero_giftbox: HeroGiftBox,
+    hero_envelope: HeroEnvelope,
+    hero_book: HeroBook,
     hero_folio: HeroFolio,
     hero_kbach: HeroKbach,
     hero_grace: GraceHero,

@@ -11,6 +11,7 @@ coupleWebsiteRouter.get("/website/settings", CoupleWebsiteController.getSettings
 coupleWebsiteRouter.patch("/website/slug", CoupleWebsiteController.updateSlug);
 coupleWebsiteRouter.post("/website/template", CoupleWebsiteController.selectTemplate);
 coupleWebsiteRouter.patch("/website/theme", CoupleWebsiteController.updateTheme);
+coupleWebsiteRouter.patch("/website/language", CoupleWebsiteController.updateLanguage);
 coupleWebsiteRouter.get("/website/sections", CoupleWebsiteController.listSections);
 coupleWebsiteRouter.patch("/website/sections/:sectionId", CoupleWebsiteController.updateSection);
 coupleWebsiteRouter.post("/website/sections/reorder", CoupleWebsiteController.reorderSections);

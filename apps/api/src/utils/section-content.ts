@@ -33,6 +33,12 @@ export const LIMITS = {
   registryLinks: 20,
   linkLabel: 80,
   videoTitle: 120,
+  openingBlessing: 200,
+  openingTime: 40,
+  openingVenue: 160,
+  openingLine: 120,
+  openingTitle: 60,
+  openingButton: 60,
 } as const;
 
 type Obj = Record<string, unknown>;
@@ -255,6 +261,66 @@ function cleanVideo(content: Obj): Obj {
   return compact({ url, title: optString(content, "title", LIMITS.videoTitle, "content") });
 }
 
+/** The opening's wording and event details. Empty fields fall back to the template's text or the profile. */
+/** A calendar date as YYYY-MM-DD, or undefined when empty. Rejects impossible dates such as 2027-02-31. */
+function optDate(source: Obj, key: string, path: string): string | undefined {
+  const value = optString(source, key, 10, path);
+  if (value === undefined) return undefined;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const date = match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))) : null;
+  if (!match || !date || date.getUTCFullYear() !== Number(match[1]) || date.getUTCMonth() !== Number(match[2]) - 1 || date.getUTCDate() !== Number(match[3])) {
+    throw new Error(`${path}.${key} must be a date as YYYY-MM-DD`);
+  }
+  return value;
+}
+
+function cleanOpening(content: Obj): Obj {
+  return compact({
+    name1Kh: optString(content, "name1Kh", LIMITS.name, "content"),
+    name1En: optString(content, "name1En", LIMITS.name, "content"),
+    name2Kh: optString(content, "name2Kh", LIMITS.name, "content"),
+    name2En: optString(content, "name2En", LIMITS.name, "content"),
+    date: optDate(content, "date", "content"),
+    time: optString(content, "time", LIMITS.openingTime, "content"),
+    venue: optString(content, "venue", LIMITS.openingVenue, "content"),
+    blessingKh: optString(content, "blessingKh", LIMITS.openingBlessing, "content"),
+    blessingEn: optString(content, "blessingEn", LIMITS.openingBlessing, "content"),
+    inviteKh: optString(content, "inviteKh", LIMITS.openingLine, "content"),
+    inviteEn: optString(content, "inviteEn", LIMITS.openingLine, "content"),
+    titleKh: optString(content, "titleKh", LIMITS.openingTitle, "content"),
+    titleEn: optString(content, "titleEn", LIMITS.openingTitle, "content"),
+    openKh: optString(content, "openKh", LIMITS.openingButton, "content"),
+    openEn: optString(content, "openEn", LIMITS.openingButton, "content"),
+  });
+}
+
+/** An image link: http or https only (blocks javascript:, data:). http is allowed because local dev storage serves over http. */
+export function validateImageUrl(value: unknown, field: string): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "string") throw new Error(`${field} must be a string`);
+  const trimmed = value.trim();
+  if (trimmed === "") return undefined;
+  if (trimmed.length > LIMITS.url) throw new Error(`${field} must be at most ${LIMITS.url} characters`);
+  let url: URL;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new Error(`${field} must be a valid image URL`);
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") throw new Error(`${field} must start with https://`);
+  return trimmed;
+}
+
+/** The hero's own banners: one for tall screens, one for wide. The profile cover photo stays the fallback. */
+function cleanHero(content: Obj): Obj {
+  return compact({
+    portraitUrl: validateImageUrl(content.portraitUrl, "content.portraitUrl"),
+    landscapeUrl: validateImageUrl(content.landscapeUrl, "content.landscapeUrl"),
+  });
+}
+
+export const OPENING_CONTENT_SECTION = "opening";
+
 export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry", "video"] as const;
 
 /**
@@ -265,6 +331,8 @@ export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "regis
  */
 export function validateSectionContent(sectionKey: string, content: unknown): unknown {
   if (content === null || content === undefined) return content;
+  if (sectionKey === OPENING_CONTENT_SECTION) return cleanOpening(asObject(content, "content"));
+  if (sectionKey === "hero") return cleanHero(asObject(content, "content"));
   if (!(KHMER_CONTENT_SECTIONS as readonly string[]).includes(sectionKey)) return content;
   const obj = asObject(content, "content");
   if (sectionKey === "invitation") return cleanInvitation(obj);

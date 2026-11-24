@@ -6,6 +6,7 @@ import { mutate } from "swr";
 import { ImagePlus } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
 import { DialogFooter } from "@mongkolka/ui/dialog";
+import { DatePicker } from "@mongkolka/ui/date-picker";
 import { Input } from "@mongkolka/ui/input";
 import { Label } from "@mongkolka/ui/label";
 import { Textarea } from "@mongkolka/ui/textarea";
@@ -87,6 +88,9 @@ export function ProfileSectionForm({ sectionKey, profile, onSaved }: { sectionKe
               <Textarea id={id} rows={8} placeholder={f.placeholder} value={values[f.name] ?? ""} onChange={(e) => set(f.name, e.target.value)} aria-describedby={describedBy} />
             ) : (
               <div className="flex gap-2">
+                {f.type === "date" ? (
+                  <DatePicker id={id} value={values[f.name] ?? ""} onChange={(next) => set(f.name, next)} aria-invalid={!!error} aria-describedby={describedBy} />
+                ) : (
                 <Input
                   id={id}
                   type={f.type}
@@ -96,6 +100,7 @@ export function ProfileSectionForm({ sectionKey, profile, onSaved }: { sectionKe
                   aria-invalid={!!error}
                   aria-describedby={describedBy}
                 />
+                )}
                 {f.name === "venue_image_url" && (
                   <Button ref={pickerButtonRef} type="button" variant="outline" onClick={() => setPickerOpen(true)}>
                     <ImagePlus className="size-4" /> Library

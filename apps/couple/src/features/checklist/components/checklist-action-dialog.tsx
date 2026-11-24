@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@mongkolka/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
+import { DatePicker } from "@mongkolka/ui/date-picker";
 import { Input } from "@mongkolka/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { Textarea } from "@mongkolka/ui/textarea";
@@ -167,7 +168,7 @@ export function ChecklistActionDialog({
                   <FormItem>
                     <FormLabel>Due date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <DatePicker value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

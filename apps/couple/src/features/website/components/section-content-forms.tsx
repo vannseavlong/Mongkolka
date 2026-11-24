@@ -9,7 +9,9 @@ import { useRef, useState } from "react";
 import { Button } from "@mongkolka/ui/button";
 import { DialogFooter } from "@mongkolka/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
+import { DatePicker } from "@mongkolka/ui/date-picker";
 import { Input } from "@mongkolka/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { Textarea } from "@mongkolka/ui/textarea";
 import { ApiError } from "@/lib/api";
 import { asRecord, saveContent } from "../lib/section-content-save";
@@ -20,6 +22,7 @@ import { VERSE_PRESETS } from "../lib/verse-presets";
 import { InvitationContentForm } from "./invitation-content-form";
 import { AgendaContentForm } from "./agenda-content-form";
 import { LettersContentForm } from "./letters-content-form";
+import { OpeningContentForm } from "./opening-content-form";
 import { VideoContentForm } from "./video-content-form";
 import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
@@ -418,7 +421,7 @@ function RsvpContentForm({ section, onSaved }: { section: WebsiteSection; onSave
             <FormItem>
               <FormLabel>RSVP deadline</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <DatePicker value={field.value} onChange={field.onChange} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -535,19 +538,18 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
           <label htmlFor="verse-preset" className="text-sm font-medium">
             Choose a well-known verse
           </label>
-          <select
-            id="verse-preset"
-            value=""
-            onChange={(e) => applyPreset(e.target.value)}
-            className="h-9 rounded-md border bg-transparent px-3 text-sm"
-          >
-            <option value="">Pick a preset (optional)…</option>
-            {VERSE_PRESETS.map((preset, i) => (
-              <option key={preset.reference} value={i}>
-                {preset.reference}
-              </option>
-            ))}
-          </select>
+          <Select value="" onValueChange={applyPreset}>
+            <SelectTrigger id="verse-preset" className="w-full">
+              <SelectValue placeholder="Pick a preset (optional)…" />
+            </SelectTrigger>
+            <SelectContent className="max-h-72">
+              {VERSE_PRESETS.map((preset, i) => (
+                <SelectItem key={preset.reference} value={String(i)}>
+                  {preset.reference}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <FormField
           control={form.control}
@@ -674,6 +676,7 @@ function FooterContentForm({ section, onSaved }: { section: WebsiteSection; onSa
 
 /** Edit form for a content-backed section, shown inline in the builder's content panel. */
 export function SectionContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+  if (section.section_key === "opening") return <OpeningContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "gallery") return <GalleryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "registry") return <RegistryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "timeline") return <TimelineContentForm key={section.section_id} section={section} onSaved={onSaved} />;

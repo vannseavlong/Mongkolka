@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
+import { DatePicker } from "@mongkolka/ui/date-picker";
 import { Input } from "@mongkolka/ui/input";
 import { getToken, setToken } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
@@ -120,7 +121,7 @@ export function RegisterGate() {
               <FormItem>
                 <FormLabel>Wedding date (optional)</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePicker value={field.value} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

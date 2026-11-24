@@ -2,6 +2,8 @@
 
 import type { Control, FieldValues, Path } from "react-hook-form";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
+import { DatePicker } from "@mongkolka/ui/date-picker";
+import { DateTimePicker } from "@mongkolka/ui/date-time-picker";
 import { Input } from "@mongkolka/ui/input";
 import { Textarea } from "@mongkolka/ui/textarea";
 
@@ -31,7 +33,11 @@ export function TextRow<T extends FieldValues>({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            {rows ? (
+            {type === "date" ? (
+              <DatePicker value={field.value} onChange={field.onChange} placeholder={placeholder ?? "Pick a date"} />
+            ) : type === "datetime-local" ? (
+              <DateTimePicker value={field.value} onChange={field.onChange} />
+            ) : rows ? (
               <Textarea rows={rows} placeholder={placeholder} {...field} />
             ) : (
               <Input type={type} placeholder={placeholder} {...field} />

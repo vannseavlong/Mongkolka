@@ -8,6 +8,15 @@ import type { SkinKey } from "./sections/skins";
 export type Language = "en" | "kh";
 
 /**
+ * The language a site opens in: an explicit `?lang=` on the link wins (a couple can share an English
+ * link), then the couple's saved default, and Khmer when they have not chosen.
+ */
+export function resolveInitialLanguage(queryLang: string | null | undefined, siteDefault: string | null | undefined): Language {
+  if (queryLang === "kh" || queryLang === "en") return queryLang;
+  return siteDefault === "en" ? "en" : "kh";
+}
+
+/**
  * UI chrome only — section headings, buttons, form labels. Couple-authored free
  * text (love story, details, RSVP custom message, etc.) is written once by the
  * couple and shown as-is regardless of language; building a per-field bilingual

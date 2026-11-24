@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-26 · [Cross] feat: opening content, site language, hero banners and reveal heroes, shadcn pickers
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-hero-banners-and-pickers.md (plan: Tasks/_plans/Web-hero-redesign.md)
+- Branch/PR: main (no PR)
+- What changed: [Web] Opening section form (Khmer and English wording, names, date, time, place; the cover reads the same); default site language setting (Khmer unless changed) and a Khmer/EN preview switch; Hero portrait and landscape banners (picked by screen orientation) uploaded from the Hero Content panel; new heroes Cinematic, Editorial, Framed, Gift Box, Book and a rebuilt cinematic Envelope Reveal; shadcn DatePicker, DateTimePicker and Select replace native date inputs and selects; template default style always listed in the style picker. [API] `couple_profile.default_language`, `PATCH /couple/api/website/language`, validation for opening and hero content, 8 new hero catalog rows
+- Needs: `lsdb sync --dry-run`, `lsdb sync`, `lsdb sync --all-users`, deploy API, `lsdb seed seeds/section-components.ts --upsert` and site-templates, activate rows in admin; sites now open in Khmer by default; Khmer wording of new heroes needs native review; tablet and reduced-motion checks and code review not run
+
 ## 2026-11-25 · [Cross] feat: cover section (animated intro before the opening) for Covenant
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/API-cover-section-key.md, Web-cover-sequence.md, Web-covenant-cover.md (plan: Tasks/_plans/Web-cover-section.md)

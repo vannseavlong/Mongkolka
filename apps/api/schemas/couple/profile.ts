@@ -24,6 +24,8 @@ export default defineTable({
     // Partial<Theme> — the couple's whole-site color override, on top of the
     // selected template's default_theme.
     theme_override: json(),
+    // Language the public site opens in ('kh' when unset). Guests can still switch; ?lang= wins for a shared link.
+    default_language: string().enum(['en', 'kh']),
     // Guest photo uploads — all couple-configurable from the portal; the API clamps
     // numeric values to platform ceilings (see guest-photos.limits.ts).
     photo_uploads: string().enum(['off', 'auto', 'pending']).default('pending'),

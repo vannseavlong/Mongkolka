@@ -12,7 +12,7 @@ export interface IntroTimeline {
   guestMs: number;
   /** The open button appears and the intro waits for a tap. */
   readyAt: number;
-  /** After the tap: the cross shows, then `onOpen` fires. */
+  /** After the tap: the card fades out, then `onOpen` fires. */
   crossMs: number;
 }
 
@@ -25,7 +25,7 @@ export const INTRO: IntroTimeline = {
   guestAt: 4900,
   guestMs: 1200,
   readyAt: 6300,
-  crossMs: 1500,
+  crossMs: 700,
 };
 
 /** Reduced motion: everything is there at once, the cross beat is short. */

@@ -10,7 +10,6 @@ import { formatWeddingDate } from "../../format";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import { Butterfly, EdgePetals, FlourishCorner, FlourishEdge, Hearts } from "./card-art";
 import { CARD_CSS, COVENANT_CSS } from "./covenant-styles";
-import { Cross } from "./cross";
 import { coupleNamesFor } from "./names";
 import { useFitScale } from "./use-fit-scale";
 import { guestLine, hasKhmer, introFor } from "./intro-logic";
@@ -130,9 +129,6 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
 
         <div ref={contentRef} style={{ transform: `scale(${scale})`, transformOrigin: "center" }}>
         <div className="cv-content">
-          <div className="cv-cross-top">
-            <Cross color={accent} size={44} draw glow />
-          </div>
 
           <div className="cv-wipe" style={at(tl.blessingAt, tl.blessingMs)}>
             <p className="m-0" style={{ ...foil, fontFamily: MOUL_FONT, fontSize: "clamp(1.05rem,5.4vw,1.5rem)", lineHeight: 1.9 }}>
@@ -213,15 +209,6 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
       </div>
 
       {!ready && <p className="cv-skiphint m-0">{t("covenant.skip")}</p>}
-
-      <div aria-hidden className="cv-burst">
-        <span className="cv-ray" />
-        {crossing && (
-          <span className="cv-big">
-            <Cross color={accent} size={170} draw glow />
-          </span>
-        )}
-      </div>
     </div>
   );
 }

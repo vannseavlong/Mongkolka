@@ -42,13 +42,13 @@ export function TemplatePreview({
   template,
   fullPage = false,
   initialLanguage = "en",
-  guestGreeting = "Guest",
+  guestGreeting,
   brandUrl,
 }: {
   template: SiteRendererTemplate & { default_sections?: unknown };
   fullPage?: boolean;
   initialLanguage?: "en" | "kh";
-  /** From `?to=` / `?name=` on the preview page; falls back to a generic "Guest". */
+  /** From `?to=` / `?name=` on the preview page; falls back to a generic "Guest" (not for Covenant). */
   guestGreeting?: string;
   /** Main-site URL for the footer credit link (undefined = plain text). */
   brandUrl?: string;
@@ -61,7 +61,8 @@ export function TemplatePreview({
       sections={previewSections(template.default_sections)}
       couple={sampleCoupleFor(skin)}
       buildContent={(sectionKey) => sample[sectionKey] ?? {}}
-      guestGreeting={guestGreeting}
+      // Other templates preview with a generic "Guest"; Covenant shows no guest box unless the link names someone, like a real site.
+      guestGreeting={guestGreeting ?? (skin === "covenant" ? undefined : "Guest")}
       extraProps={(sectionKey) => {
         // Sample data only: nothing is sent anywhere from a template preview.
         if (sectionKey === "rsvp") return { onSubmit: async () => {} };

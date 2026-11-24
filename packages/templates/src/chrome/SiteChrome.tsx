@@ -64,6 +64,7 @@ export function SiteChrome({ resolved, theme, sections, music }: SiteChromeProps
           navLabel={chromeText(language, "dock.label")}
           vars={vars}
           lang={language}
+          variant={resolved.dock.variant}
           onSelect={scrollToSection}
         />
       )}

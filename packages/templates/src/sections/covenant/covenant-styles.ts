@@ -15,7 +15,6 @@ export const COVENANT_CSS = `
 .cv-fr .l{left:0;transform-origin:50% 100%;animation:cv-sy var(--ms) ease-out calc(var(--at) + var(--ms) * .75) both}
 .cv-corner{position:absolute;opacity:0;animation:cv-pop .8s cubic-bezier(.2,.8,.2,1) calc(var(--at) + var(--ms) * .9) both}
 .cv-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2.4svh,24px);max-width:min(92vw,460px);transition:opacity .5s ease,transform .5s ease}
-.cv-cross-top{animation:cv-pop 1s cubic-bezier(.2,.8,.2,1) .3s both}
 .cv-wipe{animation:cv-wipe var(--ms) cubic-bezier(.3,.7,.2,1) var(--at) both}
 .cv-in-l{animation:cv-from-l var(--ms) cubic-bezier(.2,.8,.2,1) var(--at) both}
 .cv-in-r{animation:cv-from-r var(--ms) cubic-bezier(.2,.8,.2,1) var(--at) both}
@@ -27,11 +26,7 @@ export const COVENANT_CSS = `
 .cv-cta:focus-visible{outline:2px solid var(--cv-mid);outline-offset:4px}
 .cv-pulse{animation:cv-pulse 2.6s ease-in-out infinite}
 .cv-skiphint{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));font-size:12px;letter-spacing:.08em;opacity:.55;z-index:3;pointer-events:none}
-.cv-burst{position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,#fff 0,rgba(255,255,255,.85) 28%,transparent 70%);transition:opacity .6s ease}
-.is-cross .cv-burst{opacity:1}
-.is-cross .cv-content{opacity:0;transform:scale(.96)}
-.cv-burst .cv-ray{position:absolute;left:50%;top:50%;width:140vmax;height:140vmax;margin:-70vmax 0 0 -70vmax;background:repeating-conic-gradient(from 0deg,var(--cv-glow) 0 4deg,transparent 4deg 18deg);-webkit-mask-image:radial-gradient(circle,#000 0,transparent 55%);mask-image:radial-gradient(circle,#000 0,transparent 55%);opacity:.55;animation:cv-turn 24s linear infinite}
-.cv-burst .cv-big{position:relative;animation:cv-big 1.4s cubic-bezier(.2,.8,.2,1) both;filter:drop-shadow(0 0 22px var(--cv-glow))}
+.is-cross .is-cross .cv-content{opacity:0;transform:scale(.96)}
 .cv-cross-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:cv-draw 1.1s ease-out .1s forwards}
 .cv-cross-fill{opacity:0;animation:cv-fillin .6s ease 1s forwards}
 .cv-fluid svg{width:100%!important;height:100%!important}
@@ -39,22 +34,20 @@ export const COVENANT_CSS = `
 .cv-hero{position:relative;min-height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;color:#fff;background:linear-gradient(160deg,var(--cv-ground),var(--cv-petal))}
 .cv-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 28%}
 .cv-photo-full{opacity:0}
-.is-reveal .cv-photo-full{animation:cv-fadein 1.3s ease 1.6s forwards}
-.cv-bookwrap{position:absolute;left:50%;top:46%;width:var(--bw);aspect-ratio:3/4;margin-left:calc(var(--bw) / -2);margin-top:calc(var(--bw) * -2 / 3);perspective:1600px;pointer-events:none}
-.cv-book{position:relative;width:100%;height:100%;transform-style:preserve-3d;filter:drop-shadow(0 22px 26px rgba(90,40,60,.35));animation:cv-book-breathe 2.4s ease-in-out infinite}
-.is-reveal .cv-book{animation:cv-book-life 3s cubic-bezier(.5,0,.25,1) .1s forwards}
-.cv-book-page{position:absolute;inset:0;overflow:hidden;border-radius:2px 10px 10px 2px;background:var(--cv-cream);box-shadow:inset 0 0 0 1.5px var(--cv-mid),inset 0 0 0 5px var(--cv-cream),inset 0 0 0 6.5px var(--cv-mid)}
-.cv-book-page img{position:absolute;inset:9px;width:calc(100% - 18px);height:calc(100% - 18px);object-fit:cover}
-.cv-book-cover{position:absolute;inset:0;transform-origin:0 50%;transform-style:preserve-3d}
-.is-reveal .cv-book-cover{animation:cv-cover-open 1.5s cubic-bezier(.55,0,.2,1) .25s forwards}
-.cv-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px;text-align:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:2px 10px 10px 2px;background:linear-gradient(160deg,var(--cv-cream),var(--cv-petal));box-shadow:inset 0 0 0 1.5px var(--cv-mid),inset 0 0 0 5px var(--cv-cream),inset 0 0 0 6.5px var(--cv-mid)}
-.cv-face-back{transform:rotateY(180deg);background:linear-gradient(200deg,var(--cv-cream),var(--cv-petal))}
-.cv-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(90deg,var(--cv-lo),var(--cv-hi));border-radius:2px 0 0 2px;z-index:1}
+.is-reveal .cv-photo-full{opacity:1}
+.cv-curtain{position:absolute;top:0;bottom:0;width:50.5%;z-index:4;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(255,255,255,0) 0 12px,rgba(140,50,85,.16) 12px 20px,rgba(255,255,255,.2) 20px 28px,rgba(255,255,255,0) 28px 42px),linear-gradient(180deg,#f4bccb,#e8a3b8 55%,#f4bccb);box-shadow:inset 0 0 46px rgba(120,40,70,.28)}
+.cv-curtain::before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background:linear-gradient(90deg,var(--cv-lo),var(--cv-hi),var(--cv-lo));box-shadow:0 4px 8px rgba(0,0,0,.2)}
+.cv-curtain-l{left:0;border-right:3px solid var(--cv-mid)}
+.cv-curtain-r{right:0;border-left:3px solid var(--cv-mid)}
+.is-reveal .cv-curtain-l{animation:cv-slide-l 2.1s cubic-bezier(.65,0,.25,1) .35s forwards}
+.is-reveal .cv-curtain-r{animation:cv-slide-r 2.1s cubic-bezier(.65,0,.25,1) .35s forwards}
+.cv-curtain-label{position:absolute;left:50%;top:46%;z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;width:min(78vw,420px);transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:cv-breathe 2.4s ease-in-out infinite}
+.is-reveal .cv-curtain-label{animation:cv-label-out .7s ease forwards}
 .cv-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(60,20,36,.28) 0,transparent 26%,transparent 42%,rgba(52,16,32,.72) 100%);opacity:0}
-.is-reveal .cv-scrim{animation:cv-fadein 1.2s ease 1.9s forwards}
+.is-reveal .cv-scrim{animation:cv-fadein 1.2s ease 1.6s forwards}
 .cv-hero-text{position:relative;z-index:2;padding:0 20px clamp(104px,16svh,150px);display:flex;flex-direction:column;align-items:center;gap:10px;max-width:min(92vw,720px)}
 .cv-hero-text>*{opacity:0}
-.is-reveal .cv-hero-text>*{animation:cv-rise 1.1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(2.1s + var(--i) * .22s)}
+.is-reveal .cv-hero-text>*{animation:cv-rise 1.1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(2.2s + var(--i) * .22s)}
 .cv-scroll{position:absolute;bottom:clamp(18px,3svh,30px);left:50%;z-index:2;width:22px;height:36px;margin-left:-11px;border:1.5px solid rgba(255,255,255,.8);border-radius:12px;opacity:0}
 .is-reveal .cv-scroll{animation:cv-fadein 1s ease 3s forwards}
 .cv-scroll::after{content:"";position:absolute;left:50%;top:7px;width:3px;height:7px;margin-left:-1.5px;border-radius:2px;background:#fff;animation:cv-wheel 1.8s ease-in-out infinite}
@@ -66,6 +59,14 @@ export const COVENANT_CSS = `
 .cv-play:hover .cv-play-btn{transform:scale(1.06)}
 .cv-play:focus-visible .cv-play-btn{outline:3px solid #fff;outline-offset:4px}
 .cv-link{display:inline-flex;min-height:48px;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;text-decoration:none;font-weight:600;transition:transform .2s ease}
+.cv-mosaic{grid-auto-rows:7.25rem}
+@media (min-width:640px){.cv-mosaic{grid-auto-rows:10rem}}
+.cv-tile{position:relative;display:block;overflow:hidden;padding:0;border:0;border-radius:18px;background:var(--cv-petal);cursor:zoom-in;-webkit-tap-highlight-color:transparent;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.cv-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.cv-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(60,20,36,.28));opacity:0;transition:opacity .3s ease}
+.cv-tile:focus-visible{outline:2px solid var(--cv-mid);outline-offset:3px}
+@media (hover:hover){.cv-tile:hover img{transform:scale(1.06)}.cv-tile:hover::after{opacity:1}}
+@media (prefers-reduced-motion:reduce){.cv-tile,.cv-tile img{transition:none}.cv-tile:hover img{transform:none}}
 .cv-link:hover{transform:translateY(-1px)}
 .cv-link:focus-visible{outline:2px solid var(--cv-mid);outline-offset:3px}
 .cv-wish{break-inside:avoid;position:relative;padding:22px 20px 18px;border-radius:22px;text-align:center}
@@ -83,17 +84,15 @@ export const COVENANT_CSS = `
 @keyframes cv-draw{to{stroke-dashoffset:0}}
 @keyframes cv-fillin{to{opacity:1}}
 @keyframes cv-turn{to{transform:rotate(360deg)}}
-@keyframes cv-big{from{opacity:0;transform:scale(.4)}60%{opacity:1}to{opacity:1;transform:scale(1)}}
 @keyframes cv-fadein{to{opacity:1}}
-@keyframes cv-book-breathe{0%,100%{transform:translateY(0) rotateY(-8deg)}50%{transform:translateY(-8px) rotateY(-3deg)}}
-@keyframes cv-book-life{0%{transform:rotateY(-8deg) translateX(0) scale(1);opacity:1}50%{transform:rotateY(0) translateX(50%) scale(1);opacity:1}100%{transform:rotateY(0) translateX(50%) scale(1.7);opacity:0}}
-@keyframes cv-cover-open{from{transform:rotateY(0)}to{transform:rotateY(-172deg)}}
+@keyframes cv-slide-l{to{transform:translateX(-103%)}}
+@keyframes cv-slide-r{to{transform:translateX(103%)}}
+@keyframes cv-breathe{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes cv-label-out{to{opacity:0;transform:translate(-50%,-50%) scale(.96)}}
 @keyframes cv-wheel{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
 @media (prefers-reduced-motion:reduce){
-.cv-petal,.cv-pulse,.cv-book,.cv-scroll::after,.cv-burst .cv-ray{animation:none}
-.cv-petal{display:none}
-.cv-content,.cv-burst{transition:none}
-.cv-photo-full{opacity:1}.is-reveal .cv-photo-full,.is-reveal .cv-book,.is-reveal .cv-scrim,.is-reveal .cv-hero-text>*,.is-reveal .cv-scroll{animation:none}
+.cv-petal,.cv-pulse,.cv-curtain-label,.cv-scroll::after,.cv-petal{display:none}
+.cv-content,.cv-photo-full{opacity:1}.is-reveal .cv-photo-full,.is-reveal .cv-curtain-l,.is-reveal .cv-curtain-r,.is-reveal .cv-scrim,.is-reveal .cv-hero-text>*,.is-reveal .cv-scroll{animation:none}
 }
 `;
 

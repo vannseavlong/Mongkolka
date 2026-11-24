@@ -31,6 +31,14 @@ export const CHROME_CSS = `
 @media (max-width:400px){.mk-dock-btn{min-width:0;padding:6px 2px 5px}.mk-dock-btn span{font-size:9px;letter-spacing:0}}
 .mk-dock-btn:focus-visible,.mk-music:focus-visible{outline:2px solid var(--mk-gold-hi);outline-offset:2px}
 @media (hover:hover){.mk-dock-btn:hover svg{opacity:1}.mk-dock-btn:hover span{opacity:1}}
+/* wide glass variant (opt-in via chrome.dock.variant = "wide") */
+.mk-dock--wide{width:min(calc(100vw - 20px),580px);max-width:none;gap:4px;padding:7px;border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.14) 60%),var(--mk-glass);
+  -webkit-backdrop-filter:blur(24px) saturate(1.9);backdrop-filter:blur(24px) saturate(1.9);
+  box-shadow:0 18px 40px -12px rgba(60,30,40,.38),0 2px 10px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(255,255,255,.25)}
+.mk-dock--wide .mk-dock-btn{min-height:56px;border-radius:24px;gap:4px}
+.mk-dock--wide .mk-dock-btn span{font-size:11px;opacity:.85}
+.mk-dock--wide .mk-dock-btn[aria-current="true"]::before{background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.28)),radial-gradient(120% 90% at 50% 0%,var(--mk-glow),transparent 75%);box-shadow:inset 0 0 0 1px var(--mk-glow),0 6px 14px -6px var(--mk-glow)}
 @keyframes mk-dock-in{from{opacity:0;transform:translate3d(0,26px,0)}to{opacity:1;transform:none}}
 
 /* ---------- music toggle ---------- */

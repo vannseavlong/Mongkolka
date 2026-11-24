@@ -3,6 +3,7 @@ export { CovenantCardOpening } from "./CardOpening";
 export { CovenantHero } from "./Hero";
 export { CovenantVerse } from "./Verse";
 export { CovenantVideo } from "./Video";
+export { CovenantGallery } from "./Gallery";
 export { CovenantMemories } from "./Memories";
 export { CovenantWishesPage, CovenantPhotosPage, type WallStatus } from "./pages";
 export { COVENANT_ORNAMENTS } from "./ornaments";

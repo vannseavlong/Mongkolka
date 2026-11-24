@@ -16,14 +16,16 @@ export interface DockProps {
   navLabel: string;
   vars: CSSProperties;
   lang: string;
+  /** "wide": frosted glass bar across most of the screen. */
+  variant?: "wide";
   onSelect: (key: string) => void;
 }
 
 /** Bottom glass dock: gold hairline ring, frosted blur, gold line icons, a glow behind the current section. */
-export function Dock({ items, activeKey, navLabel, vars, lang, onSelect }: DockProps) {
+export function Dock({ items, activeKey, navLabel, vars, lang, variant, onSelect }: DockProps) {
   return (
     <>
-      <nav className="mk-dock mk-gold-ring" style={vars} aria-label={navLabel} data-mk-lang={lang}>
+      <nav className={`mk-dock mk-gold-ring${variant === "wide" ? " mk-dock--wide" : ""}`} style={vars} aria-label={navLabel} data-mk-lang={lang}>
         <GoldDefs />
         {items.map((item) => (
           <button

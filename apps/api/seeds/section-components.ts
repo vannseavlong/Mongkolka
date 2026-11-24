@@ -837,6 +837,16 @@ const components = [
     font_style: "serif",
     status: "inactive",
   },
+  {
+    component_id: "gallery_covenant",
+    section: "gallery",
+    name: "Covenant Gallery",
+    preview_bg_color: "#fff3f6",
+    preview_text_color: "#4a2c35",
+    preview_accent_color: "#8a6418",
+    font_style: "serif",
+    status: "inactive",
+  },
 ];
 
 export default {

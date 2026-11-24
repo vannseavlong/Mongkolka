@@ -25,8 +25,8 @@ export interface CovenantHeroProps {
 
 /**
  * Full-screen couple photo (it crops to the screen, so a landscape photo fills a laptop and a portrait one a phone).
- * While the photo loads, a closed invitation book breathes on the pink page; then its cover swings open onto the
- * photo, the book grows away and the whole photo opens up behind the names. No photo: the book opens onto a blank page.
+ * While the photo loads, two pink curtains hang closed over the page with the invitation label on the seam; then they
+ * slide apart onto the full-screen photo and the names and date rise. No photo: they open onto the pink page.
  */
 export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
   const { t, language } = useLanguage();
@@ -79,7 +79,6 @@ export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
   const vars: Vars = {
     "--cv-ground": p.ground,
     "--cv-cream": mixHex(theme.bg_color, "#fffbea", 35),
-    "--bw": "min(58vw, 44svh, 320px)",
     "--cv-petal": PINK.petal,
     "--cv-hi": p.gold.hi,
     "--cv-mid": p.gold.mid,
@@ -107,28 +106,16 @@ export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
       )}
       <div aria-hidden className="cv-scrim" />
 
-      {/* The invitation book: closed and breathing while the photo loads, then the cover swings open onto the photo. */}
-      <div aria-hidden className="cv-bookwrap">
-        <div className="cv-book">
-          <div className="cv-book-page">
-            {photo && revealed && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={photo} alt="" decoding="async" />
-            )}
-          </div>
-          <div className="cv-book-cover">
-            <span className="cv-spine" />
-            <div className="cv-face">
-              <span style={{ ...foil, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, fontSize: kh ? "0.8rem" : "0.7rem", letterSpacing: kh ? "normal" : "0.22em", textTransform: kh ? "none" : "uppercase", lineHeight: 1.9 }}>
-                {t("covenant.inviteEn")}
-              </span>
-              <span style={{ ...foilLight, fontFamily: khmerNames ? MOUL_FONT : SCRIPT, fontSize: khmerNames ? "clamp(1rem,5vw,1.4rem)" : "clamp(1.6rem,8vw,2.2rem)", lineHeight: khmerNames ? 1.9 : 1.15, overflowWrap: "anywhere" }}>
-                {names}
-              </span>
-            </div>
-            <div className="cv-face cv-face-back" />
-          </div>
-        </div>
+      {/* Curtains: closed with the invitation label while the photo loads, then they slide apart onto the photo. */}
+      <div aria-hidden className="cv-curtain cv-curtain-l" />
+      <div aria-hidden className="cv-curtain cv-curtain-r" />
+      <div aria-hidden className="cv-curtain-label">
+        <span style={{ ...foilLight, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, fontSize: kh ? "0.85rem" : "0.75rem", letterSpacing: kh ? "normal" : "0.24em", textTransform: kh ? "none" : "uppercase", lineHeight: 1.9 }}>
+          {t("covenant.inviteEn")}
+        </span>
+        <span style={{ ...foilLight, fontFamily: khmerNames ? MOUL_FONT : SCRIPT, fontSize: khmerNames ? "clamp(1.1rem,5.4vw,1.6rem)" : "clamp(1.8rem,9vw,2.6rem)", lineHeight: khmerNames ? 1.9 : 1.15, overflowWrap: "anywhere" }}>
+          {names}
+        </span>
       </div>
       {!revealed && (
         <p role="status" className="absolute inset-x-0 m-0 text-center text-sm" style={{ bottom: "12svh", color: withAlpha(p.ink, 0.7) }}>

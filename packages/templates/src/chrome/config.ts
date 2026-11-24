@@ -31,6 +31,8 @@ export interface ChromeDockConfig {
    * Sections that are disabled or render nothing are skipped automatically.
    */
   include?: string[];
+  /** "wide" = a wider, frosted-glass bar that spans most of the screen. Default: the compact dock. */
+  variant?: "wide";
 }
 
 export interface ChromeConfig {
@@ -42,7 +44,7 @@ export interface ChromeConfig {
 }
 
 export interface ResolvedChrome {
-  dock: { include?: string[] } | null;
+  dock: { include?: string[]; variant?: "wide" } | null;
   music: { src?: string; icon: MusicIcon; corner: MusicCorner } | null;
   particles: { kinds: ParticleKind[]; density: ParticleDensity; colors?: string[] } | null;
   reveal: boolean;
@@ -69,7 +71,7 @@ export function resolveChrome(config: ChromeConfig | null | undefined): Resolved
   const c = config as Record<string, unknown>;
 
   const dockIn = c.dock;
-  const dock = dockIn ? (isObject(dockIn) ? { include: strings(dockIn.include) } : {}) : null;
+  const dock = dockIn ? (isObject(dockIn) ? { include: strings(dockIn.include), ...(dockIn.variant === "wide" ? { variant: "wide" as const } : {}) } : {}) : null;
 
   const musicIn = c.music;
   const musicObj = isObject(musicIn) ? musicIn : undefined;

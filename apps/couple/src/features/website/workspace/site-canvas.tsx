@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Monitor, Smartphone } from "lucide-react";
+import { Monitor, Pencil, Smartphone } from "lucide-react";
 import {
   LanguageProvider,
   SiteRenderer,
@@ -9,8 +9,11 @@ import {
   type PartialTheme,
   type SiteRendererTemplate,
 } from "@mongkolka/templates";
+import { Button } from "@mongkolka/ui/button";
 import { cn } from "@mongkolka/ui/utils";
 import type { WebsiteSection } from "../data/schema";
+import { canEditSection } from "../lib/section-editors";
+import { sectionLabel } from "./section-labels";
 import { buildPreviewContent, type PreviewProfile } from "../lib/build-content";
 
 type Device = "desktop" | "mobile";
@@ -28,6 +31,7 @@ export function SiteCanvas({
   themeOverride,
   profile,
   onSelect,
+  onEdit,
   active,
 }: {
   template: SiteRendererTemplate;
@@ -36,6 +40,8 @@ export function SiteCanvas({
   themeOverride: PartialTheme | null;
   profile: PreviewProfile;
   onSelect: (sectionId: string) => void;
+  /** Opens the editor for the selected section. */
+  onEdit: (section: WebsiteSection) => void;
   /** Whether the canvas is on screen below lg (it is display:none while the other pane shows). */
   active: boolean;
 }) {
@@ -82,7 +88,14 @@ export function SiteCanvas({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-medium">Live preview</span>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="text-sm font-medium">Live preview</span>
+          {selected && canEditSection(selected.section_key) && (
+            <Button size="sm" variant="outline" onClick={() => onEdit(selected)}>
+              <Pencil className="size-3.5" /> Edit {sectionLabel(selected.section_key)}
+            </Button>
+          )}
+        </div>
         <div
           className="flex gap-1 rounded-lg bg-muted p-1"
           role="group"

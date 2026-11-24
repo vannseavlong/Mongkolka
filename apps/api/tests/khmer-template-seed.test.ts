@@ -45,9 +45,9 @@ const componentRows = sectionComponents.section_components;
 describe("Khmer e-invitation seed rows", () => {
   it("skin string keys match in en and kh", () => assert.deepEqual(skinKeyMismatches(), []));
 
-  it("all six templates exist, are inactive and have unique slugs", () => {
+  it("all six templates exist, are active and have unique slugs", () => {
     assert.ok(templates.every(Boolean), "a template row is missing");
-    for (const t of templates as Tpl[]) assert.equal(t.status, "inactive", `${t.template_id} must stay inactive until launch`);
+    for (const t of templates as Tpl[]) assert.equal(t.status, "active", `${t.template_id} must be active`);
     const slugs = (templates as Tpl[]).map((t) => t.slug);
     assert.equal(new Set(slugs).size, slugs.length);
     const all = siteTemplates.site_templates.map((t) => t.slug);
@@ -82,28 +82,29 @@ describe("Khmer e-invitation seed rows", () => {
     }
   });
 
-  it("each skin has its own opening and hero rows, inactive, and registry_khqr (Web-khqr-gift) is seeded inactive and registered", () => {
+  it("each skin has its own opening and hero rows, active, and registry_khqr (Web-khqr-gift) is seeded active and registered", () => {
     for (const skin of ["emerald", "garden", "cream", "sakura", "fairytale", "kids"]) {
       for (const section of ["opening", "hero"]) {
         const row = componentRows.find((c) => c.component_id === `${section}_${skin}`);
         assert.ok(row, `${section}_${skin} not seeded`);
         assert.equal(row.section, section);
-        assert.equal(row.status, "inactive");
+        assert.equal(row.status, "active");
       }
     }
     for (const id of ["invitation_khmer", "agenda_khmer", "letters_khmer", "details_khmer"]) {
-      assert.equal(componentRows.find((c) => c.component_id === id)?.status, "inactive", id);
+      assert.equal(componentRows.find((c) => c.component_id === id)?.status, "active", id);
     }
     assert.ok(registered.has("registry_khqr"), "registry_khqr is registered by Web-khqr-gift");
     const khqr = componentRows.find((c) => c.component_id === "registry_khqr");
     assert.equal(khqr?.section, "registry");
-    assert.equal(khqr?.status, "inactive");
+    assert.equal(khqr?.status, "active");
   });
 
-  it("default page is the standard sections on the skin; the Khmer-specific ones exist but are off", () => {
-    const ON = ["opening", "hero", "story", "gallery", "details", "rsvp", "guestbook", "footer"];
-    const OFF = ["invitation", "verse", "agenda", "registry", "timeline", "music", "letters"];
+  it("default page turns on the invitation, agenda, gift and (not for kids) letters; verse, timeline and music stay optional and off", () => {
     for (const t of templates as Tpl[]) {
+      const kids = t.template_id === "kids_fantasy_birthday";
+      const ON = ["opening", "hero", "invitation", "story", "agenda", "gallery", "details", "rsvp", "registry", "guestbook", ...(kids ? [] : ["letters"]), "footer"];
+      const OFF = ["verse", "timeline", "music", ...(kids ? ["letters"] : [])];
       const on = t.default_sections.filter((x) => x.enabled).map((x) => x.section_key);
       assert.deepEqual(on, ON, `${t.template_id} enabled sections, in order`);
       const off = t.default_sections.filter((x) => !x.enabled).map((x) => x.section_key);
@@ -117,12 +118,12 @@ describe("Khmer e-invitation seed rows", () => {
     }
   });
 
-  it("skinned section components are seeded inactive and registered", () => {
+  it("skinned section components are seeded active and registered", () => {
     for (const [id, section] of [["story_skin", "story"], ["details_skin", "details"], ["rsvp_skin", "rsvp"], ["footer_skin", "footer"]] as const) {
       const row = componentRows.find((c) => c.component_id === id);
       assert.ok(row, `${id} seeded`);
       assert.equal(row.section, section);
-      assert.equal(row.status, "inactive");
+      assert.equal(row.status, "active");
       assert.ok(registered.has(id), `${id} registered`);
     }
   });

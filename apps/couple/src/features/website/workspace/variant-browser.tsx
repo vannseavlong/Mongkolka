@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { sectionRegistry } from "@mongkolka/templates";
+import { sectionRegistry, skinFromComponents, variantsForSkin } from "@mongkolka/templates";
 import { Badge } from "@mongkolka/ui/badge";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { cn } from "@mongkolka/ui/utils";
@@ -24,11 +24,14 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
     (defaultId && registered[defaultId] && defaultId) ||
     Object.keys(registered)[0];
 
-  // Active catalog rows that actually have a component; the current one is kept
-  // even if it was since deactivated so the couple can see what they have.
-  const variants = components.filter(
+  // Active catalog rows that actually have a component, limited to the ones that fit this template's
+  // skin (no mixing another skin's ornaments in). The current one is always kept, even if it was
+  // since deactivated or does not fit, so the couple can see what they have.
+  const candidates = components.filter(
     (c) => c.section === section.section_key && registered[c.component_id] && (c.status === "active" || c.component_id === currentId),
   );
+  const fits = new Set(variantsForSkin(candidates, skinFromComponents(template.default_components)).map((c) => c.component_id));
+  const variants = candidates.filter((c) => fits.has(c.component_id) || c.component_id === currentId);
 
   if (catalogLoading) {
     return (

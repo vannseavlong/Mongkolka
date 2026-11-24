@@ -8,5 +8,5 @@ export * from "./guest-context";
 export * from "./sample-content";
 export * from "./theme-presets";
 export * from "./chrome";
-export { SkinProvider, useSkinOrnaments, SKIN_ORNAMENTS, ornamentsFor, skinFromComponents, DEFAULT_ORNAMENTS } from "./sections/khmer";
+export { SkinProvider, useSkinOrnaments, SKIN_ORNAMENTS, ornamentsFor, skinFromComponents, componentOwner, variantsForSkin, DEFAULT_ORNAMENTS } from "./sections/khmer";
 export type { SkinOrnaments, OrnamentProps, DividerProps, CrestProps, IconProps, IconSet, MotionFlavour } from "./sections/khmer";

@@ -17,22 +17,22 @@ const templates = siteTemplates.site_templates as Tpl[];
 const rows = (Array.isArray(sectionComponents) ? sectionComponents : (sectionComponents as { section_components: unknown[] }).section_components) as { component_id: string; section: string; status: string }[];
 
 describe("skin-aware gallery and guestbook seed", () => {
-  it("registers gallery_skin and guestbook_skin and seeds them inactive under their own sections", () => {
+  it("registers gallery_skin and guestbook_skin and seeds them active under their own sections", () => {
     for (const [id, section] of [["gallery_skin", "gallery"], ["guestbook_skin", "guestbook"]] as const) {
       assert.ok(registered.has(id), `${id} registered`);
       const row = rows.find((r) => r.component_id === id);
       assert.ok(row, `${id} seeded`);
       assert.equal(row.section, section);
-      assert.equal(row.status, "inactive");
+      assert.equal(row.status, "active");
     }
   });
-  it("all six Khmer templates use them, and stay inactive", () => {
+  it("all six Khmer templates use them, and are active", () => {
     for (const id of IDS) {
       const t = templates.find((x) => x.template_id === id)!;
       assert.ok(t, id);
       assert.equal(t.default_components.gallery, "gallery_skin", `${id} gallery`);
       assert.equal(t.default_components.guestbook, "guestbook_skin", `${id} guestbook`);
-      assert.equal(t.status, "inactive", `${id} status`);
+      assert.equal(t.status, "active", `${id} status`);
     }
   });
   it("does not change the gallery or guestbook of any other template", () => {

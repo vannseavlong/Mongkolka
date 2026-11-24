@@ -406,7 +406,7 @@ const components = [
     preview_accent_color: "#b8893b",
     font_style: "serif",
   },
-  // Khmer e-invitation sections (Tasks/_plans/Web-khmer-einvite-templates.md). INACTIVE on purpose: the components
+  // Khmer e-invitation sections (Tasks/_plans/Web-khmer-einvite-templates.md). Active: the components
   // are registered by Web-khmer-skeleton and built by Web-khmer-core-sections; the QA/launch task activates them.
   {
     component_id: "invitation_khmer",
@@ -416,7 +416,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "agenda_khmer",
@@ -426,7 +426,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "letters_khmer",
@@ -436,7 +436,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   // Grace pack: pink, gold and white Christian-wedding design (stubs until the section tasks land).
   // INACTIVE on purpose: the final Grace launch task flips these rows and the grace_blush template to active together.
@@ -540,7 +540,7 @@ const components = [
     preview_text_color: "#f3e5ab",
     preview_accent_color: "#e5c07b",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "hero_emerald",
@@ -550,7 +550,7 @@ const components = [
     preview_text_color: "#f3e5ab",
     preview_accent_color: "#e5c07b",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "opening_garden",
@@ -560,7 +560,7 @@ const components = [
     preview_text_color: "#3b3326",
     preview_accent_color: "#8a6a2f",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "hero_garden",
@@ -570,7 +570,7 @@ const components = [
     preview_text_color: "#3b3326",
     preview_accent_color: "#8a6a2f",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "opening_cream",
@@ -580,7 +580,7 @@ const components = [
     preview_text_color: "#4a3418",
     preview_accent_color: "#886420",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "hero_cream",
@@ -590,7 +590,7 @@ const components = [
     preview_text_color: "#4a3418",
     preview_accent_color: "#886420",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "opening_sakura",
@@ -600,7 +600,7 @@ const components = [
     preview_text_color: "#4a1230",
     preview_accent_color: "#b01553",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "hero_sakura",
@@ -610,7 +610,7 @@ const components = [
     preview_text_color: "#4a1230",
     preview_accent_color: "#b01553",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "opening_fairytale",
@@ -620,7 +620,7 @@ const components = [
     preview_text_color: "#1c2d5a",
     preview_accent_color: "#2f4b8a",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "gallery_skin",
@@ -631,7 +631,7 @@ const components = [
     preview_accent_color: "#d4af37",
     font_style: "serif",
     // INACTIVE on purpose: the Khmer template pack launch flips it with the six templates.
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "guestbook_skin",
@@ -641,7 +641,7 @@ const components = [
     preview_text_color: "#f3e5ab",
     preview_accent_color: "#d4af37",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "gallery_fairytale",
@@ -651,7 +651,7 @@ const components = [
     preview_text_color: "#1c2d5a",
     preview_accent_color: "#2f4b8a",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "hero_fairytale",
@@ -661,7 +661,7 @@ const components = [
     preview_text_color: "#1c2d5a",
     preview_accent_color: "#2f4b8a",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "opening_kids",
@@ -671,7 +671,7 @@ const components = [
     preview_text_color: "#5a1630",
     preview_accent_color: "#c82a62",
     font_style: "sans",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "hero_kids",
@@ -681,7 +681,7 @@ const components = [
     preview_text_color: "#5a1630",
     preview_accent_color: "#c82a62",
     font_style: "sans",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "invitation_kids",
@@ -691,7 +691,7 @@ const components = [
     preview_text_color: "#5a1630",
     preview_accent_color: "#c82a62",
     font_style: "sans",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "agenda_kids",
@@ -701,7 +701,7 @@ const components = [
     preview_text_color: "#5a1630",
     preview_accent_color: "#c82a62",
     font_style: "sans",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "details_kids",
@@ -711,7 +711,7 @@ const components = [
     preview_text_color: "#5a1630",
     preview_accent_color: "#c82a62",
     font_style: "sans",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "details_khmer",
@@ -721,7 +721,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   // Skin-aware standard sections (story, details, rsvp, footer): they wear whichever skin the template uses. INACTIVE until the Khmer templates launch.
   {
@@ -732,7 +732,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "details_skin",
@@ -742,7 +742,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "rsvp_skin",
@@ -752,7 +752,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   {
     component_id: "footer_skin",
@@ -762,7 +762,7 @@ const components = [
     preview_text_color: "#3a2a12",
     preview_accent_color: "#8f6a1c",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
   // INACTIVE on purpose: the Khmer templates launch task activates this row together with its template.
   {
@@ -773,7 +773,7 @@ const components = [
     preview_text_color: "#f3e5ab",
     preview_accent_color: "#d4af37",
     font_style: "serif",
-    status: "inactive",
+    status: "active",
   },
 ];
 

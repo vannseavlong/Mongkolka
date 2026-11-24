@@ -17,26 +17,24 @@ const rows = (Array.isArray(sectionComponents) ? sectionComponents : (sectionCom
 
 describe("kids_fantasy_birthday seed", () => {
   it("uses the kids-specific invitation, agenda and location components plus the KHQR gift card", () => {
-    assert.equal(kids.status, "inactive");
+    assert.equal(kids.status, "active");
     assert.deepEqual(
       [kids.default_components.invitation, kids.default_components.agenda, kids.default_components.details, kids.default_components.registry],
       ["invitation_kids", "agenda_kids", "details_kids", "registry_khqr"],
     );
   });
-  it("registers and seeds (inactive, under the right section) every kids component", () => {
+  it("registers and seeds (active, under the right section) every kids component", () => {
     for (const [id, section] of [["opening_kids", "opening"], ["hero_kids", "hero"], ["invitation_kids", "invitation"], ["agenda_kids", "agenda"], ["details_kids", "details"]] as const) {
       assert.ok(registered.has(id), `${id} registered`);
       const row = rows.find((r) => r.component_id === id);
       assert.ok(row, `${id} seeded`);
       assert.equal(row.section, section);
-      assert.equal(row.status, "inactive");
+      assert.equal(row.status, "active");
     }
   });
-  it("default page is the standard sections; the party invitation, party plan and gift are optional and off", () => {
+  it("default page has the party invitation, party plan and gift on; letters stay optional and off", () => {
     const on = new Set(kids.default_sections.filter((s) => s.enabled).map((s) => s.section_key));
-    for (const k of ["opening", "hero", "story", "gallery", "details", "rsvp", "guestbook", "footer"]) assert.ok(on.has(k), k);
-    for (const k of ["invitation", "agenda", "registry", "letters"]) {
-      assert.ok(kids.default_sections.some((s) => s.section_key === k && !s.enabled), `${k} present but off`);
-    }
+    for (const k of ["opening", "hero", "invitation", "story", "agenda", "gallery", "details", "rsvp", "registry", "guestbook", "footer"]) assert.ok(on.has(k), k);
+    assert.ok(kids.default_sections.some((s) => s.section_key === "letters" && !s.enabled), "letters present but off");
   });
 });

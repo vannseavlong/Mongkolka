@@ -1,3 +1,5 @@
+import { unit } from "./intro-logic";
+
 /** Placement tables for the Covenant covers. Fixed numbers (not random) so the scene is the same every time and testable. */
 
 export type CoverTone = "gold" | "rose" | "blush" | "white";
@@ -25,46 +27,9 @@ export const BUTTERFLIES: readonly CoverButterfly[] = [
   { x: 93, y: 45, size: 34, delay: 1100, rot: 10, tone: "gold" },
 ];
 
-export interface CoverFlower {
-  x: number;
-  y: number;
-  size: number;
-  delay: number;
-  tone: CoverTone;
-}
-
-export const FLOWERS: readonly CoverFlower[] = [
-  { x: 4, y: 5, size: 96, delay: 200, tone: "rose" },
-  { x: 96, y: 5, size: 96, delay: 350, tone: "blush" },
-  { x: 14, y: 14, size: 54, delay: 900, tone: "gold" },
-  { x: 86, y: 14, size: 54, delay: 1000, tone: "white" },
-  { x: 6, y: 96, size: 104, delay: 500, tone: "blush" },
-  { x: 24, y: 99, size: 70, delay: 1100, tone: "gold" },
-  { x: 42, y: 101, size: 60, delay: 1500, tone: "rose" },
-  { x: 60, y: 101, size: 60, delay: 1400, tone: "white" },
-  { x: 77, y: 99, size: 72, delay: 1200, tone: "gold" },
-  { x: 95, y: 96, size: 104, delay: 600, tone: "rose" },
-];
-
 /** Where a butterfly flies in from: the nearer side edge, below the screen. Returns vw / vh offsets. */
 export function butterflyEntry(b: CoverButterfly): { dx: number; dy: number } {
   return { dx: b.x < 50 ? -70 : 70, dy: 45 };
-}
-
-/** Points on a circle around the medallion, as % of its box (centre 50,50). `angle` is the outward direction in degrees. */
-export function wreath(count: number, radius: number): { x: number; y: number; angle: number }[] {
-  const n = Math.max(0, Math.floor(count));
-  return Array.from({ length: n }, (_, i) => {
-    const angle = (360 / n) * i - 90;
-    const rad = (angle * Math.PI) / 180;
-    return { x: 50 + radius * Math.cos(rad), y: 50 + radius * Math.sin(rad), angle };
-  });
-}
-
-/** First letter of a name for the monogram (code point aware, so Khmer and emoji do not split). "" when empty. */
-export function initialOf(name: string | undefined): string {
-  const first = Array.from((name ?? "").trim())[0];
-  return first ? first.toLocaleUpperCase() : "";
 }
 
 export interface CoverSparkle {
@@ -95,27 +60,84 @@ export interface CoverFlyer {
   tone: CoverTone;
 }
 
+/** White doves that cross the screen in the garden cover (same flight paths as the butterflies). */
+export const DOVES: readonly Omit<CoverFlyer, "tone">[] = [
+  { path: "b", size: 92, delay: 1200, duration: 12500 },
+  { path: "a", size: 76, delay: 5200, duration: 13500 },
+];
+
 export const FLYERS: readonly CoverFlyer[] = [
   { path: "a", size: 84, delay: 600, duration: 10500, tone: "gold" },
   { path: "b", size: 70, delay: 2600, duration: 11500, tone: "rose" },
   { path: "c", size: 60, delay: 4200, duration: 9500, tone: "gold" },
 ];
 
-/** One corner vine, drawn in a 200x200 box anchored at the top-left; the other corners mirror it. */
-export const VINE = {
-  stem: "M-4 22 C40 18 86 34 104 74 C118 106 98 140 62 156",
-  tendril: "M104 74 C122 64 138 74 132 90",
-  /** Leaves along the stem: position, rotation (deg), scale. */
-  leaves: [
-    { x: 30, y: 21, rot: 12, s: 1 },
-    { x: 56, y: 28, rot: -38, s: 0.9 },
-    { x: 78, y: 46, rot: 40, s: 1.1 },
-    { x: 100, y: 68, rot: -60, s: 0.9 },
-    { x: 108, y: 96, rot: 70, s: 1 },
-    { x: 98, y: 124, rot: -110, s: 0.9 },
-    { x: 78, y: 148, rot: 150, s: 0.8 },
-    { x: 132, y: 90, rot: 20, s: 0.7 },
-  ],
-  /** Where a bloom sits at the end of the stem (garden cover). */
-  bloom: { x: 58, y: 158, size: 46 },
-} as const;
+export interface Region {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+}
+
+export interface Bloom {
+  /** Centre, % of the screen. */
+  x: number;
+  y: number;
+  /** Width in vmin. */
+  size: number;
+  tone: CoverTone;
+  rot: number;
+  /** ms */
+  delay: number;
+  /** Far blooms are smaller, softer and blurred for depth. */
+  far: boolean;
+}
+
+export interface Leafy {
+  x: number;
+  y: number;
+  /** Width in vmin. */
+  size: number;
+  rot: number;
+  delay: number;
+  deep: boolean;
+}
+
+const TONE_CYCLE: readonly CoverTone[] = ["rose", "blush", "white", "blush", "rose", "gold", "white", "blush"];
+
+/** Deterministic blooms scattered inside a region: the same every render, no Math.random. */
+export function bloomCluster(region: Region, count: number, seed: number): Bloom[] {
+  const n = Math.max(0, Math.floor(count));
+  return Array.from({ length: n }, (_, i) => {
+    const far = unit(i, seed + 1) > 0.55;
+    return {
+      x: region.x0 + unit(i, seed + 2) * (region.x1 - region.x0),
+      y: region.y0 + unit(i, seed + 3) * (region.y1 - region.y0),
+      size: far ? 4 + unit(i, seed + 4) * 4 : 8 + unit(i, seed + 4) * 8,
+      tone: TONE_CYCLE[Math.floor(unit(i, seed + 5) * TONE_CYCLE.length)]!,
+      rot: Math.round(unit(i, seed + 6) * 360),
+      delay: 300 + Math.round(unit(i, seed + 7) * 1500),
+      far,
+    };
+  });
+}
+
+export function leafCluster(region: Region, count: number, seed: number): Leafy[] {
+  const n = Math.max(0, Math.floor(count));
+  return Array.from({ length: n }, (_, i) => ({
+    x: region.x0 + unit(i, seed + 12) * (region.x1 - region.x0),
+    y: region.y0 + unit(i, seed + 13) * (region.y1 - region.y0),
+    size: 5 + unit(i, seed + 14) * 7,
+    rot: Math.round(unit(i, seed + 15) * 360),
+    delay: 200 + Math.round(unit(i, seed + 16) * 1400),
+    deep: unit(i, seed + 17) > 0.5,
+  }));
+}
+
+/** Where the foliage sits: a hanging garland across the top, the two sides, and a bank along the bottom. */
+export const FOLIAGE_REGIONS: readonly { region: Region; blooms: number; leaves: number }[] = [
+  { region: { x0: 0, x1: 100, y0: -2, y1: 12 }, blooms: 16, leaves: 22 },
+  { region: { x0: -2, x1: 14, y0: 8, y1: 92 }, blooms: 12, leaves: 18 },
+  { region: { x0: 86, x1: 102, y0: 8, y1: 92 }, blooms: 12, leaves: 18 },
+  { region: { x0: 0, x1: 100, y0: 86, y1: 102 }, blooms: 20, leaves: 24 },
+];

@@ -10,7 +10,7 @@ A new section, `cover`, placed before `opening`. It plays an animated scene firs
 | Step | Who / where | Status |
 |---|---|---|
 | 1 | Guest opens the link | exists |
-| 2 | **Cover plays** (auto, about 4.5 s; tap skips). New | new |
+| 2 | **Cover plays** (auto, about 6.5 s; no skip). New | new |
 | 3 | Cover fades away and the **opening gate mounts underneath** (so its animation starts only now). New | new |
 | 4 | Guest taps "Open the invitation" | exists |
 | 5 | Rest of the site renders and animates | exists |
@@ -23,7 +23,7 @@ A new section, `cover`, placed before `opening`. It plays an animated scene firs
 - Section key: `cover`, ordered **before** `opening` in every `SECTION_KEYS` list.
 - Cover component props: `{ couple, theme, guestGreeting?, onReveal(): void, onDone(): void }`.
   - Plays itself; calls `onReveal` when the reveal starts (renderer mounts the opening beneath), then `onDone` when it is fully gone (renderer unmounts it).
-  - Must honour `prefers-reduced-motion` (static cover, reveal on tap) and be skippable by tap/Enter.
+  - Must honour `prefers-reduced-motion` (a still cover that advances after a short read). Not skippable (decision 2026-11-25).
 - No editable content in v1 (names and date come from `couple`). `canEditSection("cover")` is false.
 - Registry ids: `cover_covenant_butterflies`, `cover_covenant_garden`. Catalog rows seeded `inactive` until the Covenant template is launched (same as its other rows).
 - Original artwork only (SVG/CSS), no copied illustrations.
@@ -48,7 +48,7 @@ A new section, `cover`, placed before `opening`. It plays an animated scene firs
 - `sheet-db schema` is a project T3 signal, so the key task is T3. Security checklist: no input, no auth, no personal data; record "n/a" with reasons.
 
 ## Open questions (recommendation in brackets)
-1. Auto-advance or wait for a tap? [Auto-play about 4.5 s, tap skips. Fewer guests get stuck on a decorative screen.]
+1. Auto-advance or wait for a tap? [Auto-play, no skip (user decision). It advances by itself, so nobody gets stuck.]
 2. Should the cover show the couple's names? [Yes, small, from `couple`; no new content field.]
 3. Sound with the cover? [No. Music already starts on the gate tap.]
 

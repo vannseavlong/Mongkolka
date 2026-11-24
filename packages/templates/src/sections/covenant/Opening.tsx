@@ -23,7 +23,7 @@ const at = (start: number, ms: number): Vars => ({ "--at": `${start}ms`, "--ms":
 /**
  * Covenant cover. Without a tap it plays by itself: a gold frame draws around the page, the Khmer blessing
  * is written, the couple's names arrive from either side, then the guest is addressed ("សូមគោរពអញ្ចើញ <name>",
- * the name read from the invitation link, shown exactly as set; "អស់លោក​លោកស្រី" when there is none). The open button appears at the end; a tap earlier skips ahead.
+ * the name read from the invitation link, shown exactly as set; "អស់លោក​លោកស្រី" when there is none). The open button appears at the end; it cannot be skipped.
  * A tap fades the card out and hands over to the hero. Reduced motion shows everything at once.
  */
 export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
@@ -32,7 +32,6 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
   const tl = introFor(reduce);
   const p = covenantPalette(theme);
   const [ready, setReady] = useState(tl.readyAt === 0);
-  const [skip, setSkip] = useState(false);
   const [crossing, setCrossing] = useState(false);
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
@@ -85,7 +84,7 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
     started.current = true;
     setCrossing(true);
   };
-  const stageClass = ["cv-stage", skip ? "cv-skip" : "", crossing ? "is-cross" : ""].filter(Boolean).join(" ");
+  const stageClass = ["cv-stage", crossing ? "is-cross" : ""].filter(Boolean).join(" ");
   const Corner = COVENANT_ORNAMENTS.Corner;
   const frameTime = at(0, tl.frameMs);
 
@@ -94,12 +93,6 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
       className={stageClass}
       style={vars}
       data-mk-lang={language}
-      onClick={() => {
-        if (!ready) {
-          setSkip(true);
-          setReady(true);
-        }
-      }}
     >
       <style href="mk-covenant-css" precedence="mk-covenant">
         {COVENANT_CSS}
@@ -195,7 +188,6 @@ export function CovenantOpening({ couple, theme, guestGreeting, onOpen }: Openin
         </div>
       </div>
 
-      {!ready && <p className="cv-skiphint m-0">{t("covenant.skip")}</p>}
     </div>
   );
 }

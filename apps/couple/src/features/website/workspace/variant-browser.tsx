@@ -40,21 +40,21 @@ export function VariantBrowser({ context }: { context: SectionPanelContext }) {
     (defaultId && registered[defaultId] && defaultId) ||
     Object.keys(registered)[0];
 
-  // Active catalog rows that actually have a component, limited to the ones that fit this template's
-  // skin (no mixing another skin's ornaments in). The current one is always kept, even if it was
-  // since deactivated or does not fit, so the couple can see what they have.
+  // Two styles always stay in the list: the one in use, and the one the template ships with (so the
+  // couple can always go back to the original design after trying another). Everything else must be an
+  // active catalog row that has a component and fits this template's skin (no mixing another skin's ornaments in).
+  const keep = [defaultId, currentId].filter((id, i, all): id is string => !!id && !!registered[id] && all.indexOf(id) === i);
   const candidates = components.filter(
-    (c) => c.section === section.section_key && registered[c.component_id] && (c.status === "active" || c.component_id === currentId),
+    (c) => c.section === section.section_key && registered[c.component_id] && (c.status === "active" || keep.includes(c.component_id)),
   );
   const fits = new Set(variantsForSkin(candidates, skinFromComponents(template.default_components)).map((c) => c.component_id));
-  const listed = candidates.filter((c) => fits.has(c.component_id) || c.component_id === currentId);
-  // The live catalog may have no row for the style the template ships with (e.g. a template
-  // launched before its rows were seeded). The couple must still see what they have, so it is
-  // shown from the registry id instead of silently missing.
-  const variants: SectionComponent[] =
-    currentId && !listed.some((c) => c.component_id === currentId)
-      ? [{ ...fallbackVariant(section.section_key, currentId), status: "active" }, ...listed]
-      : listed;
+  const listed = candidates.filter((c) => fits.has(c.component_id) || keep.includes(c.component_id));
+  // The live catalog may have no row for a kept style (e.g. a template launched before its rows were
+  // seeded or while they are inactive). It is shown from the registry id instead of silently missing.
+  const missing: SectionComponent[] = keep
+    .filter((id) => !listed.some((c) => c.component_id === id))
+    .map((id) => ({ ...fallbackVariant(section.section_key, id), status: "active" as const }));
+  const variants: SectionComponent[] = [...missing, ...listed];
 
   if (catalogLoading) {
     return (

@@ -4,7 +4,6 @@
  */
 export const COVENANT_CSS = `
 .cv-stage{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:clamp(48px,9svh,96px) 34px;text-align:center;background:radial-gradient(75% 45% at 90% 4%,var(--cv-petal),transparent 70%),radial-gradient(70% 40% at 6% 96%,var(--cv-petal),transparent 70%),var(--cv-ground)}
-.cv-skip *{animation-duration:.01s!important;animation-delay:0s!important}
 .cv-petal{position:absolute;top:-28px;border-radius:80% 0 80% 0;background:radial-gradient(circle at 30% 30%,#fff,var(--cv-petal) 55%,var(--cv-rose));opacity:0;animation:cv-fall var(--d) linear var(--t) infinite;pointer-events:none}
 .cv-line{position:absolute;background:linear-gradient(90deg,var(--cv-lo),var(--cv-hi),var(--cv-lo))}
 .cv-line-h{height:1.5px;left:0;right:0}.cv-line-v{width:1.5px;top:0;bottom:0}
@@ -25,7 +24,6 @@ export const COVENANT_CSS = `
 .cv-cta:hover{transform:translateY(-1px)}
 .cv-cta:focus-visible{outline:2px solid var(--cv-mid);outline-offset:4px}
 .cv-pulse{animation:cv-pulse 2.6s ease-in-out infinite}
-.cv-skiphint{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));font-size:12px;letter-spacing:.08em;opacity:.55;z-index:3;pointer-events:none}
 .is-cross .is-cross .cv-content{opacity:0;transform:scale(.96)}
 .cv-cross-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:cv-draw 1.1s ease-out .1s forwards}
 .cv-cross-fill{opacity:0;animation:cv-fillin .6s ease 1s forwards}

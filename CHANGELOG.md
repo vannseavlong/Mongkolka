@@ -6,7 +6,7 @@ Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admi
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/API-cover-section-key.md, Web-cover-sequence.md, Web-covenant-cover.md (plan: Tasks/_plans/Web-cover-section.md)
 - Branch/PR: main (no PR)
-- What changed: [Web] new `cover` section that plays first (butterflies or garden bloom, couple names and date), then fades to reveal the opening gate, which mounts only at reveal; tap skips, reduced motion shows a still cover; builder preview plays cover then opening, Replay intro, thumbnails in the Style tab; two Covenant covers, original SVG/CSS. [API] `cover` added to the section key enums and seeds (2 component rows inactive, Covenant default_sections starts with cover; every template lists cover disabled)
+- What changed: [Web] new `cover` section that plays first (butterflies or garden bloom, couple names and date), then fades to reveal the opening gate, which mounts only at reveal; not skippable, reduced motion shows a still cover; builder preview plays cover then opening, Replay intro, thumbnails in the Style tab; two Covenant covers, original SVG/CSS. [API] `cover` added to the section key enums and seeds (2 component rows inactive, Covenant default_sections starts with cover; every template lists cover disabled)
 - Needs: `lsdb sync` if the sheet enforces the section enum, `lsdb seed --upsert`, activate the cover rows in admin; existing Covenant couples get Cover appended disabled at the bottom; browser check (Desktop and Mobile, EN and KH, public site) and code review not run
 
 ## 2026-11-24 · [Cross] feat: Covenant Gold & Blush Christian wedding template (inactive)

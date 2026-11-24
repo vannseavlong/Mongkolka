@@ -9,6 +9,12 @@ export const PINK = {
   deepRose: "#b85c7a",
 } as const;
 
+/** Fixed soft greens for foliage (the theme has no green). */
+export const GREEN = {
+  leaf: "#a9bd98",
+  deep: "#6f8a62",
+} as const;
+
 export interface CovenantPalette {
   gold: GoldStops;
   /** Page ground (white-pink). */

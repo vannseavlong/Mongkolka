@@ -22,7 +22,7 @@ const at = (start: number, ms: number): Vars => ({ "--at": `${start}ms`, "--ms":
 /**
  * The Covenant invitation card: a cream card with a gold flourish border on a dusty-pink mat, the Khmer and English
  * blessing, the couple's names with a butterfly and hearts, "សូមគោរពអញ្ចើញ / INVITATION" and the guest's name in a
- * framed box, then the date and venue. Plays by itself like the other Covenant opening (tap to skip, tap to open,
+ * framed box, then the date and venue. Plays by itself like the other Covenant opening (tap to open,
  * cross, hero). Venue and time come from the couple's details; lines without data are left out.
  */
 export function CovenantCardOpening({ couple, theme, guestGreeting, details, onOpen }: OpeningProps) {
@@ -32,7 +32,6 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
   const p = covenantPalette(theme);
   const { boxRef, contentRef, scale } = useFitScale<HTMLDivElement, HTMLDivElement>();
   const [ready, setReady] = useState(tl.readyAt === 0);
-  const [skip, setSkip] = useState(false);
   const [crossing, setCrossing] = useState(false);
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
@@ -79,7 +78,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
     color: theme.text_color,
     fontFamily: KHMER_BODY_FONT,
   };
-  const classes = ["cv-cardstage", skip ? "cv-skip" : "", crossing ? "is-cross" : ""].filter(Boolean).join(" ");
+  const classes = ["cv-cardstage", crossing ? "is-cross" : ""].filter(Boolean).join(" ");
   const label = (_text: string, size: string): CSSProperties => ({ ...foil, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, fontSize: size, lineHeight: 1.9 });
   const small: CSSProperties = { ...foil, fontFamily: KHMER_BODY_FONT, fontWeight: 700, lineHeight: 1.7 };
 
@@ -88,12 +87,6 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
       className={classes}
       style={vars}
       data-mk-lang={language}
-      onClick={() => {
-        if (!ready) {
-          setSkip(true);
-          setReady(true);
-        }
-      }}
     >
       <style href="mk-covenant-css" precedence="mk-covenant">
         {COVENANT_CSS}
@@ -208,7 +201,6 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
         </div>
       </div>
 
-      {!ready && <p className="cv-skiphint m-0">{t("covenant.skip")}</p>}
     </div>
   );
 }

@@ -88,3 +88,9 @@ export function petals(count: number): Petal[] {
     spin: Math.round(unit(i, 6) * 360),
   }));
 }
+
+/** Scale (0..1) that makes content of `natural` px fit in `available` px; never enlarges, never zero. */
+export function fitScale(available: number, natural: number): number {
+  if (!(available > 0) || !(natural > 0)) return 1;
+  return Math.max(0.3, Math.min(1, available / natural));
+}

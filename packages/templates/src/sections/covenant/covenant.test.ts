@@ -7,7 +7,7 @@ import { SkinProvider } from "../khmer/skin-context";
 import { sectionRegistry } from "../../registry";
 import { COVENANT_SAMPLE_COUPLE as SAMPLE_COUPLE, SAMPLE_CONTENT, SAMPLE_GUESTBOOK } from "../../sample-content";
 import type { SectionKey, Theme } from "../../types";
-import { guestLine, hasKhmer, petals } from "./intro-logic";
+import { fitScale, guestLine, hasKhmer, petals } from "./intro-logic";
 import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
@@ -101,7 +101,8 @@ describe("covenant sections render", () => {
       const card = render("opening", "opening_card_covenant", language, { guestGreeting: "Dara", details: { ceremonyVenue: "Grace Hall", ceremonyTime: "5:00 PM" }, onOpen: () => undefined });
       assert.ok(card.includes(language === "kh" ? "វុត្ថា" : "Vutha") && card.includes("Dara") && card.includes("Grace Hall") && card.includes("5:00 PM"));
       assert.ok(!card.includes("covenant."), "no missing translation key");
-      assert.ok(render("opening", "opening_card_covenant", language, { onOpen: () => undefined }).includes(language === "kh" ? "អស់លោក" : "Honoured guests"));
+      assert.ok(!render("opening", "opening_card_covenant", language, { onOpen: () => undefined }).includes('class="cv-guestbox'), "no guest box without a name");
+      assert.ok(card.includes('class="cv-guestbox'), "guest box with a name");
       assert.ok(render("hero", "hero_covenant", language, { content: SAMPLE_CONTENT.hero }).includes(language === "kh" ? "វុត្ថា" : "Vutha"));
       assert.ok(render("verse", "verse_covenant", language, { content: SAMPLE_CONTENT.verse }).includes("1 Corinthians 13:4–8") && render("verse", "verse_covenant", language, { content: SAMPLE_CONTENT.verse }).includes("True love is patient"));
       assert.equal(render("verse", "verse_covenant", language, {}), "");
@@ -121,5 +122,15 @@ describe("covenant names", () => {
     assert.equal(joinNames(coupleNamesFor(SAMPLE_COUPLE, "en")), "Vutha & Nita");
     assert.equal(joinNames(coupleNamesFor({ partner1Name: "Sokha" }, "kh")), "Sokha");
     assert.equal(joinNames(coupleNamesFor({ partner1Name: "A", partner2Name: "B", partner1NameKh: " ក ", partner2NameKh: "" }, "kh")), "ក & B");
+  });
+});
+
+describe("covenant fit scale", () => {
+  it("shrinks only when needed and stays sane", () => {
+    assert.equal(fitScale(800, 600), 1);
+    assert.equal(fitScale(400, 800), 0.5);
+    assert.equal(fitScale(100, 1000), 0.3);
+    assert.equal(fitScale(0, 500), 1);
+    assert.equal(fitScale(500, 0), 1);
   });
 });

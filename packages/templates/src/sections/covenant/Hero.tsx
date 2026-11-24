@@ -5,11 +5,10 @@ import { useReducedMotion } from "motion/react";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 import { formatWeddingDate } from "../../format";
-import { KHMER_BODY_FONT, MOUL_FONT } from "../../chrome/fonts";
-import { withAlpha } from "../../chrome/gold";
+import { CINZEL_FONT, KHMER_BODY_FONT, MOUL_FONT } from "../../chrome/fonts";
+import { mixHex, withAlpha } from "../../chrome/gold";
 import { foilTextGradient } from "../khmer/foil";
 import { COVENANT_CSS } from "./covenant-styles";
-import { Cross } from "./cross";
 import { nextHeroPhase, PHOTO_WAIT_MS, usablePhoto, type HeroPhase } from "./hero-logic";
 import { joinNames, coupleNamesFor } from "./names";
 import { hasKhmer } from "./intro-logic";
@@ -26,8 +25,8 @@ export interface CovenantHeroProps {
 
 /**
  * Full-screen couple photo (it crops to the screen, so a landscape photo fills a laptop and a portrait one a phone).
- * While the photo loads a gold cross breathes on the pink page; then the photo appears inside a growing cross, the
- * cross outline fades and the whole photo opens up behind the names. No photo: the pink page keeps a gold cross.
+ * While the photo loads, a closed invitation book breathes on the pink page; then its cover swings open onto the
+ * photo, the book grows away and the whole photo opens up behind the names. No photo: the book opens onto a blank page.
  */
 export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
   const { t, language } = useLanguage();
@@ -71,13 +70,20 @@ export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
     WebkitTextFillColor: "transparent",
     filter: "drop-shadow(0 2px 8px rgba(40,10,24,.55))",
   };
+  const foilLight: CSSProperties = {
+    backgroundImage: foilTextGradient(theme.accent_color, theme.bg_color),
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  };
   const vars: Vars = {
     "--cv-ground": p.ground,
+    "--cv-cream": mixHex(theme.bg_color, "#fffbea", 35),
+    "--bw": "min(58vw, 44svh, 320px)",
     "--cv-petal": PINK.petal,
     "--cv-hi": p.gold.hi,
     "--cv-mid": p.gold.mid,
     "--cv-lo": p.gold.lo,
-    "--ch": "min(74svh, 120vw)",
     fontFamily: KHMER_BODY_FONT,
   };
   const revealed = phase === "reveal";
@@ -96,19 +102,33 @@ export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
       </style>
 
       {photo && revealed && (
-        <>
-          <div aria-hidden className="cv-window">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} alt="" className="cv-photo" decoding="async" />
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo} alt={names} className="cv-photo cv-photo-full" decoding="async" />
-        </>
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={photo} alt={names} className="cv-photo cv-photo-full" decoding="async" />
       )}
       <div aria-hidden className="cv-scrim" />
 
-      <div aria-hidden className={`cv-crossbox cv-fluid cv-loadcross`} style={revealed && !photo ? { opacity: 0.9, animation: "none" } : undefined}>
-        <Cross color={theme.accent_color} size={200} draw={!revealed} glow />
+      {/* The invitation book: closed and breathing while the photo loads, then the cover swings open onto the photo. */}
+      <div aria-hidden className="cv-bookwrap">
+        <div className="cv-book">
+          <div className="cv-book-page">
+            {photo && revealed && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photo} alt="" decoding="async" />
+            )}
+          </div>
+          <div className="cv-book-cover">
+            <span className="cv-spine" />
+            <div className="cv-face">
+              <span style={{ ...foil, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, fontSize: kh ? "0.8rem" : "0.7rem", letterSpacing: kh ? "normal" : "0.22em", textTransform: kh ? "none" : "uppercase", lineHeight: 1.9 }}>
+                {t("covenant.inviteEn")}
+              </span>
+              <span style={{ ...foilLight, fontFamily: khmerNames ? MOUL_FONT : SCRIPT, fontSize: khmerNames ? "clamp(1rem,5vw,1.4rem)" : "clamp(1.6rem,8vw,2.2rem)", lineHeight: khmerNames ? 1.9 : 1.15, overflowWrap: "anywhere" }}>
+                {names}
+              </span>
+            </div>
+            <div className="cv-face cv-face-back" />
+          </div>
+        </div>
       </div>
       {!revealed && (
         <p role="status" className="absolute inset-x-0 m-0 text-center text-sm" style={{ bottom: "12svh", color: withAlpha(p.ink, 0.7) }}>

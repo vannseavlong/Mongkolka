@@ -19,7 +19,7 @@ export const COVENANT_SAMPLE_COUPLE: CoupleInfo = {
   partner2Name: "Nita",
   partner1NameKh: "វុត្ថា",
   partner2NameKh: "នីតា",
-  weddingDate: "2026-12-12",
+  weddingDate: "2027-01-07",
 };
 
 export function sampleCoupleFor(skin: SkinId | null | undefined): CoupleInfo {
@@ -119,7 +119,15 @@ const KIDS_SAMPLE_OVERRIDES: Partial<Record<SectionKey, unknown>> = {
   footer: { message: "Thank you for sharing our little one's big day.", hashtag: "#AlexTurnsOne" },
 };
 
+/** Covenant preview: 7 January 2027, 5:00 PM, at Sen Sok Hall (វិមានសែនសុខ). */
+const COVENANT_SAMPLE_OVERRIDES: Partial<Record<SectionKey, unknown>> = {
+  invitation: { ...(SAMPLE_CONTENT.invitation as object), startsAt: "2027-01-07T17:00:00+07:00", lunarKh: undefined, solarKh: "ត្រូវនឹងថ្ងៃទី០៧ ខែមករា ឆ្នាំ២០២៧" },
+  details: { ...(SAMPLE_CONTENT.details as object), ceremonyTime: "5:00 PM", ceremonyVenue: "វិមានសែនសុខ", ceremonyAddress: undefined, receptionTime: undefined, receptionVenue: undefined, receptionAddress: undefined, mapUrl: "https://maps.google.com/?q=%E1%9E%9C%E1%9E%B7%E1%9E%98%E1%9E%B6%E1%9E%93%E1%9E%9F%E1%9F%82%E1%9E%93%E1%9E%9F%E1%9E%BB%E1%9E%81" },
+  agenda: { days: [{ date: "2027-01-07", items: [{ time: "17:00", titleKh: "ពិធីអាពាហ៍ពិពាហ៍", titleEn: "Wedding ceremony", icon: "ring" }, { time: "18:30", titleKh: "ពិធីជប់លៀង", titleEn: "Reception dinner", icon: "dinner" }] }] },
+};
+
 export function sampleContentFor(skin: SkinId | null | undefined): Partial<Record<SectionKey, unknown>> {
+  if (skin === "covenant") return { ...SAMPLE_CONTENT, ...COVENANT_SAMPLE_OVERRIDES };
   return skin === "kids" ? { ...SAMPLE_CONTENT, ...KIDS_SAMPLE_OVERRIDES } : SAMPLE_CONTENT;
 }
 

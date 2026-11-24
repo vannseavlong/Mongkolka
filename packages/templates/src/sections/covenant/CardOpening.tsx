@@ -12,6 +12,7 @@ import { Butterfly, EdgePetals, FlourishCorner, FlourishEdge, Hearts } from "./c
 import { CARD_CSS, COVENANT_CSS } from "./covenant-styles";
 import { Cross } from "./cross";
 import { coupleNamesFor } from "./names";
+import { useFitScale } from "./use-fit-scale";
 import { guestLine, hasKhmer, introFor } from "./intro-logic";
 import { covenantPalette, PINK } from "./palette";
 
@@ -30,6 +31,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
   const reduce = useReducedMotion() ?? false;
   const tl = introFor(reduce);
   const p = covenantPalette(theme);
+  const { boxRef, contentRef, scale } = useFitScale<HTMLDivElement, HTMLDivElement>();
   const [ready, setReady] = useState(tl.readyAt === 0);
   const [skip, setSkip] = useState(false);
   const [crossing, setCrossing] = useState(false);
@@ -50,7 +52,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
 
   const kh = language === "kh";
   const accent = theme.accent_color;
-  const guest = guestLine(guestGreeting) || t("covenant.guestDefault");
+  const guest = guestLine(guestGreeting);
   const { first, second } = coupleNamesFor(couple, language);
   const dateKh = formatWeddingDate(couple.weddingDate, "kh");
   const dateEn = formatWeddingDate(couple.weddingDate, "en");
@@ -101,7 +103,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
         {CARD_CSS}
       </style>
 
-      <div className="cv-card">
+      <div className="cv-card" ref={boxRef}>
         <div aria-hidden className="cv-petals" style={at(0, tl.frameMs)}>
           <EdgePetals height={520} />
         </div>
@@ -126,6 +128,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
           <FlourishEdge color={accent} width={150} />
         </span>
 
+        <div ref={contentRef} style={{ transform: `scale(${scale})`, transformOrigin: "center" }}>
         <div className="cv-content">
           <div className="cv-cross-top">
             <Cross color={accent} size={44} draw glow />
@@ -164,11 +167,13 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
             <p className="m-0" style={{ ...foil, fontFamily: CINZEL_FONT, fontWeight: 700, fontSize: "clamp(1rem,5vw,1.3rem)", letterSpacing: "0.04em" }}>
               {t("covenant.inviteEn").toUpperCase()}
             </p>
-            <div className="cv-guestbox mt-3">
-              <p className="m-0 break-words" style={{ ...foil, fontFamily: hasKhmer(guest) ? MOUL_FONT : SCRIPT, fontSize: hasKhmer(guest) ? "clamp(1.1rem,5.6vw,1.6rem)" : "clamp(1.7rem,8vw,2.4rem)", lineHeight: hasKhmer(guest) ? 1.9 : 1.2, overflowWrap: "anywhere" }}>
-                {guest}
-              </p>
-            </div>
+            {guest && (
+              <div className="cv-guestbox mt-3">
+                <p className="m-0 break-words" style={{ ...foil, fontFamily: hasKhmer(guest) ? MOUL_FONT : SCRIPT, fontSize: hasKhmer(guest) ? "clamp(1.1rem,5.6vw,1.6rem)" : "clamp(1.7rem,8vw,2.4rem)", lineHeight: hasKhmer(guest) ? 1.9 : 1.2, overflowWrap: "anywhere" }}>
+                  {guest}
+                </p>
+              </div>
+            )}
           </div>
 
           {(dateKh || where) && (
@@ -203,6 +208,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, onO
               </button>
             )}
           </div>
+        </div>
         </div>
       </div>
 

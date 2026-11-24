@@ -1,5 +1,3 @@
-import { CROSS_MASK } from "./cross";
-
 /**
  * All Covenant CSS in one place (injected once with React 19 `<style href precedence>`). Transform, opacity and
  * clip-path only, so it stays cheap on low-end phones; every animation is off under reduced motion.
@@ -42,11 +40,16 @@ export const COVENANT_CSS = `
 .cv-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 28%}
 .cv-photo-full{opacity:0}
 .is-reveal .cv-photo-full{animation:cv-fadein 1.3s ease 1.6s forwards}
-.cv-window{position:absolute;inset:0;-webkit-mask-image:${CROSS_MASK};mask-image:${CROSS_MASK};-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:50% 46%;mask-position:50% 46%;-webkit-mask-size:auto var(--ch);mask-size:auto var(--ch);opacity:0}
-.is-reveal .cv-window{animation:cv-window 2.4s cubic-bezier(.2,.8,.2,1) .1s both}
-.cv-crossbox{position:absolute;left:50%;top:46%;height:var(--ch);aspect-ratio:5/7;transform:translate(-50%,-50%);pointer-events:none}
-.cv-loadcross{animation:cv-breathe 1.8s ease-in-out infinite}
-.is-reveal .cv-loadcross{animation:cv-outline 2.6s ease both}
+.cv-bookwrap{position:absolute;left:50%;top:46%;width:var(--bw);aspect-ratio:3/4;margin-left:calc(var(--bw) / -2);margin-top:calc(var(--bw) * -2 / 3);perspective:1600px;pointer-events:none}
+.cv-book{position:relative;width:100%;height:100%;transform-style:preserve-3d;filter:drop-shadow(0 22px 26px rgba(90,40,60,.35));animation:cv-book-breathe 2.4s ease-in-out infinite}
+.is-reveal .cv-book{animation:cv-book-life 3s cubic-bezier(.5,0,.25,1) .1s forwards}
+.cv-book-page{position:absolute;inset:0;overflow:hidden;border-radius:2px 10px 10px 2px;background:var(--cv-cream);box-shadow:inset 0 0 0 1.5px var(--cv-mid),inset 0 0 0 5px var(--cv-cream),inset 0 0 0 6.5px var(--cv-mid)}
+.cv-book-page img{position:absolute;inset:9px;width:calc(100% - 18px);height:calc(100% - 18px);object-fit:cover}
+.cv-book-cover{position:absolute;inset:0;transform-origin:0 50%;transform-style:preserve-3d}
+.is-reveal .cv-book-cover{animation:cv-cover-open 1.5s cubic-bezier(.55,0,.2,1) .25s forwards}
+.cv-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px;text-align:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:2px 10px 10px 2px;background:linear-gradient(160deg,var(--cv-cream),var(--cv-petal));box-shadow:inset 0 0 0 1.5px var(--cv-mid),inset 0 0 0 5px var(--cv-cream),inset 0 0 0 6.5px var(--cv-mid)}
+.cv-face-back{transform:rotateY(180deg);background:linear-gradient(200deg,var(--cv-cream),var(--cv-petal))}
+.cv-spine{position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(90deg,var(--cv-lo),var(--cv-hi));border-radius:2px 0 0 2px;z-index:1}
 .cv-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(60,20,36,.28) 0,transparent 26%,transparent 42%,rgba(52,16,32,.72) 100%);opacity:0}
 .is-reveal .cv-scrim{animation:cv-fadein 1.2s ease 1.9s forwards}
 .cv-hero-text{position:relative;z-index:2;padding:0 20px clamp(104px,16svh,150px);display:flex;flex-direction:column;align-items:center;gap:10px;max-width:min(92vw,720px)}
@@ -82,23 +85,22 @@ export const COVENANT_CSS = `
 @keyframes cv-turn{to{transform:rotate(360deg)}}
 @keyframes cv-big{from{opacity:0;transform:scale(.4)}60%{opacity:1}to{opacity:1;transform:scale(1)}}
 @keyframes cv-fadein{to{opacity:1}}
-@keyframes cv-window{0%{opacity:0;transform:scale(.2)}35%{opacity:1}100%{opacity:1;transform:scale(1)}}
-@keyframes cv-breathe{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.96)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}}
-@keyframes cv-outline{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+@keyframes cv-book-breathe{0%,100%{transform:translateY(0) rotateY(-8deg)}50%{transform:translateY(-8px) rotateY(-3deg)}}
+@keyframes cv-book-life{0%{transform:rotateY(-8deg) translateX(0) scale(1);opacity:1}50%{transform:rotateY(0) translateX(50%) scale(1);opacity:1}100%{transform:rotateY(0) translateX(50%) scale(1.7);opacity:0}}
+@keyframes cv-cover-open{from{transform:rotateY(0)}to{transform:rotateY(-172deg)}}
 @keyframes cv-wheel{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(12px)}}
 @media (prefers-reduced-motion:reduce){
-.cv-petal,.cv-pulse,.cv-loadcross,.cv-scroll::after,.cv-burst .cv-ray{animation:none}
+.cv-petal,.cv-pulse,.cv-book,.cv-scroll::after,.cv-burst .cv-ray{animation:none}
 .cv-petal{display:none}
 .cv-content,.cv-burst{transition:none}
-.cv-photo-full{opacity:1}.cv-window{display:none}.cv-scrim{opacity:1}.cv-hero-text>*,.cv-scroll{opacity:1}
-.is-reveal .cv-photo-full,.is-reveal .cv-window,.is-reveal .cv-scrim,.is-reveal .cv-hero-text>*,.is-reveal .cv-scroll{animation:none}
+.cv-photo-full{opacity:1}.is-reveal .cv-photo-full,.is-reveal .cv-book,.is-reveal .cv-scrim,.is-reveal .cv-hero-text>*,.is-reveal .cv-scroll{animation:none}
 }
 `;
 
 /** The invitation-card opening (card-art.tsx). Reuses the animation classes above. */
 export const CARD_CSS = `
-.cv-cardstage{position:relative;min-height:100svh;padding:12px;background:var(--cv-band);display:flex}
-.cv-card{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:clamp(52px,9svh,84px) clamp(30px,9vw,64px);text-align:center;background:radial-gradient(90% 55% at 50% 0%,rgba(255,255,255,.9),transparent 70%),var(--cv-cream);box-shadow:0 0 0 2px var(--cv-lo),0 0 0 5px var(--cv-cream),0 0 0 6.5px var(--cv-mid);max-width:620px;margin:0 auto;width:100%}
+.cv-cardstage{position:relative;height:100svh;max-height:100svh;overflow:hidden;box-sizing:border-box;padding:12px;background:var(--cv-band);display:flex}
+.cv-card{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:clamp(52px,9svh,84px) clamp(30px,9vw,64px);text-align:center;background:radial-gradient(90% 55% at 50% 0%,rgba(255,255,255,.9),transparent 70%),var(--cv-cream);box-shadow:0 0 0 2px var(--cv-lo),0 0 0 5px var(--cv-cream),0 0 0 6.5px var(--cv-mid);max-width:620px;margin:0 auto;width:100%}
 .cv-card .cv-content{max-width:100%;gap:clamp(8px,1.6svh,16px)}
 .cv-cardcorner{position:absolute;opacity:0;animation:cv-pop .9s cubic-bezier(.2,.8,.2,1) calc(var(--at) + var(--ms) * .8) both;pointer-events:none}
 .cv-cardedge{position:absolute;left:50%;opacity:0;animation:cv-fadein 1s ease calc(var(--at) + var(--ms)) forwards;pointer-events:none}

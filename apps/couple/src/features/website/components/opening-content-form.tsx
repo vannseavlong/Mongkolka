@@ -58,10 +58,6 @@ export function OpeningContentForm({ section, onSaved }: { section: WebsiteSecti
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground">
-          Everything the opening and the cover show is typed here. Leave a field empty to use your profile (names, date, time, venue) or the
-          template&apos;s own wording (shown in grey). The guest sees the language they are reading.
-        </p>
         <fieldset className="grid gap-3 rounded-md border p-3 sm:grid-cols-2">
           <legend className="px-1 text-sm font-medium">Couple and event</legend>
           <TextRow control={form.control} name="name1Kh" label="First name (Khmer)" placeholder={profile?.partner1_name ?? ""} />

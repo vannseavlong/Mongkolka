@@ -12,8 +12,8 @@ import { useLanguage } from "../../i18n";
  */
 
 export const DISPLAY_FONT =
-  'var(--font-display), "Cormorant Garamond", var(--font-khmer), "Noto Serif Khmer", "Playfair Display", Georgia, serif';
-export const LABEL_FONT = 'var(--font-label), "Helvetica Neue", Arial, "Noto Sans Khmer", sans-serif';
+  'var(--font-display, "Cormorant Garamond"), "Cormorant Garamond", var(--font-khmer, "Noto Serif Khmer"), "Noto Serif Khmer", "Playfair Display", Georgia, serif';
+export const LABEL_FONT = 'var(--font-label, "Helvetica Neue"), "Helvetica Neue", Arial, "Noto Sans Khmer", sans-serif';
 
 const GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";

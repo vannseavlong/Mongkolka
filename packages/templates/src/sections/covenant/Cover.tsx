@@ -166,7 +166,7 @@ function CovenantCoverShell({
   };
   const nameFace = (n: string): CSSProperties =>
     hasKhmer(n)
-      ? { fontFamily: MOUL_FONT, fontSize: "calc(var(--pw) * .075)", lineHeight: 1.9 }
+      ? { fontFamily: MOUL_FONT, fontSize: "clamp(1.5rem, calc(var(--pw) * .08), 2.8rem)", lineHeight: 1.9 }
       : { fontFamily: SCRIPT, fontSize: "calc(var(--pw) * .2)", lineHeight: 1.1 };
   const vars: Vars = {
     "--cv-ground": p.ground,
@@ -196,7 +196,7 @@ function CovenantCoverShell({
       </World>
 
       <div className="cvc-glass">
-        <p className="cvc-rise m-0" style={{ "--at": "1400ms", color: p.gold.mid, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, letterSpacing: kh ? "normal" : "0.22em", textTransform: "uppercase", fontSize: "calc(var(--pw) * .032)", lineHeight: 1.9 } as Vars}>
+        <p className="cvc-rise m-0" style={{ "--at": "1400ms", color: p.gold.mid, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, letterSpacing: kh ? "normal" : "0.22em", textTransform: "uppercase", fontSize: "clamp(14px, calc(var(--pw) * .052), 24px)", lineHeight: 1.9 } as Vars}>
           {coverTagline(content, language, t("covenant.tagline"))}
         </p>
         <h1 className="cvc-rise m-0 flex flex-col items-center" style={{ filter: `drop-shadow(0 0 14px rgba(255,255,255,.95)) drop-shadow(0 2px 3px ${withAlpha(PINK.deepRose, 0.25)})`, "--at": "2000ms" } as Vars}>
@@ -214,7 +214,7 @@ function CovenantCoverShell({
           <i />
         </div>
         {date && (
-          <p className="cvc-rise m-0" style={{ "--at": "3400ms", color: p.gold.mid, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, letterSpacing: kh ? "normal" : "0.2em", textTransform: "uppercase", fontSize: "calc(var(--pw) * .042)", lineHeight: 1.8 } as Vars}>
+          <p className="cvc-rise m-0" style={{ "--at": "3400ms", color: p.gold.mid, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, letterSpacing: kh ? "normal" : "0.2em", textTransform: "uppercase", fontSize: "clamp(15px, calc(var(--pw) * .058), 26px)", lineHeight: 1.8 } as Vars}>
             {date}
           </p>
         )}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Great_Vibes, Moul, Battambang, Cinzel, Fredoka } from "next/font/google";
+import { Great_Vibes, Moul, Battambang, Cinzel, Fredoka, Noto_Serif_Khmer } from "next/font/google";
 import { Toaster } from "@mongkolka/ui/sonner";
 import "./globals.css";
 
@@ -7,6 +7,8 @@ import "./globals.css";
 const script = Great_Vibes({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "swap", preload: false });
 
 // Same Khmer e-invitation faces as apps/web so the builder preview matches the public site (preload off: downloaded only when used).
+// The Khmer fallback face the public site (apps/web) defines too, so Khmer text in the preview looks the same.
+const khmer = Noto_Serif_Khmer({ subsets: ["khmer"], variable: "--font-khmer", display: "swap", preload: false });
 const moul = Moul({ subsets: ["khmer", "latin"], weight: "400", variable: "--font-moul", display: "swap", preload: false });
 const battambang = Battambang({ subsets: ["khmer", "latin"], weight: ["300", "400", "700"], variable: "--font-battambang", display: "swap", preload: false });
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel", display: "swap", preload: false });
@@ -83,7 +85,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${script.variable} ${moul.variable} ${battambang.variable} ${cinzel.variable} ${rounded.variable}`}>
+      <body className={`${script.variable} ${khmer.variable} ${moul.variable} ${battambang.variable} ${cinzel.variable} ${rounded.variable}`}>
         {themeStyle && <style>{themeStyle}</style>}
         {children}
         <Toaster />

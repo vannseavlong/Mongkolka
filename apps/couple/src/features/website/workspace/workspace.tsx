@@ -166,7 +166,7 @@ export function Workspace({
           <Inspector
             tab={rightTab}
             onTabChange={setRightTab}
-            content={<ContentPanel section={selected} profile={profile} />}
+            content={<ContentPanel section={selected} profile={profile} saveTitle={(title) => patchSection(selected.section_id, { title }, "Could not save the title")} />}
             colors={colors}
           />
         </aside>

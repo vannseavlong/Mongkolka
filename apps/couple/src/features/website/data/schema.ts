@@ -66,6 +66,8 @@ export const websiteSectionSchema = z.object({
   display_order: z.number(),
   enabled: z.boolean(),
   content: z.unknown().nullable(),
+  /** The section's own heading per language; null/absent = the template's wording. */
+  title: z.object({ kh: z.string().nullish(), en: z.string().nullish() }).nullish(),
 });
 
 export type WebsiteSection = z.infer<typeof websiteSectionSchema>;

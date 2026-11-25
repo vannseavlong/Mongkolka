@@ -42,6 +42,10 @@
           "destination": "/_/photos.html"
         },
         {
+          "source": "/*/gallery",
+          "destination": "/_/gallery.html"
+        },
+        {
           "source": "**",
           "destination": "/_.html"
         }

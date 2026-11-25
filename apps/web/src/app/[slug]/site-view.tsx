@@ -93,6 +93,7 @@ export function SiteView({
   const query = carryQuery(guestGreeting, initialLanguage);
   const photosHref = guestSubRoute(slug, "photos");
   const wishesHref = guestSubRoute(slug, "wishes");
+  const galleryHref = `/${encodeURIComponent(slug)}/gallery${query}`;
 
   async function submitRsvp(submission: {
     name: string;
@@ -126,6 +127,7 @@ export function SiteView({
         couple={couple}
         buildContent={(sectionKey) => buildContent(sectionKey, site.profile)}
         guestGreeting={guestGreeting}
+        galleryHref={galleryHref}
         extraProps={(sectionKey) => {
           if (sectionKey === "rsvp") return { onSubmit: submitRsvp };
           if (sectionKey === "guestbook") {

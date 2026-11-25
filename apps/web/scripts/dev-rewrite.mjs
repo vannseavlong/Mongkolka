@@ -15,6 +15,6 @@ export function devRewrite(pathname) {
   if (a === "templates" && b !== "preview" && parts.length === 2 && b !== "_") return "/templates/_";
   if (TOP_LEVEL.has(a)) return pathname;
   if (parts.length === 1) return "/_";
-  if (parts.length === 2 && (b === "wishes" || b === "photos")) return `/_/${b}`;
+  if (parts.length === 2 && (b === "wishes" || b === "photos" || b === "gallery")) return `/_/${b}`;
   return pathname;
 }

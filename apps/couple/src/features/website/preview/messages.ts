@@ -26,12 +26,6 @@ export type HostMessage = { source: typeof HOST_SOURCE; state: PreviewState };
 
 export type FrameMessage =
   | { source: typeof FRAME_SOURCE; type: "ready" }
-  | { source: typeof FRAME_SOURCE; type: "select"; sectionId: string }
-  /**
-   * Height of the frame's content, so the host can fit a whole section on screen.
-   * `viewport` is the frame's own height when measured: only a measurement taken
-   * at the normal device height is trustworthy (see computeFit).
-   */
-  | { source: typeof FRAME_SOURCE; type: "height"; selectedId: string | null; value: number; viewport: number };
+  | { source: typeof FRAME_SOURCE; type: "select"; sectionId: string };
 
 export const PREVIEW_FRAME_PATH = "/preview-frame";

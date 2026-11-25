@@ -42,5 +42,7 @@ export interface PublicSiteResponse {
     display_order: number;
     enabled: boolean;
     content: unknown;
+    /** The section's own heading per language; absent = the template's wording. */
+    title?: { kh?: string | null; en?: string | null } | null;
   }[];
 }

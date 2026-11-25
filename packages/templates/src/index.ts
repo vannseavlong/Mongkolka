@@ -12,3 +12,5 @@ export { SkinProvider, useSkinOrnaments, SKIN_ORNAMENTS, ornamentsFor, skinFromC
 export type { SkinOrnaments, OrnamentProps, DividerProps, CrestProps, IconProps, IconSet, MotionFlavour } from "./sections/khmer";
 export { CovenantWishesPage, CovenantPhotosPage, subRoute as guestSubRoute } from "./sections/covenant";
 export type { WallStatus } from "./sections/covenant";
+export * from "./section-titles";
+export { GalleryAllPage, GalleryMoreLink, stepPhoto } from "./gallery-page";

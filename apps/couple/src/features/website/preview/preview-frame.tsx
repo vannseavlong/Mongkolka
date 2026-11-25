@@ -13,7 +13,7 @@ function post(message: FrameMessage) {
 /**
  * The page that runs inside the builder's preview iframe. It draws the real
  * site (SiteRenderer, same as the public page) from state sent by the builder,
- * and reports clicks and content height back.
+ * and reports clicks back.
  */
 export function PreviewFrame() {
   const [state, setState] = useState<PreviewState | null>(null);
@@ -59,30 +59,6 @@ export function PreviewFrame() {
     window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
   }, [selectedId, mode, state?.replay]);
 
-  // The opening gate is a full-screen experience, and once it is opened in Section mode the whole page
-  // shows: neither is "one section to fit", and fitting would shrink the frame to a sliver. Report one screen.
-  const showingWholePage = mode === "section" && selectedIsOpening;
-
-  // Report content height so the builder can fit a whole section without scrolling.
-  useEffect(() => {
-    const report = () =>
-      post({
-        source: FRAME_SOURCE,
-        type: "height",
-        selectedId,
-        value: showingWholePage ? window.innerHeight : document.documentElement.scrollHeight,
-        viewport: window.innerHeight,
-      });
-    const observer = new ResizeObserver(report);
-    observer.observe(document.body);
-    window.addEventListener("resize", report);
-    report();
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", report);
-    };
-  }, [selectedId, mode, opened, showingWholePage]);
-
   if (!state) return null;
   const { template, sections, themeOverride, profile } = state;
 
@@ -107,6 +83,7 @@ export function PreviewFrame() {
         guestGreeting="Guest"
         onOpened={() => setOpened(true)}
         onCoverRevealed={() => setOpened(true)}
+        galleryHref="#"
         extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : {})}
         wrapSection={(section, node) => (
           <div

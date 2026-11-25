@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +11,10 @@ import { Form } from "@mongkolka/ui/form";
 import { ApiError } from "@/lib/api";
 import type { WebsiteSection } from "../data/schema";
 import { invitationToContent, invitationToForm, type InvitationFormValues } from "../lib/khmer-content";
+import { hasInvitationContent, prefillInvitation } from "../lib/invitation-prefill";
 import { saveContent } from "../lib/section-content-save";
+import { useApiQuery } from "@/lib/use-api-query";
+import type { CoupleProfile } from "@/features/profile/data/schema";
 import { TextRow } from "./section-form-fields";
 
 const name = z.string().max(120, "Max 120 characters");
@@ -49,6 +53,17 @@ export function InvitationContentForm({ section, onSaved }: { section: WebsiteSe
     defaultValues: invitationToForm(section.content),
   });
 
+  // A new invitation starts from the profile (names, initials, wedding date and time). It only fills empty boxes, is not
+  // saved until the couple presses Save, and runs once.
+  const { data: profileData } = useApiQuery<{ profile: CoupleProfile }>("/couple/api/profile");
+  const prefilled = useRef(false);
+  const startedEmpty = !hasInvitationContent(invitationToForm(section.content));
+  useEffect(() => {
+    if (prefilled.current || !startedEmpty || !profileData?.profile) return;
+    prefilled.current = true;
+    form.reset(prefillInvitation(form.getValues(), profileData.profile));
+  }, [form, profileData, startedEmpty]);
+
   async function onSubmit(values: InvitationFormValues) {
     try {
       await saveContent(section.section_id, { ...invitationToContent(values) });
@@ -62,6 +77,9 @@ export function InvitationContentForm({ section, onSaved }: { section: WebsiteSe
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto pr-1">
+        {startedEmpty && (
+          <p className="m-0 text-sm text-muted-foreground">Names, initials and the event date are filled in from your profile. Check them, add the parents, then press Save.</p>
+        )}
         <PartyFields form={form} who="groom" title="Groom's family (shown on the left)" />
         <PartyFields form={form} who="bride" title="Bride's family (shown on the right)" />
         <TextRow control={form.control} name="monogram" label="Monogram" placeholder="C&C" hint="Initials shown on the crest, up to 8 characters." />

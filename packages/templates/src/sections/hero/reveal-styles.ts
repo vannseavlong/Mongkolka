@@ -10,13 +10,14 @@ export const REVEAL_CSS = `
 .hr[data-phase=open] .hr-scene{pointer-events:auto}
 .hr-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hr[data-phase=open] .hr-photo{animation:hr-drift 26s ease-in-out infinite alternate}
-.hr-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.22),rgba(0,0,0,.12) 40%,rgba(0,0,0,.6))}
-.hr-names{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:0 24px;text-align:center}
+.hr-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.16) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.18) 55%,rgba(0,0,0,.78) 100%)}
+.hr-names{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding:0 24px clamp(120px,24svh,220px);text-align:center}
 .hr-names>*{opacity:0}
 .hr[data-phase=opening] .hr-names>*,.hr[data-phase=open] .hr-names>*{animation:hr-rise 1.7s cubic-bezier(.22,1,.36,1) calc(var(--sd) + 900ms) both}
 .hr[data-phase=opening] .hr-names>:nth-child(2),.hr[data-phase=open] .hr-names>:nth-child(2){animation-delay:calc(var(--sd) + 1250ms)}
 .hr[data-phase=opening] .hr-names>:nth-child(3),.hr[data-phase=open] .hr-names>:nth-child(3){animation-delay:calc(var(--sd) + 1800ms)}
 .hr-line{width:64px;height:1px}
+@media (orientation:landscape){.hr-veil{background:linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,.28) 45%,rgba(0,0,0,0) 70%),linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,0) 30%,rgba(0,0,0,.4) 100%)}.hr-names{align-items:flex-start;text-align:left;padding:0 6vw clamp(80px,20svh,170px)}.hr-names h1{justify-content:flex-start}}
 .hr-prop{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(14px,3svh,28px);transition:opacity .6s}
 .hr-hint{position:relative;z-index:3;margin:0;font-size:.78rem;letter-spacing:.24em;text-transform:uppercase;color:var(--hr-ink);opacity:.75;animation:hr-pulse 2.4s ease-in-out infinite;transition:opacity .4s}
 .hr:not([data-phase=idle]) .hr-hint{animation:none;opacity:0}

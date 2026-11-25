@@ -10,7 +10,7 @@ const NOISE =
  * delayed animation from ENVELOPE_STAGES. Transform and opacity only. Reduced motion shows the final composition.
  */
 export const ENVELOPE_CSS = `
-.he2{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg2);isolation:isolate}
+.he2{position:relative;min-height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding-top:6svh;box-sizing:border-box;background:var(--bg2);isolation:isolate}
 .he2-bg{position:absolute;inset:0;z-index:-2;opacity:0;background:radial-gradient(70% 55% at 28% 10%,rgba(255,255,255,.8),transparent 62%),radial-gradient(95% 85% at 50% 58%,var(--bg1),var(--bg2))}
 .he2-grain{position:absolute;inset:0;z-index:-1;opacity:.55;mix-blend-mode:multiply;pointer-events:none;background-image:${NOISE}}
 .he2-vig{position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(120% 100% at 50% 42%,transparent 55%,rgba(96,70,46,.16))}
@@ -18,8 +18,9 @@ export const ENVELOPE_CSS = `
 .he2[data-go] .he2-bg{animation:he2-fade ${S.scene.ms}ms ease-out ${S.scene.at}ms both}
 .he2[data-go] .he2-light{animation:he2-fade 1200ms ease-out ${S.settle.at}ms both,he2-drift 28s ease-in-out ${S.settle.at + 1200}ms infinite alternate}
 
-.he2-stage{position:relative;width:var(--ew);aspect-ratio:1/.68;margin-top:calc(var(--ew) * .88);opacity:0}
+.he2-stage{position:relative;width:var(--ew);aspect-ratio:1/.68;opacity:0}
 .he2[data-go] .he2-stage{animation:he2-enter ${S.envelope.ms}ms ${EASE_OUT} ${S.envelope.at}ms both}
+.he2[data-banner][data-go] .he2-stage{animation:he2-enter ${S.envelope.ms}ms ${EASE_OUT} ${S.envelope.at}ms both,he2-push ${S.banner.ms * 0.8}ms cubic-bezier(.6,0,.9,.4) ${S.banner.at}ms forwards}
 .he2-shadow{position:absolute;left:4%;right:4%;bottom:-5%;height:11%;border-radius:50%;background:radial-gradient(closest-side,rgba(70,45,28,.5),transparent);filter:blur(9px);opacity:.55}
 .he2[data-go] .he2-shadow{animation:he2-relax ${S.settle.ms}ms ease-out ${S.settle.at}ms both}
 
@@ -31,8 +32,8 @@ export const ENVELOPE_CSS = `
 .he2-card-in::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;opacity:.5;background-image:${NOISE}}
 .he2-card-in::before{content:"";position:absolute;inset:3.2%;pointer-events:none;border:1px solid var(--foil);opacity:.55}
 .he2-card-in:hover{transform:translateY(-4px);box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 0 0 1px rgba(120,92,60,.12),0 26px 38px -14px rgba(60,40,24,.42),0 6px 10px -3px rgba(60,40,24,.25)}
-.he2-photo{width:70%;margin-top:8%;aspect-ratio:4/3;object-fit:cover;display:block;box-shadow:0 0 0 1px rgba(120,92,60,.15)}
-.he2-text{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--cw) * .028);padding:0 9% 15%;text-align:center;color:var(--ink);min-height:0}
+.he2-photo{width:72%;margin-top:8%;aspect-ratio:5/4;object-fit:cover;object-position:50% 28%;display:block;box-shadow:0 0 0 1px rgba(120,92,60,.15)}
+.he2-text{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--cw) * .022);padding:0 9% 12%;text-align:center;color:var(--ink);min-height:0}
 .he2-t{opacity:0}
 .he2[data-go] .he2-t{animation:he2-type ${S.type.ms}ms ${EASE_OUT} var(--d) both}
 .he2[data-go] .he2-rule{animation:he2-rule ${S.type.ms}ms ${EASE_OUT} var(--d) both}
@@ -57,7 +58,17 @@ export const ENVELOPE_CSS = `
 .he2-seal::after{content:"";position:absolute;inset:11%;border-radius:50%;border:1px solid rgba(255,255,255,.4)}
 .he2[data-go] .he2-seal{animation:he2-seal ${S.seal.ms}ms ease-in ${S.seal.at}ms both}
 
-.he2-cue{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;cursor:pointer;color:var(--ink);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;opacity:0;padding:6px 10px}
+.he2-banner{position:absolute;inset:0;z-index:6;opacity:0;pointer-events:none;overflow:hidden;background:#000}
+.he2-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.he2-banner-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.16) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.18) 55%,rgba(0,0,0,.78) 100%)}
+.he2-banner-names{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:12px;padding:0 24px clamp(120px,24svh,220px);text-align:center;color:#fff}
+.he2-banner-names>*{opacity:0}
+.he2[data-go] .he2-banner{animation:he2-banner ${S.banner.ms}ms ${EASE_OUT} ${S.banner.at}ms both}
+.he2[data-go] .he2-banner-names>*{animation:he2-type 900ms ${EASE_OUT} ${S.banner.at + 700}ms both}
+.he2[data-go] .he2-banner-names>:nth-child(2){animation-delay:${S.banner.at + 850}ms}
+.he2[data-go] .he2-banner-names>:nth-child(3){animation-delay:${S.banner.at + 1050}ms}
+@media (orientation:landscape){.he2-banner-veil{background:linear-gradient(90deg,rgba(0,0,0,.66),rgba(0,0,0,.28) 45%,rgba(0,0,0,0) 70%),linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,0) 30%,rgba(0,0,0,.4) 100%)}.he2-banner-names{align-items:flex-start;text-align:left;padding:0 6vw clamp(80px,20svh,170px)}}
+.he2-cue{position:absolute;z-index:7;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;cursor:pointer;color:var(--cue,var(--ink));font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;opacity:0;padding:6px 10px}
 .he2-cue i{display:block;width:1px;height:26px;background:currentColor;opacity:.6;transform-origin:50% 0;transition:transform .3s ${EASE_OUT}}
 .he2-cue:hover i,.he2-cue:focus-visible i{transform:scaleY(1.3)}
 .he2-cue:focus-visible{outline:1px solid var(--foil);outline-offset:2px}
@@ -65,6 +76,8 @@ export const ENVELOPE_CSS = `
 
 @keyframes he2-fade{from{opacity:0}to{opacity:1}}
 @keyframes he2-fadeout{to{opacity:0}}
+@keyframes he2-push{to{opacity:0;transform:scale(1.5)}}
+@keyframes he2-banner{from{opacity:0;transform:scale(1.14)}to{opacity:1;transform:none}}
 @keyframes he2-enter{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes he2-flap{to{transform:rotateX(-180deg)}}
 @keyframes he2-z{0%{z-index:4}50%{z-index:0}100%{z-index:0}}

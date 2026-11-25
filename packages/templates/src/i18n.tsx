@@ -33,6 +33,12 @@ const baseDictionary = {
     "kbach.open": "Open the invitation",
     "section.story.heading": "Our Story",
     "section.gallery.heading": "Gallery",
+    "section.gallery.viewAll": "View all photos",
+    "gallery.page.back": "Back to the invitation",
+    "gallery.page.empty": "No photos yet.",
+    "gallery.page.close": "Close",
+    "gallery.page.prev": "Previous photo",
+    "gallery.page.next": "Next photo",
     "section.details.heading": "Event Details",
     "section.details.ceremony": "Ceremony",
     "section.details.reception": "Reception",
@@ -99,8 +105,14 @@ const baseDictionary = {
     "opening.dear": "ជូនចំពោះ",
     "kbach.honour": "សូមគោរពអញ្ជើញចូលរួមពិធីមង្គលការ",
     "kbach.open": "បើកការអញ្ជើញ",
-    "section.story.heading": "រឿងរបស់យើង",
-    "section.gallery.heading": "វិចិត្រសាល",
+    "section.story.heading": "រឿងរ៉ាវពួកយើង",
+    "section.gallery.heading": "កម្រងរូបភាព",
+    "section.gallery.viewAll": "មើលរូបភាពទាំងអស់",
+    "gallery.page.back": "ត្រឡប់ទៅសំបុត្រអញ្ជើញ",
+    "gallery.page.empty": "មិនទាន់មានរូបភាពទេ។",
+    "gallery.page.close": "បិទ",
+    "gallery.page.prev": "រូបភាពមុន",
+    "gallery.page.next": "រូបភាពបន្ទាប់",
     "section.details.heading": "ព័ត៌មានលម្អិត",
     "section.details.ceremony": "ពិធីមង្គលការ",
     "section.details.reception": "ពិធីជប់លៀង",
@@ -209,10 +221,29 @@ export function LanguageProvider({
   );
 }
 
+/** Wording the couple replaced (section titles), by dictionary key and language. Empty or missing = the built-in text. */
+export type TextOverrides = Record<string, { en?: string; kh?: string }>;
+
+const TextOverridesContext = createContext<TextOverrides | undefined>(undefined);
+
+export function TextOverridesProvider({ overrides, children }: { overrides: TextOverrides; children: ReactNode }) {
+  return <TextOverridesContext.Provider value={overrides}>{children}</TextOverridesContext.Provider>;
+}
+
+/** The built-in text for a key in a language (ignoring overrides), or undefined when there is none. */
+export function defaultText(key: string, language: Language): string | undefined {
+  return (dictionary[language] as Record<string, string | undefined>)[key];
+}
+
 export function useLanguage(): LanguageContextValue {
   const ctx = useContext(LanguageContext);
+  const overrides = useContext(TextOverridesContext);
   if (!ctx) throw new Error("useLanguage must be used within a LanguageProvider");
-  return ctx;
+  if (!overrides) return ctx;
+  return {
+    ...ctx,
+    t: (key) => overrides[key]?.[ctx.language]?.trim() || ctx.t(key),
+  };
 }
 
 export function LanguageToggle({ theme }: { theme?: { text_color?: string } }) {

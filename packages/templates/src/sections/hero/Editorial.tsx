@@ -18,7 +18,8 @@ export interface HeroEditorialProps {
 export function HeroEditorial({ couple, theme, content }: HeroEditorialProps) {
   const { first, second, date, kh } = useHeroText(couple);
   const reduce = useReducedMotion() ?? false;
-  const photo = content?.coverPhotoUrl;
+  // The arch is a tall frame, so it takes the portrait banner on every screen (the landscape one only if that is all there is).
+  const photo = content?.portraitUrl ?? content?.coverPhotoUrl;
   const face = (n: string) => (hasKhmer(n) ? KHMER_DISPLAY_FONT : SCRIPT_FONT);
   const size = (n: string) => (hasKhmer(n) ? "clamp(1.6rem,6vw,3rem)" : "clamp(3rem,11vw,6.5rem)");
 

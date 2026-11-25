@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { LIMITS, validateSectionContent } from "../src/utils/section-content.js";
+import { SECTION_TITLE_MAX, validateSectionTitle } from "../src/utils/section-title.js";
 import { DEFAULT_SITE_LANGUAGE, resolveSiteLanguage, validateSiteLanguage } from "../src/utils/language.js";
 
 describe("opening content validation", () => {
@@ -73,5 +74,22 @@ describe("site language", () => {
     for (const stored of [undefined, null, "", "fr", 1]) assert.equal(resolveSiteLanguage(stored), "kh");
     assert.equal(resolveSiteLanguage("en"), "en");
     assert.equal(resolveSiteLanguage("kh"), "kh");
+  });
+});
+
+describe("section titles", () => {
+  it("keeps Khmer and English headings trimmed and drops empty ones", () => {
+    assert.deepEqual(validateSectionTitle({ kh: "  រឿងរ៉ាវពួកយើង ", en: "Our story" }), { kh: "រឿងរ៉ាវពួកយើង", en: "Our story" });
+    assert.deepEqual(validateSectionTitle({ kh: "", en: "Gallery" }), { en: "Gallery" });
+  });
+  it("null or nothing left means the template's wording", () => {
+    assert.equal(validateSectionTitle(null), null);
+    assert.equal(validateSectionTitle({ kh: "  ", en: "" }), null);
+    assert.equal(validateSectionTitle({}), null);
+  });
+  it("rejects non-objects, non-strings and over-long headings", () => {
+    for (const bad of ["x", 5, [], undefined]) assert.throws(() => validateSectionTitle(bad), /must be an object/);
+    assert.throws(() => validateSectionTitle({ kh: 5 }), /must be a string/);
+    assert.throws(() => validateSectionTitle({ en: "x".repeat(SECTION_TITLE_MAX + 1) }), /at most/);
   });
 });

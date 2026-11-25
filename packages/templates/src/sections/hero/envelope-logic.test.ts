@@ -4,7 +4,7 @@ import { ENVELOPE_STAGES as S, sequenceEnd, TYPE_ORDER, typeStart } from "./enve
 
 describe("envelope storyboard", () => {
   it("runs the stages in order, each starting once the previous one has begun", () => {
-    const order = [S.scene, S.envelope, S.flap, S.card, S.type, S.settle, S.cue];
+    const order = [S.scene, S.envelope, S.flap, S.card, S.type, S.settle, S.banner, S.cue];
     for (let i = 1; i < order.length; i++) assert.ok(order[i]!.at > order[i - 1]!.at, `stage ${i}`);
   });
   it("the envelope enters while the scene is still fading, and the flap opens after the envelope has arrived", () => {
@@ -25,8 +25,24 @@ describe("envelope storyboard", () => {
     for (const s of [S.flap, S.card]) assert.ok(s.ms >= 700 && s.ms <= 1200);
     assert.ok(S.seal.ms >= 150 && S.seal.ms <= 300);
   });
-  it("finishes within about four and a half seconds", () => {
-    assert.ok(sequenceEnd() <= 4700);
-    assert.ok(sequenceEnd() >= 4000);
+  it("the banner opens after the text has been read, and the cue comes after the banner has arrived", () => {
+    assert.ok(S.banner.at >= S.type.at + S.type.ms + 300);
+    assert.ok(S.cue.at >= S.banner.at + S.banner.ms - 600);
+  });
+  it("finishes within about six and a half seconds", () => {
+    assert.ok(sequenceEnd() <= 6500);
+    assert.ok(sequenceEnd() >= 5500);
+  });
+});
+
+import { ENVELOPE_CSS } from "./envelope-styles";
+
+describe("envelope layout css", () => {
+  it("keeps every overlay out of the flex row, so the envelope stays centred", () => {
+    // A static (in-flow) cue or banner would become a flex item beside the envelope and push it off-centre.
+    for (const selector of [".he2-bg", ".he2-light", ".he2-grain", ".he2-vig", ".he2-banner", ".he2-cue"]) {
+      const rule = new RegExp(`\\${selector}\\{[^}]*position:absolute`).test(ENVELOPE_CSS);
+      assert.ok(rule, `${selector} must be position:absolute`);
+    }
   });
 });

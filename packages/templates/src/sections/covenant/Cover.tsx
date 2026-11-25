@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, type CSSProperties, type ReactNode } from "react";
+import { styleKey } from "../../style-key";
 import type { CoverProps } from "../../types";
 import { useLanguage } from "../../i18n";
 import { CINZEL_FONT, KHMER_BODY_FONT, MOUL_FONT } from "../../chrome/fonts";
@@ -185,7 +186,7 @@ function CovenantCoverShell({
       data-mk-cover
       data-mk-lang={language}
     >
-      <style href="mk-covenant-cover-css" precedence="mk-covenant">
+      <style href={styleKey("mk-covenant-cover-css", COVENANT_COVER_CSS)} precedence="mk-covenant">
         {COVENANT_COVER_CSS}
       </style>
       <World p={p} density={density}>

@@ -9,6 +9,7 @@ import {
   parseDefaultSections,
 } from "../../utils/section-keys.js";
 import { validateSectionContent } from "../../utils/section-content.js";
+import { validateSectionTitle } from "../../utils/section-title.js";
 import { resolveSiteLanguage, type SiteLanguage } from "../../utils/language.js";
 import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
 
@@ -60,7 +61,7 @@ function isSet(value: unknown): boolean {
 }
 
 /** Columns a couple may change through PATCH /sections/:id. */
-const PATCHABLE_SECTION_FIELDS = ["component_id", "color_override", "display_order", "enabled", "content"] as const;
+const PATCHABLE_SECTION_FIELDS = ["component_id", "color_override", "display_order", "enabled", "content", "title"] as const;
 
 export const CoupleWebsiteService = {
   async getCatalog() {
@@ -344,6 +345,13 @@ export const CoupleWebsiteService = {
     let input: Record<string, unknown> = {};
     for (const key of PATCHABLE_SECTION_FIELDS) {
       if (rawInput[key] !== undefined) input[key] = rawInput[key];
+    }
+    if (input.title !== undefined) {
+      try {
+        input = { ...input, title: validateSectionTitle(input.title) };
+      } catch (err) {
+        throw new ContentValidationError((err as Error).message);
+      }
     }
     if (input.content !== undefined && input.content !== null) {
       // Khmer sections (invitation/agenda/letters/registry) are validated server-side; throws a

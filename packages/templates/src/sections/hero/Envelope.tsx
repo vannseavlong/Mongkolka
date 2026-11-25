@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useInView, useReducedMotion } from "motion/react";
+import { styleKey } from "../../style-key";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { CINZEL_FONT, KHMER_BODY_FONT } from "../../chrome/fonts";
 import { goldStops, mixHex } from "../../chrome/gold";
@@ -25,8 +26,8 @@ const TEXT = {
 /**
  * Envelope: a calm cinematic sequence in one art-directed composition. The scene settles, an ivory envelope
  * arrives, its flap opens, and the invitation card (your hero banner on top, then the names and date) rises out
- * and comes forward. It plays once when the hero is on screen and ends in a stable layout; reduced motion shows
- * that final layout at once. The stages and timings live in envelope-logic.ts.
+ * and comes forward. It is read, then pushes toward the viewer and opens into the full banner photo with the names
+ * (the final hero). It plays once when the hero is on screen; reduced motion shows the final hero at once. The stages and timings live in envelope-logic.ts.
  */
 export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
   const { first, second, date, kh } = useHeroText(couple);
@@ -47,7 +48,7 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
   const track = (em: string) => (kh ? "normal" : em);
 
   const vars: Vars = {
-    "--ew": "min(78vw, 46svh, 520px)",
+    "--ew": "min(80vw, 40svh, 520px)",
     "--cw": "calc(var(--ew) * .72)",
     "--bg1": mixHex(theme.bg_color, "#fffaf2", 45),
     "--bg2": mixHex(theme.bg_color, "#e6d8c8", 55),
@@ -66,14 +67,15 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
     "--foil-lo": g.lo,
     "--foil-ink": mixHex(g.lo, "#000000", 55),
     "--ink": theme.text_color,
+    "--cue": photo ? "#ffffff" : theme.text_color,
     "--seal-font": CINZEL_FONT,
   };
 
   const t = (i: number): Vars => ({ "--d": typeDelay(i) });
 
   return (
-    <section ref={ref} className="he2" data-go={go ? "" : undefined} style={vars} aria-label={text.open}>
-      <style href="mk-hero-envelope-css" precedence="mk-hero">
+    <section ref={ref} className="he2" data-go={go ? "" : undefined} data-banner={photo ? "" : undefined} style={vars} aria-label={text.open}>
+      <style href={styleKey("mk-hero-envelope-css", ENVELOPE_CSS)} precedence="mk-hero">
         {ENVELOPE_CSS}
       </style>
       <div aria-hidden className="he2-bg" />
@@ -96,11 +98,11 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
                 {text.label}
               </p>
               <h1 className="he2-t m-0 flex flex-col items-center leading-none" style={t(1)}>
-                <span style={{ fontFamily: face(first), fontSize: hasKhmer(first) ? "calc(var(--cw) * .062)" : "calc(var(--cw) * .135)", lineHeight: hasKhmer(first) ? 1.6 : 1.08 }}>{first}</span>
+                <span style={{ fontFamily: face(first), fontSize: hasKhmer(first) ? "calc(var(--cw) * .062)" : "calc(var(--cw) * .118)", lineHeight: hasKhmer(first) ? 1.6 : 1.08 }}>{first}</span>
                 {second && (
                   <>
-                    <span style={{ fontFamily: SCRIPT_FONT, fontSize: "calc(var(--cw) * .07)", color: g.mid, lineHeight: 1.1 }}>&amp;</span>
-                    <span style={{ fontFamily: face(second), fontSize: hasKhmer(second) ? "calc(var(--cw) * .062)" : "calc(var(--cw) * .135)", lineHeight: hasKhmer(second) ? 1.6 : 1.08 }}>{second}</span>
+                    <span style={{ fontFamily: SCRIPT_FONT, fontSize: "calc(var(--cw) * .06)", color: g.mid, lineHeight: 1.1 }}>&amp;</span>
+                    <span style={{ fontFamily: face(second), fontSize: hasKhmer(second) ? "calc(var(--cw) * .062)" : "calc(var(--cw) * .118)", lineHeight: hasKhmer(second) ? 1.6 : 1.08 }}>{second}</span>
                   </>
                 )}
               </h1>
@@ -135,6 +137,31 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
           {Array.from(first)[0]?.toLocaleUpperCase()}
         </div>
       </div>
+
+      {photo && (
+        <div aria-hidden className="he2-banner">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo} alt="" />
+          <div className="he2-banner-veil" />
+          <div className="he2-banner-names">
+            <span className="h-px w-14" style={{ backgroundColor: theme.accent_color }} />
+            <div className="flex flex-wrap items-baseline justify-center gap-x-3 leading-none landscape:justify-start" style={{ textShadow: "0 2px 22px rgba(0,0,0,.55)" }}>
+              <span style={{ fontFamily: face(first), fontSize: hasKhmer(first) ? "clamp(1.8rem,7vw,3.5rem)" : "clamp(3.2rem,13vw,6.6rem)", lineHeight: hasKhmer(first) ? 1.6 : 1.05 }}>{first}</span>
+              {second && (
+                <>
+                  <span style={{ fontFamily: SCRIPT_FONT, fontSize: "clamp(1.8rem,6.4vw,3.2rem)", color: g.hi }}>&amp;</span>
+                  <span style={{ fontFamily: face(second), fontSize: hasKhmer(second) ? "clamp(1.8rem,7vw,3.5rem)" : "clamp(3.2rem,13vw,6.6rem)", lineHeight: hasKhmer(second) ? 1.6 : 1.05 }}>{second}</span>
+                </>
+              )}
+            </div>
+            {date && (
+              <p className="m-0 uppercase" style={{ fontFamily: small, letterSpacing: track("0.3em"), fontSize: "clamp(.85rem,2.9vw,1.2rem)" }}>
+                {date}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <button
         type="button"

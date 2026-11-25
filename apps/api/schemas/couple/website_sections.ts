@@ -19,5 +19,7 @@ export default defineTable({
     display_order: number().default(0),
     enabled: boolean().default(true),
     content: json(),
+    // The section's own heading, per language: { kh?: string, en?: string }. Empty = the template's wording.
+    title: json(),
   },
 });

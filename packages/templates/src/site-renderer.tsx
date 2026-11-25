@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState, type ReactNode } from "react";
+import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { resolveComponent } from "./registry";
 import { GuestProvider } from "./guest-context";
 import { ChromeSection } from "./chrome/ChromeSection";
@@ -9,7 +9,10 @@ import type { ChromeConfig } from "./chrome/config";
 import { useSiteChrome } from "./chrome/use-site-chrome";
 import { SkinProvider } from "./sections/khmer/skin-context";
 import { skinFromComponents } from "./sections/khmer/skin-resolve";
+import { GalleryMoreLink } from "./gallery-page";
 import { heroContentFor } from "./hero-photo";
+import { TextOverridesProvider } from "./i18n";
+import { titleOverrides, type SectionTitle } from "./section-titles";
 import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { resolveTheme } from "./theme";
@@ -22,6 +25,8 @@ export interface SiteRendererSection {
   color_override: PartialTheme | null;
   display_order: number;
   enabled: boolean;
+  /** The section's own heading per language; overrides the template's wording. */
+  title?: SectionTitle | null;
   /**
    * The section's own stored `website_sections.content` JSON (gallery's
    * `photos`, registry's `links`, timeline's `chapters`, rsvp's
@@ -75,6 +80,8 @@ export interface SiteRendererProps {
   onCoverRevealed?: () => void;
   /** Thumbnail mode: the cover keeps playing and never reveals (builder style picker). */
   coverPreview?: boolean;
+  /** Where "View all photos" goes (the gallery sub-page). Omit for no button. */
+  galleryHref?: string;
 }
 
 /**
@@ -95,8 +102,13 @@ export function SiteRenderer(props: SiteRendererProps) {
   const openingContent = sections.find((s) => s.section_key === "opening")?.content as OpeningContent | undefined;
   const introCouple = applyOpeningOverrides(couple, undefined, openingContent).couple;
 
+  // The couple's own section titles replace the template's headings wherever those are drawn.
+  const titleKey = JSON.stringify(sections.map((s) => [s.section_key, s.enabled, s.title]));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by the titles' content so the provider value stays stable
+  const overrides = useMemo(() => titleOverrides(sections), [titleKey]);
+
   return (
-    <>
+    <TextOverridesProvider overrides={overrides}>
       {!holding && <SiteRendererBody {...props} />}
       {cover && Cover && coverPhase !== "done" && (
         <Cover
@@ -111,7 +123,7 @@ export function SiteRenderer(props: SiteRendererProps) {
           onDone={() => setCoverPhase("done")}
         />
       )}
-    </>
+    </TextOverridesProvider>
   );
 }
 
@@ -126,6 +138,7 @@ function SiteRendererBody({
   wrapSection,
   musicSrc,
   onOpened,
+  galleryHref,
 }: SiteRendererProps) {
   const [openingDismissed, setOpeningDismissed] = useState(false);
   const orientation = useOrientation();
@@ -185,18 +198,20 @@ function SiteRendererBody({
           template.default_components[section.section_key],
         );
         if (!Component) return null;
-        const node = (
-          <Component
-            key={section.section_id}
-            couple={couple}
-            theme={theme}
-            content={
-              section.section_key === "hero"
-                ? heroContentFor(buildContent("hero"), section.content, orientation)
-                : (section.content ?? buildContent(section.section_key))
-            }
-            {...extraProps?.(section.section_key)}
-          />
+        const content =
+          section.section_key === "hero"
+            ? heroContentFor(buildContent("hero"), section.content, orientation)
+            : (section.content ?? buildContent(section.section_key));
+        const piece = <Component key={section.section_id} couple={couple} theme={theme} content={content} {...extraProps?.(section.section_key)} />;
+        // A gallery with photos gets a "View all photos" button to the sub-page, whichever style draws the gallery.
+        const hasMorePhotos = section.section_key === "gallery" && !!galleryHref && ((content as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
+        const node = hasMorePhotos ? (
+          <Fragment key={section.section_id}>
+            {piece}
+            <GalleryMoreLink href={galleryHref!} theme={theme} />
+          </Fragment>
+        ) : (
+          piece
         );
         if (chrome.resolved) {
           return (

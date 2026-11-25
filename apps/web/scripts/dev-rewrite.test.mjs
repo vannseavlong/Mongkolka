@@ -6,6 +6,7 @@ test("couple sites and their sub-pages go to the _ shell", () => {
   assert.equal(devRewrite("/demo"), "/_");
   assert.equal(devRewrite("/demo/wishes"), "/_/wishes");
   assert.equal(devRewrite("/demo/photos"), "/_/photos");
+  assert.equal(devRewrite("/demo/gallery"), "/_/gallery");
   assert.equal(devRewrite("/_"), "/_");
 });
 test("template and marketplace pages", () => {

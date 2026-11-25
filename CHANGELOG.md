@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Cross] feat: section titles, gallery sub-page, envelope hero banner, invitation prefill, Khmer wording
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-hero-banners-and-pickers.md (plan: Tasks/_plans/Web-hero-redesign.md)
+- Branch/PR: main (no PR)
+- What changed: [Web] per-section Khmer and English titles (Content panel; replace the template heading in every template); new `/<slug>/gallery` sub-page with all photos and a viewer, and a "View all photos" button under every gallery; Envelope Reveal hero ends on the full banner and is centred; hero names larger and higher; Invitation form pre-fills names, initials and event date from the profile; one language switch in the preview bar that also saves the site language; the builder frame is the same size in Section and Full page; click-to-upload hero banners; Khmer wording "រឿងរ៉ាវពួកយើង" and "កម្រងរូបភាព"; injected style tags are keyed by content so open pages pick up CSS edits. [API] `website_sections.title` column and validation, seed fix (component_id first so `lsdb seed --upsert` matches on it) and a test that guards it
+- Needs: `lsdb sync --dry-run`, `lsdb sync`, `lsdb sync --all-users` (adds `title` and `default_language`), deploy API, `lsdb seed seeds/section-components.ts --upsert` (rerun until 0 failed; Google read quota) and site-templates, activate rows in admin; deploy web with the new `/*/gallery` Firebase rewrite and restart the web dev server for the dev route; the seed bug overwrote the `opening_curtain` row earlier (re-created by the fixed seed); Khmer wording needs native review; tablet, reduced motion and code review not run
+
 ## 2026-11-26 · [Cross] feat: opening content, site language, hero banners and reveal heroes, shadcn pickers
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-hero-banners-and-pickers.md (plan: Tasks/_plans/Web-hero-redesign.md)

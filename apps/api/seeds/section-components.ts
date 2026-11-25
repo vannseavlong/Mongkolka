@@ -931,5 +931,7 @@ const components = [
 
 export default {
   // Rows may carry their own status (the Grace rows are inactive until launch); the rest default to active.
-  section_components: components.map((c) => ({ status: "active", ...c })),
+  // component_id MUST stay the first key: `lsdb seed --upsert` matches an existing row on the first key of each
+  // record, so with `status` first it rewrote the first active row over and over instead of upserting by id.
+  section_components: components.map((c) => ({ component_id: c.component_id, status: "active", ...c })),
 };

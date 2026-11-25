@@ -3,10 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { FileText, LayoutTemplate, Monitor, Rows3, RotateCcw, Smartphone } from "lucide-react";
 import type { PartialTheme, SiteRendererTemplate } from "@mongkolka/templates";
+import { toast } from "sonner";
 import { Button } from "@mongkolka/ui/button";
+import { ApiError } from "@/lib/api";
 import { cn } from "@mongkolka/ui/utils";
 import type { SiteLanguage, WebsiteSection } from "../data/schema";
 import type { PreviewProfile } from "../lib/build-content";
+import { saveSiteLanguage } from "../lib/language-api";
 import { computeFit, DEVICE_SIZE, type Device } from "../preview/fit";
 import {
   FRAME_SOURCE,
@@ -52,8 +55,8 @@ function Segment<T extends string>({
 /**
  * Live canvas: the real site runs in an iframe laid out at a true device size
  * (so vh, breakpoints and the opening animation behave like the public site)
- * and is scaled to fit the stage. Section mode grows the frame to the section's
- * height so it is visible whole, with no scrolling.
+ * and is scaled to fit the stage. The frame is the same size in Section and Full
+ * page mode; a tall section scrolls inside it.
  */
 export function SiteCanvas({
   template,
@@ -83,20 +86,27 @@ export function SiteCanvas({
   // null = follow the site's default language; the couple can flip it to check the other one.
   const [pickedLanguage, setPickedLanguage] = useState<SiteLanguage | null>(null);
   const language = pickedLanguage ?? defaultLanguage;
+
+  // One language switch for the preview and the site: it shows the language now and saves it as the language the public
+  // site opens in (guests can still switch). If saving fails the preview goes back to what is saved.
+  async function chooseLanguage(next: SiteLanguage) {
+    if (next === language) return;
+    setPickedLanguage(next);
+    try {
+      await saveSiteLanguage(next);
+      toast.success(next === "kh" ? "Your site now opens in Khmer" : "Your site now opens in English");
+    } catch (err) {
+      setPickedLanguage(null);
+      toast.error(err instanceof ApiError ? err.message : "Couldn't change the language");
+    }
+  }
   const [stage, setStage] = useState({ width: 0, height: 0 });
-  const [content, setContent] = useState<{ selectedId: string | null; device: Device; value: number }>({
-    selectedId: null,
-    device: "desktop",
-    value: 0,
-  });
   const [ready, setReady] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const onSelectRef = useRef(onSelect);
-  const deviceRef = useRef(device);
   useEffect(() => {
     onSelectRef.current = onSelect;
-    deviceRef.current = device;
   });
 
   const selected = sections.find((s) => s.section_id === selectedId) ?? null;
@@ -114,18 +124,13 @@ export function SiteCanvas({
     return () => observer.disconnect();
   }, []);
 
-  // Messages from the frame: ready, a click on a section, content height.
+  // Messages from the frame: ready, and a click on a section.
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       const data = e.data as FrameMessage | undefined;
       if (e.origin !== window.location.origin || e.source !== frameRef.current?.contentWindow || data?.source !== FRAME_SOURCE) return;
       if (data.type === "ready") setReady(true);
       else if (data.type === "select") onSelectRef.current(data.sectionId);
-      // Only a measurement taken at the normal device height counts. Once the frame has been
-      // grown, svh-sized sections stretch with it and would read taller every time.
-      else if (data.viewport === DEVICE_SIZE[deviceRef.current].height) {
-        setContent({ selectedId: data.selectedId, device: deviceRef.current, value: data.value });
-      }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
@@ -139,9 +144,7 @@ export function SiteCanvas({
     frameRef.current?.contentWindow?.postMessage(message, window.location.origin);
   }, [ready, template, sections, themeOverride, profile, selectedId, mode, replay, language]);
 
-  // A height report only counts for the section and device it was measured on.
-  const contentHeight = content.selectedId === selectedId && content.device === device ? content.value : 0;
-  const fit = computeFit(device, mode, contentHeight, stage);
+  const fit = computeFit(device, stage);
   const base = DEVICE_SIZE[device];
 
   return (
@@ -161,9 +164,9 @@ export function SiteCanvas({
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
           <Segment
-            label="Preview language"
+            label="Site language"
             value={language}
-            onChange={setPickedLanguage}
+            onChange={chooseLanguage}
             items={[
               ["kh", null, "ខ្មែរ"],
               ["en", null, "EN"],

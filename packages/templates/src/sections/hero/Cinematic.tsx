@@ -28,7 +28,7 @@ export function HeroCinematic({ couple, theme, content }: HeroCinematicProps) {
   const face = (n: string) => (hasKhmer(n) ? KHMER_DISPLAY_FONT : SCRIPT_FONT);
 
   return (
-    <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden text-center" style={{ backgroundColor: theme.bg_color }}>
+    <section className="relative flex min-h-[100svh] items-end justify-center overflow-hidden text-center landscape:justify-start landscape:text-left" style={{ backgroundColor: theme.bg_color }}>
       {photo ? (
         <motion.img
           src={photo}
@@ -41,23 +41,24 @@ export function HeroCinematic({ couple, theme, content }: HeroCinematicProps) {
       ) : (
         <div className="absolute inset-0" style={{ background: `radial-gradient(80% 70% at 50% 40%, ${theme.bg_color}, ${theme.accent_color}33)` }} />
       )}
-      {photo && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.28) 0%, rgba(0,0,0,.18) 40%, rgba(0,0,0,.6) 100%)" }} />}
+      {photo && <div aria-hidden className="absolute inset-0 hidden landscape:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.66), rgba(0,0,0,.28) 45%, rgba(0,0,0,0) 70%)" }} />}
+      {photo && <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.78) 100%)" }} />}
 
-      <div className="relative z-10 flex flex-col items-center gap-5 px-6" style={{ color: photo ? "#ffffff" : theme.text_color }}>
+      <div className="relative z-10 flex flex-col items-center gap-4 px-6 pb-[clamp(120px,24svh,220px)] landscape:items-start landscape:pb-[clamp(80px,20svh,170px)] landscape:pl-[6vw]" style={{ color: photo ? "#ffffff" : theme.text_color }}>
         <motion.span {...rise(0.2, reduce)} className="h-px w-16" style={{ backgroundColor: theme.accent_color }} />
-        <motion.h1 {...rise(0.5, reduce)} className="m-0 flex flex-col items-center leading-none" style={{ textShadow: photo ? "0 2px 24px rgba(0,0,0,.45)" : undefined }}>
-          <span style={{ fontFamily: face(first), fontSize: hasKhmer(first) ? "clamp(1.8rem,8vw,3.6rem)" : "clamp(3.4rem,15vw,7.5rem)", lineHeight: hasKhmer(first) ? 1.8 : 1.05 }}>{first}</span>
+        <motion.h1 {...rise(0.5, reduce)} className="m-0 flex flex-wrap items-baseline justify-center gap-x-3 leading-none landscape:justify-start" style={{ textShadow: photo ? "0 2px 22px rgba(0,0,0,.55)" : undefined }}>
+          <span style={{ fontFamily: face(first), fontSize: hasKhmer(first) ? "clamp(1.8rem,7vw,3.5rem)" : "clamp(3.2rem,13vw,6.6rem)", lineHeight: hasKhmer(first) ? 1.8 : 1.05 }}>{first}</span>
           {second && (
             <>
-              <span className="my-1" style={{ fontFamily: SCRIPT_FONT, fontSize: "clamp(1.6rem,6vw,3rem)", color: theme.accent_color }}>
+              <span style={{ fontFamily: SCRIPT_FONT, fontSize: "clamp(1.8rem,6.4vw,3.2rem)", color: theme.accent_color }}>
                 &amp;
               </span>
-              <span style={{ fontFamily: face(second), fontSize: hasKhmer(second) ? "clamp(1.8rem,8vw,3.6rem)" : "clamp(3.4rem,15vw,7.5rem)", lineHeight: hasKhmer(second) ? 1.8 : 1.05 }}>{second}</span>
+              <span style={{ fontFamily: face(second), fontSize: hasKhmer(second) ? "clamp(1.8rem,7vw,3.5rem)" : "clamp(3.2rem,13vw,6.6rem)", lineHeight: hasKhmer(second) ? 1.8 : 1.05 }}>{second}</span>
             </>
           )}
         </motion.h1>
         {date && (
-          <motion.p {...rise(1.1, reduce)} className="m-0 uppercase" style={{ letterSpacing: kh ? "0.05em" : "0.32em", fontSize: "clamp(.8rem,2.6vw,1.1rem)" }}>
+          <motion.p {...rise(1.1, reduce)} className="m-0 uppercase" style={{ letterSpacing: kh ? "0.05em" : "0.32em", fontSize: "clamp(.9rem,3vw,1.25rem)" }}>
             {date}
           </motion.p>
         )}

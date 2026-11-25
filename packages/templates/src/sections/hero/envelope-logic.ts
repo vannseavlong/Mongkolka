@@ -20,8 +20,10 @@ export const ENVELOPE_STAGES = {
   type: { at: 2500, ms: 700 },
   /** 06 Final composition: shadows relax. */
   settle: { at: 3500, ms: 1000 },
-  /** 07 The scroll cue appears last. */
-  cue: { at: 4000, ms: 600 },
+  /** 07 The card pushes toward the viewer and opens into the full banner photo with the names. */
+  banner: { at: 4400, ms: 1400 },
+  /** The scroll cue appears last, over the banner. */
+  cue: { at: 5400, ms: 600 },
 } as const satisfies Record<string, Stage>;
 
 /** Reading order of the card text; names carry the most weight. */

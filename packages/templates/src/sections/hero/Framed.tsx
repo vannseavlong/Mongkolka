@@ -22,10 +22,10 @@ export function HeroFramed({ couple, theme, content }: HeroFramedProps) {
   const face = (n: string) => (hasKhmer(n) ? KHMER_DISPLAY_FONT : SCRIPT_FONT);
 
   return (
-    <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-5 py-10" style={{ backgroundColor: theme.bg_color, color: theme.text_color }}>
+    <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-7 py-12 sm:px-10" style={{ backgroundColor: theme.bg_color, color: theme.text_color }}>
       <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(70% 60% at 50% 45%, #ffffff66, transparent 70%)` }} />
 
-      <div className="relative w-full max-w-xl">
+      <div className="relative w-full max-w-[min(34rem,calc((100svh-6rem)*0.78))] landscape:max-w-[min(56rem,calc((100svh-6rem)*1.35))]">
         {[0, 1].map((n) => (
           <motion.div
             key={n}
@@ -39,17 +39,18 @@ export function HeroFramed({ couple, theme, content }: HeroFramedProps) {
         ))}
 
         <motion.div
-          className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[5/4]"
+          className="relative aspect-[2/3] w-full overflow-hidden landscape:aspect-[16/10]"
           style={{ backgroundColor: `${theme.accent_color}22` }}
           initial={reduce ? false : { opacity: 0, scale: 1.06 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
           {photo && <img src={photo} alt="" className="size-full object-cover" />}
-          <div aria-hidden className="absolute inset-x-0 bottom-0 h-3/5" style={{ background: "linear-gradient(180deg, transparent, rgba(0,0,0,.55))" }} />
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-4 pb-6 text-center text-white">
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-3/5" style={{ background: "linear-gradient(180deg, transparent, rgba(0,0,0,.7))" }} />
+          <div aria-hidden className="absolute inset-0 hidden landscape:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,0) 60%)" }} />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-4 pb-6 text-center text-white landscape:items-start landscape:pb-8 landscape:pl-10 landscape:text-left">
             <motion.h1
-              className="m-0 flex flex-wrap items-center justify-center gap-x-3 leading-none"
+              className="m-0 flex flex-wrap items-center justify-center gap-x-3 leading-none landscape:justify-start"
               style={{ textShadow: "0 2px 18px rgba(0,0,0,.5)" }}
               initial={reduce ? false : { opacity: 0, y: 20, filter: "blur(6px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}

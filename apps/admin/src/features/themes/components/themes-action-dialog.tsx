@@ -140,7 +140,7 @@ function buildTokens(values: ThemeFormValues): ThemeTokens {
     accent: t.accent,
     accentForeground: t.accentForeground,
     border: t.border,
-    input: t.border.replace(/[\d.]+\)$/, "0.3)"),
+    input: (t.border ?? "").replace(/[\d.]+\)$/, "0.3)"),
     inputBackground: t.card,
     ring: t.ring,
     sidebar: t.sidebar || t.card,

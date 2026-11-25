@@ -1,6 +1,8 @@
 import { env } from "../../config/env.js";
 import { createLocalStorage } from "./local.driver.js";
 import { createS3Storage } from "./s3.driver.js";
+import { createCoupleStorage } from "../drive/couple-storage.js";
+import { driveEnabled, driveRuntime } from "../drive/drive.runtime.js";
 import type { PhotoStorage } from "./storage.types.js";
 
 export type { PhotoStorage } from "./storage.types.js";
@@ -32,11 +34,20 @@ export function photoStorage(): PhotoStorage {
 }
 
 /**
- * Storage driver for one couple's files. Today every couple shares the default driver;
- * per-couple Drive storage plugs in here later. New code must use this, not photoStorage().
- * Keys passed to the returned driver must start with `couples/<coupleId>/`.
+ * Storage for one couple's files. A couple with an active Google Drive connection gets their own
+ * Drive (files served through /media); everyone else, and any Drive failure, uses the default
+ * driver so an upload is never lost. Keys passed in must start with `couples/<coupleId>/`.
  */
 export function storageFor(coupleId: string): PhotoStorage {
-  void coupleId;
-  return photoStorage();
+  const fallback = photoStorage();
+  if (!driveEnabled()) return fallback;
+  const drive = driveRuntime();
+  return createCoupleStorage({
+    coupleId,
+    fallback,
+    drive: drive.gateway,
+    isConnected: drive.isConnected,
+    markNeedsReconnect: drive.markNeedsReconnect,
+    publicApiUrl: env.PUBLIC_API_URL,
+  });
 }

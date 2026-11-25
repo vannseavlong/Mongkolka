@@ -34,7 +34,7 @@ export interface AssetModel {
 }
 export interface AssetStorage {
   put(key: string, body: Buffer, mime: string): Promise<string>;
-  delete(key: string): Promise<void>;
+  delete(key: string, url?: string): Promise<void>;
 }
 export interface Deps {
   model: AssetModel;
@@ -180,7 +180,7 @@ export function createWebsiteAssetsCore(deps: Deps) {
           await model.create(t.actorSheetId, row);
         } catch (err) {
           console.error(`[website-assets] row create failed for ${key}`, err);
-          await storage.delete(key).catch((e) => console.error(`[website-assets] orphaned file ${key}`, e));
+          await storage.delete(key, url).catch((e) => console.error(`[website-assets] orphaned file ${key}`, e));
           return { ok: false, status: 502, error: "storage_failed" };
         }
         return { ok: true, asset: toPublic({ ...row, _created_at: new Date().toISOString() }) };
@@ -230,7 +230,7 @@ export function createWebsiteAssetsCore(deps: Deps) {
       }
       await deps
         .storageFor(t.coupleId)
-        .delete(asset.storage_key)
+        .delete(asset.storage_key, asset.url)
         .catch((err) => console.error(`[website-assets] orphaned file ${asset.storage_key}`, err));
       return { ok: true };
     },

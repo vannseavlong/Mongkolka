@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { photoStorage } from "../../services/storage/index.js";
+import { storageFor } from "../../services/storage/index.js";
 import { RateLimiter } from "../../utils/rate-limit.js";
 import { TtlCache } from "../../utils/ttl-cache.js";
 import { matchesSignature } from "../../utils/image-signature.js";
@@ -87,8 +87,9 @@ export const GuestPhotosService = {
     if (mine >= settings.maxPerGuest) return { ok: false, status: 429, error: "guest_limit" };
 
     const photoId = randomUUID();
-    const key = `${entry.coupleId}/${photoId}.${ext}`;
-    const url = await photoStorage().put(key, input.body, input.mimeType);
+    // Under the couple's prefix so storageFor() can route it (their own Drive, if connected).
+    const key = `couples/${entry.coupleId}/guest-photos/${photoId}.${ext}`;
+    const url = await storageFor(entry.coupleId).put(key, input.body, input.mimeType);
     const status: PhotoStatus = settings.mode === "auto" ? "approved" : "pending";
 
     GuestPhotosQueue.enqueue(actorSheetId, {
@@ -158,19 +159,21 @@ export const GuestPhotosService = {
    * Row first, file second: if the file delete fails the photo is already gone from
    * the site — we log the orphan instead of resurrecting it.
    */
-  async remove(actorSheetId: string, photoId: string): Promise<boolean> {
+  async remove(actorSheetId: string, coupleId: string, photoId: string): Promise<boolean> {
     try {
       const queued = GuestPhotosQueue.cancel(actorSheetId, photoId);
       let key: string | undefined = queued?.storage_key as string | undefined;
+      let url: string | undefined = queued?.url as string | undefined;
       if (!queued) {
         const row = await GuestPhotosModel.findById(actorSheetId, photoId);
         if (!row) return false;
         key = row.storage_key as string;
+        url = row.url as string;
         await GuestPhotosModel.delete(actorSheetId, photoId);
       }
       if (key) {
-        await photoStorage()
-          .delete(key)
+        await storageFor(coupleId)
+          .delete(key, url)
           .catch((err) => console.error(`[guest-photos] orphaned file ${key}: could not delete`, err));
       }
       return true;
@@ -179,10 +182,10 @@ export const GuestPhotosService = {
     }
   },
 
-  async removeMany(actorSheetId: string, photoIds: string[]) {
+  async removeMany(actorSheetId: string, coupleId: string, photoIds: string[]) {
     let removed = 0;
     for (const id of photoIds) {
-      if (await GuestPhotosService.remove(actorSheetId, id)) removed += 1;
+      if (await GuestPhotosService.remove(actorSheetId, coupleId, id)) removed += 1;
     }
     return removed;
   },

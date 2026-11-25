@@ -10,6 +10,7 @@ import { coupleMilestonesRouter } from "../modules/couple-milestones/couple-mile
 import { coupleGuestPhotosRouter } from "../modules/guest-photos/guest-photos.routes.js";
 import { coupleGuestWishesRouter } from "../modules/guest-wishes/guest-wishes.routes.js";
 import { coupleWebsiteRouter } from "../modules/couple-website/couple-website.routes.js";
+import { coupleDriveRouter } from "../modules/couple-drive/couple-drive.routes.js";
 import { websiteAssetsRouter } from "../modules/website-assets/website-assets.routes.js";
 
 export const coupleApiRouter = Router();
@@ -24,5 +25,6 @@ coupleApiRouter.use(coupleChecklistRouter);
 coupleApiRouter.use(coupleMilestonesRouter);
 coupleApiRouter.use(coupleWebsiteRouter);
 coupleApiRouter.use(websiteAssetsRouter);
+coupleApiRouter.use(coupleDriveRouter);
 coupleApiRouter.use(coupleGuestPhotosRouter);
 coupleApiRouter.use(coupleGuestWishesRouter);

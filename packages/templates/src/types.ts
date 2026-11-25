@@ -188,6 +188,12 @@ export interface MusicContent {
   playlistUrl?: string;
 }
 
+/** The cover's own wording. Empty or missing fields use the template's built-in text. */
+export interface CoverContent {
+  taglineKh?: string;
+  taglineEn?: string;
+}
+
 export interface CoverProps {
   couple: CoupleInfo;
   theme: Theme;
@@ -198,6 +204,8 @@ export interface CoverProps {
   onDone: () => void;
   /** Thumbnail mode (builder style picker): keep playing the scene, never reveal or finish. */
   preview?: boolean;
+  /** Couple-written wording (builder form). */
+  content?: CoverContent;
 }
 
 /**

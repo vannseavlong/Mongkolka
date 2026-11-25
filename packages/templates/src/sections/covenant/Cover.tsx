@@ -21,6 +21,7 @@ import {
 import { COVENANT_COVER_CSS } from "./cover-styles";
 import { hasKhmer, petals, unit } from "./intro-logic";
 import { coupleNamesFor } from "./names";
+import { coverTagline } from "./cover-text";
 import { covenantPalette, PINK, type CovenantPalette } from "./palette";
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
@@ -147,6 +148,7 @@ function CovenantCoverShell({
   onReveal,
   onDone,
   preview,
+  content,
   density,
   critters,
 }: CoverProps & { density: number; critters: (p: CovenantPalette) => ReactNode }) {
@@ -195,7 +197,7 @@ function CovenantCoverShell({
 
       <div className="cvc-glass">
         <p className="cvc-rise m-0" style={{ "--at": "1400ms", color: p.gold.mid, fontFamily: kh ? MOUL_FONT : CINZEL_FONT, letterSpacing: kh ? "normal" : "0.22em", textTransform: "uppercase", fontSize: "calc(var(--pw) * .032)", lineHeight: 1.9 } as Vars}>
-          {t("covenant.tagline")}
+          {coverTagline(content, language, t("covenant.tagline"))}
         </p>
         <h1 className="cvc-rise m-0 flex flex-col items-center" style={{ filter: `drop-shadow(0 0 14px rgba(255,255,255,.95)) drop-shadow(0 2px 3px ${withAlpha(PINK.deepRose, 0.25)})`, "--at": "2000ms" } as Vars}>
           <span style={{ ...foil, ...nameFace(first) }}>{first}</span>

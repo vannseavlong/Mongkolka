@@ -63,6 +63,17 @@ describe("hero banners", () => {
   });
 });
 
+describe("cover content", () => {
+  it("keeps one trimmed line per language", () => {
+    assert.deepEqual(validateSectionContent("cover", { taglineKh: " ក ", taglineEn: "", junk: 1 }), { taglineKh: "ក" });
+  });
+  it("rejects non-strings, non-objects and over-long lines", () => {
+    assert.throws(() => validateSectionContent("cover", { taglineEn: 5 }), /must be a string/);
+    assert.throws(() => validateSectionContent("cover", "x"), /must be an object/);
+    assert.throws(() => validateSectionContent("cover", { taglineKh: "x".repeat(LIMITS.coverTagline + 1) }), /at most/);
+  });
+});
+
 describe("site language", () => {
   it("accepts only en or kh", () => {
     assert.equal(validateSiteLanguage("en"), "en");

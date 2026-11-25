@@ -12,6 +12,7 @@ import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
 import { youtubeId } from "./video-logic";
+import { coverTagline } from "./cover-text";
 import { openingText } from "./opening-text";
 import { BUTTERFLIES, bloomCluster, butterflyEntry, DOVES, FLYERS, FOLIAGE_REGIONS, leafCluster, SPARKLES } from "./cover-logic";
 
@@ -199,5 +200,18 @@ describe("initial site language", () => {
     assert.equal(resolveInitialLanguage(null, null), "kh");
     assert.equal(resolveInitialLanguage(undefined, undefined), "kh");
     assert.equal(resolveInitialLanguage("fr", "en"), "en");
+  });
+});
+
+describe("cover wording", () => {
+  it("uses the couple's line for the viewer's language, else the built-in one", () => {
+    assert.equal(coverTagline({ taglineKh: " ខ្ញុំស្រលាញ់អ្នក ", taglineEn: "" }, "kh", "x"), "ខ្ញុំស្រលាញ់អ្នក");
+    assert.equal(coverTagline({ taglineKh: "ក" }, "en", "built-in"), "built-in");
+    assert.equal(coverTagline(undefined, "kh", "built-in"), "built-in");
+  });
+  it("shows the couple's line on both covers", () => {
+    for (const id of ["cover_covenant_butterflies", "cover_covenant_garden"]) {
+      assert.ok(render("cover", id, "en", { onReveal: () => {}, onDone: () => {}, content: { taglineEn: "Forever starts today" } }).includes("Forever starts today"), id);
+    }
   });
 });

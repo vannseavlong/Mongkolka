@@ -22,6 +22,7 @@ import { VERSE_PRESETS } from "../lib/verse-presets";
 import { InvitationContentForm } from "./invitation-content-form";
 import { AgendaContentForm } from "./agenda-content-form";
 import { LettersContentForm } from "./letters-content-form";
+import { CoverContentForm } from "./cover-content-form";
 import { OpeningContentForm } from "./opening-content-form";
 import { VideoContentForm } from "./video-content-form";
 import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
@@ -676,6 +677,7 @@ function FooterContentForm({ section, onSaved }: { section: WebsiteSection; onSa
 
 /** Edit form for a content-backed section, shown inline in the builder's content panel. */
 export function SectionContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+  if (section.section_key === "cover") return <CoverContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "opening") return <OpeningContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "gallery") return <GalleryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "registry") return <RegistryContentForm key={section.section_id} section={section} onSaved={onSaved} />;

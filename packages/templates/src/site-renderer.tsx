@@ -16,7 +16,7 @@ import { titleOverrides, type SectionTitle } from "./section-titles";
 import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { resolveTheme } from "./theme";
-import type { CoupleInfo, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
+import type { CoupleInfo, CoverContent, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
 export interface SiteRendererSection {
   section_id: string;
@@ -116,6 +116,7 @@ export function SiteRenderer(props: SiteRendererProps) {
           theme={resolveTheme(template.default_theme, themeOverride, cover.color_override)}
           guestGreeting={guestGreeting}
           preview={coverPreview}
+          content={cover.content as CoverContent | undefined}
           onReveal={() => {
             setCoverPhase("revealing");
             onCoverRevealed?.();

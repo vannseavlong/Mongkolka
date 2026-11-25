@@ -4,6 +4,7 @@ import { isProfileSection } from "./profile-section-fields";
 /** Sections whose content lives in website_sections.content, edited by SectionContentDialog.
  * See docs/tasks/template.md's "Where each section's content comes from" table. */
 export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
+  "cover",
   "opening",
   "gallery",
   "video",

@@ -33,6 +33,7 @@ export const LIMITS = {
   registryLinks: 20,
   linkLabel: 80,
   videoTitle: 120,
+  coverTagline: 120,
   openingBlessing: 200,
   openingTime: 40,
   openingVenue: 160,
@@ -319,6 +320,14 @@ function cleanHero(content: Obj): Obj {
   });
 }
 
+/** The cover's wording: one line per language. Empty fields fall back to the template's own line. */
+function cleanCover(content: Obj): Obj {
+  return compact({
+    taglineKh: optString(content, "taglineKh", LIMITS.coverTagline, "content"),
+    taglineEn: optString(content, "taglineEn", LIMITS.coverTagline, "content"),
+  });
+}
+
 export const OPENING_CONTENT_SECTION = "opening";
 
 export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry", "video"] as const;
@@ -332,6 +341,7 @@ export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "regis
 export function validateSectionContent(sectionKey: string, content: unknown): unknown {
   if (content === null || content === undefined) return content;
   if (sectionKey === OPENING_CONTENT_SECTION) return cleanOpening(asObject(content, "content"));
+  if (sectionKey === "cover") return cleanCover(asObject(content, "content"));
   if (sectionKey === "hero") return cleanHero(asObject(content, "content"));
   if (!(KHMER_CONTENT_SECTIONS as readonly string[]).includes(sectionKey)) return content;
   const obj = asObject(content, "content");

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Main } from "@mongkolka/ui/layout/main";
 import { useApiQuery } from "@/lib/use-api-query";
+import { DriveReconnectBanner } from "@/features/storage/components/drive-reconnect-banner";
 import { PhotoGrid } from "./components/photo-grid";
 import { PROFILE_KEY, PhotoSettingsCard } from "./components/photo-settings-card";
 import { WishesList } from "./components/wishes-list";
@@ -33,6 +34,8 @@ export function Photos() {
         <h1 className="text-2xl font-bold tracking-tight">Guestbook</h1>
         <p className="text-muted-foreground">Photos and wishes your guests share on your wedding website.</p>
       </div>
+
+      <DriveReconnectBanner />
 
       {profile.data && (
         // keyed so the form re-seeds from the server value after a save/refetch

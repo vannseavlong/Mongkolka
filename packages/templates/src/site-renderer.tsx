@@ -17,6 +17,7 @@ import { TextOverridesProvider } from "./i18n";
 import { titleOverrides, type SectionTitle } from "./section-titles";
 import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
+import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
 import { resolveTheme } from "./theme";
 import type { CoupleInfo, CoverContent, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
@@ -156,6 +157,8 @@ function SiteRendererBody({
   const [openingDismissed, setOpeningDismissed] = useState(!!skipIntro);
   const orientation = useOrientation();
   const { language } = useLanguage();
+  // While the cover and opening play, warm the hero photo and the first gallery photos in the background.
+  usePrefetchImages(prefetchTargets(sections, orientation));
 
   const musicSection = sections.find((s) => s.section_key === "music" && s.enabled);
   const musicContent = musicSection

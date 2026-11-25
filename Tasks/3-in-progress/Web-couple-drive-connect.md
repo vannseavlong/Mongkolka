@@ -4,9 +4,9 @@
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new settings screen on top of a T3 API (auto picker, see `PIPELINE.md`)
-- **Claimed by:** none
+- **Claimed by:** Claude (session), 2026-11-28
 - **Worktree:** `Mongkolka/couple-drive-connect/` · **Branch:** `feat/couple-drive-connect` (created when it moves to 3-in-progress)
-- **Started / updated:** not started / 2026-10-28
+- **Started / updated:** 2026-11-28 / 2026-11-28
 - **Docs:** Tasks/_plans/Web-builder-redesign.md, Docs/tasks/guest-photos.md, Docs/backend-schema.md
 - **Depends on:** API-couple-drive-storage
 - **Touches:** apps/couple/src/features/profile or new features/storage (connect card), website builder asset tab (status banner only)

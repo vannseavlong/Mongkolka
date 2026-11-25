@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat: Storage screen to connect Google Drive (couple portal)
+- Owner: SNLRLONG
+- Task: Tasks/3-in-progress/Web-couple-drive-connect.md (T-0020, still open: needs a real-account render check)
+- Branch/PR: feat/couple-drive-connect merged to main (no PR)
+- What changed: [Web] new `/settings/storage` screen and sidebar item: connect, reconnect and disconnect Google Drive (confirmation explains Drive photos stop showing after disconnect), states for loading, error, no access, not available, not connected, connected, needs reconnect; toast for the `?drive=` result Google redirects back with; reconnect banner on Guestbook and the image library
+- Needs: API from the entry below deployed first; 360px width, real Google account run and code review not done
+
 ## 2026-11-28 · [API] feat: per-couple Google Drive storage through lsdb
 - Owner: SNLRLONG
 - Task: Tasks/3-in-progress/API-couple-drive-storage.md (T-0018, still open: needs a real-account run)

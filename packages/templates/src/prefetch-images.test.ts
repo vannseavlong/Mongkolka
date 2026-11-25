@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { prefetchTargets } from "./prefetch-images.ts";
+import { prefetchTargets } from "./prefetch-images";
 
 const sections = [
   { section_key: "hero", enabled: true, content: { portraitUrl: "/p.webp", landscapeUrl: "/l.webp" } },

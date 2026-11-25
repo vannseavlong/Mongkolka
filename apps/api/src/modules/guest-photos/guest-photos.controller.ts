@@ -76,6 +76,7 @@ export const CoupleGuestPhotosController = {
   async remove(req: CoupleRequest, res: Response) {
     const ok = await GuestPhotosService.remove(
       req.coupleActorSheetId as string,
+      req.coupleId as string,
       req.params.photoId as string,
     );
     if (!ok) {
@@ -91,7 +92,7 @@ export const CoupleGuestPhotosController = {
       res.status(400).json({ error: "ids must be 1-100 photo ids" });
       return;
     }
-    const removed = await GuestPhotosService.removeMany(req.coupleActorSheetId as string, ids as string[]);
+    const removed = await GuestPhotosService.removeMany(req.coupleActorSheetId as string, req.coupleId as string, ids as string[]);
     res.json({ removed });
   },
 };

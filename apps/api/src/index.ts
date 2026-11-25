@@ -17,6 +17,7 @@ import { vendorApiRouter } from "./routes/vendor-api.routes.js";
 import { publicApiRouter } from "./routes/public-api.routes.js";
 import { env } from "./config/env.js";
 import { localUploadsRoot } from "./services/storage/local.driver.js";
+import { mediaRouter } from "./modules/media/media.routes.js";
 import { GuestPhotosQueue } from "./modules/guest-photos/guest-photos.queue.js";
 import { GuestWishesQueue } from "./modules/guest-wishes/guest-wishes.queue.js";
 
@@ -38,6 +39,8 @@ if (env.PHOTO_STORAGE === "local") {
     }),
   );
 }
+
+app.use("/media", mediaRouter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });

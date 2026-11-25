@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createSheetAdapter } from "longcelot-sheet-db";
+import { createSheetAdapter, DriveStorageAdapter, type TokenStore } from "longcelot-sheet-db";
 import { env } from "./env.js";
 
 import usersSchema from "../../schemas/admin/users.js";
@@ -17,6 +17,7 @@ import contactMessagesSchema from "../../schemas/admin/contact_messages.js";
 import sectionComponentsSchema from "../../schemas/admin/section_components.js";
 import bookingsSchema from "../../schemas/admin/bookings.js";
 import platformSettingsSchema from "../../schemas/admin/platform_settings.js";
+import coupleDriveConnectionsSchema from "../../schemas/admin/couple_drive_connections.js";
 
 import coupleProfileSchema from "../../schemas/couple/profile.js";
 import websiteSectionsSchema from "../../schemas/couple/website_sections.js";
@@ -38,6 +39,14 @@ function loadTokens(): unknown {
   return JSON.parse(fs.readFileSync(tokenFile, "utf-8"));
 }
 
+// The Drive token store needs the couple_drive_connections model, which needs this file, so it is
+// registered after startup by services/drive/drive.runtime.ts. Until then (and for every id that
+// is not a drive: actor) it answers null, which is lsdb's pre-existing behaviour.
+let driveTokenStore: TokenStore | undefined;
+export function setDriveTokenStore(store: TokenStore) {
+  driveTokenStore = store;
+}
+
 export const adapter = createSheetAdapter({
   adminSheetId: env.ADMIN_SHEET_ID,
   credentials: {
@@ -55,6 +64,13 @@ export const adapter = createSheetAdapter({
   // affected tab immediately, so this only delays visibility of changes made
   // outside this adapter instance (e.g. a human editing the sheet directly).
   cache: { ttlMs: 15_000 },
+  // Lets adapter.upload()/deleteFile() write into an actor's own Drive when the token store has
+  // their tokens (here: drive:<coupleId> actors only). See services/drive/.
+  storage: new DriveStorageAdapter(),
+  tokenStore: {
+    get: async (actorId) => (driveTokenStore ? driveTokenStore.get(actorId) : null),
+    set: async (actorId, tokens) => driveTokenStore?.set(actorId, tokens),
+  },
 });
 
 adapter.registerSchemas([
@@ -72,6 +88,7 @@ adapter.registerSchemas([
   sectionComponentsSchema,
   bookingsSchema,
   platformSettingsSchema,
+  coupleDriveConnectionsSchema,
   coupleProfileSchema,
   websiteSectionsSchema,
   guestsSchema,

@@ -42,5 +42,13 @@ export const env = {
   ASSET_MAX_DIMENSION: process.env.ASSET_MAX_DIMENSION ?? "",
   ASSET_MAX_PER_COUPLE: process.env.ASSET_MAX_PER_COUPLE ?? "",
 
+  // Per-couple Google Drive storage. DRIVE_TOKEN_KEY is a base64 32-byte key (openssl rand -base64 32)
+  // that encrypts couples' refresh tokens; DRIVE_TOKEN_KEY_PREV keeps old tokens readable while rotating.
+  DRIVE_TOKEN_KEY: process.env.DRIVE_TOKEN_KEY ?? "",
+  DRIVE_TOKEN_KEY_PREV: process.env.DRIVE_TOKEN_KEY_PREV ?? "",
+  // Redirect URI of the separate "Connect Google Drive" consent (must be listed in the Google OAuth client).
+  DRIVE_GOOGLE_REDIRECT_URI:
+    process.env.DRIVE_GOOGLE_REDIRECT_URI ?? "http://localhost:4000/couple/api/drive/callback",
+
   LSDB_TOKENS_FILE: process.env.LSDB_TOKENS_FILE ?? ".lsdb-tokens.json",
 };

@@ -10,11 +10,13 @@ import { coupleMilestonesRouter } from "../modules/couple-milestones/couple-mile
 import { coupleGuestPhotosRouter } from "../modules/guest-photos/guest-photos.routes.js";
 import { coupleGuestWishesRouter } from "../modules/guest-wishes/guest-wishes.routes.js";
 import { coupleWebsiteRouter } from "../modules/couple-website/couple-website.routes.js";
-import { coupleDriveRouter } from "../modules/couple-drive/couple-drive.routes.js";
+import { coupleDriveCallbackRouter, coupleDriveRouter } from "../modules/couple-drive/couple-drive.routes.js";
 import { websiteAssetsRouter } from "../modules/website-assets/website-assets.routes.js";
 
 export const coupleApiRouter = Router();
 
+// First, on purpose: Google's redirect has no login token (see couple-drive.routes.ts).
+coupleApiRouter.use(coupleDriveCallbackRouter);
 coupleApiRouter.use(coupleSessionRouter);
 coupleApiRouter.use(coupleOverviewRouter);
 coupleApiRouter.use(coupleProfileRouter);

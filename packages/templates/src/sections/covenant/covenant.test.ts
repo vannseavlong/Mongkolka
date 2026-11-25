@@ -7,7 +7,7 @@ import { SkinProvider } from "../khmer/skin-context";
 import { sectionRegistry } from "../../registry";
 import { COVENANT_SAMPLE_COUPLE as SAMPLE_COUPLE, SAMPLE_CONTENT, SAMPLE_GUESTBOOK } from "../../sample-content";
 import type { SectionKey, Theme } from "../../types";
-import { fitScale, guestLine, hasKhmer, petals } from "./intro-logic";
+import { fitScale, guestLine, hasKhmer, petals, placeLine } from "./intro-logic";
 import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
@@ -213,5 +213,14 @@ describe("cover wording", () => {
     for (const id of ["cover_covenant_butterflies", "cover_covenant_garden"]) {
       assert.ok(render("cover", id, "en", { onReveal: () => {}, onDone: () => {}, content: { taglineEn: "Forever starts today" } }).includes("Forever starts today"), id);
     }
+  });
+});
+
+describe("placeLine", () => {
+  it("leaves a pasted map link out of the opening's place line", () => {
+    assert.equal(placeLine("Sensok City", "https://www.google.com/maps/dir//Vimean+Piphup"), "Sensok City");
+    assert.equal(placeLine("Sensok City", "www.google.com/maps/dir//x"), "Sensok City");
+    assert.equal(placeLine("Sensok City", "Phnom Penh"), "Sensok City · Phnom Penh");
+    assert.equal(placeLine("", "  "), "");
   });
 });

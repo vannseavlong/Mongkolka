@@ -13,7 +13,7 @@ import { CARD_CSS, COVENANT_CSS } from "./covenant-styles";
 import { coupleNamesFor } from "./names";
 import { openingText } from "./opening-text";
 import { useFitScale } from "./use-fit-scale";
-import { guestLine, hasKhmer, introFor } from "./intro-logic";
+import { guestLine, hasKhmer, introFor, placeLine } from "./intro-logic";
 import { covenantPalette, PINK } from "./palette";
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
@@ -55,7 +55,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, con
   const { first, second } = coupleNamesFor(couple, language);
   const dateKh = formatWeddingDate(couple.weddingDate, "kh");
   const dateEn = formatWeddingDate(couple.weddingDate, "en");
-  const where = [details?.ceremonyVenue, details?.ceremonyAddress].filter(Boolean).join(" · ");
+  const where = placeLine(details?.ceremonyVenue, details?.ceremonyAddress);
   const when = [details?.ceremonyTime].filter(Boolean).join("");
   const foil: CSSProperties = {
     backgroundImage: foilTextGradient(accent, isDarkColor(theme.bg_color) ? theme.bg_color : "#ffffff"),
@@ -175,7 +175,7 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, con
                 </p>
               )}
               {where && (
-                <p className="m-0 break-words" style={{ ...small, fontWeight: 400, fontSize: "clamp(.8rem,3.8vw,1rem)" }}>
+                <p className="m-0 max-w-full break-words px-4" style={{ ...small, fontWeight: 400, fontSize: "clamp(.8rem,3.8vw,1rem)", overflowWrap: "anywhere" }}>
                   {where}
                 </p>
               )}

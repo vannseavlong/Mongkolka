@@ -94,3 +94,12 @@ export function fitScale(available: number, natural: number): number {
   if (!(available > 0) || !(natural > 0)) return 1;
   return Math.max(0.3, Math.min(1, available / natural));
 }
+
+/** "Venue · address" for the opening. A link typed into the address box (a map URL) is not an address, so it is left out. */
+export function placeLine(venue?: string | null, address?: string | null): string {
+  const isLink = (v: string) => /^(https?:\/\/|www\.)/i.test(v) || /\bgoogle\.com\/maps\b|maps\.app\.goo\.gl/i.test(v);
+  return [venue, address]
+    .map((v) => (v ?? "").replace(/\s+/g, " ").trim())
+    .filter((v) => v && !isLink(v))
+    .join(" · ");
+}

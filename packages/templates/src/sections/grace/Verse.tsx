@@ -3,6 +3,7 @@
 import { GraceSection, Cross, GoldDivider, Reveal, gracePalette, nameFont } from "./shared";
 import { useLanguage } from "../../i18n";
 import type { VerseContent, Theme } from "../../types";
+import { verseView } from "../../verse-view";
 
 export interface GraceVerseProps {
   theme: Theme;
@@ -13,7 +14,7 @@ export function GraceVerse({ theme, content }: GraceVerseProps) {
   const { language } = useLanguage();
   const p = gracePalette(theme);
   const kh = language === "kh";
-  const text = kh && content?.textKh ? content.textKh : content?.text;
+  const { text, reference } = verseView(content, language);
   if (!text) return null;
 
   return (
@@ -43,7 +44,7 @@ export function GraceVerse({ theme, content }: GraceVerseProps) {
           >
             {text}
           </blockquote>
-          {content?.reference ? (
+          {reference ? (
             <figcaption
               className="mt-8 break-words text-sm font-medium [overflow-wrap:anywhere]"
               style={{
@@ -57,7 +58,7 @@ export function GraceVerse({ theme, content }: GraceVerseProps) {
                 className="mx-auto mb-4 block h-px w-14"
                 style={{ backgroundColor: p.accent, backgroundImage: `linear-gradient(90deg, transparent, ${p.foilLight}, transparent)` }}
               />
-              <cite className="not-italic">{content.reference}</cite>
+              <cite className="not-italic">{reference}</cite>
             </figcaption>
           ) : null}
         </figure>

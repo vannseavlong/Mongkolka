@@ -1,5 +1,6 @@
 import type { Theme, VerseContent } from "../../types";
 import { useLanguage } from "../../i18n";
+import { verseView } from "../../verse-view";
 
 export interface VerseClassicProps {
   theme: Theme;
@@ -8,7 +9,7 @@ export interface VerseClassicProps {
 
 export function VerseClassic({ theme, content }: VerseClassicProps) {
   const { language } = useLanguage();
-  const text = language === "kh" && content?.textKh ? content.textKh : content?.text;
+  const { text, reference } = verseView(content, language);
   if (!text) return null;
 
   return (
@@ -24,14 +25,14 @@ export function VerseClassic({ theme, content }: VerseClassicProps) {
         <blockquote className="m-0 whitespace-pre-line break-words text-lg italic leading-relaxed [overflow-wrap:anywhere]">
           {text}
         </blockquote>
-        {content?.reference ? (
+        {reference ? (
           <figcaption className="mt-4 break-words text-sm font-medium tracking-wide [overflow-wrap:anywhere]">
             <span
               aria-hidden="true"
               className="mx-auto mb-3 block h-px w-10"
               style={{ backgroundColor: theme.accent_color }}
             />
-            <cite className="not-italic">{content.reference}</cite>
+            <cite className="not-italic">{reference}</cite>
           </figcaption>
         ) : null}
       </figure>

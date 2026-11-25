@@ -51,13 +51,18 @@ export interface HeroContent {
 }
 
 export interface StoryContent {
+  /** The story in English. Falls back to the couple's profile story. */
   loveStory?: string;
+  /** The story in Khmer. */
+  loveStoryKh?: string;
 }
 
 export interface VerseContent {
   text?: string;
   reference?: string;
   textKh?: string;
+  /** Khmer spelling of the reference, e.g. "កូរិនថូសទី១ ១៣:៤-៧". */
+  referenceKh?: string;
   /** Optional one-line meaning shown under the reference by templates that support it (Covenant). */
   meaning?: string;
   meaningKh?: string;

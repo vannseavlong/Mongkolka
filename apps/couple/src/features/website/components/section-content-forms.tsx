@@ -13,6 +13,7 @@ import { DatePicker } from "@mongkolka/ui/date-picker";
 import { Input } from "@mongkolka/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { Textarea } from "@mongkolka/ui/textarea";
+import { TextRow } from "./section-form-fields";
 import { ApiError } from "@/lib/api";
 import { asRecord, saveContent } from "../lib/section-content-save";
 import type { WebsiteSection } from "../data/schema";
@@ -491,13 +492,17 @@ function MusicContentForm({ section, onSaved }: { section: WebsiteSection; onSav
 }
 
 // ---------------------------------------------------------------------------
-// verse — content: { text?: string, reference?: string, textKh?: string }
+// verse — content: { text, textKh, reference, referenceKh, meaning, meaningKh }
 // ---------------------------------------------------------------------------
 
+const VERSE_LIMITS = { text: 600, reference: 60, meaning: 200 } as const;
 const verseSchema = z.object({
-  text: z.string().max(600, "Max 600 characters"),
-  reference: z.string().max(60, "Max 60 characters"),
-  textKh: z.string().max(600, "Max 600 characters"),
+  textKh: z.string().max(VERSE_LIMITS.text, `Max ${VERSE_LIMITS.text} characters`),
+  referenceKh: z.string().max(VERSE_LIMITS.reference, `Max ${VERSE_LIMITS.reference} characters`),
+  meaningKh: z.string().max(VERSE_LIMITS.meaning, `Max ${VERSE_LIMITS.meaning} characters`),
+  text: z.string().max(VERSE_LIMITS.text, `Max ${VERSE_LIMITS.text} characters`),
+  reference: z.string().max(VERSE_LIMITS.reference, `Max ${VERSE_LIMITS.reference} characters`),
+  meaning: z.string().max(VERSE_LIMITS.meaning, `Max ${VERSE_LIMITS.meaning} characters`),
 });
 type VerseFormValues = z.infer<typeof verseSchema>;
 
@@ -506,7 +511,14 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
   const str = (v: unknown) => (typeof v === "string" ? v : "");
   const form = useForm<VerseFormValues>({
     resolver: zodResolver(verseSchema),
-    defaultValues: { text: str(content.text), reference: str(content.reference), textKh: str(content.textKh) },
+    defaultValues: {
+      textKh: str(content.textKh),
+      referenceKh: str(content.referenceKh),
+      meaningKh: str(content.meaningKh),
+      text: str(content.text),
+      reference: str(content.reference),
+      meaning: str(content.meaning),
+    },
   });
 
   function applyPreset(index: string) {
@@ -514,16 +526,23 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
     if (!preset) return;
     form.setValue("text", preset.text, { shouldDirty: true });
     form.setValue("reference", preset.reference, { shouldDirty: true });
-    // A new passage makes any existing Khmer translation stale.
+    form.setValue("referenceKh", preset.referenceKh, { shouldDirty: true });
+    // A new passage makes the Khmer wording and both meanings stale; the Khmer text is typed by the couple.
     form.setValue("textKh", "", { shouldDirty: true });
+    form.setValue("meaning", "", { shouldDirty: true });
+    form.setValue("meaningKh", "", { shouldDirty: true });
   }
 
   async function onSubmit(values: VerseFormValues) {
     try {
+      const clean = (v: string) => v.trim() || undefined;
       await saveContent(section.section_id, {
-        text: values.text.trim() || undefined,
-        reference: values.reference.trim() || undefined,
-        textKh: values.textKh.trim() || undefined,
+        text: clean(values.text),
+        textKh: clean(values.textKh),
+        reference: clean(values.reference),
+        referenceKh: clean(values.referenceKh),
+        meaning: clean(values.meaning),
+        meaningKh: clean(values.meaningKh),
       });
       toast.success("Verse updated");
       onSaved();
@@ -537,7 +556,7 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <label htmlFor="verse-preset" className="text-sm font-medium">
-            Choose a well-known verse
+            Start from a well-known verse
           </label>
           <Select value="" onValueChange={applyPreset}>
             <SelectTrigger id="verse-preset" className="w-full">
@@ -546,51 +565,24 @@ function VerseContentForm({ section, onSaved }: { section: WebsiteSection; onSav
             <SelectContent className="max-h-72">
               {VERSE_PRESETS.map((preset, i) => (
                 <SelectItem key={preset.reference} value={String(i)}>
-                  {preset.reference}
+                  {preset.reference} · {preset.referenceKh}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <FormField
-          control={form.control}
-          name="text"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Verse or quote</FormLabel>
-              <FormControl>
-                <Textarea rows={5} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="reference"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Reference</FormLabel>
-              <FormControl>
-                <Input placeholder="1 Corinthians 13:4-7" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="textKh"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Khmer text (optional)</FormLabel>
-              <FormControl>
-                <Textarea rows={4} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <fieldset className="flex flex-col gap-3 rounded-md border p-3">
+          <legend className="px-1 text-sm font-medium">ខ្មែរ · Khmer</legend>
+          <TextRow control={form.control} name="textKh" label="Verse" rows={5} />
+          <TextRow control={form.control} name="referenceKh" label="Reference" placeholder="កូរិនថូសទី១ ១៣:៤-៧" />
+          <TextRow control={form.control} name="meaningKh" label="Meaning (one line, optional)" />
+        </fieldset>
+        <fieldset className="flex flex-col gap-3 rounded-md border p-3">
+          <legend className="px-1 text-sm font-medium">English</legend>
+          <TextRow control={form.control} name="text" label="Verse" rows={5} />
+          <TextRow control={form.control} name="reference" label="Reference" placeholder="1 Corinthians 13:4-7" />
+          <TextRow control={form.control} name="meaning" label="Meaning (one line, optional)" />
+        </fieldset>
         <DialogFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
             Save verse

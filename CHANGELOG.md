@@ -16,6 +16,13 @@ Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admi
 - What changed: [API] couples can connect their own Google Drive (`drive.file`); uploads then go to their Drive through lsdb `DriveStorageAdapter` and are served by a public `/media/:coupleId/:fileId` route (ETag, long cache, rate limit, images only). Refresh tokens encrypted at rest (`DRIVE_TOKEN_KEY`). `storageFor(coupleId)` falls back to the default driver on any Drive failure and flags `needs_reconnect` on a revoked grant. New `couple_drive_connections` admin table; `/couple/api/drive` status, connect, callback, disconnect. Guest photos now use `storageFor()` with key `couples/<id>/guest-photos/...`. Off unless `DRIVE_TOKEN_KEY` is set
 - Needs: `lsdb sync` (adds `couple_drive_connections`), set `DRIVE_TOKEN_KEY` (`openssl rand -base64 32`), `DRIVE_GOOGLE_REDIRECT_URI` and `PUBLIC_API_URL` on the API host, add the redirect URI to the Google OAuth client and enable `drive.file` on the consent screen, deploy API; disconnect-with-copy, load check and security review not done
 
+## 2026-11-28 · [Cross] feat: bilingual verse and story, wish-only reply, gallery sub-page rework, video and details cleanup
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-hero-banners-and-pickers.md (plan: Tasks/_plans/Web-hero-redesign.md)
+- Branch/PR: main (no PR)
+- What changed: [Web] Verse and Our story have Khmer and English text (verse also reference and meaning each); story stored on the section with the profile story as fallback; Covenant reply form is a wish form only (name and message, sent to the guestbook); gallery "show all" is one consistent button that opens the sub-page, the sub-page is redesigned (sticky back arrow, framed tiles, site viewer) and coming back restores the reader's place with no cover or opening replay; video has no card, caption or YouTube link; one cross in the story; Event details panel grouped (Ceremony, Reception, More); less helper text in panels; editable cover sub-title. [API] verse, story and cover content validation, covenant seed fix, admin build type fix
+- Needs: same as the previous entry (`lsdb sync`, seeds, deploy, `/*/gallery` rewrite); existing verse text typed in the English box should be moved to the Khmer box; Khmer wording of the wish form and presets needs native review; tablet and reduced-motion checks and code review not run
+
 ## 2026-11-27 · [Cross] feat: section titles, gallery sub-page, envelope hero banner, invitation prefill, Khmer wording
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-hero-banners-and-pickers.md (plan: Tasks/_plans/Web-hero-redesign.md)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { clearReturnPlace, navigationType, readReturnPlace, saveReturnPlace, shouldRestore } from "@/lib/return-place";
 import {
   LanguageProvider,
   LanguageToggle,
@@ -62,6 +63,20 @@ export function SiteView({
 }) {
   const [guestbook, setGuestbook] = useState<GuestbookData | undefined>();
   const slug = site.couple.slug;
+  // Back from the gallery sub-page: go straight to the page where the reader left it, no cover and no opening.
+  const [restoreY] = useState<number | null>(() => {
+    const place = readReturnPlace(slug);
+    return place && shouldRestore(place, navigationType(), Date.now()) ? place.y : null;
+  });
+  useEffect(() => {
+    if (restoreY === null) return;
+    clearReturnPlace(slug);
+    // The sections and their photos settle over a moment, so settle the position a couple of times.
+    const go = () => window.scrollTo({ top: restoreY, behavior: "auto" });
+    go();
+    const timers = [120, 450, 900].map((ms) => setTimeout(go, ms));
+    return () => timers.forEach(clearTimeout);
+  }, [restoreY, slug]);
   const hasGuestbook = site.sections.some((s) => s.section_key === "guestbook" && s.enabled);
   useEffect(() => {
     if (!hasGuestbook) return;
@@ -94,6 +109,11 @@ export function SiteView({
   const photosHref = guestSubRoute(slug, "photos");
   const wishesHref = guestSubRoute(slug, "wishes");
   const galleryHref = `/${encodeURIComponent(slug)}/gallery${query}`;
+
+  async function submitWish(wish: { name: string; message: string }) {
+    await submitGuestbook(slug, { name: wish.name, message: wish.message });
+    fetchGuestbook(slug).then(setGuestbook).catch(() => undefined);
+  }
 
   async function submitRsvp(submission: {
     name: string;
@@ -128,8 +148,14 @@ export function SiteView({
         buildContent={(sectionKey) => buildContent(sectionKey, site.profile)}
         guestGreeting={guestGreeting}
         galleryHref={galleryHref}
+        onGalleryOpen={() => saveReturnPlace(slug, window.scrollY)}
+        skipIntro={restoreY !== null}
         extraProps={(sectionKey) => {
-          if (sectionKey === "rsvp") return { onSubmit: submitRsvp };
+          if (sectionKey === "rsvp") {
+            // Covenant: the reply form is a wish form only (no attendance question); the wish goes to the guestbook.
+            if (wishFromRsvp) return { onSubmit: submitRsvp, wishOnly: true, onWish: submitWish };
+            return { onSubmit: submitRsvp };
+          }
           if (sectionKey === "guestbook") {
             return {
               guestbook,

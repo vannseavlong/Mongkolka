@@ -4,11 +4,10 @@ import { useState } from "react";
 import { Play } from "lucide-react";
 import type { Theme, VideoContent } from "../../types";
 import { useLanguage } from "../../i18n";
-import { withAlpha } from "../../chrome/gold";
-import { OrnateSection } from "../khmer/OrnateSection";
+import { KHMER_BODY_FONT } from "../../chrome/fonts";
 import { COVENANT_CSS } from "./covenant-styles";
 import { covenantPalette } from "./palette";
-import { youtubeEmbedUrl, youtubeId, youtubeThumbUrl, youtubeWatchUrl } from "./video-logic";
+import { youtubeEmbedUrl, youtubeId, youtubeThumbUrl } from "./video-logic";
 
 export interface CovenantVideoProps {
   theme: Theme;
@@ -18,7 +17,8 @@ export interface CovenantVideoProps {
 /**
  * The couple's YouTube video. Nothing is embedded until the guest taps play (the page stays light, and the player's
  * third-party cookies are only set on purpose): a thumbnail with a gold play button, then the privacy-enhanced
- * (youtube-nocookie) player. Only the video id is taken from the link. Returns nothing without a valid link.
+ * (youtube-nocookie) player. Only the video id is taken from the link. Just the video under a heading: no card, no
+ * caption, no outside link. Returns nothing without a valid link.
  */
 export function CovenantVideo({ theme, content }: CovenantVideoProps) {
   const { t } = useLanguage();
@@ -27,20 +27,24 @@ export function CovenantVideo({ theme, content }: CovenantVideoProps) {
   const id = youtubeId(content?.url);
   if (!id) return null;
   const title = content?.title?.trim();
+  const heading = t("covenant.video.heading");
 
   return (
-    <OrnateSection theme={theme} id="video" heading={t("covenant.video.heading")}>
+    <section id="video" className="px-4 py-14 text-center sm:px-6" style={{ backgroundColor: theme.bg_color, color: theme.text_color, fontFamily: KHMER_BODY_FONT }}>
+      <h2 className="m-0 mb-6 text-2xl font-semibold" style={{ color: theme.accent_color }}>
+        {heading}
+      </h2>
       <style href="mk-covenant-css" precedence="mk-covenant">
         {COVENANT_CSS}
       </style>
       <div
-        className="relative mx-auto aspect-video w-full overflow-hidden"
-        style={{ borderRadius: 18, border: `1.5px solid ${withAlpha(theme.accent_color, 0.7)}`, boxShadow: `0 0 0 5px ${withAlpha("#ffffff", 0.9)}, 0 0 0 6px ${withAlpha(theme.accent_color, 0.35)}, 0 18px 34px -18px rgba(90,40,60,.45)`, backgroundColor: "#2a1520", ["--cv-hi" as string]: p.gold.hi, ["--cv-mid" as string]: p.gold.mid, ["--cv-lo" as string]: p.gold.lo }}
+        className="relative mx-auto aspect-video w-full max-w-3xl overflow-hidden"
+        style={{ borderRadius: 14, boxShadow: "0 18px 34px -18px rgba(90,40,60,.45)", backgroundColor: "#2a1520", ["--cv-hi" as string]: p.gold.hi, ["--cv-mid" as string]: p.gold.mid, ["--cv-lo" as string]: p.gold.lo }}
       >
         {playing ? (
           <iframe
             src={youtubeEmbedUrl(id)}
-            title={title || t("covenant.video.heading")}
+            title={title || heading}
             className="absolute inset-0 h-full w-full border-0"
             allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
@@ -59,12 +63,6 @@ export function CovenantVideo({ theme, content }: CovenantVideoProps) {
           </>
         )}
       </div>
-      {title && <p className="m-0 mt-4 break-words text-base">{title}</p>}
-      <p className="m-0 mt-3 text-sm">
-        <a href={youtubeWatchUrl(id)} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4" style={{ color: theme.accent_color }}>
-          {t("covenant.video.unavailable")}
-        </a>
-      </p>
-    </OrnateSection>
+    </section>
   );
 }

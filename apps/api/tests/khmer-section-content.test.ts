@@ -22,7 +22,7 @@ const read = (rel: string) => readFileSync(fileURLToPath(new URL(rel, import.met
 describe("Khmer section content validation", () => {
   it("passes sections it does not own through untouched", () => {
     const content = { text: "x".repeat(5000), anything: true };
-    assert.equal(validateSectionContent("verse", content), content);
+    assert.equal(validateSectionContent("gallery", content), content);
     assert.equal(validateSectionContent("invitation", null), null);
   });
 
@@ -146,7 +146,7 @@ describe("section content wiring", () => {
   beforeEach(() => {
     rows = {
       s_inv: { section_id: "s_inv", section_key: "invitation", content: null },
-      s_verse: { section_id: "s_verse", section_key: "verse", content: null },
+      s_verse: { section_id: "s_verse", section_key: "gallery", content: null },
     };
     writes = [];
     profileWrites = [];
@@ -185,9 +185,9 @@ describe("section content wiring", () => {
   });
 
   it("ignores section_key / section_id in the body so validation cannot be bypassed", async () => {
-    rows.s_story = { section_id: "s_story", section_key: "story", content: null };
+    rows.s_story = { section_id: "s_story", section_key: "timeline", content: null };
     const evil = { khqrImageUrl: "http://x", accountNumber: "<script>", bank: "b".repeat(10000) };
-    // content is checked against the STORED key (story: pass-through) but must be written as story,
+    // content is checked against the STORED key (timeline: pass-through) but must be written as timeline,
     // never re-typed to registry, so the registry rules cannot be skipped.
     await CoupleWebsiteService.updateSection("sheet", "s_story", {
       section_key: "registry",
@@ -199,7 +199,7 @@ describe("section content wiring", () => {
     // and a registry section stays strictly validated even when the body claims another key
     rows.s_reg = { section_id: "s_reg", section_key: "registry", content: null };
     await assert.rejects(
-      CoupleWebsiteService.updateSection("sheet", "s_reg", { section_key: "story", content: evil }),
+      CoupleWebsiteService.updateSection("sheet", "s_reg", { section_key: "timeline", content: evil }),
       ContentValidationError,
     );
     assert.equal(writes.length, 1);

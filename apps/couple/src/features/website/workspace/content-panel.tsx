@@ -5,6 +5,7 @@ import type { WebsiteSection } from "../data/schema";
 import { SectionTitleFields } from "../components/section-title-fields";
 import { HeroBannerAssets } from "../components/hero-banner-assets";
 import { ProfileSectionForm } from "../components/profile-section-form";
+import { StoryContentForm } from "../components/story-content-form";
 import { SectionContentForm } from "../components/section-content-forms";
 import type { PreviewProfile } from "../lib/build-content";
 import { isProfileSection } from "../lib/profile-section-fields";
@@ -27,9 +28,6 @@ export function ContentPanel({
     <div className="flex flex-col gap-4">
       <div>
         <h2 className="text-lg font-semibold">{name}</h2>
-        {isProfileSection(section.section_key) && (
-          <p className="text-sm text-muted-foreground">These details are shared with your profile and every template.</p>
-        )}
       </div>
       {hasSectionTitle(section.section_key) && <SectionTitleFields key={`title-${section.section_id}`} section={section} onSave={saveTitle} />}
       {!canEditSection(section.section_key) ? (
@@ -46,6 +44,8 @@ export function ContentPanel({
           )}
           <ProfileSectionForm key={`profile-${section.section_id}`} sectionKey={section.section_key} profile={profile} onSaved={() => {}} />
         </>
+      ) : section.section_key === "story" ? (
+        <StoryContentForm key={`story-${section.section_id}`} section={section} profile={profile} onSaved={() => {}} />
       ) : (
         <SectionContentForm key={`content-${section.section_id}`} section={section} onSaved={() => {}} />
       )}

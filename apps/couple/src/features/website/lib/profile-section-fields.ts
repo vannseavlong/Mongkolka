@@ -8,7 +8,6 @@ import type { PreviewProfile } from "./build-content";
  */
 export const PROFILE_SECTION_FIELDS = {
   hero: ["partner1_name", "partner2_name", "wedding_date"],
-  story: ["love_story"],
   details: [
     "ceremony_time",
     "ceremony_venue",

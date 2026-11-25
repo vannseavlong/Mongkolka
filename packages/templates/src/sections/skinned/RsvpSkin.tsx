@@ -17,6 +17,9 @@ export interface RsvpSkinProps {
   content?: RsvpContent;
   /** Left to the consuming app: packages/templates never calls fetch() itself. */
   onSubmit: (submission: RsvpSubmission) => Promise<void>;
+  /** Wish-only mode: just a name and a message, no attendance or guest count. The wish goes to `onWish`. */
+  wishOnly?: boolean;
+  onWish?: (wish: { name: string; message: string }) => Promise<void>;
 }
 
 const FORM_CSS =
@@ -30,7 +33,7 @@ const FORM_CSS =
  * invitation link, attend yes/no, guest count, note, sending / error / thank-you states); the look of the
  * fields, pills, steppers and button comes from the skin.
  */
-export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
+export function RsvpSkin({ theme, content, onSubmit, wishOnly = false, onWish }: RsvpSkinProps) {
   const { t } = useLanguage();
   const { name: invitedName } = useGuest();
   const ui = useSkinUi();
@@ -58,9 +61,12 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
     }
   }, [state]);
 
-  const errors = rsvpErrors({ name, attending });
+  const errors = wishOnly ? { name: !name.trim(), attending: false } : rsvpErrors({ name, attending });
+  const messageMissing = wishOnly && !message.trim();
   const nameError = tried && errors.name;
   const attendError = tried && errors.attending;
+  const messageError = tried && messageMissing;
+  const messageRef = useRef<HTMLTextAreaElement>(null);
   const label = { color: ui.labelColor(theme) };
   const labelCls = "mb-1.5 block text-[15px] font-semibold";
 
@@ -70,9 +76,11 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
     setTried(true);
     if (errors.name) return nameRef.current?.focus();
     if (errors.attending) return attendRef.current?.focus();
+    if (messageMissing) return messageRef.current?.focus();
     setState("sending");
     try {
-      await onSubmit(buildRsvpSubmission({ name, attending, guests, message }));
+      if (wishOnly) await onWish?.({ name: name.trim(), message: message.trim() });
+      else await onSubmit(buildRsvpSubmission({ name, attending, guests, message }));
       setState("done");
     } catch {
       setState("error");
@@ -80,10 +88,10 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
   }
 
   return (
-    <OrnateSection theme={theme} id="rsvp" heading={t("grace.rsvp.heading")}>
+    <OrnateSection theme={theme} id="rsvp" heading={wishOnly ? t("covenant.wish.heading") : t("grace.rsvp.heading")}>
       <style>{FORM_CSS}</style>
-      {content?.customMessage ? <p className="m-0 mb-2 whitespace-pre-line break-words text-[15px] leading-relaxed">{content.customMessage}</p> : null}
-      {content?.deadline ? (
+      {!wishOnly && content?.customMessage ? <p className="m-0 mb-2 whitespace-pre-line break-words text-[15px] leading-relaxed">{content.customMessage}</p> : null}
+      {!wishOnly && content?.deadline ? (
         <p className="m-0 mb-4 text-sm font-semibold" style={{ color: theme.accent_color }}>
           {t("grace.rsvp.deadlinePrefix")} {content.deadline}
         </p>
@@ -99,7 +107,7 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
               {t("grace.rsvp.thanksTitle")}
               {name.trim() ? `, ${name.trim()}` : ""}
             </p>
-            <p className="m-0 mt-2 break-words text-[15px]">{attending ? t("grace.rsvp.thanksYes") : t("grace.rsvp.thanksNo")}</p>
+            <p className="m-0 mt-2 break-words text-[15px]">{wishOnly ? t("covenant.wish.thanks") : attending ? t("grace.rsvp.thanksYes") : t("grace.rsvp.thanksNo")}</p>
             <button
               type="button"
               onClick={() => {
@@ -109,7 +117,7 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
               className="mt-4 min-h-11 px-4 text-sm underline underline-offset-4"
               style={{ color: theme.accent_color }}
             >
-              {t("grace.rsvp.change")}
+              {wishOnly ? t("covenant.wish.another") : t("grace.rsvp.change")}
             </button>
           </div>
         ) : (
@@ -137,6 +145,7 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
               )}
             </div>
 
+            {!wishOnly && (
             <fieldset className="m-0 border-0 p-0" aria-describedby={attendError ? "sk-rsvp-att-err" : undefined}>
               <legend className={labelCls} style={label}>
                 {t("grace.rsvp.attendLegend")}
@@ -170,8 +179,9 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
                 </p>
               )}
             </fieldset>
+            )}
 
-            {attending === true && (
+            {!wishOnly && attending === true && (
               <div role="group" aria-labelledby="sk-rsvp-guests-label">
                 <span id="sk-rsvp-guests-label" className={labelCls} style={label}>
                   {t("grace.rsvp.guestsLabel")}
@@ -209,17 +219,25 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
 
             <div>
               <label htmlFor="sk-rsvp-message" className={labelCls} style={label}>
-                {t("grace.rsvp.messageLabel")}
+                {wishOnly ? t("covenant.wish.messageLabel") : t("grace.rsvp.messageLabel")}
               </label>
               <textarea
                 id="sk-rsvp-message"
+                ref={messageRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                rows={3}
+                rows={wishOnly ? 5 : 3}
                 maxLength={MAX_MESSAGE}
                 className="resize-none"
-                style={ui.field(theme, false)}
+                aria-invalid={messageError || undefined}
+                aria-describedby={messageError ? "sk-rsvp-message-err" : undefined}
+                style={ui.field(theme, messageError)}
               />
+              {messageError && (
+                <p id="sk-rsvp-message-err" role="alert" className="m-0 mt-1.5 text-sm" style={{ color: err }}>
+                  {t("covenant.wish.messageRequired")}
+                </p>
+              )}
             </div>
 
             <div aria-live="polite">
@@ -237,7 +255,7 @@ export function RsvpSkin({ theme, content, onSubmit }: RsvpSkinProps) {
               className="px-6 text-[17px] font-semibold"
               style={ui.button(theme)}
             >
-              {state === "sending" ? t("grace.rsvp.sending") : t("grace.rsvp.submit")}
+              {state === "sending" ? t("grace.rsvp.sending") : wishOnly ? t("covenant.wish.submit") : t("grace.rsvp.submit")}
             </button>
           </form>
         )}

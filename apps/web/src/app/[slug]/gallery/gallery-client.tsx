@@ -7,9 +7,12 @@ import {
   LanguageToggle,
   resolveInitialLanguage,
   resolveTheme,
+  skinFromComponents,
+  SkinProvider,
   TextOverridesProvider,
   titleOverrides,
 } from "@mongkolka/templates";
+import { markReturning } from "@/lib/return-place";
 import { PageLoading, PageMessage } from "@/components/loading-state";
 import { guestGreetingFrom } from "@/lib/guest-name";
 import { useRouteParam } from "@/lib/route-param";
@@ -45,7 +48,9 @@ export function GalleryClient() {
     <LanguageProvider initialLanguage={lang}>
       <TextOverridesProvider overrides={titleOverrides(data.sections)}>
         <LanguageToggle theme={{ text_color: theme.text_color }} />
-        <GalleryAllPage theme={theme} couple={couple} photos={photos} backHref={`/${encodeURIComponent(slug)}${carryQuery(guest, lang)}`} />
+        <SkinProvider skin={skinFromComponents(data.template.default_components)}>
+          <GalleryAllPage theme={theme} couple={couple} photos={photos} backHref={`/${encodeURIComponent(slug)}${carryQuery(guest, lang)}`} onBack={() => markReturning(slug)} />
+        </SkinProvider>
       </TextOverridesProvider>
     </LanguageProvider>
   );

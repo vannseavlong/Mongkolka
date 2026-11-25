@@ -11,6 +11,7 @@ import { useGallery } from "../skinned/gallery-state";
 import { mediaFor } from "../skinned/gallery-media";
 import { useSkinOrnaments } from "../khmer/skin-context";
 import { COVENANT_CSS } from "./covenant-styles";
+import { galleryButtonStyle, useGalleryLink } from "../../gallery-page";
 import { hiddenCount, mosaicCell, mosaicGrid, visibleCount } from "./gallery-logic";
 
 export interface CovenantGalleryProps {
@@ -28,6 +29,7 @@ export function CovenantGallery({ theme, content }: CovenantGalleryProps) {
   const media = mediaFor(sk);
   const g = useGallery(content?.photos);
   const [expanded, setExpanded] = useState(false);
+  const link = useGalleryLink();
   if (g.total === 0 && !g.isOpen) return null;
 
   const shown = g.photos.slice(0, visibleCount(g.total, expanded));
@@ -57,11 +59,17 @@ export function CovenantGallery({ theme, content }: CovenantGalleryProps) {
           </button>
         ))}
       </div>
-      {more > 0 && (
-        <button type="button" className="cv-link mt-8" style={{ ...media.button(theme), border: 0, cursor: "pointer" }} onClick={() => setExpanded(true)}>
-          {fillTemplate(t("covenant.gallery.showAll"), { n: g.total })}
-        </button>
-      )}
+      {more > 0 &&
+        (link ? (
+          // The sub-page shows every photo; same button as every other gallery.
+          <a href={link.href} onClick={link.onOpen} className="mt-8" style={galleryButtonStyle(theme, media.button(theme))}>
+            {fillTemplate(t("covenant.gallery.showAll"), { n: g.total })}
+          </a>
+        ) : (
+          <button type="button" className="mt-8" style={galleryButtonStyle(theme, media.button(theme))} onClick={() => setExpanded(true)}>
+            {fillTemplate(t("covenant.gallery.showAll"), { n: g.total })}
+          </button>
+        ))}
       {g.viewerIndex >= 0 && (
         <GraceLightbox
           theme={theme}

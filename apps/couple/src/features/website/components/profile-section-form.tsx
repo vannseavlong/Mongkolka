@@ -22,29 +22,49 @@ import {
 import { PROFILE_KEY } from "./asset-library-api";
 import { AssetPicker } from "./asset-picker";
 
-type FieldSpec = { name: string; label: string; type?: string; placeholder?: string; hint?: string; multiline?: boolean };
+type FieldSpec = { name: string; label: string; type?: string; placeholder?: string; hint?: string; multiline?: boolean; narrow?: boolean };
+type Group = { title?: string; fields: FieldSpec[] };
 
-const FIELDS: Record<ProfileSectionKey, FieldSpec[]> = {
+/** Fields grouped the way a couple thinks about them: one card per part of the day, then the place itself. */
+const GROUPS: Record<ProfileSectionKey, Group[]> = {
   hero: [
-    { name: "partner1_name", label: "Partner 1" },
-    { name: "partner2_name", label: "Partner 2" },
-    { name: "wedding_date", label: "Wedding date", type: "date" },
+    {
+      fields: [
+        { name: "partner1_name", label: "Partner 1" },
+        { name: "partner2_name", label: "Partner 2" },
+        { name: "wedding_date", label: "Wedding date", type: "date" },
+      ],
+    },
   ],
-  story: [{ name: "love_story", label: "Love story", multiline: true, placeholder: "How you met, the proposal, what this day means…" }],
   details: [
-    { name: "ceremony_time", label: "Ceremony time", placeholder: "9:00 AM" },
-    { name: "ceremony_venue", label: "Ceremony venue" },
-    { name: "ceremony_address", label: "Ceremony address", hint: "Used for the “Get directions” button." },
-    { name: "reception_time", label: "Reception time", placeholder: "6:00 PM" },
-    { name: "reception_venue", label: "Reception venue" },
-    { name: "reception_address", label: "Reception address" },
-    { name: "dress_code", label: "Dress code", placeholder: "e.g. Black tie · jewel tones welcome" },
-    { name: "map_url", label: "Map link", placeholder: "https://maps.app.goo.gl/…", hint: "A Google Maps share link. https only." },
-    { name: "venue_image_url", label: "Venue photo URL", placeholder: "https://…" },
+    {
+      title: "Ceremony",
+      fields: [
+        { name: "ceremony_time", label: "Time", placeholder: "9:00 AM", narrow: true },
+        { name: "ceremony_venue", label: "Venue" },
+        { name: "ceremony_address", label: "Address", placeholder: "Used for the directions button" },
+      ],
+    },
+    {
+      title: "Reception",
+      fields: [
+        { name: "reception_time", label: "Time", placeholder: "6:00 PM", narrow: true },
+        { name: "reception_venue", label: "Venue" },
+        { name: "reception_address", label: "Address" },
+      ],
+    },
+    {
+      title: "More",
+      fields: [
+        { name: "dress_code", label: "Dress code", placeholder: "e.g. Black tie" },
+        { name: "map_url", label: "Map link", placeholder: "https://maps.app.goo.gl/…" },
+        { name: "venue_image_url", label: "Venue photo", placeholder: "https://…" },
+      ],
+    },
   ],
 };
 
-/** Edit form for hero, story and details. Saves to the couple profile (their canonical home) and refreshes the canvas. */
+/** Edit form for hero and details. Saves to the couple profile (their canonical home) and refreshes the canvas. */
 export function ProfileSectionForm({ sectionKey, profile, onSaved }: { sectionKey: ProfileSectionKey; profile: PreviewProfile; onSaved: () => void }) {
   const [values, setValues] = useState<ProfileSectionValues>(() => profileSectionValues(sectionKey, profile));
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -77,42 +97,48 @@ export function ProfileSectionForm({ sectionKey, profile, onSaved }: { sectionKe
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      {FIELDS[sectionKey].map((f) => {
-        const id = `profile-${f.name}`;
-        const error = errors[f.name];
-        const describedBy = error ? `${id}-error` : f.hint ? `${id}-hint` : undefined;
-        return (
-          <div key={f.name} className="flex flex-col gap-1.5">
-            <Label htmlFor={id}>{f.label}</Label>
-            {f.multiline ? (
-              <Textarea id={id} rows={8} placeholder={f.placeholder} value={values[f.name] ?? ""} onChange={(e) => set(f.name, e.target.value)} aria-describedby={describedBy} />
-            ) : (
-              <div className="flex gap-2">
-                {f.type === "date" ? (
-                  <DatePicker id={id} value={values[f.name] ?? ""} onChange={(next) => set(f.name, next)} aria-invalid={!!error} aria-describedby={describedBy} />
+      {GROUPS[sectionKey].map((group, gi) => (
+        <fieldset key={group.title ?? gi} className={group.title ? "flex flex-col gap-3 rounded-lg border p-3" : "flex flex-col gap-3 border-0 p-0"}>
+          {group.title && <legend className="px-1 text-sm font-semibold">{group.title}</legend>}
+          {group.fields.map((f) => {
+            const id = `profile-${f.name}`;
+            const error = errors[f.name];
+            const describedBy = error ? `${id}-error` : f.hint ? `${id}-hint` : undefined;
+            return (
+              <div key={f.name} className="flex flex-col gap-1.5">
+                <Label htmlFor={id}>{f.label}</Label>
+                {f.multiline ? (
+                  <Textarea id={id} rows={8} placeholder={f.placeholder} value={values[f.name] ?? ""} onChange={(e) => set(f.name, e.target.value)} aria-describedby={describedBy} />
                 ) : (
-                <Input
-                  id={id}
-                  type={f.type}
-                  placeholder={f.placeholder}
-                  value={values[f.name] ?? ""}
-                  onChange={(e) => set(f.name, e.target.value)}
-                  aria-invalid={!!error}
-                  aria-describedby={describedBy}
-                />
+                  <div className="flex gap-2">
+                    {f.type === "date" ? (
+                      <DatePicker id={id} value={values[f.name] ?? ""} onChange={(next) => set(f.name, next)} aria-invalid={!!error} aria-describedby={describedBy} />
+                    ) : (
+                      <Input
+                        id={id}
+                        type={f.type}
+                        placeholder={f.placeholder}
+                        value={values[f.name] ?? ""}
+                        onChange={(e) => set(f.name, e.target.value)}
+                        aria-invalid={!!error}
+                        aria-describedby={describedBy}
+                        className={f.narrow ? "max-w-40" : undefined}
+                      />
+                    )}
+                    {f.name === "venue_image_url" && (
+                      <Button ref={pickerButtonRef} type="button" variant="outline" className="shrink-0" onClick={() => setPickerOpen(true)}>
+                        <ImagePlus className="size-4" /> Library
+                      </Button>
+                    )}
+                  </div>
                 )}
-                {f.name === "venue_image_url" && (
-                  <Button ref={pickerButtonRef} type="button" variant="outline" onClick={() => setPickerOpen(true)}>
-                    <ImagePlus className="size-4" /> Library
-                  </Button>
-                )}
+                {f.hint && !error && <p id={`${id}-hint`} className="text-xs text-muted-foreground">{f.hint}</p>}
+                {error && <p id={`${id}-error`} role="alert" className="text-xs text-destructive">{error}</p>}
               </div>
-            )}
-            {f.hint && !error && <p id={`${id}-hint`} className="text-xs text-muted-foreground">{f.hint}</p>}
-            {error && <p id={`${id}-error`} role="alert" className="text-xs text-destructive">{error}</p>}
-          </div>
-        );
-      })}
+            );
+          })}
+        </fieldset>
+      ))}
       <AssetPicker
         open={pickerOpen}
         onOpenChange={setPickerOpen}

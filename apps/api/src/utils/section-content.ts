@@ -34,6 +34,10 @@ export const LIMITS = {
   linkLabel: 80,
   videoTitle: 120,
   coverTagline: 120,
+  storyText: 5000,
+  verseText: 600,
+  verseReference: 60,
+  verseMeaning: 200,
   openingBlessing: 200,
   openingTime: 40,
   openingVenue: 160,
@@ -320,6 +324,26 @@ function cleanHero(content: Obj): Obj {
   });
 }
 
+/** The love story in both languages. */
+function cleanStory(content: Obj): Obj {
+  return compact({
+    loveStory: optString(content, "loveStory", LIMITS.storyText, "content"),
+    loveStoryKh: optString(content, "loveStoryKh", LIMITS.storyText, "content"),
+  });
+}
+
+/** The verse in both languages: text, reference and an optional one-line meaning each. */
+function cleanVerse(content: Obj): Obj {
+  return compact({
+    text: optString(content, "text", LIMITS.verseText, "content"),
+    textKh: optString(content, "textKh", LIMITS.verseText, "content"),
+    reference: optString(content, "reference", LIMITS.verseReference, "content"),
+    referenceKh: optString(content, "referenceKh", LIMITS.verseReference, "content"),
+    meaning: optString(content, "meaning", LIMITS.verseMeaning, "content"),
+    meaningKh: optString(content, "meaningKh", LIMITS.verseMeaning, "content"),
+  });
+}
+
 /** The cover's wording: one line per language. Empty fields fall back to the template's own line. */
 function cleanCover(content: Obj): Obj {
   return compact({
@@ -341,6 +365,8 @@ export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "regis
 export function validateSectionContent(sectionKey: string, content: unknown): unknown {
   if (content === null || content === undefined) return content;
   if (sectionKey === OPENING_CONTENT_SECTION) return cleanOpening(asObject(content, "content"));
+  if (sectionKey === "story") return cleanStory(asObject(content, "content"));
+  if (sectionKey === "verse") return cleanVerse(asObject(content, "content"));
   if (sectionKey === "cover") return cleanCover(asObject(content, "content"));
   if (sectionKey === "hero") return cleanHero(asObject(content, "content"));
   if (!(KHMER_CONTENT_SECTIONS as readonly string[]).includes(sectionKey)) return content;

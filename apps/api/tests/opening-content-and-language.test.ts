@@ -74,6 +74,33 @@ describe("cover content", () => {
   });
 });
 
+describe("story content", () => {
+  it("keeps the English and Khmer story, trimmed, and drops empty ones", () => {
+    assert.deepEqual(validateSectionContent("story", { loveStory: " We met ", loveStoryKh: "", junk: 1 }), { loveStory: "We met" });
+    assert.deepEqual(validateSectionContent("story", { loveStoryKh: "ខ្មែរ" }), { loveStoryKh: "ខ្មែរ" });
+  });
+  it("rejects over-long, non-string and non-object content", () => {
+    assert.throws(() => validateSectionContent("story", { loveStory: "x".repeat(LIMITS.storyText + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("story", { loveStoryKh: 5 }), /must be a string/);
+    assert.throws(() => validateSectionContent("story", "x"), /must be an object/);
+  });
+});
+
+describe("verse content", () => {
+  it("keeps text, reference and meaning in both languages, trimmed", () => {
+    assert.deepEqual(
+      validateSectionContent("verse", { text: " Love ", textKh: "ស្រឡាញ់", reference: "Ruth 1:16", referenceKh: "រស់ ១:១៦", meaning: "", meaningKh: "អត្ថន័យ", junk: 1 }),
+      { text: "Love", textKh: "ស្រឡាញ់", reference: "Ruth 1:16", referenceKh: "រស់ ១:១៦", meaningKh: "អត្ថន័យ" },
+    );
+  });
+  it("rejects over-long, non-string and non-object content", () => {
+    assert.throws(() => validateSectionContent("verse", { text: "x".repeat(LIMITS.verseText + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("verse", { referenceKh: "x".repeat(LIMITS.verseReference + 1) }), /at most/);
+    assert.throws(() => validateSectionContent("verse", { meaning: 5 }), /must be a string/);
+    assert.throws(() => validateSectionContent("verse", "x"), /must be an object/);
+  });
+});
+
 describe("site language", () => {
   it("accepts only en or kh", () => {
     assert.equal(validateSiteLanguage("en"), "en");

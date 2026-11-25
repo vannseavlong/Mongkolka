@@ -6,6 +6,7 @@ import { isProfileSection } from "./profile-section-fields";
 export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
   "cover",
   "opening",
+  "story",
   "gallery",
   "video",
   "registry",

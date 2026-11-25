@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import type { VerseContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
+import { verseView } from "../../verse-view";
 import { KHMER_BODY_FONT } from "../../chrome/fonts";
 import { withAlpha } from "../../chrome/gold";
 import { useSkinOrnaments } from "../khmer/skin-context";
@@ -24,10 +25,8 @@ export function CovenantVerse({ theme, content }: CovenantVerseProps) {
   const sk = useSkinOrnaments();
   const p = covenantPalette(theme);
   const kh = language === "kh";
-  const text = (kh && content?.textKh?.trim()) || content?.text?.trim();
+  const { text, reference, meaning } = verseView(content, language);
   if (!text) return null;
-  const reference = content?.reference?.trim();
-  const meaning = (kh && content?.meaningKh?.trim()) || content?.meaning?.trim();
   const vars = { "--cv-ground": theme.bg_color, fontFamily: KHMER_BODY_FONT, color: theme.text_color } as CSSProperties;
 
   return (

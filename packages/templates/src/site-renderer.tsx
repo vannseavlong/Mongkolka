@@ -9,7 +9,9 @@ import type { ChromeConfig } from "./chrome/config";
 import { useSiteChrome } from "./chrome/use-site-chrome";
 import { SkinProvider } from "./sections/khmer/skin-context";
 import { skinFromComponents } from "./sections/khmer/skin-resolve";
-import { GalleryMoreLink } from "./gallery-page";
+import { GalleryLinkProvider, GalleryMoreLink } from "./gallery-page";
+import { storyContentFor } from "./story-view";
+import { useLanguage } from "./i18n";
 import { heroContentFor } from "./hero-photo";
 import { TextOverridesProvider } from "./i18n";
 import { titleOverrides, type SectionTitle } from "./section-titles";
@@ -17,6 +19,9 @@ import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { resolveTheme } from "./theme";
 import type { CoupleInfo, CoverContent, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
+
+/** Gallery styles that draw their own "show all" button (it links to the sub-page), so none is added under them. */
+const GALLERY_OWN_LINK: ReadonlySet<string> = new Set(["gallery_covenant"]);
 
 export interface SiteRendererSection {
   section_id: string;
@@ -82,6 +87,10 @@ export interface SiteRendererProps {
   coverPreview?: boolean;
   /** Where "View all photos" goes (the gallery sub-page). Omit for no button. */
   galleryHref?: string;
+  /** Called just before leaving for the gallery sub-page (the site saves the reader's place). */
+  onGalleryOpen?: () => void;
+  /** Coming back from the gallery sub-page: skip the cover and the opening and go straight to the page. */
+  skipIntro?: boolean;
 }
 
 /**
@@ -94,7 +103,7 @@ export function SiteRenderer(props: SiteRendererProps) {
   const { template, sections, themeOverride, couple, guestGreeting, onCoverRevealed, coverPreview } = props;
   // The cover plays first. The rest of the site (opening gate included) mounts only when it starts to
   // reveal, so nothing underneath animates before the guest can see it.
-  const [coverPhase, setCoverPhase] = useState<"play" | "revealing" | "done">("play");
+  const [coverPhase, setCoverPhase] = useState<"play" | "revealing" | "done">(props.skipIntro ? "done" : "play");
   const cover = sections.find((s) => s.section_key === "cover" && s.enabled);
   const Cover = cover ? resolveComponent("cover", cover.component_id, template.default_components.cover) : undefined;
   const holding = !!Cover && coverPhase === "play";
@@ -109,6 +118,7 @@ export function SiteRenderer(props: SiteRendererProps) {
 
   return (
     <TextOverridesProvider overrides={overrides}>
+      <GalleryLinkProvider link={props.galleryHref ? { href: props.galleryHref, onOpen: props.onGalleryOpen } : null}>
       {!holding && <SiteRendererBody {...props} />}
       {cover && Cover && coverPhase !== "done" && (
         <Cover
@@ -124,6 +134,7 @@ export function SiteRenderer(props: SiteRendererProps) {
           onDone={() => setCoverPhase("done")}
         />
       )}
+      </GalleryLinkProvider>
     </TextOverridesProvider>
   );
 }
@@ -140,9 +151,11 @@ function SiteRendererBody({
   musicSrc,
   onOpened,
   galleryHref,
+  skipIntro,
 }: SiteRendererProps) {
-  const [openingDismissed, setOpeningDismissed] = useState(false);
+  const [openingDismissed, setOpeningDismissed] = useState(!!skipIntro);
   const orientation = useOrientation();
+  const { language } = useLanguage();
 
   const musicSection = sections.find((s) => s.section_key === "music" && s.enabled);
   const musicContent = musicSection
@@ -202,14 +215,17 @@ function SiteRendererBody({
         const content =
           section.section_key === "hero"
             ? heroContentFor(buildContent("hero"), section.content, orientation)
-            : (section.content ?? buildContent(section.section_key));
+            : section.section_key === "story"
+              ? storyContentFor(buildContent("story"), section.content, language)
+              : (section.content ?? buildContent(section.section_key));
         const piece = <Component key={section.section_id} couple={couple} theme={theme} content={content} {...extraProps?.(section.section_key)} />;
         // A gallery with photos gets a "View all photos" button to the sub-page, whichever style draws the gallery.
-        const hasMorePhotos = section.section_key === "gallery" && !!galleryHref && ((content as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
+        const ownGalleryButton = section.section_key === "gallery" && GALLERY_OWN_LINK.has(section.component_id ?? template.default_components.gallery ?? "");
+        const hasMorePhotos = section.section_key === "gallery" && !!galleryHref && !ownGalleryButton && ((content as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
         const node = hasMorePhotos ? (
           <Fragment key={section.section_id}>
             {piece}
-            <GalleryMoreLink href={galleryHref!} theme={theme} />
+            <GalleryMoreLink theme={theme} />
           </Fragment>
         ) : (
           piece

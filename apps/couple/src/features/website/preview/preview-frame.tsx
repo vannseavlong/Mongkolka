@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LanguageProvider, SiteRenderer, type CoupleInfo } from "@mongkolka/templates";
+import { LanguageProvider, SiteRenderer, skinFromComponents, type CoupleInfo } from "@mongkolka/templates";
 import { cn } from "@mongkolka/ui/utils";
 import { buildPreviewContent } from "../lib/build-content";
 import { FRAME_SOURCE, HOST_SOURCE, type FrameMessage, type HostMessage, type PreviewState } from "./messages";
@@ -61,6 +61,8 @@ export function PreviewFrame() {
 
   if (!state) return null;
   const { template, sections, themeOverride, profile } = state;
+  // The Covenant template replies with a wish form only (no attendance question).
+  const wishOnly = skinFromComponents(template.default_components) === "covenant";
 
   const couple: CoupleInfo = {
     partner1Name: profile.partner1_name ?? "Partner One",
@@ -84,7 +86,7 @@ export function PreviewFrame() {
         onOpened={() => setOpened(true)}
         onCoverRevealed={() => setOpened(true)}
         galleryHref="#"
-        extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : {})}
+        extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {}, wishOnly: wishOnly, onWish: async () => {} } : {})}
         wrapSection={(section, node) => (
           <div
             data-section-id={section.section_id}

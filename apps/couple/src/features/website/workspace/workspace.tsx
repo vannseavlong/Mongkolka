@@ -11,6 +11,7 @@ import { SectionDock } from "./section-dock";
 import { SectionRail } from "./section-rail";
 import { SiteCanvas } from "./site-canvas";
 import { useSectionActions } from "./use-section-actions";
+import { UploadDock } from "../components/upload-dock";
 
 /** Below xl one pane shows at a time; at xl all of them are on screen. */
 type Pane = "sections" | "preview" | "content" | "style" | "colors";
@@ -171,6 +172,7 @@ export function Workspace({
           />
         </aside>
       </div>
+      <UploadDock />
     </div>
   );
 }

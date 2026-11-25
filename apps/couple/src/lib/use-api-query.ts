@@ -1,12 +1,12 @@
 "use client";
 
-import useSWR from "swr";
+import useSWR, { type SWRConfiguration } from "swr";
 import { api, ApiError } from "./api";
 
 // `path: null` disables the fetch entirely (SWR's own convention for a
 // conditional key) — used to defer a query until its prerequisites are ready.
-export function useApiQuery<T>(path: string | null) {
-  const { data, error, isLoading, mutate } = useSWR<T>(path, (p: string) => api.get<T>(p));
+export function useApiQuery<T>(path: string | null, options?: SWRConfiguration<T>) {
+  const { data, error, isLoading, mutate } = useSWR<T>(path, (p: string) => api.get<T>(p), options);
 
   return {
     data: data ?? null,

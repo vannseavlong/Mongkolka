@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { AlertTriangle, Check, ImagePlus, Loader2, Trash2, X } from "lucide-react";
@@ -17,6 +17,7 @@ import {
 import { Button } from "@mongkolka/ui/button";
 import { Progress } from "@mongkolka/ui/progress";
 import { Skeleton } from "@mongkolka/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mongkolka/ui/tabs";
 import { cn } from "@mongkolka/ui/utils";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
@@ -24,32 +25,30 @@ import { DriveReconnectBanner } from "@/features/storage/components/drive-reconn
 import { SECTIONS_KEY } from "../lib/keys";
 import { sectionLabel } from "../workspace/section-labels";
 import type { WebsiteSectionKey } from "../data/schema";
-import { ASSET_LIMITS_KEY, ASSETS_KEY, PROFILE_KEY, readImageSize, uploadAsset, UPLOAD_CANCELLED } from "./asset-library-api";
-import { optimizeImage } from "./asset-optimize";
+import { ASSET_LIMITS_KEY, ASSETS_KEY, PROFILE_KEY } from "./asset-library-api";
+import { cancelUpload, clearFinished, enqueueUploads, registerLibraryView, useUploadQueue } from "./upload-queue";
+import { summarize } from "./upload-progress";
 import {
   type AssetLimits,
   ASSET_ACCEPT,
   DEFAULT_ASSET_LIMITS,
-  sizeError,
-  dimensionsError,
   formatBytes,
-  planUploads,
   type AssetUsage,
   type WebsiteAsset,
 } from "./asset-library-logic";
 
+/**
+ * Reuse the last answer instead of refetching every time the dialog opens or the window regains focus. The window
+ * matches the API's lsdb read-cache TTL (15 s), so a refetch inside it would only hit the same cache. Uploads and
+ * deletes update the list themselves (mutate), so it never goes stale from our own changes.
+ */
+const LIST_CACHE = { revalidateOnFocus: false, dedupingInterval: 15_000, keepPreviousData: true } as const;
+
+/** Library tiles drawn at first and per "Show more": each one decodes a full-size photo, so they come in steps. */
+const PAGE_SIZE = 24;
+
 /** Shared look for buttons that use aria-disabled (the shared Button has no style for it). */
 export const ARIA_DISABLED = "aria-disabled:pointer-events-none aria-disabled:opacity-50";
-
-interface UploadItem {
-  id: number;
-  name: string;
-  status: "queued" | "uploading" | "done" | "error";
-  percent: number;
-  error?: string;
-}
-
-let nextUploadId = 1;
 
 interface AssetLibraryProps {
   /** URLs currently chosen; their tiles show as selected (numbered when `numbered`). */
@@ -60,95 +59,42 @@ interface AssetLibraryProps {
   /** Accessible verb for the tile button, e.g. "Use as cover". */
   pickLabel?: string;
   allowDelete?: boolean;
+  /** Adds a "Select all" / "Clear selection" button; called with every library image and whether all are already selected. */
+  onSelectAll?: (assets: WebsiteAsset[], allSelected: boolean) => void;
 }
 
 /** The couple's image library: upload (drag-drop or picker), pick, delete, quota. */
-export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true }: AssetLibraryProps) {
-  const { data, loading, error, refetch } = useApiQuery<{ assets: WebsiteAsset[] }>(ASSETS_KEY);
+export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true, onSelectAll }: AssetLibraryProps) {
+  const { data, loading, error, refetch } = useApiQuery<{ assets: WebsiteAsset[] }>(ASSETS_KEY, LIST_CACHE);
   const assets = data?.assets ?? [];
-  const { data: limitsData } = useApiQuery<{ limits: AssetLimits }>(ASSET_LIMITS_KEY);
+  const { data: limitsData } = useApiQuery<{ limits: AssetLimits }>(ASSET_LIMITS_KEY, LIST_CACHE);
   const limits = limitsData?.limits ?? DEFAULT_ASSET_LIMITS;
-  const [uploads, setUploads] = useState<UploadItem[]>([]);
+  const { items: uploads, notes } = useUploadQueue();
   const [dragging, setDragging] = useState(false);
-  const [notes, setNotes] = useState<string[]>([]);
+  const [tab, setTab] = useState("library");
+  const [shown, setShown] = useState(PAGE_SIZE);
   const [deleting, setDeleting] = useState<WebsiteAsset | null>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chooseRef = useRef<HTMLButtonElement>(null);
-  const controllers = useRef(new Map<number, AbortController>());
 
-  // Abort everything still in flight when the library goes away.
-  useEffect(() => {
-    const map = controllers.current;
-    return () => map.forEach((c) => c.abort());
-  }, []);
+  // Uploads keep running when this view closes; the floating dock takes over while it is gone.
+  useEffect(() => registerLibraryView(), []);
 
   const full = assets.length >= limits.maxPerCouple;
+  const allSelected = assets.length > 0 && assets.every((a) => selected.includes(a.url));
+  const summary = summarize(uploads);
   const busy = uploads.some((u) => u.status === "uploading" || u.status === "queued");
 
-  function patchUpload(id: number, patch: Partial<UploadItem>) {
-    setUploads((prev) => prev.map((u) => (u.id === id ? { ...u, ...patch } : u)));
-  }
+  const moreRef = useCallback((node: HTMLElement | null) => {
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && setShown((n) => n + PAGE_SIZE), { rootMargin: "400px" });
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
 
-  async function handleFiles(list: FileList | File[]) {
-    const files = Array.from(list);
-    if (files.length === 0) return;
-    const { accepted, rejected } = planUploads(files, assets.length, limits);
-    setNotes(rejected);
-    const items = accepted.map((file) => ({ file, id: nextUploadId++ }));
-    for (const { id } of items) controllers.current.set(id, new AbortController());
-    setUploads((prev) => [
-      ...prev.filter((u) => u.status === "uploading" || u.status === "queued"),
-      ...items.map(({ file, id }) => ({ id, name: file.name, status: "queued" as const, percent: 0 })),
-    ]);
-    let libraryFull = false;
-    try {
-      for (const { file, id } of items) {
-        const signal = controllers.current.get(id)!.signal;
-        if (libraryFull) {
-          patchUpload(id, { status: "error", error: "Skipped: your library is full." });
-          continue;
-        }
-        if (signal.aborted) {
-          patchUpload(id, { status: "error", error: "Cancelled." });
-          continue;
-        }
-        patchUpload(id, { status: "uploading" });
-        try {
-          const size = await readImageSize(file);
-          const tooBig = size && dimensionsError(file.name, size.width, size.height, limits);
-          if (tooBig) throw new ApiError(tooBig, 0);
-          // Convert to WebP at max quality first, so large photos fit the limit without visible loss.
-          const { file: optimized } = await optimizeImage(file);
-          const tooLarge = sizeError(optimized, limits);
-          if (tooLarge) throw new ApiError(tooLarge, 0);
-          if (signal.aborted) throw new ApiError("Cancelled", UPLOAD_CANCELLED);
-          const asset = await uploadAsset(optimized, (percent) => patchUpload(id, { percent }), signal, undefined, limits);
-          patchUpload(id, { status: "done", percent: 100 });
-          mutate(ASSETS_KEY, (cur?: { assets: WebsiteAsset[] }) => ({ assets: [asset, ...(cur?.assets ?? [])] }), {
-            revalidate: false,
-          });
-        } catch (err) {
-          const cancelled = err instanceof ApiError && err.status === UPLOAD_CANCELLED;
-          patchUpload(id, {
-            status: "error",
-            error: cancelled ? "Cancelled." : err instanceof ApiError ? err.message : "Upload failed.",
-          });
-          if (err instanceof ApiError && err.status === 409) libraryFull = true;
-        }
-      }
-    } finally {
-      // Whatever happened, nothing may stay spinning.
-      for (const { id } of items) controllers.current.delete(id);
-      setUploads((prev) =>
-        prev.map((u) =>
-          items.some((i) => i.id === u.id) && (u.status === "uploading" || u.status === "queued")
-            ? { ...u, status: "error", error: "Stopped." }
-            : u,
-        ),
-      );
-      mutate(ASSETS_KEY);
-    }
+  function handleFiles(list: FileList | File[]) {
+    enqueueUploads(list, assets.length, limits);
   }
 
   return (
@@ -156,11 +102,98 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
       <DriveReconnectBanner />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium">Image library</h3>
+        {onSelectAll && assets.length > 0 && (
+          <Button type="button" size="sm" variant="outline" className="h-7" onClick={() => onSelectAll(assets, allSelected)}>
+            {allSelected ? "Clear selection" : "Select all"}
+          </Button>
+        )}
         <p className={cn("text-xs", full ? "font-medium text-destructive" : "text-muted-foreground")} aria-live="polite">
           {data ? `${assets.length}/${limits.maxPerCouple} images${full ? " (full)" : ""}` : " "}
         </p>
       </div>
 
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="library">Library</TabsTrigger>
+          <TabsTrigger value="upload">{summary.active > 0 ? `Upload (${summary.active})` : "Upload"}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="library" className="flex flex-col gap-3">
+      {loading ? (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-busy="true" aria-label="Loading images">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="aspect-square w-full rounded-md" />
+          ))}
+        </div>
+      ) : error ? (
+        <Alert variant="destructive">
+          <AlertTriangle />
+          <AlertTitle>Could not load your images</AlertTitle>
+          <AlertDescription>
+            <p>{error}</p>
+            <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => void refetch()}>
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : assets.length === 0 ? (
+        <p className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
+          No images yet. Use the Upload tab to add your first photo.
+        </p>
+      ) : (
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Images">
+          {assets.slice(0, shown).map((asset, i) => {
+            const index = selected.indexOf(asset.url);
+            const isSelected = index !== -1;
+            const name = `image ${i + 1} of ${assets.length} (${formatBytes(asset.size_bytes)})`;
+            return (
+              <li key={asset.asset_id} className="group relative [contain-intrinsic-size:auto_9rem] [content-visibility:auto]">
+                <button
+                  type="button"
+                  aria-pressed={onPick ? isSelected : undefined}
+                  aria-label={onPick ? `${pickLabel}: ${name}` : name}
+                  onClick={() => onPick?.(asset)}
+                  className={cn(
+                    "block aspect-square w-full overflow-hidden rounded-md border bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                    onPick ? "cursor-pointer hover:border-foreground/40" : "cursor-default",
+                    isSelected && "border-primary ring-2 ring-primary/40",
+                  )}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={asset.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+                </button>
+                {isSelected && (
+                  <span className="pointer-events-none absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                    {numbered ? index + 1 : <Check className="size-3.5" aria-hidden />}
+                  </span>
+                )}
+                {allowDelete && (
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="secondary"
+                    aria-label={`Delete ${name}`}
+                    className="absolute top-1 right-1 size-7 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
+                    onClick={(e) => {
+                      openerRef.current = e.currentTarget;
+                      setDeleting(asset);
+                    }}
+                  >
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {assets.length > shown && (
+        <Button key={shown} ref={moreRef as never} type="button" size="sm" variant="outline" className="self-center" onClick={() => setShown((n) => n + PAGE_SIZE)}>
+          Show more ({assets.length - shown})
+        </Button>
+      )}
+
+        </TabsContent>
+        <TabsContent value="upload" className="flex flex-col gap-3">
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -170,7 +203,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         onDrop={(e) => {
           e.preventDefault();
           setDragging(false);
-          if (!full) void handleFiles(e.dataTransfer.files);
+          if (!full) handleFiles(e.dataTransfer.files);
         }}
         className={cn(
           "flex flex-col items-center gap-2 rounded-lg border-2 border-dashed p-4 text-center transition-colors",
@@ -188,7 +221,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
           tabIndex={-1}
           aria-label="Choose images to upload"
           onChange={(e) => {
-            if (!full && e.target.files) void handleFiles(e.target.files);
+            if (!full && e.target.files) handleFiles(e.target.files);
             e.target.value = "";
           }}
         />
@@ -228,6 +261,16 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
 
       {uploads.length > 0 && (
         <ul className="flex flex-col gap-2" aria-label="Uploads" aria-live="polite">
+          <li className="flex flex-col gap-1 rounded-md bg-muted/50 p-2 text-sm">
+            <span className="flex items-center justify-between gap-2">
+              <span className="font-medium">
+                {summary.active > 0 ? `Uploading ${summary.done + summary.failed} of ${summary.total}` : `${summary.done} of ${summary.total} uploaded`}
+              </span>
+              <span className="text-xs text-muted-foreground">{summary.percent}%</span>
+            </span>
+            <Progress value={summary.percent} aria-label="Total upload progress" />
+            {busy && <span className="text-xs text-muted-foreground">You can close this window; uploads keep going in the background.</span>}
+          </li>
           {uploads.map((u) => (
             <li key={u.id} className="flex flex-col gap-1 rounded-md border p-2 text-sm">
               <span className="flex items-center gap-2">
@@ -251,7 +294,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
                     variant="ghost"
                     className="size-6"
                     aria-label={`Cancel upload of ${u.name}`}
-                    onClick={() => controllers.current.get(u.id)?.abort()}
+                    onClick={() => cancelUpload(u.id)}
                   >
                     <X className="size-3.5" />
                   </Button>
@@ -263,7 +306,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
           ))}
           {!busy && (
             <li>
-              <Button type="button" size="sm" variant="ghost" onClick={() => setUploads([])}>
+              <Button type="button" size="sm" variant="ghost" onClick={clearFinished}>
                 Clear list
               </Button>
             </li>
@@ -271,74 +314,8 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         </ul>
       )}
 
-      {loading ? (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-busy="true" aria-label="Loading images">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="aspect-square w-full rounded-md" />
-          ))}
-        </div>
-      ) : error ? (
-        <Alert variant="destructive">
-          <AlertTriangle />
-          <AlertTitle>Could not load your images</AlertTitle>
-          <AlertDescription>
-            <p>{error}</p>
-            <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => void refetch()}>
-              Try again
-            </Button>
-          </AlertDescription>
-        </Alert>
-      ) : assets.length === 0 ? (
-        <p className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
-          No images yet. Upload your first photo above.
-        </p>
-      ) : (
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Images">
-          {assets.map((asset, i) => {
-            const index = selected.indexOf(asset.url);
-            const isSelected = index !== -1;
-            const name = `image ${i + 1} of ${assets.length} (${formatBytes(asset.size_bytes)})`;
-            return (
-              <li key={asset.asset_id} className="group relative">
-                <button
-                  type="button"
-                  aria-pressed={onPick ? isSelected : undefined}
-                  aria-label={onPick ? `${pickLabel}: ${name}` : name}
-                  onClick={() => onPick?.(asset)}
-                  className={cn(
-                    "block aspect-square w-full overflow-hidden rounded-md border bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                    onPick ? "cursor-pointer hover:border-foreground/40" : "cursor-default",
-                    isSelected && "border-primary ring-2 ring-primary/40",
-                  )}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={asset.url} alt="" loading="lazy" className="size-full object-cover" />
-                </button>
-                {isSelected && (
-                  <span className="pointer-events-none absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-                    {numbered ? index + 1 : <Check className="size-3.5" aria-hidden />}
-                  </span>
-                )}
-                {allowDelete && (
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="secondary"
-                    aria-label={`Delete ${name}`}
-                    className="absolute top-1 right-1 size-7 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
-                    onClick={(e) => {
-                      openerRef.current = e.currentTarget;
-                      setDeleting(asset);
-                    }}
-                  >
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        </TabsContent>
+      </Tabs>
 
       <AlertDialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
         {deleting && (

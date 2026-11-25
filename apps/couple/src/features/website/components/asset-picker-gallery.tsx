@@ -74,6 +74,10 @@ export function GalleryAssets({ context }: { context: SectionPanelContext }) {
         numbered
         pickLabel="Toggle in gallery"
         onPick={(asset) => void save(togglePhoto(photos, asset.url))}
+        onSelectAll={(assets, allSelected) => {
+          const urls = assets.map((a) => a.url);
+          void save(allSelected ? photos.filter((u) => !urls.includes(u)) : [...photos, ...newUrlsOnly(photos, urls)]);
+        }}
       />
 
       <Collapsible>

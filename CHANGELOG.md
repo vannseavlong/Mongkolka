@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [API] feat: per-couple Google Drive storage through lsdb
+- Owner: SNLRLONG
+- Task: Tasks/3-in-progress/API-couple-drive-storage.md (T-0018, still open: needs a real-account run)
+- Branch/PR: feat/couple-drive-storage merged to main (no PR)
+- What changed: [API] couples can connect their own Google Drive (`drive.file`); uploads then go to their Drive through lsdb `DriveStorageAdapter` and are served by a public `/media/:coupleId/:fileId` route (ETag, long cache, rate limit, images only). Refresh tokens encrypted at rest (`DRIVE_TOKEN_KEY`). `storageFor(coupleId)` falls back to the default driver on any Drive failure and flags `needs_reconnect` on a revoked grant. New `couple_drive_connections` admin table; `/couple/api/drive` status, connect, callback, disconnect. Guest photos now use `storageFor()` with key `couples/<id>/guest-photos/...`. Off unless `DRIVE_TOKEN_KEY` is set
+- Needs: `lsdb sync` (adds `couple_drive_connections`), set `DRIVE_TOKEN_KEY` (`openssl rand -base64 32`), `DRIVE_GOOGLE_REDIRECT_URI` and `PUBLIC_API_URL` on the API host, add the redirect URI to the Google OAuth client and enable `drive.file` on the consent screen, deploy API; disconnect-with-copy, load check and security review not done
+
 ## 2026-11-27 · [Cross] feat: section titles, gallery sub-page, envelope hero banner, invitation prefill, Khmer wording
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-hero-banners-and-pickers.md (plan: Tasks/_plans/Web-hero-redesign.md)

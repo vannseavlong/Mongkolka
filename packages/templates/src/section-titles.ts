@@ -16,13 +16,33 @@ export const SECTION_TITLE_KEYS: Partial<Record<SectionKey, readonly string[]>> 
   gallery: ["section.gallery.heading", "covenant.gallery.heading", "grace.gallery.heading"],
   details: ["section.details.heading", "grace.details.heading", "khmer.details.heading"],
   rsvp: ["section.rsvp.heading", "grace.rsvp.heading"],
-  registry: ["section.registry.heading"],
+  registry: ["registry.gift.heading", "section.registry.heading"],
   timeline: ["section.timeline.heading"],
   music: ["section.music.heading"],
   guestbook: ["guestbook.heading", "grace.guestbook.heading", "covenant.memories.heading"],
   video: ["covenant.video.heading"],
+  map: ["covenant.map.heading"],
+  letters: ["covenant.letters.heading", "khmer.letters.gratitude"],
   invitation: ["khmer.invitation.heading"],
   agenda: ["khmer.agenda.heading"],
+};
+
+/** Components whose heading is not the first key of their section (so the editor's grey hint matches what the page shows). */
+export const COMPONENT_TITLE_KEY: Record<string, string> = {
+  guestbook_skin: "grace.guestbook.heading",
+  guestbook_grace: "grace.guestbook.heading",
+  guestbook_covenant: "covenant.memories.heading",
+  guestbook_wall: "guestbook.heading",
+  gallery_covenant: "covenant.gallery.heading",
+  gallery_grace: "grace.gallery.heading",
+  details_grace: "grace.details.heading",
+  rsvp_grace: "grace.rsvp.heading",
+  story_grace: "grace.story.title",
+  registry_khqr: "registry.gift.heading",
+  letters_khmer: "khmer.letters.gratitude",
+  registry_classic: "section.registry.heading",
+  registry_cards: "section.registry.heading",
+  registry_list: "section.registry.heading",
 };
 
 /** True for sections whose heading the couple can change. */
@@ -44,7 +64,13 @@ export function titleOverrides(sections: readonly { section_key: SectionKey; ena
 }
 
 /** The template's own heading for a section in a language (what an empty title falls back to), or "" when unknown. */
-export function defaultSectionTitle(key: SectionKey, language: Language): string {
+export function defaultSectionTitle(key: SectionKey, language: Language, componentId?: string | null): string {
+  // The component that draws the section may use a different heading than the first one in the list: show that one.
+  const own = componentId ? COMPONENT_TITLE_KEY[componentId] : undefined;
+  if (own) {
+    const text = defaultText(own, language);
+    if (text) return text;
+  }
   for (const k of SECTION_TITLE_KEYS[key] ?? []) {
     const text = defaultText(k, language);
     if (text) return text;

@@ -15,12 +15,17 @@ type Form = ReturnType<typeof useGuestbookForm>;
 const LABEL = "mb-1.5 block text-base font-medium";
 
 /** The guest form (photo, name, wish, submit) and its thank-you state, styled by the active skin. */
-export function SkinGuestbookForm({ theme, form }: { theme: Theme; form: Form }) {
+export function SkinGuestbookForm({ theme, form, more }: { theme: Theme; form: Form; more?: { href: string; label: string } }) {
   const { t, language } = useLanguage();
   const sk = useSkinOrnaments();
   const media = mediaFor(sk);
   const tone = mediaTones(theme);
   const { refs, errors } = form;
+  const optional = (
+    <span className="text-sm font-normal" style={{ color: tone.muted }}>
+      {t("grace.guestbook.optionalTag")}
+    </span>
+  );
 
   if (form.phase === "done") {
     return (
@@ -45,8 +50,55 @@ export function SkinGuestbookForm({ theme, form }: { theme: Theme; form: Form })
   return (
     <form onSubmit={form.submit} noValidate className="flex flex-col gap-6">
       <div>
+        <label htmlFor="sk-gb-name" className={LABEL}>
+          {t("grace.guestbook.nameLabel")}
+        </label>
+        <input
+          id="sk-gb-name"
+          ref={refs.nameRef}
+          value={form.name}
+          onChange={(e) => form.setName(e.target.value)}
+          maxLength={80}
+          autoComplete="name"
+          required
+          aria-invalid={errors.name || undefined}
+          aria-describedby={errors.name ? "sk-gb-name-err" : undefined}
+          className="sk-field"
+          style={media.field(theme, errors.name)}
+        />
+        {errors.name && (
+          <p id="sk-gb-name-err" role="alert" className="mt-1.5 text-base" style={{ color: tone.error }}>
+            {t("grace.guestbook.nameRequired")}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="sk-gb-wish" className={LABEL}>
+          {t("grace.guestbook.wishLabelShort")}
+        </label>
+        <textarea
+          id="sk-gb-wish"
+          ref={refs.wishRef}
+          value={form.message}
+          onChange={(e) => form.setMessage(e.target.value.slice(0, MAX_WISH))}
+          rows={4}
+          maxLength={MAX_WISH}
+          aria-invalid={errors.empty || undefined}
+          aria-describedby={errors.empty ? "sk-gb-need-err" : undefined}
+          className="sk-field resize-none"
+          style={media.field(theme, errors.empty)}
+        />
+        {errors.empty && (
+          <p id="sk-gb-need-err" role="alert" className="mt-1 text-base" style={{ color: tone.error }}>
+            {t("grace.guestbook.needSomething")}
+          </p>
+        )}
+      </div>
+
+      <div>
         <span id="sk-gb-photo-label" className={LABEL}>
-          {t("grace.guestbook.photoLabel")}
+          {t("grace.guestbook.photoLabel")} {optional}
         </span>
         <input
           ref={refs.fileRef}
@@ -102,56 +154,6 @@ export function SkinGuestbookForm({ theme, form }: { theme: Theme; form: Form })
         )}
       </div>
 
-      <div>
-        <label htmlFor="sk-gb-name" className={LABEL}>
-          {t("grace.guestbook.nameLabel")}
-        </label>
-        <input
-          id="sk-gb-name"
-          ref={refs.nameRef}
-          value={form.name}
-          onChange={(e) => form.setName(e.target.value)}
-          maxLength={80}
-          autoComplete="name"
-          required
-          aria-invalid={errors.name || undefined}
-          aria-describedby={errors.name ? "sk-gb-name-err" : undefined}
-          className="sk-field"
-          style={media.field(theme, errors.name)}
-        />
-        {errors.name && (
-          <p id="sk-gb-name-err" role="alert" className="mt-1.5 text-base" style={{ color: tone.error }}>
-            {t("grace.guestbook.nameRequired")}
-          </p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="sk-gb-wish" className={LABEL}>
-          {t("grace.guestbook.wishLabel")}
-        </label>
-        <textarea
-          id="sk-gb-wish"
-          ref={refs.wishRef}
-          value={form.message}
-          onChange={(e) => form.setMessage(e.target.value.slice(0, MAX_WISH))}
-          rows={4}
-          maxLength={MAX_WISH}
-          aria-invalid={errors.empty || undefined}
-          aria-describedby={`sk-gb-count${errors.empty ? " sk-gb-need-err" : ""}`}
-          className="sk-field resize-none"
-          style={media.field(theme, errors.empty)}
-        />
-        <p id="sk-gb-count" className="mt-1 text-right text-base" style={{ color: tone.muted }}>
-          {MAX_WISH - form.message.length} {t("grace.guestbook.counter")}
-        </p>
-        {errors.empty && (
-          <p id="sk-gb-need-err" role="alert" className="mt-1 text-base" style={{ color: tone.error }}>
-            {t("grace.guestbook.needSomething")}
-          </p>
-        )}
-      </div>
-
       <div aria-live="polite">
         {form.phase === "error" && form.errorKind && (
           <p role="alert" className="text-base" style={{ color: tone.error }}>
@@ -160,9 +162,16 @@ export function SkinGuestbookForm({ theme, form }: { theme: Theme; form: Form })
         )}
       </div>
 
-      <button type="submit" disabled={form.phase === "sending"} aria-busy={form.phase === "sending"} className="sk-btn mx-auto w-full text-lg sm:w-auto" style={media.button(theme)}>
-        {form.phase === "sending" ? t("grace.guestbook.sending") : t("grace.guestbook.submit")}
-      </button>
+      <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+        <button type="submit" disabled={form.phase === "sending"} aria-busy={form.phase === "sending"} className="sk-btn w-full text-lg sm:w-auto sm:min-w-40" style={media.button(theme)}>
+          {form.phase === "sending" ? t("grace.guestbook.sending") : t("grace.guestbook.submitShort")}
+        </button>
+        {more && (
+          <a href={more.href} className="sk-btn inline-flex min-h-12 w-full items-center justify-center px-6 text-base sm:w-auto" style={{ ...media.note(theme), borderRadius: 999, boxShadow: "none", color: tone.accent, textDecoration: "none" }}>
+            {more.label}
+          </a>
+        )}
+      </div>
     </form>
   );
 }

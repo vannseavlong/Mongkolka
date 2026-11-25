@@ -18,6 +18,8 @@ export const SECTION_LABELS: Record<WebsiteSectionKey, string> = {
   music: "Music",
   guestbook: "Guestbook",
   letters: "Thank-you letters",
+  note: "Guest note",
+  map: "Map",
   footer: "Footer",
 };
 

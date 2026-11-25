@@ -14,7 +14,7 @@ export const OPENING_DEFAULTS: Record<"blessingKh" | "blessingEn" | "inviteKh" |
   inviteKh: "សូមគោរពអញ្ចើញ",
   inviteEn: "With honour, we invite",
   titleKh: "Invitation",
-  titleEn: "Invitation",
+  titleEn: "",
   openKh: "បើកសំបុត្រអញ្ជើញ",
   openEn: "Open the invitation",
 };

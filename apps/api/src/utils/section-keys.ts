@@ -18,6 +18,8 @@ export const SECTION_KEYS = [
   "music",
   "guestbook",
   "letters",
+  "note",
+  "map",
   "footer",
 ] as const;
 

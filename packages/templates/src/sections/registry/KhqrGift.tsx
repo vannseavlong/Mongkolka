@@ -16,23 +16,13 @@ export interface RegistryKhqrProps {
 
 const TOAST_MS = 2400;
 
-/** Bracket corners that frame the QR like a foil-stamped plate. Original geometry. */
-function Corner({ stroke, className }: { stroke: string; className: string }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className={`absolute size-6 ${className}`} fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round">
-      <path d="M2 12V5a3 3 0 0 1 3-3h7" />
-      <path d="M2 12v0M12 2h0" />
-    </svg>
-  );
-}
-
 /**
  * Gift card: a gold-foil framed plate holding the couple's own KHQR image, bank, account name and
  * number, with a copy button. Display only; nothing is collected or processed. Theme-driven: gold
- * comes from the accent, the plate paper is a warm tint, so every skin gets the same quality.
+ * comes from the accent, there is no card around the QR, so every skin gets the same quality.
  */
 export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
-  const { language } = useLanguage();
+  const { language, t: tr } = useLanguage();
   const reduce = useReducedMotion();
   const [outcome, setOutcome] = useState<CopyOutcome | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,9 +32,10 @@ export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
   if (!gift) return null;
 
   const t = (k: Parameters<typeof giftText>[1]) => giftText(language, k);
+  const heading = tr("registry.gift.heading"); // the same key the couple's own title overrides
   const stops = goldStops(theme.accent_color);
-  const paper = mixHex("#fff9ea", theme.accent_color, 92);
-  const ink = mixHex(theme.accent_color, "#1f1404", 28);
+  const ink = theme.text_color; // sits straight on the page: no card, no frame
+  const toastBg = mixHex(theme.accent_color, "#1f1404", 28);
   const isKh = language === "kh";
 
   async function onCopy() {
@@ -68,7 +59,7 @@ export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
         className="mb-10 text-center text-2xl"
         style={{ color: theme.accent_color, fontFamily: isKh ? MOUL_FONT : CINZEL_FONT, letterSpacing: isKh ? undefined : "0.14em" }}
       >
-        {t("heading")}
+        {heading}
       </h2>
 
       <motion.div
@@ -76,37 +67,17 @@ export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
         whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative mx-auto w-full max-w-[22rem] rounded-[1.6rem] p-[5px]"
-        style={{
-          background: goldGradient(theme.accent_color),
-          boxShadow: `0 18px 40px ${withAlpha("#000000", 0.28)}, inset 0 1px 0 ${withAlpha("#ffffff", 0.55)}, inset 0 -2px 0 ${withAlpha(stops.lo, 0.7)}`,
-        }}
+        className="relative mx-auto w-full max-w-[24rem]"
       >
-        <div
-          className="relative rounded-[1.35rem] px-5 pb-6 pt-7 text-center"
-          style={{
-            backgroundColor: paper,
-            color: ink,
-            boxShadow: `inset 0 0 0 1px ${withAlpha(stops.lo, 0.55)}, inset 0 0 0 5px ${paper}, inset 0 0 0 6px ${withAlpha(stops.mid, 0.6)}`,
-          }}
-        >
+        <div className="relative px-3 pb-2 text-center" style={{ color: ink }}>
           {gift.imageUrl && (
             <>
-              <p className="mb-4 text-xs uppercase tracking-[0.2em]" style={{ color: ink }}>
-                {t("scan")}
-              </p>
               {(() => {
-                const plate = (
-                  <>
-                    <Corner stroke={stops.mid} className="left-1 top-1" />
-                    <Corner stroke={stops.mid} className="right-1 top-1 rotate-90" />
-                    <Corner stroke={stops.mid} className="bottom-1 right-1 rotate-180" />
-                    <Corner stroke={stops.mid} className="bottom-1 left-1 -rotate-90" />
-                    {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied QR; next/image needs known hosts */}
-                    <img src={gift.imageUrl} alt={t("qrAlt")} className="block size-48 max-w-full object-contain" loading="lazy" />
-                  </>
+                // The couple's own image goes in as it is (it usually already carries the bank's frame), just given room.
+                const image = (
+                  // eslint-disable-next-line @next/next/no-img-element -- user-supplied QR; next/image needs known hosts
+                  <img src={gift.imageUrl} alt={t("qrAlt")} className="mx-auto block h-auto w-full rounded-lg object-contain" loading="lazy" />
                 );
-                const plateStyle = { boxShadow: `0 0 0 1px ${withAlpha(stops.lo, 0.5)}, 0 6px 16px ${withAlpha("#000000", 0.14)}` };
                 return gift.linkUrl ? (
                   <>
                     <a
@@ -114,19 +85,16 @@ export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={t("tapToPay")}
-                      className="relative mx-auto block w-fit rounded-xl bg-white p-4 outline-none transition-transform active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
-                      style={plateStyle}
+                      className="mx-auto block w-full rounded-lg py-3 outline-none transition-transform active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
                     >
-                      {plate}
+                      {image}
                     </a>
-                    <p className="mt-3 text-xs opacity-80" style={{ fontFamily: isKh ? KHMER_BODY_FONT : undefined }}>
+                    <p className="mt-2 text-xs opacity-80" style={{ fontFamily: isKh ? KHMER_BODY_FONT : undefined }}>
                       {t("tapToPay")}
                     </p>
                   </>
                 ) : (
-                  <div className="relative mx-auto w-fit rounded-xl bg-white p-4" style={plateStyle}>
-                    {plate}
-                  </div>
+                  <div className="py-3">{image}</div>
                 );
               })()}
             </>
@@ -166,7 +134,7 @@ export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
         {outcome && (
           <span
             className="rounded-full px-4 py-2 text-sm shadow-lg"
-            style={{ backgroundColor: ink, color: "#fff6dc", border: `1px solid ${stops.mid}`, fontFamily: isKh ? KHMER_BODY_FONT : undefined }}
+            style={{ backgroundColor: toastBg, color: "#fff6dc", border: `1px solid ${stops.mid}`, fontFamily: isKh ? KHMER_BODY_FONT : undefined }}
           >
             {outcome === "copied" ? t("copiedToast") : t("failedToast")}
           </span>

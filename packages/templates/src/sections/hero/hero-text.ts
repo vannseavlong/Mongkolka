@@ -9,7 +9,7 @@ import { coupleNamesFor } from "../covenant/names";
 export function useHeroText(couple: CoupleInfo): { first: string; second?: string; date: string | null; kh: boolean } {
   const { language } = useLanguage();
   const { first, second } = coupleNamesFor(couple, language);
-  return { first, second, date: formatWeddingDate(couple.weddingDate, language), kh: language === "kh" };
+  return { first, second, date: formatWeddingDate(couple.weddingDate, language, { padDay: true }), kh: language === "kh" };
 }
 
 export const SCRIPT_FONT = 'var(--font-script), "Great Vibes", cursive';

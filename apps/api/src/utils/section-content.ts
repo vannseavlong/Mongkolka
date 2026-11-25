@@ -44,6 +44,9 @@ export const LIMITS = {
   openingLine: 120,
   openingTitle: 60,
   openingButton: 60,
+  mapCaption: 200,
+  noteTitle: 80,
+  noteBody: 600,
 } as const;
 
 type Obj = Record<string, unknown>;
@@ -345,6 +348,25 @@ function cleanVerse(content: Obj): Obj {
   });
 }
 
+/** `map` section: the couple's own map picture (image URL, same rules as every uploaded image) and a short caption per language. */
+function cleanMap(content: Obj): Obj {
+  return compact({
+    imageUrl: validateImageUrl(content.imageUrl, "content.imageUrl"),
+    captionKh: optString(content, "captionKh", LIMITS.mapCaption, "content"),
+    captionEn: optString(content, "captionEn", LIMITS.mapCaption, "content"),
+  });
+}
+
+/** `note` section: a short message to guests (title and body per language). Empty fields fall back to the built-in note. */
+function cleanNote(content: Obj): Obj {
+  return compact({
+    titleKh: optString(content, "titleKh", LIMITS.noteTitle, "content"),
+    titleEn: optString(content, "titleEn", LIMITS.noteTitle, "content"),
+    bodyKh: optString(content, "bodyKh", LIMITS.noteBody, "content"),
+    bodyEn: optString(content, "bodyEn", LIMITS.noteBody, "content"),
+  });
+}
+
 /** The cover's wording: one line per language. Empty fields fall back to the template's own line. */
 function cleanCover(content: Obj): Obj {
   return compact({
@@ -355,7 +377,7 @@ function cleanCover(content: Obj): Obj {
 
 export const OPENING_CONTENT_SECTION = "opening";
 
-export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry", "video"] as const;
+export const KHMER_CONTENT_SECTIONS = ["invitation", "agenda", "letters", "registry", "video", "map", "note"] as const;
 
 /**
  * Validates and cleans `website_sections.content` for the Khmer sections. Returns the
@@ -376,5 +398,7 @@ export function validateSectionContent(sectionKey: string, content: unknown): un
   if (sectionKey === "agenda") return cleanAgenda(obj);
   if (sectionKey === "registry") return cleanRegistry(obj);
   if (sectionKey === "video") return cleanVideo(obj);
+  if (sectionKey === "map") return cleanMap(obj);
+  if (sectionKey === "note") return cleanNote(obj);
   return cleanLetters(obj);
 }

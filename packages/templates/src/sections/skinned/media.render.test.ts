@@ -87,9 +87,9 @@ describe("guestbook_skin", () => {
       });
     }
   }
-  it("shows a friendly empty note when nobody has shared yet", () => {
+  it("leaves the wall out (no heading, no empty card) when nobody has shared yet", () => {
     const html = render("guestbook", "kids", SKINS[5]!.theme, "en", { guestbook: { photos: [], wishes: [] } });
-    assert.ok(html.includes("Be the first to share a moment."));
+    assert.ok(!html.includes("Be the first to share a moment."));
     assert.equal((html.match(/<img/g) ?? []).length, 0);
   });
   it("shows directions when the couple has a maps link", () => {

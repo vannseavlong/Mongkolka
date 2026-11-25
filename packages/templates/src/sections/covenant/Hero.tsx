@@ -60,7 +60,7 @@ export function CovenantHero({ couple, theme, content }: CovenantHeroProps) {
   }, [photo]);
 
   const names = joinNames(coupleNamesFor(couple, language));
-  const date = formatWeddingDate(couple.weddingDate, language);
+  const date = formatWeddingDate(couple.weddingDate, language, { padDay: true });
   const kh = language === "kh";
   const khmerNames = hasKhmer(names);
   const foil: CSSProperties = {

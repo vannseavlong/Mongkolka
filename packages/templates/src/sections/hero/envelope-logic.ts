@@ -43,3 +43,16 @@ export function sequenceEnd(): number {
   const last = typeStart(TYPE_ORDER.length - 1) + ENVELOPE_STAGES.type.ms;
   return Math.max(last, ...Object.values(ENVELOPE_STAGES).map((s) => s.at + s.ms));
 }
+
+/** The first letter of a name (the whole first code point, so a Khmer consonant stays one piece), upper-cased for Latin. */
+export function initialOf(name: string | undefined): string {
+  const ch = Array.from((name ?? "").trim())[0];
+  return ch ? ch.toLocaleUpperCase() : "";
+}
+
+/** The seal's monogram: both partners' initials joined by "&" ("V&S", "វ&ស"); one initial when there is one name. */
+export function sealMonogram(first: string, second?: string): string {
+  const a = initialOf(first);
+  const b = initialOf(second);
+  return a && b ? `${a}&${b}` : a || b;
+}

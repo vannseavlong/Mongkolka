@@ -57,27 +57,20 @@ function Card({ theme, item, index }: { theme: Theme; item: WallItem; index: num
 export function SkinGuestbookWall({ theme, data }: { theme: Theme; data?: GuestbookData }) {
   const { t, language } = useLanguage();
   const sk = useSkinOrnaments();
-  const media = mediaFor(sk);
   const items = buildWall(data);
+  if (items.length === 0) return null; // nothing shared yet: no heading, no empty card
   return (
     <div className="mt-16">
       <h3 className="m-0 text-xl" style={sk.heading(theme, language)}>
         {t("grace.guestbook.wallHeading")}
       </h3>
-      {items.length > 0 ? (
-        <ul className="m-0 mt-8 list-none columns-2 gap-3 p-0 text-left sm:columns-3 sm:gap-5">
-          {items.map((item, i) => (
-            <li key={item.key} className="mb-3 break-inside-avoid sm:mb-5">
-              <Card theme={theme} item={item} index={i} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="mx-auto mt-8 flex max-w-sm flex-col items-center gap-3 p-8" style={media.note(theme)}>
-          <sk.Crest color={theme.accent_color} ground={theme.bg_color} label="♥" size={56} />
-          <p className="m-0 text-base">{t("grace.guestbook.empty")}</p>
-        </div>
-      )}
+      <ul className="m-0 mt-8 list-none columns-2 gap-3 p-0 text-left sm:columns-3 sm:gap-5">
+        {items.map((item, i) => (
+          <li key={item.key} className="mb-3 break-inside-avoid sm:mb-5">
+            <Card theme={theme} item={item} index={i} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

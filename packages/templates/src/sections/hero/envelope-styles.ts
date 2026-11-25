@@ -55,6 +55,7 @@ export const ENVELOPE_CSS = `
 .he2[data-go] .he2-flap{animation:he2-flap ${S.flap.ms}ms ${EASE_IO} ${S.flap.at}ms both,he2-z ${S.flap.ms}ms step-end ${S.flap.at}ms both}
 
 .he2-seal{position:absolute;left:50%;top:57%;width:13%;aspect-ratio:1;z-index:5;transform:translate(-50%,-50%);border-radius:50%;display:grid;place-items:center;color:var(--foil-ink);font-family:var(--seal-font);font-size:calc(var(--ew) * .05);background:radial-gradient(circle at 34% 28%,var(--foil-hi),var(--foil) 55%,var(--foil-lo));box-shadow:0 0 0 1px rgba(255,255,255,.35) inset,0 0 0 3px rgba(0,0,0,.05) inset,0 5px 8px -2px rgba(50,32,18,.4)}
+.he2-seal[data-two]{width:17%;font-size:calc(var(--ew) * .036);letter-spacing:.02em;white-space:nowrap}
 .he2-seal::after{content:"";position:absolute;inset:11%;border-radius:50%;border:1px solid rgba(255,255,255,.4)}
 .he2[data-go] .he2-seal{animation:he2-seal ${S.seal.ms}ms ease-in ${S.seal.at}ms both}
 

@@ -17,6 +17,8 @@ export const WEBSITE_SECTIONS = [
   "music",
   "guestbook",
   "letters",
+  "note",
+  "map",
   "footer",
 ] as const;
 

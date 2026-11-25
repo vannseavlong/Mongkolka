@@ -41,7 +41,6 @@ export function CoverContentForm({ section, onSaved }: { section: WebsiteSection
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground">The line above the names. Leave it empty to keep the template&apos;s own line (shown in grey). Names and date come from the Opening section.</p>
         <TextRow control={form.control} name="taglineKh" label="Sub-title (Khmer)" placeholder={DEFAULTS.taglineKh} />
         <TextRow control={form.control} name="taglineEn" label="Sub-title (English)" placeholder={DEFAULTS.taglineEn} />
         <DialogFooter>

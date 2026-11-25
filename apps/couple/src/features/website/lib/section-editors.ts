@@ -18,6 +18,8 @@ export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
   "invitation",
   "agenda",
   "letters",
+  "note",
+  "map",
 ];
 
 /** True when the builder has an Edit dialog for this section (content or profile backed). */

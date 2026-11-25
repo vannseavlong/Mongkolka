@@ -336,3 +336,18 @@ describe("video section content", () => {
     }
   });
 });
+
+describe("map and note section content", () => {
+  it("keeps the map picture link (http or https only) and trims captions", () => {
+    assert.deepEqual(validateSectionContent("map", { imageUrl: " https://x.test/m.png ", captionEn: " Find us ", junk: 1 }), { imageUrl: "https://x.test/m.png", captionEn: "Find us" });
+    assert.deepEqual(validateSectionContent("map", { imageUrl: "", captionKh: "" }), {});
+    assert.throws(() => validateSectionContent("map", { imageUrl: "javascript:alert(1)" }));
+    assert.throws(() => validateSectionContent("map", { captionEn: "x".repeat(LIMITS.mapCaption + 1) }));
+  });
+  it("keeps the note's title and message per language within the limits", () => {
+    assert.deepEqual(validateSectionContent("note", { titleEn: " No alcohol ", bodyKh: "សូម", extra: true }), { titleEn: "No alcohol", bodyKh: "សូម" });
+    assert.deepEqual(validateSectionContent("note", {}), {});
+    assert.throws(() => validateSectionContent("note", { bodyEn: "x".repeat(LIMITS.noteBody + 1) }));
+    assert.throws(() => validateSectionContent("note", { titleEn: 5 }));
+  });
+});

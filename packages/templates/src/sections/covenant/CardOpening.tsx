@@ -11,7 +11,7 @@ import { foilTextGradient, isDarkColor } from "../khmer/foil";
 import { Butterfly, EdgePetals, FlourishCorner, FlourishEdge, Hearts } from "./card-art";
 import { CARD_CSS, COVENANT_CSS } from "./covenant-styles";
 import { coupleNamesFor } from "./names";
-import { openingText } from "./opening-text";
+import { openingText, openingTitle } from "./opening-text";
 import { useFitScale } from "./use-fit-scale";
 import { guestLine, hasKhmer, introFor, placeLine } from "./intro-logic";
 import { covenantPalette, PINK } from "./palette";
@@ -52,9 +52,10 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, con
   const kh = language === "kh";
   const accent = theme.accent_color;
   const guest = guestLine(guestGreeting);
+  const title = openingTitle(content, language, t("covenant.inviteEn"));
   const { first, second } = coupleNamesFor(couple, language);
-  const dateKh = formatWeddingDate(couple.weddingDate, "kh");
-  const dateEn = formatWeddingDate(couple.weddingDate, "en");
+  const dateKh = formatWeddingDate(couple.weddingDate, "kh", { padDay: true });
+  const dateEn = formatWeddingDate(couple.weddingDate, "en", { padDay: true });
   const where = placeLine(details?.ceremonyVenue, details?.ceremonyAddress);
   const when = [details?.ceremonyTime].filter(Boolean).join("");
   const foil: CSSProperties = {
@@ -154,9 +155,11 @@ export function CovenantCardOpening({ couple, theme, guestGreeting, details, con
             <p className="m-0" style={label("", "clamp(.95rem,4.6vw,1.25rem)")}>
               {openingText(content, "invite", language, t("covenant.invite"))}
             </p>
-            <p className="m-0" style={{ ...foil, fontFamily: CINZEL_FONT, fontWeight: 700, fontSize: "clamp(1rem,5vw,1.3rem)", letterSpacing: "0.04em" }}>
-              {openingText(content, "title", language, t("covenant.inviteEn")).toUpperCase()}
-            </p>
+            {title && (
+              <p className="m-0" style={{ ...foil, fontFamily: CINZEL_FONT, fontWeight: 700, fontSize: "clamp(1rem,5vw,1.3rem)", letterSpacing: "0.04em" }}>
+                {title.toUpperCase()}
+              </p>
+            )}
             {guest && (
               <div className="cv-guestbox mt-3">
                 <p className="m-0 break-words" style={{ ...foil, fontFamily: hasKhmer(guest) ? MOUL_FONT : SCRIPT, fontSize: hasKhmer(guest) ? "clamp(1.1rem,5.6vw,1.6rem)" : "clamp(1.7rem,8vw,2.4rem)", lineHeight: hasKhmer(guest) ? 1.9 : 1.2, overflowWrap: "anywhere" }}>

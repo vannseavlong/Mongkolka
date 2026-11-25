@@ -50,6 +50,7 @@ export function WallClient({ page }: { page: "wishes" | "photos" }) {
     };
   }, [slug]);
 
+  const Page = page === "wishes" ? CovenantWishesPage : CovenantPhotosPage;
   if (site.status === "not-found") return <PageMessage withChrome={false} title="Page not found" body="This wedding website doesn't exist or isn't published." />;
   if (site.status === "error") return <PageMessage withChrome={false} title="Couldn't load this page" body="Please try again in a moment." />;
   if (site.status === "loading" || !slug) return <PageLoading withChrome={false} />;
@@ -69,23 +70,19 @@ export function WallClient({ page }: { page: "wishes" | "photos" }) {
   return (
     <LanguageProvider initialLanguage={lang}>
       <LanguageToggle theme={{ text_color: theme.text_color }} />
-      {page === "wishes" ? (
-        <CovenantWishesPage theme={theme} couple={couple} data={wall.data} status={wall.status} backHref={backHref} guestName={guest} />
-      ) : (
-        <CovenantPhotosPage
-          theme={theme}
-          couple={couple}
-          data={wall.data}
-          status={wall.status}
-          backHref={backHref}
-          guestName={guest}
-          onSubmit={async (input) => {
-            const result = await submitGuestbook(slug, input);
-            fetchGuestbook(slug).then((d) => setWall({ status: "ready", data: d })).catch(() => undefined);
-            return result;
-          }}
-        />
-      )}
+      <Page
+        theme={theme}
+        couple={couple}
+        data={wall.data}
+        status={wall.status}
+        backHref={backHref}
+        guestName={guest}
+        onSubmit={async (input) => {
+          const result = await submitGuestbook(slug, input);
+          fetchGuestbook(slug).then((d) => setWall({ status: "ready", data: d })).catch(() => undefined);
+          return result;
+        }}
+      />
     </LanguageProvider>
   );
 }

@@ -157,7 +157,7 @@ function CovenantCoverShell({
   const p = covenantPalette(theme);
   const { first, second } = coupleNamesFor(couple, language);
   const kh = language === "kh";
-  const date = formatWeddingDate(couple.weddingDate, language);
+  const date = formatWeddingDate(couple.weddingDate, language, { padDay: true });
   const foil: CSSProperties = {
     backgroundImage: foilTextGradient(theme.accent_color, isDarkColor(theme.bg_color) ? theme.bg_color : "#ffffff"),
     WebkitBackgroundClip: "text",

@@ -3,49 +3,47 @@
 import type { CSSProperties } from "react";
 import type { GuestbookPhoto, GuestbookWish, Theme } from "../../types";
 import { MOUL_FONT } from "../../chrome/fonts";
-import { withAlpha } from "../../chrome/gold";
-import { useSkinOrnaments } from "../khmer/skin-context";
-import { mediaFor } from "../skinned/gallery-media";
-import { Blossom } from "./cross";
+import { goldStops, withAlpha } from "../../chrome/gold";
 import { hasKhmer } from "./intro-logic";
-import { PINK } from "./palette";
+import { LazyImage } from "./lazy-image";
+import { guestInitial } from "./wall-logic";
 
 const SCRIPT = 'var(--font-script), "Great Vibes", cursive';
 
-/** One guest wish as a card: a gold-edged white note with a blossom, the words, the guest's name in script, and their photo if they sent one. */
+/**
+ * One guest wish as a card: the guest's photo (if they sent one) on top, then a gold quote mark, the words, and a
+ * signature row with the guest's initial in a gold seal and their name. Plain white card with a gold hairline, so it
+ * reads on any template colour. Cards sit in columns, so they keep their own height.
+ */
 export function WishCard({ theme, wish, photo, index }: { theme: Theme; wish: GuestbookWish; photo?: GuestbookPhoto; index: number }) {
-  const sk = useSkinOrnaments();
-  const media = mediaFor(sk);
   const accent = theme.accent_color;
-  const name = wish.name;
-  const tilt: CSSProperties = { transform: `rotate(${((index % 3) - 1) * 0.6}deg)` };
+  const g = goldStops(accent);
+  const khName = hasKhmer(wish.name);
+  const seal: CSSProperties = { background: `linear-gradient(135deg, ${g.hi}, ${g.mid} 55%, ${g.lo})`, boxShadow: `0 0 0 3px ${withAlpha(accent, 0.15)}` };
   return (
-    <figure className="cv-wish m-0" style={{ ...media.note(theme), ...tilt, borderColor: withAlpha(accent, 0.5) }}>
-      <span aria-hidden className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2" style={{ lineHeight: 0 }}>
-        <svg width="34" height="34" viewBox="-17 -17 34 34">
-          <circle r="15" fill="#ffffff" stroke={withAlpha(accent, 0.6)} strokeWidth="1" />
-          <Blossom x={0} y={0} r={11} petal={PINK.petal} centre={accent} />
-        </svg>
-      </span>
-      {photo && (
-        <div className="mb-3">
-          <media.Frame theme={theme} index={index} variant="wall" aspect="aspect-[4/5]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo.url} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
-          </media.Frame>
-        </div>
-      )}
-      {wish.message && (
-        <blockquote className="m-0 whitespace-pre-line break-words text-[15px] leading-relaxed" style={{ overflowWrap: "anywhere" }}>
-          {wish.message}
-        </blockquote>
-      )}
-      <figcaption
-        className="mt-3 break-words"
-        style={{ color: accent, fontFamily: hasKhmer(name) ? MOUL_FONT : SCRIPT, fontSize: hasKhmer(name) ? "0.95rem" : "1.6rem", lineHeight: hasKhmer(name) ? 1.9 : 1.2 }}
-      >
-        {name}
-      </figcaption>
+    <figure
+      className="cv-wish m-0 overflow-hidden text-left"
+      style={{ backgroundColor: "#ffffff", color: "#3d2a31", borderRadius: 22, border: `1px solid ${withAlpha(accent, 0.35)}`, boxShadow: `0 18px 34px -24px ${withAlpha(accent, 0.8)}`, padding: 0 }}
+    >
+      {photo && <LazyImage src={photo.url} alt="" tint={accent} ratio={index % 2 ? "4 / 3" : "1 / 1"} />}
+      <div className="px-5 pb-5 pt-4">
+        <span aria-hidden className="block select-none leading-none" style={{ color: withAlpha(accent, 0.5), fontFamily: "Georgia, serif", fontSize: 44, height: 28 }}>
+          &ldquo;
+        </span>
+        {wish.message && (
+          <blockquote className="m-0 whitespace-pre-line break-words text-[15px] leading-relaxed" style={{ overflowWrap: "anywhere" }}>
+            {wish.message}
+          </blockquote>
+        )}
+        <figcaption className="mt-4 flex items-center gap-3 border-t pt-3" style={{ borderColor: withAlpha(accent, 0.2) }}>
+          <span className="grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold" style={{ ...seal, color: "#fff" }} aria-hidden>
+            {guestInitial(wish.name)}
+          </span>
+          <span className="min-w-0 break-words" style={{ color: accent, fontFamily: khName ? MOUL_FONT : SCRIPT, fontSize: khName ? "0.9rem" : "1.45rem", lineHeight: khName ? 1.8 : 1.15 }}>
+            {wish.name}
+          </span>
+        </figcaption>
+      </div>
     </figure>
   );
 }

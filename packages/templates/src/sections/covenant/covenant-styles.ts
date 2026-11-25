@@ -69,6 +69,39 @@ export const COVENANT_CSS = `
 .cv-link:focus-visible{outline:2px solid var(--cv-mid);outline-offset:3px}
 .cv-wish{break-inside:avoid;position:relative;padding:22px 20px 18px;border-radius:22px;text-align:center}
 
+.cv-lazy{position:relative;display:block;width:100%;overflow:hidden;background:linear-gradient(110deg,var(--cv-tint) 30%,var(--cv-tint-hi) 50%,var(--cv-tint) 70%);background-size:220% 100%;animation:cv-shimmer 1.5s linear infinite}
+.cv-lazy>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.05);filter:blur(12px);transition:opacity .7s ease,transform 1s cubic-bezier(.2,.8,.2,1),filter .7s ease;will-change:opacity,transform}
+.cv-lazy-fill{position:absolute;inset:0;height:100%}
+.cv-lazy[data-ready]{animation:none;background:var(--cv-tint)}
+.cv-lazy[data-ready]>img{opacity:1;transform:none;filter:none}
+.cv-photo-card{position:relative;overflow:hidden;text-decoration:none;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.cv-photo-name{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 9px;color:#fff;font-size:13px;text-align:left;overflow-wrap:anywhere;background:linear-gradient(180deg,transparent,rgba(50,16,30,.62))}
+@media (hover:hover){.cv-photo-card:hover{transform:translateY(-3px)}}
+.cv-photo-card:focus-visible{outline:2px solid var(--cv-mid,#b8892e);outline-offset:3px}
+.cv-flow{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;padding:4px 16px 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.cv-flow::-webkit-scrollbar{display:none}
+.cv-flow-col{flex:0 0 min(62vw,17rem);display:flex;flex-direction:column;gap:12px;scroll-snap-align:start}
+.cv-flow-col>.cv-tile{width:100%}
+.cv-nav{display:inline-flex;width:44px;height:44px;align-items:center;justify-content:center;border-radius:50%;border:1px solid var(--cv-line,#d8b46a);background:#fff;color:var(--cv-ink,#8a6418);cursor:pointer;transition:transform .2s ease,opacity .2s ease}
+.cv-nav:hover{transform:scale(1.06)}.cv-nav:disabled{opacity:.35;cursor:default;transform:none}
+.cv-nav:focus-visible{outline:2px solid var(--cv-ink,#8a6418);outline-offset:3px}
+.cv-bar{height:3px;border-radius:3px;background:rgba(0,0,0,.08);overflow:hidden}
+.cv-bar>i{display:block;height:100%;border-radius:3px;background:var(--cv-ink,#8a6418);transition:width .3s ease}
+.cv-feature{animation:cv-fade .55s ease both}
+.cv-thumb{flex:0 0 auto;width:64px;padding:0;border:0;border-radius:12px;overflow:hidden;cursor:pointer;opacity:.6;background:none;transition:opacity .25s ease,transform .25s ease;-webkit-tap-highlight-color:transparent}
+.cv-thumb[aria-current="true"]{opacity:1;transform:translateY(-3px)}
+.cv-thumb:focus-visible{outline:2px solid var(--cv-ink,#8a6418);outline-offset:2px}
+.cv-polaroid{display:block;width:100%;padding:8px 8px 26px;border:0;cursor:zoom-in;background:#fff;box-shadow:0 14px 24px -14px rgba(60,30,40,.55);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+@media (hover:hover){.cv-polaroid:hover{transform:rotate(0deg) translateY(-4px)!important}}
+.cv-polaroid:focus-visible{outline:2px solid var(--cv-ink,#8a6418);outline-offset:3px}
+@keyframes cv-fade{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.cv-flow{scroll-behavior:auto}.cv-feature{animation:none}.cv-thumb,.cv-polaroid,.cv-nav{transition:none}}
+.cv-poster{animation:cv-kenburns 14s ease-in-out infinite alternate}
+@keyframes cv-kenburns{from{transform:scale(1)}to{transform:scale(1.07)}}
+@media (prefers-reduced-motion:reduce){.cv-poster{animation:none}}
+@keyframes cv-shimmer{to{background-position:-220% 0}}
+@media (prefers-reduced-motion:reduce){.cv-lazy{animation:none}.cv-lazy>img{transition:opacity .2s ease;transform:none;filter:none}}
+
 @keyframes cv-fall{0%{opacity:0;transform:translate3d(0,-10px,0) rotate(var(--r))}10%{opacity:.85}100%{opacity:0;transform:translate3d(var(--x),108svh,0) rotate(calc(var(--r) + 320deg))}}
 @keyframes cv-sx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes cv-sy{from{transform:scaleY(0)}to{transform:scaleY(1)}}

@@ -44,7 +44,7 @@ export function SectionTitleFields({
             id={`title-kh-${section.section_id}`}
             value={values.kh}
             maxLength={TITLE_MAX}
-            placeholder={defaultSectionTitle(section.section_key, "kh")}
+            placeholder={defaultSectionTitle(section.section_key, "kh", section.component_id)}
             onChange={(e) => setValues((v) => ({ ...v, kh: e.target.value }))}
           />
         </div>
@@ -54,7 +54,7 @@ export function SectionTitleFields({
             id={`title-en-${section.section_id}`}
             value={values.en}
             maxLength={TITLE_MAX}
-            placeholder={defaultSectionTitle(section.section_key, "en")}
+            placeholder={defaultSectionTitle(section.section_key, "en", section.component_id)}
             onChange={(e) => setValues((v) => ({ ...v, en: e.target.value }))}
           />
         </div>

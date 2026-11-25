@@ -29,20 +29,22 @@ export function localizeDigits(value: number | string, language: "en" | "kh"): s
   return language === "kh" ? toKhmerDigits(value) : String(value);
 }
 
+const day = (d: number, o?: { padDay?: boolean }) => (o?.padDay ? String(d).padStart(2, "0") : d);
+
 /**
  * `language` is optional so existing callers keep the runtime default locale.
  * With it, output is deterministic (UTC date, fixed en-US locale, and a built-in
  * Khmer formatter that does not depend on the runtime's ICU data), so server and
- * client renders cannot differ.
+ * client renders cannot differ. `padDay` writes the day with two digits (07 / ០៧).
  */
-export function formatWeddingDate(iso: string | undefined, language?: "en" | "kh"): string | null {
+export function formatWeddingDate(iso: string | undefined, language?: "en" | "kh", options?: { padDay?: boolean }): string | null {
   if (!iso) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
   if (language === "kh") {
-    return `${toKhmerDigits(date.getUTCDate())} ${KH_MONTHS[date.getUTCMonth()]} ${toKhmerDigits(date.getUTCFullYear())}`;
+    return `${toKhmerDigits(day(date.getUTCDate(), options))} ${KH_MONTHS[date.getUTCMonth()]} ${toKhmerDigits(date.getUTCFullYear())}`;
   }
-  const opts: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" };
+  const opts: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: options?.padDay ? "2-digit" : "numeric" };
   if (language === "en") return date.toLocaleDateString("en-US", { ...opts, timeZone: "UTC" });
   return date.toLocaleDateString(undefined, opts);
 }

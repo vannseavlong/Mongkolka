@@ -70,7 +70,7 @@ import { GardenOpening, GardenHero } from "./sections/garden";
 import { CreamOpening, CreamHero } from "./sections/cream";
 import { SakuraOpening, SakuraHero } from "./sections/sakura";
 import { FairytaleOpening, FairytaleHero, FairytaleGallery } from "./sections/fairytale";
-import { CovenantButterflyCover, CovenantGardenCover, CovenantCardOpening, CovenantOpening, CovenantHero, CovenantVerse, CovenantVideo, CovenantMemories, CovenantGallery } from "./sections/covenant";
+import { CovenantButterflyCover, CovenantGardenCover, CovenantCardOpening, CovenantOpening, CovenantHero, CovenantVerse, CovenantVideo, CovenantMemories, CovenantGallery, CovenantGalleryFlow, CovenantGallerySpotlight, CovenantGalleryPolaroid, CovenantVideoCinema, CovenantVideoArch, CovenantVideoPolaroid, CovenantVideoStory, CovenantLettersPaper, CovenantLettersArch, CovenantLettersScript, CovenantNoteCard, CovenantNoteBanner, CovenantNoteRibbon, CovenantMapPaper, CovenantMapPostcard } from "./sections/covenant";
 import { KidsOpening, KidsHero, InvitationKids, AgendaKids, DetailsKids } from "./sections/kids";
 
 // Each section's components take a different, section-specific props shape (see
@@ -156,9 +156,16 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
     gallery_grace: GraceGallery,
     gallery_skin: SkinGallery,
     gallery_covenant: CovenantGallery,
+    gallery_flow_covenant: CovenantGalleryFlow,
+    gallery_spotlight_covenant: CovenantGallerySpotlight,
+    gallery_polaroid_covenant: CovenantGalleryPolaroid,
   },
   video: {
     video_skin: CovenantVideo,
+    video_cinema_covenant: CovenantVideoCinema,
+    video_arch_covenant: CovenantVideoArch,
+    video_polaroid_covenant: CovenantVideoPolaroid,
+    video_story_covenant: CovenantVideoStory,
   },
   details: {
     details_classic: DetailsClassic,
@@ -206,7 +213,18 @@ export const sectionRegistry: Record<SectionKey, Record<string, AnyComponent>> =
   },
   letters: {
     letters_khmer: LettersKhmer,
+    letters_paper_covenant: CovenantLettersPaper,
+    letters_arch_covenant: CovenantLettersArch,
+    letters_script_covenant: CovenantLettersScript,
   },
+  note: {
+    note_card_skin: CovenantNoteCard,
+    note_banner_skin: CovenantNoteBanner,
+    note_ribbon_skin: CovenantNoteRibbon,
+  },
+  map: {
+    map_paper_skin: CovenantMapPaper,
+    map_postcard_skin: CovenantMapPostcard,  },
   footer: {
     footer_classic: FooterClassic,
     footer_grace: GraceFooter,

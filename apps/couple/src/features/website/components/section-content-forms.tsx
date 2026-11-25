@@ -26,6 +26,8 @@ import { LettersContentForm } from "./letters-content-form";
 import { CoverContentForm } from "./cover-content-form";
 import { OpeningContentForm } from "./opening-content-form";
 import { VideoContentForm } from "./video-content-form";
+import { MapContentForm } from "./map-content-form";
+import { NoteContentForm } from "./note-content-form";
 import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
 
@@ -36,8 +38,15 @@ export { CONTENT_EDITABLE_SECTIONS } from "../lib/section-editors";
 // gallery — content: { photos: string[] }
 // ---------------------------------------------------------------------------
 
+/** Fewest and most photos the invitation page can show before "See all" (the Covenant galleries clamp to the same range). */
+const HOME_PHOTOS_MIN = 3;
+const HOME_PHOTOS_MAX = 24;
+
 const gallerySchema = z.object({
   photos: z.array(z.object({ url: z.string().min(1, "Photo URL is required") })),
+  maxPhotos: z
+    .string()
+    .refine((v) => v.trim() === "" || (/^\d+$/.test(v.trim()) && Number(v) >= HOME_PHOTOS_MIN && Number(v) <= HOME_PHOTOS_MAX), `Enter a whole number from ${HOME_PHOTOS_MIN} to ${HOME_PHOTOS_MAX}, or leave it empty`),
 });
 type GalleryFormValues = z.infer<typeof gallerySchema>;
 
@@ -48,6 +57,7 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
     resolver: zodResolver(gallerySchema),
     defaultValues: {
       photos: initialPhotos.filter((p): p is string => typeof p === "string").map((url) => ({ url })),
+      maxPhotos: typeof content.maxPhotos === "number" ? String(content.maxPhotos) : "",
     },
   });
   const { fields, append, remove, move } = useFieldArray({ control: form.control, name: "photos" });
@@ -56,7 +66,8 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
 
   async function onSubmit(values: GalleryFormValues) {
     try {
-      await saveContent(section.section_id, { photos: values.photos.map((p) => p.url) });
+      const max = values.maxPhotos.trim();
+      await saveContent(section.section_id, { ...content, photos: values.photos.map((p) => p.url), maxPhotos: max ? Number(max) : undefined });
       toast.success("Gallery updated");
       onSaved();
     } catch (err) {
@@ -122,6 +133,22 @@ function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onS
             const have = form.getValues("photos").map((p) => p.url);
             newUrlsOnly(have, urls).forEach((url) => append({ url }));
           }}
+        />
+        <FormField
+          control={form.control}
+          name="maxPhotos"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Photos shown on the invitation page</FormLabel>
+              <FormControl>
+                <Input inputMode="numeric" className="w-32" placeholder="Template default" {...field} />
+              </FormControl>
+              <p className="text-sm text-muted-foreground">
+                The rest are one tap away behind the &ldquo;See all photos&rdquo; button. {HOME_PHOTOS_MIN} to {HOME_PHOTOS_MAX}; leave empty for the template&apos;s own number.
+              </p>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         <DialogFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
@@ -682,6 +709,8 @@ export function SectionContentForm({ section, onSaved }: { section: WebsiteSecti
   if (section.section_key === "invitation") return <InvitationContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "agenda") return <AgendaContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "video") return <VideoContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "note") return <NoteContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "map") return <MapContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "letters") return <LettersContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   return null;
 }

@@ -24,6 +24,8 @@ export const SECTION_KEYS = [
   "music",
   "guestbook",
   "letters",
+  "note",
+  "map",
   "footer",
 ] as const;
 
@@ -152,8 +154,25 @@ export interface VideoContent {
   title?: string;
 }
 
+/** `map` section: the couple's own drawn map picture and an optional caption. The directions button uses the details map link. */
+export interface MapContent {
+  imageUrl?: string;
+  captionKh?: string;
+  captionEn?: string;
+}
+
+/** `note` section: a short message to guests (for example "no alcohol at this wedding"). Empty fields use the built-in note. */
+export interface NoteContent {
+  titleKh?: string;
+  titleEn?: string;
+  bodyKh?: string;
+  bodyEn?: string;
+}
+
 export interface GalleryContent {
   photos: string[];
+  /** How many photos the invitation page shows before "show all" (Covenant galleries; 3 to 24). Empty uses the template's own number. */
+  maxPhotos?: number;
 }
 
 export interface DetailsContent {

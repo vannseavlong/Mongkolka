@@ -41,6 +41,8 @@ function buildContent(sectionKey: SectionKey, profile: PublicSiteResponse["profi
     case "invitation":
     case "agenda":
     case "letters":
+    case "note":
+    case "map":
     case "footer":
       // Owned by website_sections.content; nothing derived from the profile.
       return {};
@@ -170,6 +172,8 @@ export function SiteView({
               },
             };
           }
+          // The directions button on the map uses the venue link from the details.
+          if (sectionKey === "map") return { mapUrl: site.profile?.map_url ?? undefined };
           if (sectionKey === "footer") return { brandUrl };
           return {};
         }}

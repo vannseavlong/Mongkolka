@@ -22,7 +22,7 @@ import { resolveTheme } from "./theme";
 import type { CoupleInfo, CoverContent, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
 /** Gallery styles that draw their own "show all" button (it links to the sub-page), so none is added under them. */
-const GALLERY_OWN_LINK: ReadonlySet<string> = new Set(["gallery_covenant"]);
+const GALLERY_OWN_LINK: ReadonlySet<string> = new Set(["gallery_covenant", "gallery_flow_covenant", "gallery_spotlight_covenant", "gallery_polaroid_covenant"]);
 
 export interface SiteRendererSection {
   section_id: string;

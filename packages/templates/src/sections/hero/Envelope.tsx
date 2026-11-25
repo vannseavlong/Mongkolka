@@ -7,6 +7,7 @@ import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { CINZEL_FONT, KHMER_BODY_FONT } from "../../chrome/fonts";
 import { goldStops, mixHex } from "../../chrome/gold";
 import { hasKhmer } from "../covenant/intro-logic";
+import { sealMonogram } from "./envelope-logic";
 import { ENVELOPE_CSS, typeDelay } from "./envelope-styles";
 import { KHMER_DISPLAY_FONT, SCRIPT_FONT, useHeroText } from "./hero-text";
 
@@ -40,6 +41,7 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
     if (inView || reduce) setGo(true);
   }, [inView, reduce]);
 
+  const monogram = sealMonogram(first, second);
   const g = goldStops(theme.accent_color);
   const a = theme.accent_color;
   const photo = content?.coverPhotoUrl;
@@ -133,8 +135,8 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
           <i className="out" />
           <i className="in" />
         </div>
-        <div aria-hidden className="he2-seal">
-          {Array.from(first)[0]?.toLocaleUpperCase()}
+        <div aria-hidden className="he2-seal" data-two={monogram.length > 1 ? "" : undefined}>
+          {monogram}
         </div>
       </div>
 

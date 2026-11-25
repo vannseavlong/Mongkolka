@@ -19,7 +19,7 @@ import { SkinGuestbookWall } from "./GuestbookSkinWall";
  * as the Grace guestbook (same props, same submit contract, pending/approved outcome), dressed in
  * the active skin's card, fields, button, photo frames and notes.
  */
-export function SkinGuestbook({ couple, theme, guestbook, actions, onSubmit }: GuestbookWallProps) {
+export function SkinGuestbook({ couple, theme, guestbook, actions, onSubmit, photosHref, wishesHref }: GuestbookWallProps & { photosHref?: string; wishesHref?: string }) {
   const { t, language } = useLanguage();
   const { name: invitedName } = useGuest();
   const sk = useSkinOrnaments();
@@ -27,6 +27,7 @@ export function SkinGuestbook({ couple, theme, guestbook, actions, onSubmit }: G
   const tone = mediaTones(theme);
   const form = useGuestbookForm(invitedName, onSubmit);
   const act = useGuestbookActions(couple, actions);
+  const seeAllHref = wishesHref ?? photosHref;
 
   const buttons = [
     actions?.mapsUrl && { key: "maps", icon: MapPin, label: t("grace.guestbook.directions"), onClick: act.openMaps },
@@ -37,10 +38,11 @@ export function SkinGuestbook({ couple, theme, guestbook, actions, onSubmit }: G
   return (
     <MediaSection theme={theme} id="guestbook" heading={t("grace.guestbook.heading")} intro={t("grace.guestbook.subheading")}>
       <SkinCard theme={theme}>
-        <SkinGuestbookForm theme={theme} form={form} />
+        <SkinGuestbookForm theme={theme} form={form} more={seeAllHref ? { href: seeAllHref, label: t("grace.guestbook.seeAll") } : undefined} />
       </SkinCard>
 
-      <SkinGuestbookWall theme={theme} data={guestbook} />
+      {/* With a sub-page, every wish and photo lives there; without one (previews) the wall stays in the section. */}
+      {!seeAllHref && <SkinGuestbookWall theme={theme} data={guestbook} />}
 
       <div className="mt-14">
         <p className="m-0 text-base" style={{ color: tone.accent }}>

@@ -20,6 +20,7 @@ import { Skeleton } from "@mongkolka/ui/skeleton";
 import { cn } from "@mongkolka/ui/utils";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
+import { DriveReconnectBanner } from "@/features/storage/components/drive-reconnect-banner";
 import { SECTIONS_KEY } from "../lib/keys";
 import { sectionLabel } from "../workspace/section-labels";
 import type { WebsiteSectionKey } from "../data/schema";
@@ -152,6 +153,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
 
   return (
     <div className="flex flex-col gap-3">
+      <DriveReconnectBanner />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium">Image library</h3>
         <p className={cn("text-xs", full ? "font-medium text-destructive" : "text-muted-foreground")} aria-live="polite">

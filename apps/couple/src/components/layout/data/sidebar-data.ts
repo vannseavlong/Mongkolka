@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Wallet, ListChecks, Milestone, Globe, Heart, Images } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, ListChecks, Milestone, Globe, Heart, Images, HardDrive } from "lucide-react";
 import type { SidebarNavData } from "@mongkolka/ui/layout/nav-types";
 
 export const sidebarData: SidebarNavData = {
@@ -19,6 +19,7 @@ export const sidebarData: SidebarNavData = {
         { title: "Builder", href: "/website", icon: Globe },
         { title: "Guestbook", href: "/photos", icon: Images },
         { title: "Profile", href: "/profile", icon: Heart },
+        { title: "Storage", href: "/settings/storage", icon: HardDrive },
       ],
     },
   ],

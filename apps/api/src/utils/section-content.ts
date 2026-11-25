@@ -233,7 +233,8 @@ function cleanRegistry(content: Obj): Obj {
   }
   return compact({
     links: cleanLinks(content.links),
-    khqrImageUrl: validateHttpsUrl(content.khqrImageUrl, "khqrImageUrl"),
+    khqrImageUrl: validateImageUrl(content.khqrImageUrl, "khqrImageUrl"),
+    khqrLinkUrl: validateHttpsUrl(content.khqrLinkUrl, "khqrLinkUrl"),
     bank: optString(content, "bank", LIMITS.bank, "content"),
     accountName: optString(content, "accountName", LIMITS.accountName, "content"),
     accountNumber,

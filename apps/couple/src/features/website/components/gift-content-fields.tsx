@@ -10,6 +10,8 @@ import { TextRow } from "./section-form-fields";
 /** The gift fields every registry form shares. Mirrors the server limits (UX only; the API enforces them). */
 export interface GiftFormValues {
   khqrImageUrl: string;
+  /** Opens when a guest taps the QR (the bank's payment deep link). */
+  khqrLinkUrl: string;
   bank: string;
   accountName: string;
   accountNumber: string;
@@ -24,6 +26,7 @@ export function giftFromContent(content: Record<string, unknown>): GiftFormValue
   const s = (v: unknown) => (typeof v === "string" ? v : "");
   return {
     khqrImageUrl: s(content.khqrImageUrl),
+    khqrLinkUrl: s(content.khqrLinkUrl),
     bank: s(content.bank),
     accountName: s(content.accountName),
     accountNumber: s(content.accountNumber),
@@ -52,7 +55,7 @@ export function GiftContentFields<T extends Host>({ form }: { form: UseFormRetur
 
   return (
     <fieldset className="flex flex-col gap-3 rounded-md border p-3">
-      <legend className="px-1 text-sm font-medium">Gift (KHQR)</legend>
+      <legend className="px-1 text-sm font-medium">Gift (QR payment)</legend>
       <p className="text-xs text-muted-foreground">
         Shown on your site with a copy button. Guests send gifts in their own banking app; nothing is collected here.
       </p>
@@ -82,6 +85,7 @@ export function GiftContentFields<T extends Host>({ form }: { form: UseFormRetur
         returnFocusRef={pickerButtonRef}
         onConfirm={([url]) => url && typed.setValue("gift.khqrImageUrl", url, { shouldDirty: true })}
       />
+      <TextRow control={control} name="gift.khqrLinkUrl" label="Payment link" placeholder="https://pay.ababank.com/…" hint="Optional. Tapping the QR opens this, e.g. your ABA payment link. Must start with https://" />
       <TextRow control={control} name="gift.bank" label="Bank" placeholder="ABA Bank" />
       <TextRow control={control} name="gift.accountName" label="Account name" />
       <TextRow control={control} name="gift.accountNumber" label="Account number" hint="Digits, spaces and hyphens only." />

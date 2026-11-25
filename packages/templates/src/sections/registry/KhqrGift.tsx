@@ -95,14 +95,40 @@ export function RegistryKhqr({ theme, content }: RegistryKhqrProps) {
               <p className="mb-4 text-xs uppercase tracking-[0.2em]" style={{ color: ink }}>
                 {t("scan")}
               </p>
-              <div className="relative mx-auto w-fit rounded-xl bg-white p-4" style={{ boxShadow: `0 0 0 1px ${withAlpha(stops.lo, 0.5)}, 0 6px 16px ${withAlpha("#000000", 0.14)}` }}>
-                <Corner stroke={stops.mid} className="left-1 top-1" />
-                <Corner stroke={stops.mid} className="right-1 top-1 rotate-90" />
-                <Corner stroke={stops.mid} className="bottom-1 right-1 rotate-180" />
-                <Corner stroke={stops.mid} className="bottom-1 left-1 -rotate-90" />
-                {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied QR; next/image needs known hosts */}
-                <img src={gift.imageUrl} alt={t("qrAlt")} className="block size-48 max-w-full object-contain" loading="lazy" />
-              </div>
+              {(() => {
+                const plate = (
+                  <>
+                    <Corner stroke={stops.mid} className="left-1 top-1" />
+                    <Corner stroke={stops.mid} className="right-1 top-1 rotate-90" />
+                    <Corner stroke={stops.mid} className="bottom-1 right-1 rotate-180" />
+                    <Corner stroke={stops.mid} className="bottom-1 left-1 -rotate-90" />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- user-supplied QR; next/image needs known hosts */}
+                    <img src={gift.imageUrl} alt={t("qrAlt")} className="block size-48 max-w-full object-contain" loading="lazy" />
+                  </>
+                );
+                const plateStyle = { boxShadow: `0 0 0 1px ${withAlpha(stops.lo, 0.5)}, 0 6px 16px ${withAlpha("#000000", 0.14)}` };
+                return gift.linkUrl ? (
+                  <>
+                    <a
+                      href={gift.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("tapToPay")}
+                      className="relative mx-auto block w-fit rounded-xl bg-white p-4 outline-none transition-transform active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-offset-2"
+                      style={plateStyle}
+                    >
+                      {plate}
+                    </a>
+                    <p className="mt-3 text-xs opacity-80" style={{ fontFamily: isKh ? KHMER_BODY_FONT : undefined }}>
+                      {t("tapToPay")}
+                    </p>
+                  </>
+                ) : (
+                  <div className="relative mx-auto w-fit rounded-xl bg-white p-4" style={plateStyle}>
+                    {plate}
+                  </div>
+                );
+              })()}
             </>
           )}
 

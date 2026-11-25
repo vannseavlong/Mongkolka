@@ -302,8 +302,9 @@ describe("Registry gift content validation", () => {
     });
   });
 
-  it("rejects non-https images and bad account numbers", () => {
-    assert.throws(() => validateSectionContent("registry", { khqrImageUrl: "http://x.test/a.png" }), /https/);
+  it("rejects non-web images and bad account numbers", () => {
+    // http is allowed because local dev storage serves over http (same rule as the hero banners).
+    assert.doesNotThrow(() => validateSectionContent("registry", { khqrImageUrl: "http://localhost:4000/uploads/a.webp" }));
     assert.throws(() => validateSectionContent("registry", { khqrImageUrl: "javascript:alert(1)" }), /khqrImageUrl/);
     assert.throws(() => validateSectionContent("registry", { khqrImageUrl: "data:image/png;base64,AA" }), /khqrImageUrl/);
     assert.throws(() => validateSectionContent("registry", { accountNumber: "12AB34" }), /digits, spaces and hyphens/);

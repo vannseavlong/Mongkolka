@@ -179,6 +179,8 @@ export interface RegistryContent {
   links: { label: string; url: string }[];
   /** Gift (KHQR) block, display only: no amounts, nothing is collected. */
   khqrImageUrl?: string;
+  /** Where tapping the QR goes: the bank's payment deep link (e.g. an ABA https link). https only. */
+  khqrLinkUrl?: string;
   bank?: string;
   accountName?: string;
   /** Digits, spaces and hyphens only (validated server-side). */

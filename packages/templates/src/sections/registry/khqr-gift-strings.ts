@@ -8,6 +8,7 @@ const STRINGS = {
   en: {
     heading: "Wedding Gift",
     scan: "Scan to send your gift",
+    tapToPay: "Tap the QR to open your bank app",
     bank: "Bank",
     accountName: "Account name",
     accountNumber: "Account number",
@@ -20,6 +21,7 @@ const STRINGS = {
   kh: {
     heading: "អំណោយចំណងដៃ",
     scan: "ស្កេនដើម្បីផ្ញើអំណោយ",
+    tapToPay: "ចុចលើ QR ដើម្បីបើកកម្មវិធីធនាគារ",
     bank: "ធនាគារ",
     accountName: "ឈ្មោះគណនី",
     accountNumber: "លេខគណនី",

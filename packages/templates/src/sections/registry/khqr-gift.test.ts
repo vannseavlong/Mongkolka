@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { accountNumberDigits, copyText, safeImageUrl, toGiftView } from "./khqr-gift-logic";
+import { accountNumberDigits, copyText, safeImageUrl, safeLinkUrl, toGiftView } from "./khqr-gift-logic";
 
 test("toGiftView: nothing to show returns null", () => {
   assert.equal(toGiftView(undefined), null);
@@ -43,4 +43,14 @@ test("copyText: async clipboard, legacy fallback, failure", async () => {
   assert.equal(await copyText("1", { writeText: async () => Promise.reject(new Error("no")), legacyCopy: () => true }), "copied");
   assert.equal(await copyText("1", { writeText: async () => Promise.reject(new Error("no")) }), "failed");
   assert.equal(await copyText("1", { legacyCopy: () => { throw new Error("x"); } }), "failed");
+});
+
+test("payment link on the QR: https only", () => {
+  assert.equal(safeLinkUrl("https://pay.ababank.com/abc123"), "https://pay.ababank.com/abc123");
+  assert.equal(safeLinkUrl("  https://pay.ababank.com/abc123 "), "https://pay.ababank.com/abc123");
+  assert.equal(safeLinkUrl("http://pay.ababank.com/x"), undefined);
+  assert.equal(safeLinkUrl("javascript:alert(1)"), undefined);
+  assert.equal(safeLinkUrl("//evil.com"), undefined);
+  assert.equal(safeLinkUrl(""), undefined);
+  assert.equal(toGiftView({ links: [], khqrImageUrl: "https://x.com/q.png", khqrLinkUrl: "https://pay.ababank.com/a" })?.linkUrl, "https://pay.ababank.com/a");
 });

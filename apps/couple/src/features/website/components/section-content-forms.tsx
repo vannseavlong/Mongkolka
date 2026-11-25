@@ -146,6 +146,7 @@ const registrySchema = z.object({
   ),
   gift: z.object({
     khqrImageUrl: z.string(),
+    khqrLinkUrl: z.string().refine((v) => v.trim() === "" || /^https:\/\/\S+$/i.test(v.trim()), "Must start with https://"),
     bank: z.string().max(GIFT_LIMITS.bank, `Max ${GIFT_LIMITS.bank} characters`),
     accountName: z.string().max(GIFT_LIMITS.accountName, `Max ${GIFT_LIMITS.accountName} characters`),
     accountNumber: z

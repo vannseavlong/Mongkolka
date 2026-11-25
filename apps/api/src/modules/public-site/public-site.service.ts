@@ -1,3 +1,4 @@
+import { publicMediaUrls, toPublicUrl } from "../../utils/media-url.js";
 import { randomUUID } from "node:crypto";
 import { PublicSiteModel } from "./public-site.model.js";
 import { TtlCache } from "../../utils/ttl-cache.js";
@@ -25,6 +26,15 @@ async function findPublishedCoupleBySlug(slug: string) {
   return couple;
 }
 
+/** The profile's image fields with the API address in front of our own paths. */
+function exposeProfileUrls<T extends Record<string, unknown>>(profile: T): T {
+  const out: Record<string, unknown> = { ...profile };
+  for (const field of ["cover_photo_url", "venue_image_url"]) {
+    if (typeof out[field] === "string") out[field] = toPublicUrl(out[field] as string);
+  }
+  return out as T;
+}
+
 async function loadSite(slug: string): Promise<CachedSite> {
   const couple = await findPublishedCoupleBySlug(slug);
   if (!couple) return { site: null, coupleId: null, actorSheetId: null };
@@ -49,9 +59,9 @@ async function loadSite(slug: string): Promise<CachedSite> {
         wedding_date: couple.wedding_date ?? null,
         slug: couple.slug,
       },
-      profile: profile ?? null,
+      profile: profile ? exposeProfileUrls(profile) : null,
       template: template ?? null,
-      sections: sections.filter((s) => s.enabled),
+      sections: sections.filter((s) => s.enabled).map((s) => (s.content == null ? s : { ...s, content: publicMediaUrls(s.content) })),
     },
   };
 }

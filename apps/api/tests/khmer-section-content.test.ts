@@ -12,7 +12,7 @@ import {
   validateStartsAt,
 } from "../src/utils/section-content.js";
 import { CoupleWebsiteModel } from "../src/modules/couple-website/couple-website.model.js";
-import { CoupleWebsiteService, ContentValidationError } from "../src/modules/couple-website/couple-website.service.js";
+import { CoupleWebsiteService, ContentValidationError, exposeSection } from "../src/modules/couple-website/couple-website.service.js";
 import { CoupleWebsiteController } from "../src/modules/couple-website/couple-website.controller.js";
 import { CoupleProfileModel } from "../src/modules/couple-profile/couple-profile.model.js";
 import { CoupleProfileService, ProfileInputError } from "../src/modules/couple-profile/couple-profile.service.js";
@@ -166,6 +166,16 @@ describe("section content wiring", () => {
     assert.deepEqual(writes, [{ id: "s_inv", data: { content: { monogram: "S&D" } } }]);
   });
 
+  it("saves our own image URLs as paths, and serves them with the API address", async () => {
+    const base = process.env.PUBLIC_API_URL ?? "http://localhost:4000";
+    rows.s_gal = { section_id: "s_gal", section_key: "gallery", content: null };
+    await CoupleWebsiteService.updateSection("sheet", "s_gal", { content: { photos: [`${base}/uploads/couples/c/assets/a.jpg`, "https://cdn.example/b.jpg"] } });
+    assert.deepEqual(writes[0]?.data.content, { photos: ["/uploads/couples/c/assets/a.jpg", "https://cdn.example/b.jpg"] });
+    const out = exposeSection({ section_id: "s_gal", content: { photos: ["/uploads/couples/c/assets/a.jpg", "https://cdn.example/b.jpg"] } });
+    assert.deepEqual(out.content, { photos: [`${base}/uploads/couples/c/assets/a.jpg`, "https://cdn.example/b.jpg"] });
+    assert.equal(exposeSection({ content: null }).content, null);
+  });
+
   it("rejects bad content before writing anything", async () => {
     await assert.rejects(
       CoupleWebsiteService.updateSection("sheet", "s_inv", { content: { startsAt: "nope" } }),
@@ -225,6 +235,13 @@ describe("section content wiring", () => {
     } finally {
       server.close();
     }
+  });
+
+  it("profile saves our own uploads as paths, and still refuses other http links", async () => {
+    const base = process.env.PUBLIC_API_URL ?? "http://localhost:4000";
+    await CoupleProfileService.update("c1", "sheet", { cover_photo_url: `${base}/uploads/couples/c/assets/a.jpg`, venue_image_url: `${base}/media/c/abcDEF12345` });
+    assert.deepEqual(profileWrites[0], { cover_photo_url: "/uploads/couples/c/assets/a.jpg", venue_image_url: "/media/c/abcDEF12345" });
+    await assert.rejects(CoupleProfileService.update("c1", "sheet", { venue_image_url: "http://evil.example/x.jpg" }), ProfileInputError);
   });
 
   it("profile accepts https map_url / venue_image_url, clears empties, rejects the rest", async () => {

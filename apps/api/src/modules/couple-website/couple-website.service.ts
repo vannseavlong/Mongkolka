@@ -9,6 +9,7 @@ import {
   parseDefaultSections,
 } from "../../utils/section-keys.js";
 import { validateSectionContent } from "../../utils/section-content.js";
+import { publicMediaUrls, storeMediaUrls } from "../../utils/media-url.js";
 import { validateSectionTitle } from "../../utils/section-title.js";
 import { resolveSiteLanguage, type SiteLanguage } from "../../utils/language.js";
 import { SiteTemplatesService } from "../site-templates/site-templates.service.js";
@@ -62,6 +63,11 @@ function isSet(value: unknown): boolean {
 
 /** Columns a couple may change through PATCH /sections/:id. */
 const PATCHABLE_SECTION_FIELDS = ["component_id", "color_override", "display_order", "enabled", "content", "title"] as const;
+
+/** A section as the client sees it: stored image paths get the API address in front (see utils/media-url.ts). */
+export function exposeSection<T extends Record<string, unknown>>(section: T): T {
+  return section.content === null || section.content === undefined ? section : { ...section, content: publicMediaUrls(section.content) };
+}
 
 export const CoupleWebsiteService = {
   async getCatalog() {
@@ -336,7 +342,7 @@ export const CoupleWebsiteService = {
       );
     }
 
-    return deduped.sort(compareByDisplayOrder);
+    return deduped.sort(compareByDisplayOrder).map(exposeSection);
   },
 
   async updateSection(actorSheetId: string, sectionId: string, rawInput: Record<string, unknown>) {
@@ -365,12 +371,15 @@ export const CoupleWebsiteService = {
         }
       }
     }
+    // Save our own image URLs as paths, whatever address the client sent them with.
+    if (input.content !== undefined && input.content !== null) input = { ...input, content: storeMediaUrls(input.content) };
     try {
       await CoupleWebsiteModel.updateSection(actorSheetId, sectionId, input);
     } finally {
       PublicSiteCache.invalidateActorSheet(actorSheetId);
     }
-    return CoupleWebsiteModel.findSectionById(actorSheetId, sectionId);
+    const saved = await CoupleWebsiteModel.findSectionById(actorSheetId, sectionId);
+    return saved ? exposeSection(saved) : saved;
   },
 
   async reorderSections(actorSheetId: string, sectionIds: string[]) {
@@ -383,7 +392,7 @@ export const CoupleWebsiteService = {
     } finally {
       PublicSiteCache.invalidateActorSheet(actorSheetId);
     }
-    return CoupleWebsiteModel.findSections(actorSheetId);
+    return (await CoupleWebsiteModel.findSections(actorSheetId)).map(exposeSection);
   },
 
   async publish(coupleId: string, actorSheetId: string) {

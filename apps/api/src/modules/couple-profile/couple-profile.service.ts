@@ -1,3 +1,4 @@
+import { toPublicUrl, toStoredUrl } from "../../utils/media-url.js";
 import { randomUUID } from "node:crypto";
 import { CoupleProfileModel } from "./couple-profile.model.js";
 import { PHOTO_UPLOAD_MODES, clampPhotoSetting } from "../guest-photos/guest-photos.limits.js";
@@ -37,13 +38,26 @@ function httpsUrlOrNull(value: unknown, field: string): string | null {
   }
 }
 
+/** One of our own uploaded files (saved as a path) or an https link. A bare http link to a local API is only ever our own file. */
+function ownPathOrHttpsUrl(value: unknown, field: string): string | null {
+  if (typeof value === "string") {
+    const stored = toStoredUrl(value.trim());
+    if (/^\/(uploads|media)\//.test(stored)) return stored;
+  }
+  return httpsUrlOrNull(value, field);
+}
+
 export const CoupleProfileService = {
   async get(coupleId: string, actorSheetId: string) {
     const [catalog, profile] = await Promise.all([
       CoupleProfileModel.findCatalogById(coupleId),
       CoupleProfileModel.findOwnProfile(actorSheetId),
     ]);
-    return { ...catalog, ...profile };
+    const merged: Record<string, unknown> = { ...catalog, ...profile };
+    for (const field of ["cover_photo_url", "venue_image_url"]) {
+      if (typeof merged[field] === "string") merged[field] = toPublicUrl(merged[field] as string);
+    }
+    return merged as typeof catalog & typeof profile;
   },
 
   async update(coupleId: string, actorSheetId: string, input: CoupleProfileUpdateInput) {
@@ -58,7 +72,7 @@ export const CoupleProfileService = {
 
     const profileFields: Record<string, unknown> = {};
     if (input.love_story !== undefined) profileFields.love_story = input.love_story;
-    if (input.cover_photo_url !== undefined) profileFields.cover_photo_url = input.cover_photo_url;
+    if (input.cover_photo_url !== undefined) profileFields.cover_photo_url = typeof input.cover_photo_url === "string" ? toStoredUrl(input.cover_photo_url) : input.cover_photo_url;
     if (input.ceremony_time !== undefined) profileFields.ceremony_time = input.ceremony_time;
     if (input.ceremony_venue !== undefined) profileFields.ceremony_venue = input.ceremony_venue;
     if (input.ceremony_address !== undefined) profileFields.ceremony_address = input.ceremony_address;
@@ -70,7 +84,7 @@ export const CoupleProfileService = {
     // https only (a map link and a venue photo are rendered as href/src on the public site).
     if (input.map_url !== undefined) profileFields.map_url = httpsUrlOrNull(input.map_url, "map_url");
     if (input.venue_image_url !== undefined)
-      profileFields.venue_image_url = httpsUrlOrNull(input.venue_image_url, "venue_image_url");
+      profileFields.venue_image_url = ownPathOrHttpsUrl(input.venue_image_url, "venue_image_url");
     if (input.photo_uploads !== undefined) {
       if (!(PHOTO_UPLOAD_MODES as readonly string[]).includes(input.photo_uploads)) {
         throw new Error("photo_uploads must be off, auto or pending");

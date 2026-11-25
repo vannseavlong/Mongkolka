@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { sameMediaUrl, toPublicUrl, toStoredUrl } from "../../utils/media-url.js";
 import { KeyedLock } from "../../utils/keyed-lock.js";
 import { matchesSignature, readImageSize } from "../../utils/image-signature.js";
 import { ALLOWED_MIME, ASSET_LIMITS, type AssetLimits } from "./website-assets.limits.js";
@@ -71,10 +72,11 @@ export interface PublicAsset {
 }
 
 function toPublic(r: AssetRecord): PublicAsset {
+  // Stored as a path ("/uploads/..."); the API address is added on the way out.
   const num = (v: unknown) => (v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
   return {
     asset_id: r.asset_id,
-    url: r.url,
+    url: toPublicUrl(r.url),
     mime: r.mime,
     size_bytes: Number(r.size_bytes ?? 0),
     width: num(r.width),
@@ -94,7 +96,7 @@ function parseContent(value: unknown): unknown {
 }
 
 function containsUrl(node: unknown, url: string): boolean {
-  if (node === url) return true;
+  if (typeof node === "string" && sameMediaUrl(node, url)) return true;
   if (Array.isArray(node)) return node.some((n) => containsUrl(n, url));
   if (node && typeof node === "object") return Object.values(node).some((n) => containsUrl(n, url));
   return false;
@@ -102,10 +104,11 @@ function containsUrl(node: unknown, url: string): boolean {
 
 /** Array items equal to the URL are removed; object fields equal to it become "". */
 function stripUrl(node: unknown, url: string): unknown {
-  if (Array.isArray(node)) return node.filter((n) => n !== url).map((n) => stripUrl(n, url));
+  const isUrl = (v: unknown) => typeof v === "string" && sameMediaUrl(v, url);
+  if (Array.isArray(node)) return node.filter((n) => !isUrl(n)).map((n) => stripUrl(n, url));
   if (node && typeof node === "object") {
     return Object.fromEntries(
-      Object.entries(node).map(([k, v]) => [k, v === url ? "" : stripUrl(v, url)]),
+      Object.entries(node).map(([k, v]) => [k, isUrl(v) ? "" : stripUrl(v, url)]),
     );
   }
   return node;
@@ -124,7 +127,7 @@ export function createWebsiteAssetsCore(deps: Deps) {
 
   async function coverUsed(sheet: string, url: string) {
     const profile = await model.findProfile(sheet);
-    return profile && profile.cover_photo_url === url ? profile : null;
+    return profile && typeof profile.cover_photo_url === "string" && sameMediaUrl(profile.cover_photo_url, url) ? profile : null;
   }
 
   return {
@@ -170,7 +173,8 @@ export function createWebsiteAssetsCore(deps: Deps) {
           asset_id: assetId,
           couple_id: t.coupleId,
           storage_key: key,
-          url,
+          // The path only, so the sheet does not hold the API address (see utils/media-url.ts).
+          url: toStoredUrl(url),
           mime: input.mimeType,
           size_bytes: input.body.length,
           width: size?.width,

@@ -61,6 +61,49 @@ const A = { coupleId: "cA", actorSheetId: "sheetA" };
 const B = { coupleId: "cB", actorSheetId: "sheetB" };
 const png = { body: PNG, mimeType: "image/png" };
 
+describe("website assets: stored as a path", () => {
+  const LOCAL = "http://localhost:4000";
+
+  it("saves our own upload URL as a path and serves it with the API address", async () => {
+    const assets = new Map<string, AssetRecord[]>();
+    const model = {
+      findMany: async (s: string) => [...(assets.get(s) ?? [])],
+      findById: async (s: string, id: string) => (assets.get(s) ?? []).find((r) => r.asset_id === id) ?? null,
+      create: async (s: string, d: unknown) => void assets.set(s, [...(assets.get(s) ?? []), d as AssetRecord]),
+      delete: async () => undefined,
+      findSections: async () => [],
+      findSectionById: async () => null,
+      findProfile: async () => null,
+      updateProfileCover: async () => undefined,
+      updateSectionContent: async () => undefined,
+    } as unknown as AssetModel;
+    const core = createWebsiteAssetsCore({
+      model,
+      storageFor: () => ({ put: async (key) => `${LOCAL}/uploads/${key}`, delete: async () => undefined }),
+      invalidateCouple: () => undefined,
+    });
+    const r = await core.upload(A, png);
+    assert.ok(r.ok);
+    const stored = (assets.get("sheetA") ?? [])[0]!;
+    assert.match(stored.url, /^\/uploads\/couples\/cA\/assets\/.+\.png$/, "the sheet holds the path only");
+    assert.ok(!stored.url.includes("localhost"));
+    assert.equal(r.asset.url, `${process.env.PUBLIC_API_URL ?? LOCAL}${stored.url}`);
+    const listed = await core.list(A);
+    assert.equal(listed[0]!.url, r.asset.url);
+  });
+
+  it("an old row that still holds the full address is found in content written as a path", async () => {
+    const { core, assets, sections } = setup();
+    const up = await core.upload(A, png);
+    assert.ok(up.ok);
+    const row = (assets.get("sheetA") ?? [])[0]!;
+    row.url = `http://localhost:4000/uploads/${row.storage_key}`; // legacy: full address
+    sections.set("sheetA", [{ section_id: "s1", section_key: "gallery", content: { photos: [`/uploads/${row.storage_key}`] } } as SectionRecord]);
+    const usage = await core.usage(A, up.asset.asset_id);
+    assert.equal(usage?.sections.length, 1);
+  });
+});
+
 describe("website assets: validation", () => {
   it("rejects empty, wrong mime, spoofed bytes and oversize", async () => {
     const { core, files } = setup();

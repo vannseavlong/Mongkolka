@@ -94,9 +94,7 @@ export function InvitationKhmer({ couple, theme, content }: InvitationKhmerProps
       {view.blocks.map((block, i) => (
         <div key={block.lang}>
           {i > 0 && (
-            <div className="my-8">
-              <sk.Divider color={theme.accent_color} width={150} />
-            </div>
+            <div aria-hidden className="mx-auto my-8 h-px w-24" style={{ backgroundImage: `linear-gradient(90deg, transparent, ${withAlpha(theme.accent_color, 0.75)}, transparent)` }} />
           )}
           <Block block={block} theme={theme} />
         </div>
@@ -104,7 +102,7 @@ export function InvitationKhmer({ couple, theme, content }: InvitationKhmerProps
 
       {(view.lunar || view.solarKh || view.englishDate) && (
         <div className="mt-10">
-          <sk.Divider color={theme.accent_color} />
+          <div aria-hidden className="mx-auto h-px w-24" style={{ backgroundImage: `linear-gradient(90deg, transparent, ${withAlpha(theme.accent_color, 0.75)}, transparent)` }} />
           <div className="mt-6 space-y-2">
             {view.lunar && (
               <p className="m-0 px-1 text-sm sm:text-base" style={{ ...sk.heading(theme, "kh"), fontSize: "0.95rem" }} lang="km">

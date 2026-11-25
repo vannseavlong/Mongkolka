@@ -68,7 +68,7 @@ function CrossDivider({ color, width = 220 }: DividerProps) {
   );
 }
 
-/** A gold ring with the monogram, a small cross on top and a blush wreath of blossoms below. */
+/** A gold ring with the monogram and a blush wreath of blossoms below. */
 function CovenantCrest({ color, ground, label, size = 104 }: CrestProps) {
   const g = svgId("cvk");
   const { lo, mid } = goldStops(color);
@@ -80,9 +80,6 @@ function CovenantCrest({ color, ground, label, size = 104 }: CrestProps) {
       </defs>
       <circle cx="60" cy="64" r="42" fill={ground} stroke={`url(#${g})`} strokeWidth="2" />
       <circle cx="60" cy="64" r="36.5" fill={withAlpha(PINK.blush, 0.55)} stroke={`url(#${g})`} strokeWidth="0.7" />
-      <g transform="translate(60 14) scale(0.13) translate(-50 -70)">
-        <path d={CROSS_PATH} fill={`url(#${g})`} />
-      </g>
       {[-60, -30, 30, 60].map((a) => {
         const rad = ((a + 90) * Math.PI) / 180;
         return <Blossom key={a} x={60 + Math.cos(rad) * 42} y={64 + Math.sin(rad) * 42} r={5} petal={PINK.petal} centre={mid} />;

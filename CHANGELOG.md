@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] fix: serve landing photos as static files instead of Unsplash hotlinks
+- Owner: SNLRLONG
+- Task: none (follow-up to the landing revamp)
+- Branch/PR: feat/web-landing-static-images merged to main (no PR)
+- What changed: [Web] 16 resized photos saved in `apps/web/public/landing/` (1.5 MB); `photo()` in `landing/content.ts` now returns local paths, so the page makes no calls to Unsplash
+- Needs: full page not re-checked in a browser after the switch; hero photo is about 515 KB
+
 ## 2026-11-27 · [Web] feat(web): gallery layout stack, photo limit for all layouts, thumbnail photo list
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-gallery-stack.md

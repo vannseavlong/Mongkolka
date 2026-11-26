@@ -10,26 +10,25 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-/** Stock photo helper (Unsplash CDN). Width keeps the payload small per slot. */
-export function photo(id: string, width: number): string {
-  return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${width}&q=75`;
+/** Static stock photo from public/landing (Unsplash licence, downloaded once). `width` is one of the saved sizes. */
+export function photo(name: string, width: 120 | 700 | 1200 | 1600): string {
+  return `/landing/${name}-${width}.jpg`;
 }
 
 export const IMAGES = {
-  heroMain: "1583939003579-730e3918a45a",
-  heroSide: "1537633552985-df8429e8048b",
-  heroRings: "1465495976277-4387d4b0b4c6",
-  story: "1522673607200-164d1b6ce486",
-  ctaBackdrop: "1532712938310-34cb3982ef74",
-  venue: "1469371670807-013ccf25f16a",
-  tableDecor: "1519225421980-715cb0215aed",
-  florals: "1529636798458-92182e662485",
-  photography: "1606216794074-735e91aa2c92",
-  reception: "1511795409834-ef04bbd61622",
-  mood: "1460978812857-470ed1c77af0",
-  chairs: "1522673607200-164d1b6ce486",
-  bouquet: "1519741497674-611481863552",
-  signage: "1507504031003-b417219a0fde",
+  heroMain: "heroMain",
+  heroSide: "heroSide",
+  heroRings: "heroRings",
+  story: "story",
+  ctaBackdrop: "ctaBackdrop",
+  venue: "venue",
+  tableDecor: "tableDecor",
+  florals: "florals",
+  photography: "photography",
+  reception: "reception",
+  mood: "mood",
+  bouquet: "bouquet",
+  signage: "signage",
 } as const;
 
 export const STATS = [

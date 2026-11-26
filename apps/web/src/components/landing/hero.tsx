@@ -60,7 +60,7 @@ export function Hero() {
               {[IMAGES.heroSide, IMAGES.heroRings, IMAGES.photography].map((id) => (
                 <ImageWithFallback
                   key={id}
-                  src={photo(id, 96)}
+                  src={photo(id, 120)}
                   alt=""
                   className="size-9 rounded-full border-2 border-background object-cover"
                 />
@@ -87,7 +87,7 @@ export function Hero() {
           <div className="absolute inset-0 translate-x-3 translate-y-3 rounded-t-[999px] rounded-b-3xl border border-brand-line sm:translate-x-5 sm:translate-y-5" />
           <div className="relative overflow-hidden rounded-t-[999px] rounded-b-3xl shadow-2xl">
             <ImageWithFallback
-              src={photo(IMAGES.heroMain, 1000)}
+              src={photo(IMAGES.heroMain, 1200)}
               alt="A couple kissing as petals fall around them"
               className="aspect-[4/5] w-full object-cover"
               fetchPriority="high"
@@ -97,7 +97,7 @@ export function Hero() {
 
           <div className="animate-drift absolute -bottom-6 -left-3 hidden w-40 overflow-hidden rounded-2xl border-4 border-background shadow-xl sm:block lg:-left-10 lg:w-44">
             <ImageWithFallback
-              src={photo(IMAGES.heroRings, 400)}
+              src={photo(IMAGES.heroRings, 700)}
               alt="Two hands with wedding rings"
               className="aspect-square w-full object-cover"
             />

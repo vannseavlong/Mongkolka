@@ -13,7 +13,7 @@ export function Categories() {
             className="group relative block aspect-[4/5] overflow-hidden rounded-2xl sm:rounded-3xl"
           >
             <ImageWithFallback
-              src={photo(category.image, 600)}
+              src={photo(category.image, 700)}
               alt=""
               loading="lazy"
               className="size-full object-cover transition-transform duration-700 group-hover:scale-105"

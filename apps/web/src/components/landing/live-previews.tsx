@@ -1,69 +1,74 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, MapPin, Store } from "lucide-react";
+import { Skeleton } from "@mongkolka/ui/skeleton";
 import type { SiteTemplateSummary } from "@/app/templates/types";
 import type { VendorListItem } from "@/app/marketplace/types";
+import { Categories } from "./categories";
+import { Reveal } from "./reveal";
+import { SectionHeading } from "./section-heading";
+
+function SeeAll({ href, children }: { href: string; children: string }) {
+  return (
+    <Link href={href} className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary">
+      {children}
+      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+    </Link>
+  );
+}
+
+function CardSkeletons({ count, className }: { count: number; className: string }) {
+  return (
+    <div className={className}>
+      {Array.from({ length: count }).map((_, i) => (
+        <Skeleton key={i} className="h-56 rounded-3xl" />
+      ))}
+    </div>
+  );
+}
 
 export function LivePreviews({
   templates,
   vendors,
+  loading,
 }: {
   templates: SiteTemplateSummary[];
   vendors: VendorListItem[];
+  loading: boolean;
 }) {
   return (
     <>
-      <section className="bg-muted/40 px-6 py-20 sm:px-12">
+      <section id="templates" className="bg-brand-wash px-5 py-20 sm:px-12 sm:py-28">
         <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-10 flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left"
-          >
-            <div>
-              <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">
-                Choose a wedding website template
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                Preview real designs, then customize the colors and sections once you start planning.
-              </p>
-            </div>
-            <Link
-              href="/templates"
-              className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary"
-            >
-              Browse all templates
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </motion.div>
+          <SectionHeading
+            align="left"
+            eyebrow="Wedding websites"
+            title="Choose a template that feels like you"
+            description="Preview real designs, then customise the colours and sections once you start planning."
+            action={<SeeAll href="/templates">Browse all templates</SeeAll>}
+          />
 
-          {templates.length === 0 ? (
-            <p className="text-center text-muted-foreground">Templates are coming soon.</p>
+          {loading ? (
+            <CardSkeletons count={3} className="grid gap-6 sm:grid-cols-3" />
+          ) : templates.length === 0 ? (
+            <p className="rounded-3xl border border-dashed border-brand-line py-12 text-center text-muted-foreground">
+              Templates are coming soon.
+            </p>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {templates.map((template, index) => (
-                <motion.div
-                  key={template.template_id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.08 }}
-                  whileHover={{ y: -6 }}
-                >
+                <Reveal key={template.template_id} delay={index * 0.08} className="h-full">
                   <Link
                     href={`/templates/${template.template_id}`}
-                    className="flex h-full flex-col gap-4 rounded-xl border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
+                    className="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10"
                   >
                     <div
-                      className="flex h-32 items-center justify-center rounded-lg"
+                      className="relative flex h-44 items-center justify-center sm:h-52"
                       style={{ backgroundColor: template.default_theme.bg_color }}
                     >
                       <span
-                        className="text-lg"
+                        className="text-6xl transition-transform duration-500 group-hover:scale-110"
                         style={{
                           color: template.default_theme.accent_color,
                           fontFamily: template.default_theme.font_style,
@@ -71,9 +76,12 @@ export function LivePreviews({
                       >
                         Aa
                       </span>
+                      <span className="absolute right-3 bottom-3 rounded-full bg-card/90 px-3 py-1 text-xs font-medium opacity-0 shadow transition-opacity group-hover:opacity-100">
+                        Preview
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="font-medium">{template.name}</h3>
+                    <div className="flex items-center justify-between gap-3 p-5">
+                      <h3 className="font-display text-xl font-medium">{template.name}</h3>
                       <div className="flex shrink-0 -space-x-1">
                         {[
                           template.default_theme.bg_color,
@@ -82,62 +90,50 @@ export function LivePreviews({
                         ].map((color, i) => (
                           <span
                             key={i}
-                            className="size-4 rounded-full border"
+                            className="size-5 rounded-full border-2 border-card"
                             style={{ backgroundColor: color }}
                           />
                         ))}
                       </div>
                     </div>
                   </Link>
-                </motion.div>
+                </Reveal>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      <section className="px-6 py-20 sm:px-12">
+      <section id="vendors" className="px-5 py-20 sm:px-12 sm:py-28">
         <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-10 flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left"
-          >
-            <div>
-              <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">Meet trusted vendors</h2>
-              <p className="mt-2 text-muted-foreground">
-                Photographers, venues, salons, and more — find vendors for your wedding.
-              </p>
-            </div>
-            <Link
-              href="/marketplace"
-              className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary"
-            >
-              Browse the marketplace
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </motion.div>
+          <SectionHeading
+            align="left"
+            eyebrow="Marketplace"
+            title="Meet trusted wedding vendors"
+            description="Photographers, venues, salons and more. Find the people who will make your day."
+            action={<SeeAll href="/marketplace">Browse the marketplace</SeeAll>}
+          />
 
-          {vendors.length === 0 ? (
-            <p className="text-center text-muted-foreground">Vendors are joining soon.</p>
+          <Categories />
+
+          {loading ? (
+            <CardSkeletons count={4} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" />
+          ) : vendors.length === 0 ? (
+            <p className="rounded-3xl border border-dashed border-brand-line py-12 text-center text-muted-foreground">
+              Vendors are joining soon.
+            </p>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {vendors.map((vendor, index) => (
-                <motion.div
-                  key={vendor.vendor_id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.08 }}
-                  whileHover={{ y: -6 }}
-                >
+                <Reveal key={vendor.vendor_id} delay={index * 0.07} className="h-full">
                   <Link
                     href={`/marketplace/${vendor.vendor_id}`}
-                    className="flex h-full flex-col gap-3 rounded-xl border bg-card p-6 shadow-sm transition-shadow hover:shadow-md"
+                    className="group flex h-full flex-col gap-3 rounded-3xl border bg-card p-6 transition duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10"
                   >
-                    <h3 className="font-medium">{vendor.business_name || "Unnamed vendor"}</h3>
+                    <div className="flex size-11 items-center justify-center rounded-2xl bg-brand-tint">
+                      <Store className="size-5 text-primary" />
+                    </div>
+                    <h3 className="font-display text-xl font-medium">{vendor.business_name || "Unnamed vendor"}</h3>
                     {vendor.location && (
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <MapPin className="size-3.5" />
@@ -148,7 +144,7 @@ export function LivePreviews({
                       <p className="line-clamp-2 text-sm text-muted-foreground">{vendor.description}</p>
                     )}
                   </Link>
-                </motion.div>
+                </Reveal>
               ))}
             </div>
           )}

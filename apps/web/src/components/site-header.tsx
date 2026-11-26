@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Heart, Menu } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
+import { COUPLE_URL, VENDOR_URL } from "@/lib/app-urls";
 import {
   Sheet,
   SheetContent,
@@ -12,8 +13,6 @@ import {
   SheetTrigger,
 } from "@mongkolka/ui/sheet";
 
-const COUPLE_URL = process.env.NEXT_PUBLIC_COUPLE_URL ?? "http://localhost:3002";
-const VENDOR_URL = process.env.NEXT_PUBLIC_VENDOR_URL ?? "http://localhost:3003";
 
 const NAV_LINKS = [
   { href: "/marketplace", label: "Marketplace" },
@@ -26,10 +25,10 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="flex items-center justify-between px-6 py-5 sm:px-12">
+    <header className="sticky top-0 z-40 flex items-center justify-between border-b border-brand-line/60 bg-background/80 px-5 py-3.5 backdrop-blur-md sm:px-12">
       <Link href="/" className="flex items-center gap-2">
-        <Heart className="size-5 text-primary" />
-        <span className="text-lg font-medium">Mongkolka</span>
+        <Heart className="size-5 fill-primary/20 text-primary" />
+        <span className="font-display text-2xl leading-none font-medium tracking-tight">Mongkolka</span>
       </Link>
 
       <nav className="hidden items-center gap-1 md:flex">

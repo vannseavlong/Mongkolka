@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat: richer landing page with stock photos, brand theme defaults and responsive layout
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-landing-revamp.md
+- Branch/PR: feat/web-landing-revamp merged to main (no PR)
+- What changed: [Web] landing page rebuilt: photo hero, stats, story, features, photo mosaic, how-it-works, template and vendor sections with loading states, vendor categories, testimonials, FAQ, photo CTA, new footer and sticky header. `globals.css` now ships Sage & Champagne defaults plus derived brand tokens so the page keeps its colours when the active-theme API is empty or down. Copy and image ids moved to `landing/content.ts`; app URLs to `lib/app-urls.ts`
+- Needs: template and vendor cards with live API data, Khmer text, and the lower sections at 360px not checked. Photos load from Unsplash
+
 ## 2026-11-27 · [Web][Admin] feat: brand logo, favicon and share image
 - Owner: SNLRLONG
 - Task: none (ad hoc request)

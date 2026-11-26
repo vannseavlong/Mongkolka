@@ -5,18 +5,91 @@
 @source "../../../../packages/templates/src/**/*.{ts,tsx}";
 
 /*
- * Theme-aware gradient text utility for the marketing site. Generalizes the
- * hardcoded `.text-gradient-pink` utility (defined in
- * `@mongkolka/ui/theme.css`) into one driven by the active brand theme's
- * `--primary`/`--accent` CSS variables, so it keeps matching whichever brand
- * theme (or future admin-controlled palette) is active instead of always
- * rendering pink/rose.
+ * Brand defaults for the marketing site ("Sage & Champagne", same values as the seeded `sage` theme).
+ * The shared ui theme ships a black/white palette, so without these the landing page turned grey
+ * whenever the active-theme API was empty, cold or down. The layout injects the admin-chosen theme
+ * after this file, so an active theme still wins; these only fill the gaps.
  */
+:root {
+  --background: #f8f1e6;
+  --foreground: #3b3b3b;
+  --card: #fffdf9;
+  --card-foreground: #3b3b3b;
+  --popover: #fffdf9;
+  --popover-foreground: #3b3b3b;
+  --primary: #6f8f72;
+  --primary-foreground: #fffdf9;
+  --secondary: #ede1d1;
+  --secondary-foreground: #3b3b3b;
+  --muted: #ede1d1;
+  --muted-foreground: #6b6b6b;
+  --accent: #c9a86a;
+  --accent-foreground: #3b3b3b;
+  --border: rgba(59, 59, 59, 0.12);
+  --input: rgba(59, 59, 59, 0.28);
+  --input-background: #fffdf9;
+  --ring: #6f8f72;
+
+  /*
+   * Derived brand tokens: mixed from the base tokens above, so they follow whichever theme is active
+   * and a theme never has to define them (the root cause of "missing token" blank spots).
+   */
+  --brand-tint: color-mix(in oklab, var(--primary) 12%, var(--background));
+  --brand-wash: color-mix(in oklab, var(--accent) 16%, var(--background));
+  --brand-deep: color-mix(in oklab, var(--primary) 55%, #0d140e);
+  --brand-gold: var(--accent);
+  --brand-line: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+
+@theme inline {
+  --color-brand-tint: var(--brand-tint);
+  --color-brand-wash: var(--brand-wash);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-line: var(--brand-line);
+  --font-display: var(--font-display), "Cormorant Garamond", Georgia, serif;
+}
+
+@layer base {
+  /* Fixed header offset for in-page anchors. */
+  [id] {
+    scroll-margin-top: 5rem;
+  }
+}
+
 @layer utilities {
+  /* Theme-aware gradient text, driven by the active --primary/--accent. */
   .text-gradient-brand {
     background: linear-gradient(135deg, var(--primary), var(--accent));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  /* Soft decorative backdrop used behind hero and CTA blocks. */
+  .bg-brand-glow {
+    background-image:
+      radial-gradient(60rem 30rem at 85% -10%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 60%),
+      radial-gradient(50rem 28rem at -10% 10%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 60%);
+  }
+
+  /* Slow drift for floating accents; disabled for reduced motion below. */
+  @keyframes drift {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(3deg); }
+  }
+  .animate-drift {
+    animation: drift 7s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-float,
+  .animate-sparkle {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }

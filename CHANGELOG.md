@@ -9,6 +9,13 @@ Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admi
 - What changed: "Photos shown" now caps Grid, Masonry, Carousel, Plates and Skin as well as Covenant (only where a "View all" link exists). A gallery can stack layouts (Grid, Masonry, Carousel), each with its own photo count, even on a Covenant style. The gallery form lists photos as thumbnail and file name, with "Add by link" validated
 - Needs: none (no API or sheet change, no seed). Narrow-width and loading/error states, and Skin and Plates with a limit, not checked in a browser
 
+## 2026-11-27 · [Web] feat: richer landing page with stock photos, brand theme defaults and responsive layout
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-landing-revamp.md
+- Branch/PR: feat/web-landing-revamp merged to main (no PR)
+- What changed: [Web] landing page rebuilt: photo hero, stats, story, features, photo mosaic, how-it-works, template and vendor sections with loading states, vendor categories, testimonials, FAQ, photo CTA, new footer and sticky header. `globals.css` now ships Sage & Champagne defaults plus derived brand tokens so the page keeps its colours when the active-theme API is empty or down. Copy and image ids moved to `landing/content.ts`; app URLs to `lib/app-urls.ts`
+- Needs: template and vendor cards with live API data, Khmer text, and the lower sections at 360px not checked. Photos load from Unsplash
+
 ## 2026-11-27 · [Web][Admin] feat: brand logo, favicon and share image
 - Owner: SNLRLONG
 - Task: none (ad hoc request)

@@ -7,8 +7,12 @@ import { isMainHost } from "@/lib/hosts";
 import { useApi } from "@/lib/use-api";
 import { SlugClient } from "./[slug]/slug-client";
 import { Hero } from "@/components/landing/hero";
-import { About } from "@/components/landing/about";
-import { WhyChoose } from "@/components/landing/why-choose";
+import { StatsStrip } from "@/components/landing/stats-strip";
+import { Story } from "@/components/landing/story";
+import { Features } from "@/components/landing/features";
+import { Showcase } from "@/components/landing/showcase";
+import { HowItWorks } from "@/components/landing/how-it-works";
+import { Faq } from "@/components/landing/faq";
 import { LivePreviews } from "@/components/landing/live-previews";
 import { Testimonials } from "@/components/landing/testimonials";
 import { FinalCta } from "@/components/landing/final-cta";
@@ -47,10 +51,18 @@ function Home() {
     <main className="flex min-h-screen flex-col">
       <SiteHeader />
       <Hero />
-      <About />
-      <WhyChoose />
-      <LivePreviews templates={templates} vendors={vendors} />
+      <StatsStrip />
+      <Story />
+      <Features />
+      <Showcase />
+      <HowItWorks />
+      <LivePreviews
+        templates={templates}
+        vendors={vendors}
+        loading={templatesRes.status === "loading" || vendorsRes.status === "loading"}
+      />
       <Testimonials />
+      <Faq />
       <FinalCta />
       <SiteFooter />
     </main>

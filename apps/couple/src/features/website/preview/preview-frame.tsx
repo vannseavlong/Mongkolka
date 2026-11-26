@@ -6,6 +6,12 @@ import { cn } from "@mongkolka/ui/utils";
 import { buildPreviewContent } from "../lib/build-content";
 import { FRAME_SOURCE, HOST_SOURCE, type FrameMessage, type HostMessage, type PreviewState } from "./messages";
 
+/** A gallery section with the couple's "photos shown" number raised to the most allowed (24), so every photo shows. */
+function withAllPhotos<T extends { section_key: string; content?: unknown }>(section: T): T {
+  if (section.section_key !== "gallery" || !section.content || typeof section.content !== "object") return section;
+  return { ...section, content: { ...(section.content as Record<string, unknown>), maxPhotos: 24 } };
+}
+
 function post(message: FrameMessage) {
   window.parent.postMessage(message, window.location.origin);
 }
@@ -20,6 +26,8 @@ export function PreviewFrame() {
   // The opening gate was opened by the couple while previewing it on its own.
   const [opened, setOpened] = useState(false);
   const [prevKey, setPrevKey] = useState("");
+  // The builder has no gallery sub-page, so "View all photos" there shows every photo in place (click again to collapse).
+  const [allPhotos, setAllPhotos] = useState(false);
   const fromFrame = useRef(false);
 
   useEffect(() => {
@@ -48,16 +56,30 @@ export function PreviewFrame() {
 
   const mode = state?.mode;
   const selectedId = state?.selectedId ?? null;
+  // Changes when the selected section is edited or restyled, so the preview re-aligns to it after a save.
+  const selectedKey = selected ? JSON.stringify([selected.component_id, selected.content]) : "";
   useEffect(() => {
     if (fromFrame.current) {
       fromFrame.current = false;
       return;
     }
-    const target = selectedId && document.querySelector<HTMLElement>(`[data-section-id="${CSS.escape(selectedId)}"]`);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const top = mode === "page" && target ? target.getBoundingClientRect().top + window.scrollY : 0;
-    window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
-  }, [selectedId, mode, state?.replay]);
+    const topOf = () => {
+      const target = selectedId && document.querySelector<HTMLElement>(`[data-section-id="${CSS.escape(selectedId)}"]`);
+      return mode === "page" && target ? target.getBoundingClientRect().top + window.scrollY : 0;
+    };
+    window.scrollTo({ top: topOf(), behavior: reduce ? "auto" : "smooth" });
+    if (mode !== "page") return;
+    // Photos load after the jump and push the section away from where it was measured. For a moment, whenever the
+    // page height changes, put the selected section back at the top (instantly, so it does not fight the scroll).
+    const observer = new ResizeObserver(() => window.scrollTo({ top: topOf(), behavior: "auto" }));
+    observer.observe(document.body);
+    const stop = window.setTimeout(() => observer.disconnect(), 2500);
+    return () => {
+      window.clearTimeout(stop);
+      observer.disconnect();
+    };
+  }, [selectedId, mode, state?.replay, selectedKey]);
 
   if (!state) return null;
   const { template, sections, themeOverride, profile } = state;
@@ -69,8 +91,9 @@ export function PreviewFrame() {
     partner2Name: profile.partner2_name ?? undefined,
     weddingDate: profile.wedding_date ?? undefined,
   };
-  const shown =
+  const picked =
     state.mode === "page" ? sections : selected ? (selectedIsOpening && opened ? sections : [selected]) : [];
+  const shown = allPhotos ? picked.map(withAllPhotos) : picked;
 
   return (
     <LanguageProvider key={state.language} initialLanguage={state.language}>
@@ -94,6 +117,7 @@ export function PreviewFrame() {
               // Selecting must not trigger the section's own links/buttons.
               e.preventDefault();
               e.stopPropagation();
+              if (section.section_key === "gallery" && (e.target as HTMLElement).closest('a[href="#"]')) setAllPhotos((v) => !v);
               if (section.section_id !== selectedId) fromFrame.current = true;
               post({ source: FRAME_SOURCE, type: "select", sectionId: section.section_id });
             }}

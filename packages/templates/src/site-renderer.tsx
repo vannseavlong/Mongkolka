@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useMemo, useState, type ComponentType, type ReactNode } from "react";
-import { resolveComponent } from "./registry";
+import { resolveComponent, sectionRegistry } from "./registry";
 import { GuestProvider } from "./guest-context";
 import { ChromeSection } from "./chrome/ChromeSection";
 import { SiteChrome } from "./chrome/SiteChrome";
@@ -19,7 +19,7 @@ import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
 import { resolveTheme } from "./theme";
-import { limitPhotos, stackSlices } from "./sections/gallery/gallery-stack";
+import { StackPositionProvider, limitPhotos, stackSlices } from "./sections/gallery/gallery-stack";
 import type { CoupleInfo, CoverContent, DetailsContent, GalleryContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
 /** Gallery styles that draw their own "show all" button (it links to the sub-page), so none is added under them. */
@@ -227,7 +227,7 @@ function SiteRendererBody({
         // The couple's "photos shown" number caps every layout, but only where a "View all" link exists to reach the rest.
         const capped = gallery ? (galleryHref ? limitPhotos(gallery.photos ?? [], gallery.maxPhotos) : (gallery.photos ?? [])) : [];
         // A stack is the couple's explicit choice, so it wins over the style's own single layout (Covenant included).
-        const slices = gallery ? stackSlices(capped, gallery.stack) : [];
+        const slices = gallery ? stackSlices(capped, gallery.stack, (id) => !!sectionRegistry.gallery[id]) : [];
         const stacked = slices.length > 0;
         // Covenant styles apply the number and draw their own "show all" button; a stack uses the shared one.
         const ownGalleryButton = isGallery && !stacked && GALLERY_OWN_LINK.has(section.component_id ?? template.default_components.gallery ?? "");
@@ -236,7 +236,12 @@ function SiteRendererBody({
           <Fragment key={section.section_id}>
             {slices.map((slice, i) => {
               const Layout = resolveComponent("gallery", slice.layout, undefined) as ComponentType<{ theme: Theme; content: GalleryContent; showHeading?: boolean }> | undefined;
-              return Layout ? <Layout key={`${slice.layout}-${i}`} theme={theme} content={{ photos: slice.photos }} showHeading={i === 0} /> : null;
+              // maxPhotos 24: the slice is already the size the couple asked for, so a style's own cap must not shrink it again.
+              return Layout ? (
+                <StackPositionProvider key={`${slice.layout}-${i}`} value={{ first: i === 0 }}>
+                  <Layout theme={theme} content={{ photos: slice.photos, maxPhotos: 24 }} showHeading={i === 0} />
+                </StackPositionProvider>
+              ) : null;
             })}
           </Fragment>
         ) : (

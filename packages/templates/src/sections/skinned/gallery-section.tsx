@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsFirstInStack } from "../gallery/gallery-stack";
 import type { ReactNode } from "react";
 import type { Theme } from "../../types";
 import { useLanguage } from "../../i18n";
@@ -37,6 +38,7 @@ export interface MediaSectionProps {
 export function MediaSection({ theme, id, heading, intro, children }: MediaSectionProps) {
   const { language } = useLanguage();
   const sk = useSkinOrnaments();
+  const first = useIsFirstInStack();
   const dark = isDarkColor(theme.bg_color);
   const glow = withAlpha(theme.accent_color, dark ? 0.16 : 0.1);
   return (
@@ -62,13 +64,17 @@ export function MediaSection({ theme, id, heading, intro, children }: MediaSecti
         </div>
       )}
       <div className="relative">
-        <h2 className="m-0 text-xl sm:text-2xl" style={sk.heading(theme, language)}>
-          {heading}
-        </h2>
-        <div className="mb-8 mt-3">
-          <sk.Divider color={theme.accent_color} />
-        </div>
-        {intro && (
+        {first && (
+          <>
+            <h2 className="m-0 text-xl sm:text-2xl" style={sk.heading(theme, language)}>
+              {heading}
+            </h2>
+            <div className="mb-8 mt-3">
+              <sk.Divider color={theme.accent_color} />
+            </div>
+          </>
+        )}
+        {first && intro && (
           <p className="mx-auto -mt-3 mb-8 max-w-md text-base leading-relaxed" style={{ opacity: 0.9 }}>
             {intro}
           </p>

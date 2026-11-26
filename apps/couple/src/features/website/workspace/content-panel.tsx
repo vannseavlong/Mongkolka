@@ -17,11 +17,14 @@ export function ContentPanel({
   section,
   profile,
   saveTitle,
+  galleryLayouts,
 }: {
   section: WebsiteSection;
   profile: PreviewProfile;
   /** Saves this section's own heading (null = back to the template's wording). */
   saveTitle: (title: { kh?: string; en?: string } | null) => Promise<boolean>;
+  /** The styles a gallery can stack (the same list as the Style tab). */
+  galleryLayouts?: { id: string; label: string }[];
 }) {
   const name = sectionLabel(section.section_key);
   return (
@@ -47,7 +50,7 @@ export function ContentPanel({
       ) : section.section_key === "story" ? (
         <StoryContentForm key={`story-${section.section_id}`} section={section} profile={profile} onSaved={() => {}} />
       ) : (
-        <SectionContentForm key={`content-${section.section_id}`} section={section} onSaved={() => {}} />
+        <SectionContentForm key={`content-${section.section_id}`} section={section} onSaved={() => {}} galleryLayouts={galleryLayouts} />
       )}
     </div>
   );

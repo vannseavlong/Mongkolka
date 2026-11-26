@@ -568,10 +568,10 @@ function FooterContentForm({ section, onSaved }: { section: WebsiteSection; onSa
 // ---------------------------------------------------------------------------
 
 /** Edit form for a content-backed section, shown inline in the builder's content panel. */
-export function SectionContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+export function SectionContentForm({ section, onSaved, galleryLayouts }: { section: WebsiteSection; onSaved: () => void; galleryLayouts?: { id: string; label: string }[] }) {
   if (section.section_key === "cover") return <CoverContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "opening") return <OpeningContentForm key={section.section_id} section={section} onSaved={onSaved} />;
-  if (section.section_key === "gallery") return <GalleryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
+  if (section.section_key === "gallery") return <GalleryContentForm key={section.section_id} section={section} onSaved={onSaved} layouts={galleryLayouts} />;
   if (section.section_key === "registry") return <RegistryContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "timeline") return <TimelineContentForm key={section.section_id} section={section} onSaved={onSaved} />;
   if (section.section_key === "rsvp") return <RsvpContentForm key={section.section_id} section={section} onSaved={onSaved} />;

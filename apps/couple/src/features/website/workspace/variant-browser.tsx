@@ -1,29 +1,13 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { sectionRegistry, skinFromComponents, variantsForSkin } from "@mongkolka/templates";
 import { Badge } from "@mongkolka/ui/badge";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { cn } from "@mongkolka/ui/utils";
-import type { SectionComponent, WebsiteSectionKey } from "../data/schema";
+import { listStyleVariants } from "../lib/style-variants";
 import { sectionLabel } from "./section-labels";
 import { SectionPreview } from "../components/section-preview";
 import type { SectionPanelContext } from "./panel-tabs/types";
-
-/** Display stand-in for a registered style that has no catalog row: "opening_card_covenant" -> "Card covenant". */
-function fallbackVariant(sectionKey: WebsiteSectionKey, componentId: string): Omit<SectionComponent, "status"> {
-  const words = componentId.replace(new RegExp(`^${sectionKey}_?`), "").split("_").filter(Boolean).join(" ");
-  const name = words ? words.charAt(0).toUpperCase() + words.slice(1) : componentId;
-  return {
-    component_id: componentId,
-    section: sectionKey,
-    name,
-    preview_bg_color: null,
-    preview_text_color: null,
-    preview_accent_color: null,
-    font_style: null,
-  };
-}
 
 /**
  * Every active variant of one section, each rendered with the couple's own
@@ -31,30 +15,7 @@ function fallbackVariant(sectionKey: WebsiteSectionKey, componentId: string): Om
  */
 export function VariantBrowser({ context }: { context: SectionPanelContext }) {
   const { section, components, catalogLoading, template, themeOverride, profile, patchSection } = context;
-  const registered = sectionRegistry[section.section_key];
-  const defaultId = template.default_components[section.section_key] ?? null;
-
-  // What the canvas actually renders today (mirrors resolveComponent's fallback).
-  const currentId =
-    (section.component_id && registered[section.component_id] && section.component_id) ||
-    (defaultId && registered[defaultId] && defaultId) ||
-    Object.keys(registered)[0];
-
-  // Two styles always stay in the list: the one in use, and the one the template ships with (so the
-  // couple can always go back to the original design after trying another). Everything else must be an
-  // active catalog row that has a component and fits this template's skin (no mixing another skin's ornaments in).
-  const keep = [defaultId, currentId].filter((id, i, all): id is string => !!id && !!registered[id] && all.indexOf(id) === i);
-  const candidates = components.filter(
-    (c) => c.section === section.section_key && registered[c.component_id] && (c.status === "active" || keep.includes(c.component_id)),
-  );
-  const fits = new Set(variantsForSkin(candidates, skinFromComponents(template.default_components)).map((c) => c.component_id));
-  const listed = candidates.filter((c) => fits.has(c.component_id) || keep.includes(c.component_id));
-  // The live catalog may have no row for a kept style (e.g. a template launched before its rows were
-  // seeded or while they are inactive). It is shown from the registry id instead of silently missing.
-  const missing: SectionComponent[] = keep
-    .filter((id) => !listed.some((c) => c.component_id === id))
-    .map((id) => ({ ...fallbackVariant(section.section_key, id), status: "active" as const }));
-  const variants: SectionComponent[] = [...missing, ...listed];
+  const { variants, currentId, defaultId } = listStyleVariants(section, components, template.default_components);
 
   if (catalogLoading) {
     return (

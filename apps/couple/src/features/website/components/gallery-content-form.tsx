@@ -16,7 +16,7 @@ import { asRecord, saveContent } from "../lib/section-content-save";
 import type { WebsiteSection } from "../data/schema";
 import { AssetPicker } from "./asset-picker";
 import { newUrlsOnly } from "./asset-library-logic";
-import { HOME_PHOTOS_MAX, HOME_PHOTOS_MIN, STACK_LAYOUTS, isPhotoLink, isWholeCount, photoName, stackFromForm, stackToForm } from "../lib/gallery-form-logic";
+import { HOME_PHOTOS_MAX, HOME_PHOTOS_MIN, FALLBACK_STACK_LAYOUTS, isPhotoLink, isWholeCount, photoName, stackFromForm, stackToForm } from "../lib/gallery-form-logic";
 
 // gallery — content: { photos: string[], maxPhotos?: number, stack?: { layout, count? }[] }
 
@@ -36,7 +36,7 @@ const gallerySchema = z.object({
 });
 type GalleryFormValues = z.infer<typeof gallerySchema>;
 
-export function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
+export function GalleryContentForm({ section, onSaved, layouts = FALLBACK_STACK_LAYOUTS }: { section: WebsiteSection; onSaved: () => void; layouts?: { id: string; label: string }[] }) {
   const content = asRecord(section.content);
   const initialPhotos = Array.isArray(content.photos) ? content.photos : [];
   const form = useForm<GalleryFormValues>({
@@ -44,7 +44,7 @@ export function GalleryContentForm({ section, onSaved }: { section: WebsiteSecti
     defaultValues: {
       photos: initialPhotos.filter((p): p is string => typeof p === "string").map((url) => ({ url })),
       maxPhotos: typeof content.maxPhotos === "number" ? String(content.maxPhotos) : "",
-      stack: stackToForm(content.stack),
+      stack: stackToForm(content.stack, layouts),
     },
   });
   const { fields, append, remove, move } = useFieldArray({ control: form.control, name: "photos" });
@@ -137,22 +137,21 @@ export function GalleryContentForm({ section, onSaved }: { section: WebsiteSecti
           <div className="flex items-center gap-2 text-sm font-medium">
             <Layers className="size-4" /> Mix layouts
           </div>
-          <p className="text-sm text-muted-foreground">Stack layouts one under another, e.g. Masonry then Carousel. Each takes that many photos in order; the last takes the rest. Leave empty to use the style picked in &ldquo;look&rdquo;.</p>
           {stack.fields.map((field, index) => (
-            <div key={field.id} className="flex items-start gap-2">
+            <div key={field.id} className="flex items-start gap-1.5">
               <FormField
                 control={form.control}
                 name={`stack.${index}.layout`}
                 render={({ field: f }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="min-w-0 flex-1">
                     <Select value={f.value} onValueChange={f.onChange}>
                       <FormControl>
-                        <SelectTrigger aria-label="Layout">
+                        <SelectTrigger aria-label="Layout" className="w-full">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {STACK_LAYOUTS.map((l) => (
+                        {layouts.map((l) => (
                           <SelectItem key={l.id} value={l.id}>
                             {l.label}
                           </SelectItem>
@@ -166,21 +165,21 @@ export function GalleryContentForm({ section, onSaved }: { section: WebsiteSecti
                 control={form.control}
                 name={`stack.${index}.count`}
                 render={({ field: f }) => (
-                  <FormItem>
+                  <FormItem className="shrink-0">
                     <FormControl>
-                      <Input inputMode="numeric" aria-label="Photos in this layout" className="w-28" placeholder={index === stack.fields.length - 1 ? "The rest" : "Photos"} {...f} />
+                      <Input inputMode="numeric" aria-label="Photos in this layout" className="w-20" placeholder={index === stack.fields.length - 1 ? "Rest" : "Photos"} {...f} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="button" size="icon" variant="ghost" aria-label="Move layout up" disabled={index === 0} onClick={() => stack.move(index, index - 1)}>
+              <Button type="button" size="icon" variant="ghost" aria-label="Move layout up" className="size-8 shrink-0" disabled={index === 0} onClick={() => stack.move(index, index - 1)}>
                 <ArrowUp className="size-3" />
               </Button>
-              <Button type="button" size="icon" variant="ghost" aria-label="Move layout down" disabled={index === stack.fields.length - 1} onClick={() => stack.move(index, index + 1)}>
+              <Button type="button" size="icon" variant="ghost" aria-label="Move layout down" className="size-8 shrink-0" disabled={index === stack.fields.length - 1} onClick={() => stack.move(index, index + 1)}>
                 <ArrowDown className="size-3" />
               </Button>
-              <Button type="button" size="icon" variant="ghost" aria-label="Remove layout" onClick={() => stack.remove(index)}>
+              <Button type="button" size="icon" variant="ghost" aria-label="Remove layout" className="size-8 shrink-0" onClick={() => stack.remove(index)}>
                 <Trash2 className="size-3" />
               </Button>
             </div>

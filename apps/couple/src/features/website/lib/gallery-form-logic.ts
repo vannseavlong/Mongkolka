@@ -3,12 +3,17 @@
 export const HOME_PHOTOS_MIN = 3;
 export const HOME_PHOTOS_MAX = 24;
 
-/** Layouts a gallery can stack (mirrors the templates package's STACKABLE_LAYOUTS). */
-export const STACK_LAYOUTS = [
+export interface StackLayout {
+  id: string;
+  label: string;
+}
+
+/** Used until the style list has loaded. */
+export const FALLBACK_STACK_LAYOUTS: StackLayout[] = [
   { id: "gallery_grid", label: "Grid" },
   { id: "gallery_masonry", label: "Masonry" },
   { id: "gallery_carousel", label: "Carousel" },
-] as const;
+];
 
 export interface StackFormBlock {
   layout: string;
@@ -28,11 +33,11 @@ export function photoName(url: string): string {
 }
 
 /** Saved `stack` -> form rows. Anything that is not a known layout is ignored. */
-export function stackToForm(stack: unknown): StackFormBlock[] {
+export function stackToForm(stack: unknown, layouts: readonly StackLayout[] = FALLBACK_STACK_LAYOUTS): StackFormBlock[] {
   if (!Array.isArray(stack)) return [];
   return stack.flatMap((b) => {
     const layout = (b as { layout?: unknown })?.layout;
-    if (typeof layout !== "string" || !STACK_LAYOUTS.some((l) => l.id === layout)) return [];
+    if (typeof layout !== "string" || !layouts.some((l) => l.id === layout)) return [];
     const count = (b as { count?: unknown }).count;
     return [{ layout, count: typeof count === "number" && count > 0 ? String(count) : "" }];
   });

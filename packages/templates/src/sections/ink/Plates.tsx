@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsFirstInStack } from "../gallery/gallery-stack";
 import { motion } from "motion/react";
 import type { GalleryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
@@ -13,6 +14,7 @@ export interface GalleryPlatesProps {
 /** Numbered "plates" on an inverted ink page, staggered like a printed photo folio. */
 export function GalleryPlates({ theme, content }: GalleryPlatesProps) {
   const { t } = useLanguage();
+  const first = useIsFirstInStack();
   const photos = content?.photos ?? [];
   if (photos.length === 0) return null;
   const foil = theme.accent_color;
@@ -20,12 +22,14 @@ export function GalleryPlates({ theme, content }: GalleryPlatesProps) {
   return (
     <InkSection theme={theme} inverted className="px-5 py-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
+        {first && (
         <header className="mb-16 flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between">
           <h2 className="text-[clamp(2.5rem,7vw,4.5rem)] font-light italic">{t("section.gallery.heading")}</h2>
           <Eyebrow color={foil}>
             {photos.length} {t("ink.plate")}
           </Eyebrow>
         </header>
+        )}
 
         <div className="grid grid-cols-2 gap-x-5 gap-y-14 md:grid-cols-3">
           {photos.map((src, i) => (

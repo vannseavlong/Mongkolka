@@ -6,6 +6,7 @@ import { cn } from "@mongkolka/ui/utils";
 import type { SectionComponent, SiteLanguage, SiteTemplate, WebsiteSection } from "../data/schema";
 import type { PreviewProfile } from "../lib/build-content";
 import { ContentPanel } from "./content-panel";
+import { listStyleVariants } from "../lib/style-variants";
 import { Inspector, type InspectorTab } from "./inspector";
 import { SectionDock } from "./section-dock";
 import { SectionRail } from "./section-rail";
@@ -167,7 +168,7 @@ export function Workspace({
           <Inspector
             tab={rightTab}
             onTabChange={setRightTab}
-            content={<ContentPanel section={selected} profile={profile} saveTitle={(title) => patchSection(selected.section_id, { title }, "Could not save the title")} />}
+            content={<ContentPanel section={selected} profile={profile} galleryLayouts={selected.section_key === "gallery" ? listStyleVariants(selected, components, template.default_components).variants.map((v) => ({ id: v.component_id, label: v.name })) : undefined} saveTitle={(title) => patchSection(selected.section_id, { title }, "Could not save the title")} />}
             colors={colors}
           />
         </aside>

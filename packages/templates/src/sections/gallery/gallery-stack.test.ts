@@ -18,7 +18,7 @@ test("stackSlices: counts in order, last block takes the rest", () => {
   assert.deepEqual(s.map((x) => [x.layout, x.photos.length]), [["gallery_masonry", 4], ["gallery_carousel", 6]]);
 });
 test("stackSlices: empty blocks and unknown layouts are dropped", () => {
-  const s = stackSlices(p(3), [{ layout: "gallery_grid", count: 5 }, { layout: "nope" }, { layout: "gallery_carousel" }]);
+  const s = stackSlices(p(3), [{ layout: "gallery_grid", count: 5 }, { layout: "nope" }, { layout: "gallery_carousel" }], (id) => id !== "nope");
   assert.deepEqual(s.map((x) => x.layout), ["gallery_grid"]);
   assert.equal(s[0]?.photos.length, 3);
 });

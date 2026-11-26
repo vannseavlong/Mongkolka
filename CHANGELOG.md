@@ -2,12 +2,26 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web][Admin] feat: brand logo, favicon and share image
+- Owner: SNLRLONG
+- Task: none (ad hoc request)
+- Branch/PR: d2c3da2 and fca13c8 on main (no PR); deployed to mongkolka, admin-mongkolka and couple-mongkolka
+- What changed: [Web][Admin] interlocking-rings logo (colors from the portfolio: `#3B82F6`, `#1E40AF`, `#F59E0B`) as `icon.svg`, `favicon.ico` and `apple-icon.png` in web, admin, couple and vendor. [Web] `opengraph-image.png` and `twitter-image.png` (1200x630) with alt text, `manifest.webmanifest`, `icon-192/512.png`, and `metadataBase`, Open Graph, Twitter and theme-color metadata in `layout.tsx`. New `BrandMark` in `packages/ui` replaces the Heart and Store icons in the admin, couple and vendor sidebars
+- Needs: vendor is not deployed (no hosting target). Sidebar size and collapsed view, and the social preview on a real platform, not checked in a browser
+
 ## 2026-11-27 · [API] feat: seed couple sheets for active couples only
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/API-seed-active-couples.md (still open: reviews and an `--apply` run)
 - Branch/PR: feat/seed-active-couples merged to main (no PR)
 - What changed: [API] `scripts/seed-active-couples.ts` seeds only active couples' sheets; dry run unless `--apply`
 - Needs: none. Code review, security review and a real write not done
+
+## 2026-11-27 · [Admin][API][Web] feat: admin setting for upload photo quality and resize size
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Admin-image-quality.md (T-0059, still open: needs a real upload check)
+- Branch/PR: feat/admin-image-quality merged to main (no PR)
+- What changed: [Admin] "Photo quality" and "Resize photos to" under Settings, Image uploads. [API] `webpQuality` (40-100, default 80) and `resizeTo` (600-8000, default 2048) in the upload limits. [Web] couple uploads are resized and compressed in the browser (JPEG kept on Safari); covenant sample map served as WebP
+- Needs: no sheet sync or seed. Code review and browser check not done
 
 ## 2026-11-28 · [Web] feat: Storage screen to connect Google Drive (couple portal)
 - Owner: SNLRLONG

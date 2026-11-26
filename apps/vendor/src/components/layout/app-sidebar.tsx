@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Store, LogOut, UserCircle } from "lucide-react";
+import { LogOut, UserCircle } from "lucide-react";
+import { BrandMark } from "@mongkolka/ui/layout/brand-mark";
 import {
   Sidebar,
   SidebarContent,
@@ -46,7 +47,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5">
-          <Store className="size-5 text-primary" />
+          <BrandMark />
           <span className="font-medium group-data-[collapsible=icon]:hidden">Mongkolka Vendor</span>
         </div>
       </SidebarHeader>

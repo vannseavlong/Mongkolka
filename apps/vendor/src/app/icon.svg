@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E40AF"/></linearGradient></defs>
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3B82F6"/><stop offset="1" stop-color="#1E40AF"/></linearGradient>
+<clipPath id="c"><circle cx="512" cy="457" r="115"/></clipPath></defs>
 <rect width="1024" height="1024" rx="230" fill="url(#g)"/>
-<path d="M261 737V307l251 307 251-307v430" fill="none" stroke="#fff" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
-<g fill="#F59E0B"><circle cx="468.5" cy="232" r="44"/><circle cx="555.5" cy="232" r="44"/><path d="M426 250h172L512 363z"/></g>
+<circle cx="400" cy="610" r="190" fill="none" stroke="#fff" stroke-width="62"/>
+<circle cx="624" cy="610" r="190" fill="none" stroke="#F59E0B" stroke-width="62"/>
+<circle cx="400" cy="610" r="190" fill="none" stroke="#fff" stroke-width="62" clip-path="url(#c)"/>
+<path d="M512 202l62 78-62 78-62-78z" fill="#fff"/>
+<path d="M512 202l62 78-62-4-62 4z" fill="#BFDBFE"/>
 </svg>

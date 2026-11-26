@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] fix(web): builder preview scrolls to the section once the opening gate opens
+- Owner: SNLRLONG
+- Task: none (ad hoc request)
+- Branch/PR: fix/preview-scroll-gate, fast-forwarded to main (no PR)
+- What changed: in Full page mode, a section picked while the opening gate was still shut left the preview at the top after the gate opened; it now scrolls to that section
+- Needs: none
+
 ## 2026-11-27 · [Web] fix(deploy): revalidate html on every load so new releases show at once
 - Owner: SNLRLONG
 - Task: none (ad hoc request)

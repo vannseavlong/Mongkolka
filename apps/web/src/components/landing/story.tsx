@@ -9,7 +9,7 @@ export function Story() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
         <Reveal className="relative order-2 lg:order-1">
           <ImageWithFallback
-            src={photo(IMAGES.story, 900)}
+            src={photo(IMAGES.story, 1200)}
             alt="A couple on their wedding day, smiling"
             className="aspect-[5/4] w-full rounded-3xl object-cover shadow-xl"
           />

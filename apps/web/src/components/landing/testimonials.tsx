@@ -24,7 +24,7 @@ export function Testimonials() {
                 </blockquote>
                 <figcaption className="flex items-center gap-3">
                   <ImageWithFallback
-                    src={photo(t.avatar, 112)}
+                    src={photo(t.avatar, 120)}
                     alt=""
                     loading="lazy"
                     className="size-11 rounded-full object-cover"

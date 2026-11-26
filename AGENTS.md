@@ -27,6 +27,21 @@ Never `git commit` or `git push` (any repo, any worktree) until the user says to
 
 **Parallel agents:** one agent = one task file. Claim it (`Claimed by:`) before editing, stay inside that task's worktree and `Touches`, never touch another task's worktree, and never use `git add -A`, `stash` or `reset --hard` in shared places. To reach another task, write a note in `Tasks/_inbox/<to-task>/` and read your own inbox at the start. Full rules: `Tasks/README.md`.
 
+## Seeding data (sheet-db)
+
+Run from `apps/api`. Seeds write to the real sheets of the `.env` in use, so check `ADMIN_SHEET_ID` first and ask the user before any command that writes.
+
+| Data | Command |
+|---|---|
+| Admin tables (every file in `seeds/` today) | `npx lsdb seed seeds/<file>.ts --upsert` (`seeds/admin.ts`: use `--skip-existing`) |
+| Couple tables, active couples only | `pnpm exec tsx scripts/seed-active-couples.ts <seed-file>` previews; add `--apply` to write, `--upsert` to also overwrite |
+
+- **Do not use `lsdb seed --all-actors`.** It cannot filter, so it also seeds suspended couples and vendor sheets.
+- New columns need `npx lsdb sync` before seeding. Seed only the files you changed.
+- Couple seed files export `{ table_name: rows[] }`; the first field of each row must be a unique column (e.g. `item_id`).
+- `--upsert` on couple tables can overwrite what a couple edited; get the user's approval for it.
+- `scripts/seed-mock-couple.ts` creates and publishes a test couple (`mock-demo`). Never run it against the production sheet.
+
 ## Frontend: separate concerns
 
 We write code for the next developer, not only to make it work today. Keep three layers apart so a UI change never touches business logic and every file stays small:

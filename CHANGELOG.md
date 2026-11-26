@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [API] feat: seed couple sheets for active couples only
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/API-seed-active-couples.md (still open: reviews and an `--apply` run)
+- Branch/PR: feat/seed-active-couples merged to main (no PR)
+- What changed: [API] `scripts/seed-active-couples.ts` seeds only active couples' sheets; dry run unless `--apply`
+- Needs: none. Code review, security review and a real write not done
+
 ## 2026-11-28 · [Web] feat: Storage screen to connect Google Drive (couple portal)
 - Owner: SNLRLONG
 - Task: Tasks/3-in-progress/Web-couple-drive-connect.md (T-0020, still open: needs a real-account render check)

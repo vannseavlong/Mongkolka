@@ -70,6 +70,7 @@ export function PreviewFrame() {
     };
     window.scrollTo({ top: topOf(), behavior: reduce ? "auto" : "smooth" });
     if (mode !== "page") return;
+    // `opened`: a section picked while the gate was still shut has nothing to scroll to yet, so go again once the page appears.
     // Photos load after the jump and push the section away from where it was measured. For a moment, whenever the
     // page height changes, put the selected section back at the top (instantly, so it does not fight the scroll).
     const observer = new ResizeObserver(() => window.scrollTo({ top: topOf(), behavior: "auto" }));
@@ -79,7 +80,7 @@ export function PreviewFrame() {
       window.clearTimeout(stop);
       observer.disconnect();
     };
-  }, [selectedId, mode, state?.replay, selectedKey]);
+  }, [selectedId, mode, state?.replay, selectedKey, opened]);
 
   if (!state) return null;
   const { template, sections, themeOverride, profile } = state;

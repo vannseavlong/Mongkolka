@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Noto_Serif_Khmer, Jost, Great_Vibes, Moul, Battambang, Cinzel, Fredoka } from "next/font/google";
 import "./globals.css";
 import { fetchJson } from "@/lib/api";
@@ -25,9 +25,32 @@ const battambang = Battambang({ subsets: ["khmer", "latin"], weight: ["300", "40
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel", display: "swap", preload: false });
 const rounded = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-rounded", display: "swap", preload: false });
 
+const SITE_URL = "https://mongkolka.web.app";
+const SITE_DESCRIPTION = "Plan your wedding and share a beautiful website with your guests.";
+
+// og:image / twitter:image come from the opengraph-image.png and twitter-image.png files in this folder;
+// metadataBase turns their paths into absolute URLs, which social crawlers require.
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Mongkolka",
-  description: "Plan your wedding and share a beautiful website with your guests.",
+  description: SITE_DESCRIPTION,
+  applicationName: "Mongkolka",
+  openGraph: {
+    type: "website",
+    siteName: "Mongkolka",
+    title: "Mongkolka — Wedding websites, made beautiful",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mongkolka — Wedding websites, made beautiful",
+    description: SITE_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#3B82F6",
 };
 
 type ActiveThemeTokens = {

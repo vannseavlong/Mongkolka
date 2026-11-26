@@ -15,13 +15,23 @@ import { saveUploadLimits } from "../data/settings-api";
 import { buildPayload, isDirty, LIMIT_KEYS, toFormValues, type FormErrors, type FormValues } from "../logic/upload-limits-form";
 
 const FIELDS: Record<LimitKey, { label: string; unit: string; help: string }> = {
+  webpQuality: {
+    label: "Photo quality",
+    unit: "%",
+    help: "How strongly the couple's browser compresses a photo before upload. 80 looks nearly the same as the original and is far smaller. Applies to new uploads only.",
+  },
+  resizeTo: {
+    label: "Resize photos to",
+    unit: "px",
+    help: "Longest side. Bigger photos are scaled down before upload; smaller ones are left alone. Applies to new uploads only.",
+  },
   maxMb: {
     label: "Max file size",
     unit: "MB",
-    help: "Per image, after the couple's browser converts it to WebP. The API holds each upload in memory, so raise this carefully.",
+    help: "Per image, after the couple's browser compresses it. The API holds each upload in memory, so raise this carefully.",
   },
   maxPerCouple: { label: "Images per couple", unit: "images", help: "Size of each couple's image library." },
-  maxDimension: { label: "Max image size", unit: "px", help: "Longest side. WebP cannot go above 16383." },
+  maxDimension: { label: "Reject images above", unit: "px", help: "Longest side of the original file. WebP cannot go above 16383." },
 };
 
 /** Loads the saved limits, then mounts the form; the key remounts it with fresh values after a save. */
@@ -64,12 +74,13 @@ function UploadLimitsForm({ data }: { data: UploadLimitsView }) {
       <CardHeader>
         <CardTitle>Image uploads</CardTitle>
         <CardDescription>
-          Limits for the couple image library. Leave a field blank to use the server default. Changes reach couples within
+          Compression and limits for the couple image library. Leave a field blank to use the server default. Changes reach couples within
           about a minute.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
-        {LIMIT_KEYS.map((key) => {
+        {/* Only the settings this API knows, so the page still works while an older API is live. */}
+        {LIMIT_KEYS.filter((key) => data.ranges[key]).map((key) => {
           const f = FIELDS[key];
           const { min, max } = data.ranges[key];
           return (
@@ -108,7 +119,7 @@ function UploadLimitsForm({ data }: { data: UploadLimitsView }) {
         <Button
           variant="outline"
           disabled={saving || !hasOverrides}
-          onClick={() => submit({ maxMb: "", maxPerCouple: "", maxDimension: "" })}
+          onClick={() => submit(toFormValues({}))}
         >
           Reset to defaults
         </Button>

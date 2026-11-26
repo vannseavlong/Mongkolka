@@ -20,6 +20,10 @@ export interface AssetLimits {
   maxPerCouple: number;
   maxBytes: number;
   maxDimension: number;
+  /** Compression quality in percent, applied in the browser before upload. */
+  webpQuality: number;
+  /** Longest side in pixels that a photo is scaled down to before upload. */
+  resizeTo: number;
 }
 
 /** Shown only until the real limits load; they match the API defaults. */
@@ -27,6 +31,8 @@ export const DEFAULT_ASSET_LIMITS: AssetLimits = {
   maxPerCouple: 100,
   maxBytes: 8 * 1024 * 1024,
   maxDimension: 12000,
+  webpQuality: 80,
+  resizeTo: 2048,
 };
 export const ASSET_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 export const ASSET_ACCEPT = ASSET_TYPES.join(",");

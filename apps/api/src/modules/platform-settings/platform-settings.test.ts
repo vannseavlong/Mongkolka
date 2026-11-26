@@ -36,6 +36,17 @@ describe("parseAssetLimitsInput", () => {
 });
 
 describe("platform settings core", () => {
+  it("lets an admin change photo quality and resize, within range", async () => {
+    const { core } = setup();
+    assert.equal((await core.getAssetLimits()).webpQuality, 80);
+    await core.updateAssetLimits({ webpQuality: 70, resizeTo: 1600 });
+    const limits = await core.getAssetLimits();
+    assert.equal(limits.webpQuality, 70);
+    assert.equal(limits.resizeTo, 1600);
+    for (const body of [{ webpQuality: 39 }, { webpQuality: 101 }, { resizeTo: 599 }, { resizeTo: 8001 }]) {
+      assert.equal(parseAssetLimitsInput(body).ok, false, JSON.stringify(body));
+    }
+  });
   it("returns the env defaults when nothing is overridden", async () => {
     assert.deepEqual(await setup().core.getAssetLimits(), defaults);
   });

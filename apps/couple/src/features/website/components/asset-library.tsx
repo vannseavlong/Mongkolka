@@ -68,7 +68,8 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
   const { data, loading, error, refetch } = useApiQuery<{ assets: WebsiteAsset[] }>(ASSETS_KEY, LIST_CACHE);
   const assets = data?.assets ?? [];
   const { data: limitsData } = useApiQuery<{ limits: AssetLimits }>(ASSET_LIMITS_KEY, LIST_CACHE);
-  const limits = limitsData?.limits ?? DEFAULT_ASSET_LIMITS;
+  // Spread over the defaults so a field the API does not send yet still has a value.
+  const limits = { ...DEFAULT_ASSET_LIMITS, ...limitsData?.limits };
   const { items: uploads, notes } = useUploadQueue();
   const [dragging, setDragging] = useState(false);
   const [tab, setTab] = useState("library");
@@ -242,7 +243,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
             Your library is full ({limits.maxPerCouple} images). Delete some to upload more.
           </p>
         )}
-        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(limits.maxBytes)} each. JPEG and PNG are converted to WebP at full quality.</p>
+        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(limits.maxBytes)} each. Large photos are resized and compressed before upload.</p>
       </div>
 
       {notes.length > 0 && (

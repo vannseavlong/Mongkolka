@@ -18,6 +18,14 @@ export const ASSET_CEILINGS = {
   maxPerCouple: 1000,
 } as const;
 
+/** How the couple's browser shrinks a photo before uploading it. */
+export const IMAGE_ENCODING_DEFAULTS = {
+  /** Encoder quality, in percent. */
+  webpQuality: 80,
+  /** Longest side in pixels; bigger photos are scaled down. */
+  resizeTo: 2048,
+} as const;
+
 /** Built from the environment (ASSET_MAX_MB, ASSET_MAX_DIMENSION, ASSET_MAX_PER_COUPLE). */
 export function buildAssetLimits(config: {
   ASSET_MAX_MB?: string;
@@ -30,6 +38,7 @@ export function buildAssetLimits(config: {
     maxBytes: intFromConfig(config.ASSET_MAX_MB, 8, 1, ASSET_CEILINGS.maxMb) * 1024 * 1024,
     /** Reject absurd pixel sizes (decompression-bomb style) when the header can be read. */
     maxDimension: intFromConfig(config.ASSET_MAX_DIMENSION, 12000, 1, ASSET_CEILINGS.maxDimension),
+    ...(IMAGE_ENCODING_DEFAULTS as { webpQuality: number; resizeTo: number }),
   };
 }
 
@@ -42,6 +51,8 @@ export interface AssetLimitOverrides {
   maxMb?: number;
   maxDimension?: number;
   maxPerCouple?: number;
+  webpQuality?: number;
+  resizeTo?: number;
 }
 
 /** Allowed range per override field, shared by input validation and clamping. */
@@ -49,6 +60,8 @@ export const ASSET_LIMIT_RANGES = {
   maxMb: { min: 1, max: ASSET_CEILINGS.maxMb },
   maxDimension: { min: 1, max: ASSET_CEILINGS.maxDimension },
   maxPerCouple: { min: 1, max: ASSET_CEILINGS.maxPerCouple },
+  webpQuality: { min: 40, max: 100 },
+  resizeTo: { min: 600, max: 8000 },
 } as const;
 
 /** Applies overrides on top of the env-built defaults, clamped to the ceilings. */
@@ -60,5 +73,7 @@ export function applyAssetOverrides(base: AssetLimits, o: AssetLimitOverrides): 
     maxPerCouple: pick(o.maxPerCouple, base.maxPerCouple, "maxPerCouple"),
     maxBytes: pick(o.maxMb, base.maxBytes / (1024 * 1024), "maxMb") * 1024 * 1024,
     maxDimension: pick(o.maxDimension, base.maxDimension, "maxDimension"),
+    webpQuality: pick(o.webpQuality, base.webpQuality, "webpQuality"),
+    resizeTo: pick(o.resizeTo, base.resizeTo, "resizeTo"),
   };
 }

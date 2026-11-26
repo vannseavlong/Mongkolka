@@ -1,4 +1,4 @@
-export type LimitKey = "maxMb" | "maxDimension" | "maxPerCouple";
+export type LimitKey = "maxMb" | "maxDimension" | "maxPerCouple" | "webpQuality" | "resizeTo";
 
 export type LimitNumbers = Record<LimitKey, number>;
 export type LimitRanges = Record<LimitKey, { min: number; max: number }>;

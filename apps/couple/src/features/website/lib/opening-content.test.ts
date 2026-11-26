@@ -18,7 +18,9 @@ describe("opening content mapping", () => {
   });
   it("has a built-in wording placeholder for every wording field (event details fall back to the profile)", () => {
     for (const f of OPENING_FIELDS) {
-      if (f in OPENING_DEFAULTS) assert.ok(OPENING_DEFAULTS[f as keyof typeof OPENING_DEFAULTS].length > 0, f);
+      // The English page has no built-in title: it would repeat the invitation line above it.
+      if (f === "titleEn") assert.equal(OPENING_DEFAULTS.titleEn, "");
+      else if (f in OPENING_DEFAULTS) assert.ok(OPENING_DEFAULTS[f as keyof typeof OPENING_DEFAULTS].length > 0, f);
     }
     assert.ok(!("date" in OPENING_DEFAULTS) && !("name1En" in OPENING_DEFAULTS));
   });

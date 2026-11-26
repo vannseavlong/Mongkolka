@@ -20,7 +20,7 @@ export async function uploadSingleImage(
   const size = await readImageSize(file);
   const tooBig = size && dimensionsError(file.name, size.width, size.height, limits);
   if (tooBig) throw new ApiError(tooBig, 0);
-  const { file: optimized } = await optimizeImage(file);
+  const { file: optimized } = await optimizeImage(file, limits);
   const tooLarge = sizeError(optimized, limits);
   if (tooLarge) throw new ApiError(tooLarge, 0);
   const asset = await uploadAsset(optimized, onProgress, signal, undefined, limits);

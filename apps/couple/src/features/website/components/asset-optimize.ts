@@ -1,18 +1,32 @@
 /**
- * Browser-side image optimizer: re-encodes JPEG/PNG as WebP at maximum quality before upload,
- * so big camera photos fit the server limit without visible loss. No React, no network.
+ * Browser-side image optimizer: scales a big camera photo down and compresses it before upload, so guests download
+ * a small file. Quality and size come from the admin's upload settings. No React, no network.
  * It never makes things worse: whenever it cannot help, the original file is returned.
  */
 
-/** 1 = the encoder's maximum quality (same as `quality=100` in Img2web). */
-export const WEBP_QUALITY = 1;
+export interface EncodeSettings {
+  /** Percent, 1-100. */
+  webpQuality: number;
+  /** Longest side in pixels; larger images are scaled down, smaller ones are never enlarged. */
+  resizeTo: number;
+}
 
-/** Types worth converting. GIF may be animated and WebP is already WebP (re-encoding only loses detail). */
-const CONVERTIBLE = ["image/jpeg", "image/png"];
+/** GIF may be animated, so it is never touched. */
+const CONVERTIBLE = ["image/jpeg", "image/png", "image/webp"];
 
-export function webpName(name: string): string {
+const EXTENSION: Record<string, string> = { "image/webp": "webp", "image/jpeg": "jpg" };
+
+export function renamed(name: string, type: string): string {
   const dot = name.lastIndexOf(".");
-  return `${dot > 0 ? name.slice(0, dot) : name}.webp`;
+  return `${dot > 0 ? name.slice(0, dot) : name}.${EXTENSION[type]}`;
+}
+
+/** The size to draw at: the longest side capped to `max`, aspect ratio kept. */
+export function fitWithin(width: number, height: number, max: number): { width: number; height: number; scaled: boolean } {
+  const longest = Math.max(width, height);
+  if (longest <= max) return { width, height, scaled: false };
+  const k = max / longest;
+  return { width: Math.max(1, Math.round(width * k)), height: Math.max(1, Math.round(height * k)), scaled: true };
 }
 
 export interface OptimizeResult {
@@ -22,40 +36,45 @@ export interface OptimizeResult {
   savedBytes: number;
 }
 
-/** Pure choice between the original and the converted file: keep the WebP only if it is a real WebP and smaller. */
+/** Pure choice between the original and the encoded file: keep the new one only if it is a real image and smaller. */
 export function pickSmaller(original: File, blob: Blob | null): OptimizeResult {
-  if (!blob || blob.type !== "image/webp" || blob.size === 0 || blob.size >= original.size) {
+  if (!blob || !EXTENSION[blob.type] || blob.size === 0 || blob.size >= original.size) {
     return { file: original, converted: false, savedBytes: 0 };
   }
-  const file = new File([blob], webpName(original.name), { type: "image/webp", lastModified: original.lastModified });
+  const file = new File([blob], renamed(original.name, blob.type), { type: blob.type, lastModified: original.lastModified });
   return { file, converted: true, savedBytes: original.size - blob.size };
 }
 
-async function encodeWebp(file: File): Promise<Blob | null> {
-  // Applies the EXIF rotation, so the stored WebP (which carries no EXIF) stays upright.
+async function encode(file: File, { webpQuality, resizeTo }: EncodeSettings): Promise<Blob | null> {
+  // Applies the EXIF rotation, so the stored file (which carries no EXIF) stays upright.
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
   try {
-    if (typeof OffscreenCanvas !== "undefined") {
-      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-      canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
-      return await canvas.convertToBlob({ type: "image/webp", quality: WEBP_QUALITY });
-    }
+    const size = fitWithin(bitmap.width, bitmap.height, resizeTo);
+    // Re-encoding a WebP that is already small enough would only lose detail.
+    if (file.type === "image/webp" && !size.scaled) return null;
     const canvas = document.createElement("canvas");
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
-    return await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", WEBP_QUALITY));
+    canvas.width = size.width;
+    canvas.height = size.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(bitmap, 0, 0, size.width, size.height);
+    const toBlob = (type: string) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, webpQuality / 100));
+    const webp = await toBlob("image/webp");
+    if (webp?.type === "image/webp") return webp;
+    // Safari has no WebP encoder. A JPEG source can stay JPEG; PNG and WebP may be transparent, so leave them.
+    return file.type === "image/jpeg" ? await toBlob("image/jpeg") : null;
   } finally {
     bitmap.close();
   }
 }
 
-export async function optimizeImage(file: File): Promise<OptimizeResult> {
+export async function optimizeImage(file: File, settings: EncodeSettings): Promise<OptimizeResult> {
   if (!CONVERTIBLE.includes(file.type)) return { file, converted: false, savedBytes: 0 };
   try {
-    return pickSmaller(file, await encodeWebp(file));
+    return pickSmaller(file, await encode(file, settings));
   } catch {
-    // Undecodable, too large for the canvas, or no WebP encoder (e.g. Safari returns PNG): let the server decide.
+    // Undecodable or too large for the canvas: let the server decide.
     return { file, converted: false, savedBytes: 0 };
   }
 }

@@ -1,6 +1,6 @@
 import type { LimitKey, LimitRanges, UploadLimitsPayload, UploadLimitsView } from "../data/schema";
 
-export const LIMIT_KEYS: LimitKey[] = ["maxMb", "maxPerCouple", "maxDimension"];
+export const LIMIT_KEYS: LimitKey[] = ["webpQuality", "resizeTo", "maxMb", "maxPerCouple", "maxDimension"];
 
 export type FormValues = Record<LimitKey, string>;
 export type FormErrors = Partial<Record<LimitKey, string>>;
@@ -8,7 +8,7 @@ export type FormErrors = Partial<Record<LimitKey, string>>;
 /** Blank means "use the default", so a field only has text when an override is set. */
 export function toFormValues(overrides: UploadLimitsView["overrides"]): FormValues {
   const text = (k: LimitKey) => (overrides[k] === undefined ? "" : String(overrides[k]));
-  return { maxMb: text("maxMb"), maxPerCouple: text("maxPerCouple"), maxDimension: text("maxDimension") };
+  return Object.fromEntries(LIMIT_KEYS.map((k) => [k, text(k)])) as FormValues;
 }
 
 export function isDirty(values: FormValues, overrides: UploadLimitsView["overrides"]): boolean {

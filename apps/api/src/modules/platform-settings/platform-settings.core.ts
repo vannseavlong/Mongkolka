@@ -6,7 +6,7 @@ import {
 } from "../website-assets/website-assets.limits.js";
 
 export const ASSET_LIMITS_KEY = "asset_limits";
-const FIELDS = ["maxMb", "maxDimension", "maxPerCouple"] as const;
+const FIELDS = ["maxMb", "maxDimension", "maxPerCouple", "webpQuality", "resizeTo"] as const;
 type Field = (typeof FIELDS)[number];
 
 export interface SettingsStore {
@@ -23,8 +23,8 @@ export interface Deps {
 
 /** What the admin screen shows. `overrides` only has the fields an admin has set. */
 export interface AssetLimitsView {
-  effective: { maxMb: number; maxDimension: number; maxPerCouple: number };
-  defaults: { maxMb: number; maxDimension: number; maxPerCouple: number };
+  effective: Record<Field, number>;
+  defaults: Record<Field, number>;
   overrides: AssetLimitOverrides;
   ranges: typeof ASSET_LIMIT_RANGES;
 }
@@ -66,7 +66,13 @@ function readOverrides(raw: string | null): AssetLimitOverrides {
 }
 
 const mb = (bytes: number) => bytes / (1024 * 1024);
-const toNumbers = (l: AssetLimits) => ({ maxMb: mb(l.maxBytes), maxDimension: l.maxDimension, maxPerCouple: l.maxPerCouple });
+const toNumbers = (l: AssetLimits): Record<Field, number> => ({
+  maxMb: mb(l.maxBytes),
+  maxDimension: l.maxDimension,
+  maxPerCouple: l.maxPerCouple,
+  webpQuality: l.webpQuality,
+  resizeTo: l.resizeTo,
+});
 
 export function createPlatformSettingsCore(deps: Deps) {
   const ttl = deps.ttlMs ?? 30_000;

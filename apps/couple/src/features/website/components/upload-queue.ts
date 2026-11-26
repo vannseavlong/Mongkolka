@@ -89,8 +89,8 @@ async function uploadOne(id: number, job: Job): Promise<"full" | "ok"> {
     const size = await readImageSize(file);
     const tooBig = size && dimensionsError(file.name, size.width, size.height, limits);
     if (tooBig) throw new ApiError(tooBig, 0);
-    // Convert to WebP at max quality first, so large photos fit the limit without visible loss.
-    const { file: optimized } = await optimizeImage(file);
+    // Resize and compress first, so large photos load fast for guests and fit the limit.
+    const { file: optimized } = await optimizeImage(file, limits);
     const tooLarge = sizeError(optimized, limits);
     if (tooLarge) throw new ApiError(tooLarge, 0);
     if (signal.aborted) throw new ApiError("Cancelled", UPLOAD_CANCELLED);

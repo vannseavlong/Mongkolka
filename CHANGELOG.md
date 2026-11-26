@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(web): gallery layout stack, photo limit for all layouts, thumbnail photo list
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-gallery-stack.md
+- Branch/PR: feat/gallery-stack · 09f86cd, fast-forwarded to main (no PR)
+- What changed: "Photos shown" now caps Grid, Masonry, Carousel, Plates and Skin as well as Covenant (only where a "View all" link exists). A gallery can stack layouts (Grid, Masonry, Carousel), each with its own photo count, even on a Covenant style. The gallery form lists photos as thumbnail and file name, with "Add by link" validated
+- Needs: none (no API or sheet change, no seed). Narrow-width and loading/error states, and Skin and Plates with a limit, not checked in a browser
+
 ## 2026-11-27 · [Web][Admin] feat: brand logo, favicon and share image
 - Owner: SNLRLONG
 - Task: none (ad hoc request)

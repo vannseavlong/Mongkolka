@@ -9,10 +9,12 @@ import { useLanguage } from "../../i18n";
 export interface GalleryCarouselProps {
   theme: Theme;
   content?: GalleryContent;
+  /** False for the 2nd and later layouts of a stacked gallery, so the heading shows once. */
+  showHeading?: boolean;
 }
 
 /** A horizontal, scroll-snapped filmstrip of photos rather than a static grid. */
-export function GalleryCarousel({ theme, content }: GalleryCarouselProps) {
+export function GalleryCarousel({ theme, content, showHeading = true }: GalleryCarouselProps) {
   const { t } = useLanguage();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const photos = content?.photos ?? [];
@@ -24,18 +26,20 @@ export function GalleryCarousel({ theme, content }: GalleryCarouselProps) {
 
   return (
     <section
-      className="py-20"
+      className={showHeading ? "py-20" : "pb-12"}
       style={{ backgroundColor: theme.bg_color, color: theme.text_color }}
     >
-      <h2
-        className="mb-8 px-6 text-center text-2xl font-medium"
-        style={{
-          color: theme.accent_color,
-          fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
-        }}
-      >
-        {t("section.gallery.heading")}
-      </h2>
+      {showHeading && (
+        <h2
+          className="mb-8 px-6 text-center text-2xl font-medium"
+          style={{
+            color: theme.accent_color,
+            fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+          }}
+        >
+          {t("section.gallery.heading")}
+        </h2>
+      )}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

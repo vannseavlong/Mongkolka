@@ -4,8 +4,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ArrowDown, ArrowUp, ImagePlus, Plus, Trash2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
 import { DialogFooter } from "@mongkolka/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@mongkolka/ui/form";
@@ -17,8 +16,6 @@ import { TextRow } from "./section-form-fields";
 import { ApiError } from "@/lib/api";
 import { asRecord, saveContent } from "../lib/section-content-save";
 import type { WebsiteSection } from "../data/schema";
-import { AssetPicker } from "./asset-picker";
-import { newUrlsOnly } from "./asset-library-logic";
 import { VERSE_PRESETS } from "../lib/verse-presets";
 import { InvitationContentForm } from "./invitation-content-form";
 import { AgendaContentForm } from "./agenda-content-form";
@@ -28,137 +25,12 @@ import { OpeningContentForm } from "./opening-content-form";
 import { VideoContentForm } from "./video-content-form";
 import { MapContentForm } from "./map-content-form";
 import { NoteContentForm } from "./note-content-form";
+import { GalleryContentForm } from "./gallery-content-form";
 import { ACCOUNT_NUMBER_PATTERN, GIFT_LIMITS, GiftContentFields, giftFromContent, giftToContent } from "./gift-content-fields";
 
 
 export { CONTENT_EDITABLE_SECTIONS } from "../lib/section-editors";
 
-
-// ---------------------------------------------------------------------------
-// gallery — content: { photos: string[] }
-// ---------------------------------------------------------------------------
-
-/** Fewest and most photos the invitation page can show before "See all" (the Covenant galleries clamp to the same range). */
-const HOME_PHOTOS_MIN = 3;
-const HOME_PHOTOS_MAX = 24;
-
-const gallerySchema = z.object({
-  photos: z.array(z.object({ url: z.string().min(1, "Photo URL is required") })),
-  maxPhotos: z
-    .string()
-    .refine((v) => v.trim() === "" || (/^\d+$/.test(v.trim()) && Number(v) >= HOME_PHOTOS_MIN && Number(v) <= HOME_PHOTOS_MAX), `Enter a whole number from ${HOME_PHOTOS_MIN} to ${HOME_PHOTOS_MAX}, or leave it empty`),
-});
-type GalleryFormValues = z.infer<typeof gallerySchema>;
-
-function GalleryContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
-  const content = asRecord(section.content);
-  const initialPhotos = Array.isArray(content.photos) ? content.photos : [];
-  const form = useForm<GalleryFormValues>({
-    resolver: zodResolver(gallerySchema),
-    defaultValues: {
-      photos: initialPhotos.filter((p): p is string => typeof p === "string").map((url) => ({ url })),
-      maxPhotos: typeof content.maxPhotos === "number" ? String(content.maxPhotos) : "",
-    },
-  });
-  const { fields, append, remove, move } = useFieldArray({ control: form.control, name: "photos" });
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const pickerButtonRef = useRef<HTMLButtonElement>(null);
-
-  async function onSubmit(values: GalleryFormValues) {
-    try {
-      const max = values.maxPhotos.trim();
-      await saveContent(section.section_id, { ...content, photos: values.photos.map((p) => p.url), maxPhotos: max ? Number(max) : undefined });
-      toast.success("Gallery updated");
-      onSaved();
-    } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to save gallery");
-    }
-  }
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          {fields.length === 0 && <p className="text-sm text-muted-foreground">No photos yet.</p>}
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-2">
-              <FormField
-                control={form.control}
-                name={`photos.${index}.url`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input placeholder="https://…" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                disabled={index === 0}
-                onClick={() => move(index, index - 1)}
-              >
-                <ArrowUp className="size-3" />
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                disabled={index === fields.length - 1}
-                onClick={() => move(index, index + 1)}
-              >
-                <ArrowDown className="size-3" />
-              </Button>
-              <Button type="button" size="icon" variant="ghost" onClick={() => remove(index)}>
-                <Trash2 className="size-3" />
-              </Button>
-            </div>
-          ))}
-        </div>
-        <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => append({ url: "" })}>
-          <Plus className="size-3" /> Add photo by URL
-        </Button>
-        <Button ref={pickerButtonRef} type="button" variant="outline" size="sm" className="w-fit" onClick={() => setPickerOpen(true)}>
-          <ImagePlus className="size-3" /> Choose from library
-        </Button>
-        <AssetPicker
-          open={pickerOpen}
-          onOpenChange={setPickerOpen}
-          title="Add photos to gallery"
-          returnFocusRef={pickerButtonRef}
-          onConfirm={(urls) => {
-            const have = form.getValues("photos").map((p) => p.url);
-            newUrlsOnly(have, urls).forEach((url) => append({ url }));
-          }}
-        />
-        <FormField
-          control={form.control}
-          name="maxPhotos"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Photos shown on the invitation page</FormLabel>
-              <FormControl>
-                <Input inputMode="numeric" className="w-32" placeholder="Template default" {...field} />
-              </FormControl>
-              <p className="text-sm text-muted-foreground">
-                The rest are one tap away behind the &ldquo;See all photos&rdquo; button. {HOME_PHOTOS_MIN} to {HOME_PHOTOS_MAX}; leave empty for the template&apos;s own number.
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <DialogFooter>
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            Save gallery
-          </Button>
-        </DialogFooter>
-      </form>
-    </Form>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // registry — content: { links: { label, url }[], khqrImageUrl?, bank?, accountName?, accountNumber? }

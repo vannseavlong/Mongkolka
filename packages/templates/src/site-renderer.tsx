@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useMemo, useState, type ReactNode } from "react";
+import { Fragment, useMemo, useState, type ComponentType, type ReactNode } from "react";
 import { resolveComponent } from "./registry";
 import { GuestProvider } from "./guest-context";
 import { ChromeSection } from "./chrome/ChromeSection";
@@ -19,7 +19,8 @@ import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
 import { resolveTheme } from "./theme";
-import type { CoupleInfo, CoverContent, DetailsContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
+import { limitPhotos, stackSlices } from "./sections/gallery/gallery-stack";
+import type { CoupleInfo, CoverContent, DetailsContent, GalleryContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
 /** Gallery styles that draw their own "show all" button (it links to the sub-page), so none is added under them. */
 const GALLERY_OWN_LINK: ReadonlySet<string> = new Set(["gallery_covenant", "gallery_flow_covenant", "gallery_spotlight_covenant", "gallery_polaroid_covenant"]);
@@ -215,16 +216,33 @@ function SiteRendererBody({
           template.default_components[section.section_key],
         );
         if (!Component) return null;
-        const content =
+        const rawContent =
           section.section_key === "hero"
             ? heroContentFor(buildContent("hero"), section.content, orientation)
             : section.section_key === "story"
               ? storyContentFor(buildContent("story"), section.content, language)
               : (section.content ?? buildContent(section.section_key));
-        const piece = <Component key={section.section_id} couple={couple} theme={theme} content={content} {...extraProps?.(section.section_key)} />;
-        // A gallery with photos gets a "View all photos" button to the sub-page, whichever style draws the gallery.
-        const ownGalleryButton = section.section_key === "gallery" && GALLERY_OWN_LINK.has(section.component_id ?? template.default_components.gallery ?? "");
-        const hasMorePhotos = section.section_key === "gallery" && !!galleryHref && !ownGalleryButton && ((content as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
+        const isGallery = section.section_key === "gallery";
+        const gallery = isGallery ? (rawContent as GalleryContent | null | undefined) : undefined;
+        // The couple's "photos shown" number caps every layout, but only where a "View all" link exists to reach the rest.
+        const capped = gallery ? (galleryHref ? limitPhotos(gallery.photos ?? [], gallery.maxPhotos) : (gallery.photos ?? [])) : [];
+        // A stack is the couple's explicit choice, so it wins over the style's own single layout (Covenant included).
+        const slices = gallery ? stackSlices(capped, gallery.stack) : [];
+        const stacked = slices.length > 0;
+        // Covenant styles apply the number and draw their own "show all" button; a stack uses the shared one.
+        const ownGalleryButton = isGallery && !stacked && GALLERY_OWN_LINK.has(section.component_id ?? template.default_components.gallery ?? "");
+        const content = gallery && !ownGalleryButton ? { ...gallery, photos: capped } : rawContent;
+        const piece = stacked ? (
+          <Fragment key={section.section_id}>
+            {slices.map((slice, i) => {
+              const Layout = resolveComponent("gallery", slice.layout, undefined) as ComponentType<{ theme: Theme; content: GalleryContent; showHeading?: boolean }> | undefined;
+              return Layout ? <Layout key={`${slice.layout}-${i}`} theme={theme} content={{ photos: slice.photos }} showHeading={i === 0} /> : null;
+            })}
+          </Fragment>
+        ) : (
+          <Component key={section.section_id} couple={couple} theme={theme} content={content} {...extraProps?.(section.section_key)} />
+        );
+        const hasMorePhotos = isGallery && !!galleryHref && !ownGalleryButton && ((rawContent as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
         const node = hasMorePhotos ? (
           <Fragment key={section.section_id}>
             {piece}

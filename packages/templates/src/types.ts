@@ -169,8 +169,16 @@ export interface NoteContent {
   bodyEn?: string;
 }
 
+/** One layout in a stacked gallery: it shows `count` photos (the last block takes the rest). */
+export interface GalleryStackBlock {
+  layout: string;
+  count?: number;
+}
+
 export interface GalleryContent {
   photos: string[];
+  /** Layouts stacked top to bottom, each with its slice of the photos. Empty or missing: the section's single layout. */
+  stack?: GalleryStackBlock[];
   /** How many photos the invitation page shows before "show all" (Covenant galleries; 3 to 24). Empty uses the template's own number. */
   maxPhotos?: number;
 }

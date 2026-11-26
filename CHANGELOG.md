@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] fix(deploy): revalidate html on every load so new releases show at once
+- Owner: SNLRLONG
+- Task: none (ad hoc request)
+- Branch/PR: fix/html-no-cache, fast-forwarded to main (no PR)
+- What changed: `firebase.json` sends `Cache-Control: no-cache` for every file on web, admin and couple, then the existing immutable header for `/_next/static/**`. Pages were cached for an hour, so a deploy could show the old site and old preview for up to an hour
+- Needs: admin picks it up on its next deploy
+
 ## 2026-11-27 · [Web] fix(web): gallery mix layouts form, all styles stackable, preview View all and scroll
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-preview-see-all.md

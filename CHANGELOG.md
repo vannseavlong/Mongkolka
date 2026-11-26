@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] fix(web): gallery mix layouts form, all styles stackable, preview View all and scroll
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-preview-see-all.md
+- Branch/PR: feat/preview-see-all · 4594f12, fast-forwarded to main (no PR)
+- What changed: Mix layouts box is compact (no overflow, no long text) and offers every style from the Style tab; Covenant, Plates and Skin can be stacked and show their heading once. In the builder, "View all photos" shows every photo in place and the preview re-aligns to the selected section after images load or a save
+- Needs: none. Preview scroll fix and stacked Covenant/Plates/Skin not checked in a browser before deploy
+
 ## 2026-11-27 · [Web] fix: serve landing photos as static files instead of Unsplash hotlinks
 - Owner: SNLRLONG
 - Task: none (follow-up to the landing revamp)

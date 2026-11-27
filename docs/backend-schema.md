@@ -99,6 +99,40 @@ account" a clean relationship instead of an implicit coincidence of matching
 | `invited_by` | string, nullable, ref → `users.user_id` | Null for the partner who originally registered. |
 | `joined_at` | datetime | |
 
+### `assist_requests`
+
+A couple's request for a Mongkolka admin to help edit their site (plan: `Tasks/_plans/Web-storage-profile-assist.md`).
+Admin sheet, no migration: new table, run `npx lsdb sync`.
+
+| Column | Type | Notes |
+|---|---|---|
+| `request_id` | string, PK | |
+| `couple_id` | string, ref → `couples.couple_id` | At most one open (`pending` or live `approved`) per couple, enforced by the service. |
+| `note` | string | 5 to 500 characters, trimmed. |
+| `status` | enum(pending, approved, declined, revoked, cancelled) | `expired` is **derived** on read from `expires_at`, never stored. |
+| `requested_by` | string, ref → `users.user_id` | |
+| `requested_at` | datetime (ISO UTC) | |
+| `decided_by` | string, nullable, ref → `users.user_id` | The admin who accepted or declined. |
+| `decided_at` | datetime, nullable | |
+| `decline_reason` | string, nullable | Required when declining, max 300 characters. |
+| `expires_at` | datetime, nullable | Set on accept: accept time + 7 days. A repeated accept does not extend it. |
+| `revoked_at` | datetime, nullable | |
+
+### `assist_log`
+
+Append-only audit trail. Never stores request bodies or tokens.
+
+| Column | Type | Notes |
+|---|---|---|
+| `log_id` | string, PK | |
+| `request_id` | string, ref → `assist_requests.request_id` | |
+| `couple_id` | string, ref → `couples.couple_id` | |
+| `actor_id` | string, ref → `users.user_id` | Real admin or couple user. Never shown to the couple (only `actor_role`). |
+| `actor_role` | enum(couple, admin) | |
+| `action` | string | `requested`, `cancelled`, `accepted`, `declined`, `revoked`; later `open`, `edit` (API-assist-session). |
+| `method`, `path` | string, nullable | Only for `edit`. |
+| `at` | datetime | |
+
 ### `vendors`
 
 Vendor registry, admin-visible (mirrors `couples`' role for the vendor side).

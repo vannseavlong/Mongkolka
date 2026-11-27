@@ -12,6 +12,14 @@ export const ASSETS_KEY = "/couple/api/website/assets";
 export const ASSET_LIMITS_KEY = "/couple/api/website/assets/limits";
 export const PROFILE_KEY = "/couple/api/profile";
 
+/**
+ * Reuse the last answer instead of refetching every time the dialog opens or the window regains focus. The window
+ * matches the API's lsdb read-cache TTL (15 s), so a refetch inside it would only hit the same cache. Uploads and
+ * deletes update the list themselves (mutate), so it never goes stale from our own changes.
+ */
+export const LIST_CACHE = { revalidateOnFocus: false, dedupingInterval: 15_000, keepPreviousData: true } as const;
+
+
 /** Reads an image's pixel size in the browser; null when it cannot be decoded (the server then decides). */
 export function readImageSize(file: File): Promise<{ width: number; height: number } | null> {
   return new Promise((resolve) => {

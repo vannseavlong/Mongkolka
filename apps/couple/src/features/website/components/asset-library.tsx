@@ -25,7 +25,7 @@ import { DriveReconnectBanner } from "@/features/storage/components/drive-reconn
 import { SECTIONS_KEY } from "../lib/keys";
 import { sectionLabel } from "../workspace/section-labels";
 import type { WebsiteSectionKey } from "../data/schema";
-import { ASSET_LIMITS_KEY, ASSETS_KEY, PROFILE_KEY } from "./asset-library-api";
+import { ASSET_LIMITS_KEY, ASSETS_KEY, LIST_CACHE, PROFILE_KEY } from "./asset-library-api";
 import { cancelUpload, clearFinished, enqueueUploads, registerLibraryView, useUploadQueue } from "./upload-queue";
 import { summarize } from "./upload-progress";
 import {
@@ -37,12 +37,6 @@ import {
   type WebsiteAsset,
 } from "./asset-library-logic";
 
-/**
- * Reuse the last answer instead of refetching every time the dialog opens or the window regains focus. The window
- * matches the API's lsdb read-cache TTL (15 s), so a refetch inside it would only hit the same cache. Uploads and
- * deletes update the list themselves (mutate), so it never goes stale from our own changes.
- */
-const LIST_CACHE = { revalidateOnFocus: false, dedupingInterval: 15_000, keepPreviousData: true } as const;
 
 /** Library tiles drawn at first and per "Show more": each one decodes a full-size photo, so they come in steps. */
 const PAGE_SIZE = 24;
@@ -61,10 +55,16 @@ interface AssetLibraryProps {
   allowDelete?: boolean;
   /** Adds a "Select all" / "Clear selection" button; called with every library image and whether all are already selected. */
   onSelectAll?: (assets: WebsiteAsset[], allSelected: boolean) => void;
+  /** Column classes for the tile grid; the default fits a narrow panel. A wide page can pass more columns. */
+  gridClassName?: string;
+  /** The reconnect notice is on by default; a page that already shows it elsewhere turns it off. */
+  showDriveNotice?: boolean;
 }
 
+const NARROW_GRID = "grid-cols-2 sm:grid-cols-3";
+
 /** The couple's image library: upload (drag-drop or picker), pick, delete, quota. */
-export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true, onSelectAll }: AssetLibraryProps) {
+export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true, onSelectAll, gridClassName = NARROW_GRID, showDriveNotice = true }: AssetLibraryProps) {
   const { data, loading, error, refetch } = useApiQuery<{ assets: WebsiteAsset[] }>(ASSETS_KEY, LIST_CACHE);
   const assets = data?.assets ?? [];
   const { data: limitsData } = useApiQuery<{ limits: AssetLimits }>(ASSET_LIMITS_KEY, LIST_CACHE);
@@ -100,7 +100,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
 
   return (
     <div className="flex flex-col gap-3">
-      <DriveReconnectBanner />
+      {showDriveNotice && <DriveReconnectBanner />}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium">Image library</h3>
         {onSelectAll && assets.length > 0 && (
@@ -120,7 +120,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         </TabsList>
         <TabsContent value="library" className="flex flex-col gap-3">
       {loading ? (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-busy="true" aria-label="Loading images">
+        <div className={cn("grid gap-2", gridClassName)} aria-busy="true" aria-label="Loading images">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="aspect-square w-full rounded-md" />
           ))}
@@ -141,7 +141,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
           No images yet. Use the Upload tab to add your first photo.
         </p>
       ) : (
-        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Images">
+        <ul className={cn("grid gap-2", gridClassName)} aria-label="Images">
           {assets.slice(0, shown).map((asset, i) => {
             const index = selected.indexOf(asset.url);
             const isSelected = index !== -1;

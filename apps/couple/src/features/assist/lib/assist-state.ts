@@ -68,6 +68,10 @@ const AREAS: Array<[prefix: string, label: string]> = [
   ["/couple/api/budget", "your budget"],
   ["/couple/api/checklist", "your checklist"],
   ["/couple/api/milestones", "your milestones"],
+  ["/couple/api/photos", "your guests' photos"],
+  ["/couple/api/wishes", "your guests' wishes"],
+  ["/couple/api/members", "who has access"],
+  ["/couple/api/drive", "your storage settings"],
 ];
 
 export function areaOf(path: string | null): string {
@@ -93,6 +97,12 @@ export function activityText(a: AssistActivity): string {
       return "Mongkolka opened your site editor";
     case "edit":
       return `Mongkolka changed ${areaOf(a.path)}`;
+    case "view":
+      return `Mongkolka looked at ${areaOf(a.path)}`;
+    case "blocked":
+      return "Mongkolka tried something that is not allowed, and it was stopped";
+    case "reconciled":
+      return "An earlier update was recorded late";
     default:
       return `${who} made an update`;
   }

@@ -98,6 +98,12 @@ describe("activityText", () => {
     assert.equal(activityText(row("open", "admin")), "Mongkolka opened your site editor");
     assert.equal(activityText(row("edit", "admin", null)), "Mongkolka changed your site");
   });
+  it("has wording for the later audit actions: viewed, blocked, recorded late", () => {
+    assert.equal(activityText(row("view", "admin", "/couple/api/guests")), "Mongkolka looked at your guest list");
+    assert.equal(activityText(row("view", "admin", "/couple/api/wishes")), "Mongkolka looked at your guests' wishes");
+    assert.match(activityText(row("blocked", "admin", "/couple/api/members/invite")), /stopped/);
+    assert.equal(activityText(row("reconciled", "admin")), "An earlier update was recorded late");
+  });
   it("has a sentence for an action it does not know", () => {
     assert.equal(activityText(row("something-new", "admin")), "Mongkolka made an update");
   });

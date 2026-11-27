@@ -64,23 +64,39 @@ export function PreviewFrame() {
       return;
     }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const topOf = () => {
+    const targetTop = (): number | null => {
+      if (mode !== "page") return 0;
       const target = selectedId && document.querySelector<HTMLElement>(`[data-section-id="${CSS.escape(selectedId)}"]`);
-      return mode === "page" && target ? target.getBoundingClientRect().top + window.scrollY : 0;
+      return target ? target.getBoundingClientRect().top + window.scrollY : null;
     };
-    window.scrollTo({ top: topOf(), behavior: reduce ? "auto" : "smooth" });
+    const first = targetTop();
+    window.scrollTo({ top: first ?? 0, behavior: reduce ? "auto" : "smooth" });
     if (mode !== "page") return;
-    // `opened`: a section picked while the gate was still shut has nothing to scroll to yet, so go again once the page appears.
-    // Photos load after the jump and push the section away from where it was measured. For a moment, whenever the
-    // page height changes, put the selected section back at the top (instantly, so it does not fight the scroll).
-    const observer = new ResizeObserver(() => window.scrollTo({ top: topOf(), behavior: "auto" }));
-    observer.observe(document.body);
-    const stop = window.setTimeout(() => observer.disconnect(), 2500);
-    return () => {
-      window.clearTimeout(stop);
-      observer.disconnect();
+    // The section may not be on the page yet (picked while the opening gate is shut) or may move as photos load.
+    // Watch the page: the moment the section exists, and whenever the page changes for the next moment, put it at the
+    // top again (instantly, so it does not fight the smooth scroll).
+    let settleTimer: number | undefined;
+    const align = () => {
+      const top = targetTop();
+      if (top === null) return;
+      window.scrollTo({ top, behavior: "auto" });
+      settleTimer ??= window.setTimeout(stop, 2500);
     };
-  }, [selectedId, mode, state?.replay, selectedKey, opened]);
+    const resize = new ResizeObserver(align);
+    const mutate = new MutationObserver(align);
+    resize.observe(document.body);
+    mutate.observe(document.body, { childList: true, subtree: true });
+    // Give up waiting for a section that never appears (e.g. it is switched off).
+    const giveUp = window.setTimeout(stop, 60000);
+    function stop() {
+      resize.disconnect();
+      mutate.disconnect();
+      window.clearTimeout(settleTimer);
+      window.clearTimeout(giveUp);
+    }
+    if (first !== null) settleTimer = window.setTimeout(stop, 2500);
+    return stop;
+  }, [selectedId, mode, state?.replay, selectedKey]);
 
   if (!state) return null;
   const { template, sections, themeOverride, profile } = state;

@@ -32,13 +32,18 @@ import {
   AlertDialogTrigger,
 } from "@mongkolka/ui/alert-dialog";
 import { NavGroup } from "@mongkolka/ui/layout/nav-group";
+import { exitAssist, useIsAssisting } from "@/features/assist/lib/use-assist-session";
 import { clearToken } from "@/lib/auth";
 import { sidebarData } from "./data/sidebar-data";
 
 export function AppSidebar() {
   const router = useRouter();
 
+  const assisting = useIsAssisting();
+
   function signOut() {
+    // An admin leaving goes back to the admin app; the couple is not "signed out".
+    if (assisting) return exitAssist();
     clearToken();
     router.replace("/");
   }
@@ -79,21 +84,21 @@ export function AppSidebar() {
                       onSelect={(event) => event.preventDefault()}
                     >
                       <LogOut />
-                      Sign out
+                      {assisting ? "Exit help session" : "Sign out"}
                     </DropdownMenuItem>
                   </AlertDialogTrigger>
                 </DropdownMenuContent>
               </DropdownMenu>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Sign out?</AlertDialogTitle>
+                  <AlertDialogTitle>{assisting ? "Exit the help session?" : "Sign out?"}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    You&apos;ll need to sign in again to access your account.
+                    {assisting ? "You will go back to the admin app." : "You'll need to sign in again to access your account."}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={signOut}>Sign out</AlertDialogAction>
+                  <AlertDialogAction onClick={signOut}>{assisting ? "Exit" : "Sign out"}</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

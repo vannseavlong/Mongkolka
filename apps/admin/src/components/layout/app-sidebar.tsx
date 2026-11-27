@@ -32,11 +32,17 @@ import {
   AlertDialogTrigger,
 } from "@mongkolka/ui/alert-dialog";
 import { NavGroup } from "@mongkolka/ui/layout/nav-group";
+import { usePendingBadge } from "@/features/assist-requests/lib/use-assist-requests";
 import { clearToken } from "@/lib/auth";
 import { sidebarData } from "./data/sidebar-data";
 
 export function AppSidebar() {
   const router = useRouter();
+  const pendingHelp = usePendingBadge();
+  const navGroups = sidebarData.navGroups.map((group) => ({
+    ...group,
+    items: group.items.map((item) => (item.href === "/assist-requests" ? { ...item, badge: pendingHelp } : item)),
+  }));
 
   function signOut() {
     clearToken();
@@ -52,7 +58,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((group) => (
+        {navGroups.map((group) => (
           <NavGroup key={group.title} {...group} />
         ))}
       </SidebarContent>

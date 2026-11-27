@@ -20,6 +20,7 @@ import { Button } from "@mongkolka/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@mongkolka/ui/card";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { GoogleIcon } from "@/components/google-icon";
+import { useIsAssisting } from "@/features/assist/lib/use-assist-session";
 import { driveResultMessage } from "../lib/drive-result";
 import { useDriveConnection } from "../lib/use-drive-connection";
 
@@ -47,6 +48,8 @@ const WHAT_IS_STORED = (
 export function DriveConnectCard() {
   useShowResultOnce();
   const d = useDriveConnection();
+  const assisting = useIsAssisting();
+  const coupleOnly = <p className="text-sm text-muted-foreground">Only the couple can connect or disconnect Google Drive.</p>;
 
   return (
     <Card>
@@ -93,10 +96,14 @@ export function DriveConnectCard() {
           <>
             <p className="text-sm">Right now your files are stored by Mongkolka.</p>
             {WHAT_IS_STORED}
-            <Button onClick={d.connect} disabled={d.busy !== null} className="w-full sm:w-auto">
-              {d.busy === "connect" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon className="size-4" />}
-              Connect Google Drive
-            </Button>
+            {assisting ? (
+              coupleOnly
+            ) : (
+              <Button onClick={d.connect} disabled={d.busy !== null} className="w-full sm:w-auto">
+                {d.busy === "connect" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon className="size-4" />}
+                Connect Google Drive
+              </Button>
+            )}
           </>
         )}
 
@@ -108,7 +115,7 @@ export function DriveConnectCard() {
             </p>
             <p className="text-sm text-muted-foreground">New uploads are saved in the “Mongkolka” folder of this Drive.</p>
             {WHAT_IS_STORED}
-            <DisconnectButton busy={d.busy === "disconnect"} onConfirm={d.disconnect} />
+            {assisting ? coupleOnly : <DisconnectButton busy={d.busy === "disconnect"} onConfirm={d.disconnect} />}
           </>
         )}
 
@@ -123,13 +130,17 @@ export function DriveConnectCard() {
                 website until you reconnect.
               </AlertDescription>
             </Alert>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Button onClick={d.connect} disabled={d.busy !== null} className="w-full sm:w-auto">
-                {d.busy === "connect" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon className="size-4" />}
-                Reconnect Google Drive
-              </Button>
-              <DisconnectButton busy={d.busy === "disconnect"} onConfirm={d.disconnect} />
-            </div>
+            {assisting ? (
+              coupleOnly
+            ) : (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button onClick={d.connect} disabled={d.busy !== null} className="w-full sm:w-auto">
+                  {d.busy === "connect" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon className="size-4" />}
+                  Reconnect Google Drive
+                </Button>
+                <DisconnectButton busy={d.busy === "disconnect"} onConfirm={d.disconnect} />
+              </div>
+            )}
           </>
         )}
 

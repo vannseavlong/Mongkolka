@@ -13,7 +13,7 @@ export function ProfileSection({
   children: ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-20 rounded-xl border bg-card">
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-[calc(5rem+var(--assist-banner,0px))] rounded-xl border bg-card">
       <div className="border-b px-5 py-4">
         <h2 id={`${id}-title`} className="font-semibold">
           {title}

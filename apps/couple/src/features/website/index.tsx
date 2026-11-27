@@ -48,7 +48,7 @@ export function Website() {
   return (
     // Fills the screen under the fixed app header; the page itself never
     // scrolls, each panel scrolls on its own.
-    <div className="flex h-[calc(100svh-4rem)] min-h-0 flex-col overflow-hidden border-t">
+    <div className="flex h-[calc(100svh-4rem-var(--assist-banner,0px))] min-h-0 flex-col overflow-hidden border-t">
       <BuilderToolbar settings={settings} />
 
       <div className="flex min-h-0 flex-1 flex-col">

@@ -9,6 +9,7 @@ import {
   Palette,
   BarChart3,
   MessageSquare,
+  LifeBuoy,
   Users,
   Settings,
 } from "lucide-react";
@@ -22,6 +23,7 @@ export const sidebarData: SidebarNavData = {
         { title: "Overview", href: "/dashboard", icon: LayoutDashboard },
         { title: "Approvals", href: "/approvals", icon: UserCheck },
         { title: "Couples", href: "/couples", icon: Heart },
+        { title: "Help requests", href: "/assist-requests", icon: LifeBuoy },
         { title: "Vendors", href: "/vendors", icon: Store },
         { title: "Vendor categories", href: "/vendor-categories", icon: Tags },
         { title: "Site templates", href: "/site-templates", icon: LayoutTemplate },

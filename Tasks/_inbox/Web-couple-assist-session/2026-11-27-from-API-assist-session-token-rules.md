@@ -1,0 +1,4 @@
+From: API-assist-session   To: Web-couple-assist-session   Date: 2026-11-27
+Type: heads-up
+Message: The admin's token arrives as `<couple app>/dashboard#assist=<token>` (fragment). It is a normal couple JWT (`role: couple`, claim `assist`), so send it as `Authorization: Bearer`. Every request is re-checked on the server: 403 `Assist access ended` (revoked, expired, admin gone, couple suspended) means clear the token and show a message; 403 `Not available while Mongkolka is helping` means the route is not open to admins (members write, Drive connect/disconnect, help-request actions, anything unlisted): hide those controls. A token that passes JWT expiry gets 401 `Invalid or expired token`. Allowed writes: profile, website, guests, budget-categories, checklist-items, milestones, photos, wishes. Read-only: members, drive, assist, overview, session. The token lasts at most 1 hour.
+Needs reply: no

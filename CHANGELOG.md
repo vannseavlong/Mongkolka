@@ -2,6 +2,20 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [API] feat(api): assisted editing requests and editor session
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/API-assist-requests.md, Tasks/4-testing/API-assist-session.md
+- Branch/PR: feat/assist-requests, feat/assist-session via feat/assist-integration, merged to main (no PR)
+- What changed: couples can create, cancel and revoke a help request; admins can list, accept, decline, revoke and open a 1-hour editor token. Every assisted request is re-checked, limited to an allow-list and written to `assist_log`. Assisted tokens are refused by default outside the couple routes. Blank `JWT_EXPIRES_IN` now means 7 days
+- Needs: rotate `JWT_SECRET` on Render (old tokens never expire); confirm Render deployed this commit. No screen uses it yet: the couple card (feat/assist-request), admin screens and couple editing view are not merged or not built. Not tested against the real sheet
+
+## 2026-11-27 · [Web] feat(couple): image library without tabs, plus tile to upload
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-library-no-tabs.md
+- Branch/PR: fix/library-no-tabs merged to main (no PR)
+- What changed: the image library has no Library / Upload tabs; photos show at once, the first tile is a "+" that uploads, and files can be dropped anywhere on the library
+- Needs: none. Deployed to couple-mongkolka.web.app. Not checked in a browser: picker dialog, builder panel, real mouse drag, delete focus return
+
 ## 2026-11-27 · [Web] fix(couple): make the active tab clear in the image library
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-library-active-tab.md

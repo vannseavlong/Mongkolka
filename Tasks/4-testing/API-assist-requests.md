@@ -68,3 +68,11 @@ F1 to F4, F6, F7 confirmed fixed; nothing blocks merging. New findings, not yet 
 
 ## Paused (2026-11-27)
 Owner: ignore the security findings for now and keep the task in todo. Not merged and not deployed. Work stays uncommitted in `Mongkolka/api-assist-requests/` (branch `feat/assist-requests`, from `feat/assist-integration`); it has `.env` and `.lsdb-tokens.json` symlinks into the main checkout. The two tables `assist_requests` and `assist_log` already exist in the admin sheet (synced 2026-11-27). Open security findings M1, M2, L1, L3 above; G5 re-run, G6 and G10 not done.
+
+## Shipped (2026-11-27)
+Merged to `main` (b37c7a2) and pushed. Owner chose: API only, couple card stays on `feat/assist-request`.
+- G2/G3 on merged `main`: `tsc` and build pass, 304/304 API tests. `pnpm lint` has one earlier error in `scripts/seed-mock-couple.ts`.
+- G5/G6: the earlier fresh-agent re-reviews stopped on a usage limit. Replaced by one inline review by a session that did not write the code (diff, session files, token consumers, OWASP A01/A07/A09); no blocking finding. `/security-review` skill not run.
+- Open: M1 (owner rotates `JWT_SECRET` on Render); an assisted admin can edit and delete guests, wishes, photos and website content including slug and publish; refused-path rows are bounded only by the 120/min limit; `/couple/api/session` still answers a revoked assist token with the account status.
+- G4 not run against the real API or sheet. G9: owner approved merge and deploy in chat.
+- G10 rollback: `git revert -m 1` of the merge and push. Tokens already issued die within 1 hour.

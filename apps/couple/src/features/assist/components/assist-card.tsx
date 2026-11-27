@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@mong
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { canAsk, type AssistView } from "../lib/assist-state";
 import { useAssist } from "../lib/use-assist";
+import { useIsAssisting } from "../lib/use-assist-session";
 import { AskDialog } from "./ask-dialog";
 import { AssistActivityList } from "./assist-activity";
 
@@ -27,6 +28,7 @@ const day = new Intl.DateTimeFormat(undefined, { dateStyle: "long" });
 
 export function AssistCard() {
   const a = useAssist();
+  const assisting = useIsAssisting();
   const [asking, setAsking] = useState(false);
 
   return (
@@ -69,25 +71,30 @@ export function AssistCard() {
             <div aria-live="polite">
               <Status view={a.view} />
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              {canAsk(a.view) && (
-                <Button
-                  onClick={() => {
-                    a.clearActionError(); // an old failure from cancel or revoke must not show inside the new dialog
-                    setAsking(true);
-                  }}
-                  className="w-full sm:w-auto"
-                >
-                  Ask Mongkolka to help
-                </Button>
-              )}
-              {a.view.kind === "pending" && (
-                <Button variant="outline" disabled={a.busy !== null} onClick={() => void a.cancel()} className="w-full sm:w-auto">
-                  {a.busy === "cancel" && <Loader2 className="size-4 animate-spin" aria-hidden />} Cancel request
-                </Button>
-              )}
-              {a.view.kind === "approved" && <RevokeButton busy={a.busy === "revoke"} onConfirm={() => void a.revoke()} />}
-            </div>
+            {/* Asking, cancelling and ending help are the couple's own decisions. */}
+            {assisting ? (
+              <p className="text-sm text-muted-foreground">Only the couple can ask for help or end it.</p>
+            ) : (
+              <div className="flex flex-col gap-2 sm:flex-row">
+                {canAsk(a.view) && (
+                  <Button
+                    onClick={() => {
+                      a.clearActionError(); // an old failure from cancel or revoke must not show inside the new dialog
+                      setAsking(true);
+                    }}
+                    className="w-full sm:w-auto"
+                  >
+                    Ask Mongkolka to help
+                  </Button>
+                )}
+                {a.view.kind === "pending" && (
+                  <Button variant="outline" disabled={a.busy !== null} onClick={() => void a.cancel()} className="w-full sm:w-auto">
+                    {a.busy === "cancel" && <Loader2 className="size-4 animate-spin" aria-hidden />} Cancel request
+                  </Button>
+                )}
+                {a.view.kind === "approved" && <RevokeButton busy={a.busy === "revoke"} onConfirm={() => void a.revoke()} />}
+              </div>
+            )}
             {a.actionError && a.busy === null && !asking && (
               <p role="alert" className="text-sm text-destructive">
                 {a.actionError}

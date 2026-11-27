@@ -18,6 +18,8 @@ import sectionComponentsSchema from "../../schemas/admin/section_components.js";
 import bookingsSchema from "../../schemas/admin/bookings.js";
 import platformSettingsSchema from "../../schemas/admin/platform_settings.js";
 import coupleDriveConnectionsSchema from "../../schemas/admin/couple_drive_connections.js";
+import assistRequestsSchema from "../../schemas/admin/assist_requests.js";
+import assistLogSchema from "../../schemas/admin/assist_log.js";
 
 import coupleProfileSchema from "../../schemas/couple/profile.js";
 import websiteSectionsSchema from "../../schemas/couple/website_sections.js";
@@ -89,6 +91,8 @@ adapter.registerSchemas([
   bookingsSchema,
   platformSettingsSchema,
   coupleDriveConnectionsSchema,
+  assistRequestsSchema,
+  assistLogSchema,
   coupleProfileSchema,
   websiteSectionsSchema,
   guestsSchema,

@@ -5,5 +5,5 @@ import { CoupleOverviewController } from "./couple-overview.controller.js";
 
 export const coupleOverviewRouter = Router();
 
-coupleOverviewRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleOverviewRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleOverviewRouter.get("/overview", CoupleOverviewController.get);

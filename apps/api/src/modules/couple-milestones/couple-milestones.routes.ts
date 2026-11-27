@@ -5,7 +5,7 @@ import { CoupleMilestonesController } from "./couple-milestones.controller.js";
 
 export const coupleMilestonesRouter = Router();
 
-coupleMilestonesRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleMilestonesRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleMilestonesRouter.get("/milestones", CoupleMilestonesController.list);
 coupleMilestonesRouter.post("/milestones", CoupleMilestonesController.create);
 coupleMilestonesRouter.patch("/milestones/:milestoneId", CoupleMilestonesController.update);

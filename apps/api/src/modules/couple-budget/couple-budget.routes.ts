@@ -5,7 +5,7 @@ import { CoupleBudgetController } from "./couple-budget.controller.js";
 
 export const coupleBudgetRouter = Router();
 
-coupleBudgetRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleBudgetRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleBudgetRouter.get("/budget-categories", CoupleBudgetController.list);
 coupleBudgetRouter.post("/budget-categories", CoupleBudgetController.create);
 coupleBudgetRouter.patch("/budget-categories/:categoryId", CoupleBudgetController.update);

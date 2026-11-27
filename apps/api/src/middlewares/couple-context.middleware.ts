@@ -1,12 +1,20 @@
 import type { NextFunction, Response } from "express";
 import { adminContext } from "../config/database.js";
 import type { AuthedRequest } from "./auth.middleware.js";
+import type { AssistClaim } from "../modules/assist/assist.session.core.js";
+import { createAssistTrafficLimit, createCheckAssist } from "../modules/assist/assist.session.guard.js";
+import { AssistSession } from "../modules/assist/assist.session.instance.js";
+
+const checkAssist = createCheckAssist(AssistSession);
+const limitAssistTraffic = createAssistTrafficLimit();
 
 export interface CoupleRequest extends AuthedRequest {
   coupleActorSheetId?: string;
   coupleId?: string;
   memberId?: string;
   memberRole?: string;
+  /** Set when the token is an admin's assisted-editing token and it passed the fresh checks. */
+  assist?: AssistClaim;
 }
 
 /**
@@ -20,6 +28,9 @@ export async function requireActiveCouple(req: CoupleRequest, res: Response, nex
     res.status(401).json({ error: "Missing user" });
     return;
   }
+
+  // Before any sheet read: an assisted token that loops is stopped here, not after it has used up the quota.
+  if (!limitAssistTraffic(req, res)) return;
 
   // One batchGet for all three admin tables instead of three sequential values.get calls.
   const admin = adminContext();
@@ -46,6 +57,8 @@ export async function requireActiveCouple(req: CoupleRequest, res: Response, nex
     res.status(404).json({ error: "Couple record not found" });
     return;
   }
+
+  if (!(await checkAssist(req, res, { coupleId: couple.couple_id as string, coupleStatus: couple.status }))) return;
 
   req.coupleActorSheetId = couple.actor_sheet_id as string;
   req.coupleId = couple.couple_id as string;

@@ -8,5 +8,7 @@ import { SessionController } from "../auth/session.controller.js";
 // yet?" without hitting that wall.
 export const coupleSessionRouter = Router();
 
-coupleSessionRouter.use(requireAuth(), requireRole("couple"));
+// An assisted token may read its own status here (the couple app asks it for the account status). It returns only
+// that status, and this route deliberately skips requireActiveCouple so a pending account can reach it.
+coupleSessionRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"));
 coupleSessionRouter.get("/session", SessionController.get);

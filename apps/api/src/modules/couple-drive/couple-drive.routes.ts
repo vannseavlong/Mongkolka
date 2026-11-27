@@ -15,7 +15,7 @@ coupleDriveCallbackRouter.get("/drive/callback", CoupleDriveController.callback)
 /** Mounted under /couple/api, after the public callback. */
 export const coupleDriveRouter = Router();
 
-const guard = [requireAuth(), requireRole("couple"), requireActiveCouple];
+const guard = [requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple];
 coupleDriveRouter.get("/drive", ...guard, CoupleDriveController.status);
 coupleDriveRouter.post("/drive/connect", ...guard, CoupleDriveController.connect);
 coupleDriveRouter.delete("/drive", ...guard, CoupleDriveController.disconnect);

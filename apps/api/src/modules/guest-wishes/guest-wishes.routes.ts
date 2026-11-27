@@ -8,7 +8,7 @@ publicGuestWishesRouter.get("/site/:slug/wishes", PublicGuestWishesController.li
 publicGuestWishesRouter.post("/site/:slug/wishes", PublicGuestWishesController.submit);
 
 export const coupleGuestWishesRouter = Router();
-coupleGuestWishesRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleGuestWishesRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleGuestWishesRouter.get("/wishes", CoupleGuestWishesController.list);
 coupleGuestWishesRouter.patch("/wishes/:wishId", CoupleGuestWishesController.setStatus);
 coupleGuestWishesRouter.delete("/wishes/:wishId", CoupleGuestWishesController.remove);

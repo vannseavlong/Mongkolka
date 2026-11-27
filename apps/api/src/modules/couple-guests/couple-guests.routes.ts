@@ -5,7 +5,7 @@ import { CoupleGuestsController } from "./couple-guests.controller.js";
 
 export const coupleGuestsRouter = Router();
 
-coupleGuestsRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleGuestsRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleGuestsRouter.get("/guests", CoupleGuestsController.list);
 coupleGuestsRouter.post("/guests", CoupleGuestsController.create);
 coupleGuestsRouter.patch("/guests/:guestId", CoupleGuestsController.update);

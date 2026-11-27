@@ -2,6 +2,8 @@ export const env = {
   PORT: process.env.PORT ?? "4000",
 
   JWT_SECRET: process.env.JWT_SECRET ?? "",
+  // How long a login token lasts. The portals clear it on a 401 and ask the user to sign in again.
+  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN ?? "7d",
 
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? "",

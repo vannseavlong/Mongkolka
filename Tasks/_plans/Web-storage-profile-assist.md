@@ -1,6 +1,6 @@
 # Plan: storage page + profile upload + admin-assisted editing
 
-Date: 2026-11-27 · Owner: SNLRLONG · Status: planned, nothing built
+Date: 2026-11-27 · Owner: SNLRLONG · Status: tasks 2 to 7 and the storage page are shipped; end-to-end test on real data still open
 
 ## Goal
 1. The couple **Storage** page also shows the couple's image library and looks polished.
@@ -96,6 +96,15 @@ Alternative cost: full admin login-as via the couple's password reset: no audit,
 Parallel now: 1, 2, 3 (different files). Then 4 (same module as 3, so after). Then 5 and 6 in parallel. Then 7.
 One feature split across tasks: use integration branch `feat/assist-integration` for tasks 3 to 7 (AGENTS.md "Big feature"); tasks 1 and 2 go straight to `main`.
 Security (G6): tasks 3, 4, 5, 7 (OWASP A01 broken access control, A07 auth, A09 logging; run `/security-review` on the combined diff in the integration branch).
+
+## Progress (2026-11-27)
+| # | Task | State |
+|---|---|---|
+| 1 | Web-storage-library | done |
+| 2 | Web-profile-enhance | done |
+| 3 to 7 | assist API, admin screen, help card, help session | merged and deployed (`4b904a9`), in `4-testing` until run on real data |
+
+Changes from the plan: an allow-list replaced `blockWhenAssisted`; reads and refused attempts are logged too; admins can also end access.
 
 ## Out of scope
 Partner photo field, email notifications, admin editing other apps (vendor), per-section permissions, admin chat, extending an approval without a new request, impersonation of vendors.

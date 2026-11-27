@@ -5,7 +5,7 @@
 - **Owner:** SNLRLONG
 - **Tier:** T3 · issues impersonation tokens and hands them to another app (auto picker, see `PIPELINE.md`)
 - **Claimed by:** Claude (session), 2026-11-27
-- **Worktree:** `Mongkolka/assist-requests-admin/` · **Branch:** `feat/assist-requests-admin`, cut from `feat/assist-integration` (= main)
+- **Worktree:** `Mongkolka/assist-requests-admin/` · **Branch:** `feat/assist-requests-admin`, cut from `feat/assist-integration` (= main) (removed after merge)
 - **Started / updated:** 2026-11-27 / 2026-11-27
 - **Docs:** Tasks/_plans/Web-storage-profile-assist.md
 - **Depends on:** API-assist-requests (list/accept/decline); API-assist-session (open editor)
@@ -15,9 +15,9 @@
 Admin 'Help requests' screen: list with status filter, read the couple's note, accept or decline with reason, and Open editor for approved requests. Contract first: build against the plan's contract with a typed mock in the data layer only (`// MOCK: API-assist-requests`) until the API merges.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new + edge cases)  - [ ] G4 run it
-- [ ] G5 code review (strict)  - [ ] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
-- [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
+- [x] G1 scope  - [x] G2 static  - [x] G3 tests (new + edge cases)  - [ ] G4 run it
+- [x] G5 code review (strict)  - [x] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
+- [x] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [x] G11 changelog
 
 ## Done when
 - [x] List with status tabs (pending, approved, closed), couple name, note, requested date, expiry
@@ -48,3 +48,12 @@ Merged to `main` (4b904a9) through `feat/assist-integration`, pushed and deploye
 - Open (not fixed): a link opened in a new tab from a help session may not carry the session and would use any couple login saved in that browser, with no banner (not verified in a browser); collaborators see Ask and Cancel and get a 403 (needs `member_role` from the API); the pending badge does not refresh by itself; browser history may keep the editor link (token lives at most 1 hour); `/?token=` on the sign-in page accepts any token (older than this feature).
 - G4 against the real API and sheet: not done. G9: owner approved merge and deploy in chat.
 - G10 rollback: `git revert -m 1 4b904a9`, push, `pnpm deploy:all`.
+
+## Status and what is left (2026-11-27)
+- Live: merged and deployed. Why still in `4-testing`: never run against the real API and Google Sheet.
+- Test with a test couple: send a request, accept it, Open editor, make a change, end the help as the couple, check the admin tab stops.
+- Owner: set a new `JWT_SECRET` on Render (not confirmed yet).
+- Render: one deploy built, then failed with "Port scan timeout, no open ports" (commit not recorded). The earlier version kept serving; the API starts normally in a local run of the same code. Retry with "Clear build cache & deploy" (not confirmed yet).
+- Known gap: the sidebar pending count only updates on reload or on visiting Help requests.
+- Not checked: a blocked pop-up in a real browser, "Load older requests" beyond 50, expiry while the page is open.
+- Gates open: G4 (stub only), G7, G9 (merge approved in chat, diff not reviewed by the owner), G10 (rollback written, not approved).

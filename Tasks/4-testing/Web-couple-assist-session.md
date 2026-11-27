@@ -5,7 +5,7 @@
 - **Owner:** SNLRLONG
 - **Tier:** T3 · auth token handling, session storage, permissions in the UI (auto picker, see `PIPELINE.md`)
 - **Claimed by:** Claude (session), 2026-11-27
-- **Worktree:** `Mongkolka/assist-session-web/` · **Branch:** `feat/assist-session-web`
+- **Worktree:** `Mongkolka/assist-session-web/` · **Branch:** `feat/assist-session-web` (removed after merge)
 - **Started / updated:** 2026-11-27 / 2026-11-27
 - **Docs:** Tasks/_plans/Web-storage-profile-assist.md
 - **Depends on:** API-assist-session; Admin-assist-requests
@@ -15,9 +15,9 @@
 The couple app accepts an admin's assist token from the URL fragment, keeps it in sessionStorage only, shows a permanent banner with time left and Exit, and hides the actions the API will reject.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new + edge cases)  - [ ] G4 run it
-- [ ] G5 code review (strict)  - [ ] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
-- [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
+- [x] G1 scope  - [x] G2 static  - [x] G3 tests (new + edge cases)  - [ ] G4 run it
+- [x] G5 code review (strict)  - [x] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
+- [x] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [x] G11 changelog
 
 ## Done when
 - [x] Fragment `#assist=<token>` read once, then removed with `history.replaceState`; not written to localStorage, logs or analytics
@@ -26,7 +26,7 @@ The couple app accepts an admin's assist token from the URL fragment, keeps it i
 - [x] On 403 `Assist access ended`: clear token, show a clear message, no retry loop
 - [x] Members, Drive connect/disconnect and account actions hidden or disabled with a reason (server still enforces)
 - [x] Tests for token source order and fragment parsing
-- [ ] Security result recorded here (token in URL fragment, XSS exposure of sessionStorage, referrer leakage)
+- [x] Security result recorded here (token in URL fragment, XSS exposure of sessionStorage, referrer leakage)
 - [x] Root `CHANGELOG.md` entry added
 - [x] Worktree and branch removed after merge
 
@@ -50,3 +50,16 @@ Merged to `main` (4b904a9) through `feat/assist-integration`, pushed and deploye
 - Open (not fixed): a link opened in a new tab from a help session may not carry the session and would use any couple login saved in that browser, with no banner (not verified in a browser); collaborators see Ask and Cancel and get a 403 (needs `member_role` from the API); the pending badge does not refresh by itself; browser history may keep the editor link (token lives at most 1 hour); `/?token=` on the sign-in page accepts any token (older than this feature).
 - G4 against the real API and sheet: not done. G9: owner approved merge and deploy in chat.
 - G10 rollback: `git revert -m 1 4b904a9`, push, `pnpm deploy:all`.
+
+## Status and what is left (2026-11-27)
+- Live: merged and deployed. Why still in `4-testing`: never run against the real API and Google Sheet.
+- Test with a test couple: send a request, accept it, Open editor, make a change, end the help as the couple, check the admin tab stops.
+- Owner: set a new `JWT_SECRET` on Render (not confirmed yet).
+- Render: one deploy built, then failed with "Port scan timeout, no open ports" (commit not recorded). The earlier version kept serving; the API starts normally in a local run of the same code. Retry with "Clear build cache & deploy" (not confirmed yet).
+- Security result: `/security-review` on the integration diff, no HIGH or MEDIUM finding (token handling, malicious link, account fallback in the same tab, XSS, navigation).
+- Check first: a link opened in a new tab from a help session may not carry the session and would use a couple login saved in that browser, with no banner (not verified in a browser). Admins should stay in one tab until checked.
+- Known: browser history may keep the editor link (token lives at most 1 hour). Closing it needs a one-time code exchange in the API.
+- Follow-up, older than this feature: `/?token=` on the sign-in page accepts any token.
+- Touched more than planned: `lib/api.ts`, the upload client, website builder height, storage cards, sidebar, profile offsets.
+- Not checked: website builder with the banner, uploading during a session, sidebar exit dialog.
+- Gates open: G4 (stub only), G7, G9, G10.

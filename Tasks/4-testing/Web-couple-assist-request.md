@@ -5,7 +5,7 @@
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new card on the profile screen, calls new API (auto picker, see `PIPELINE.md`)
 - **Claimed by:** Claude (session), 2026-11-27
-- **Worktree:** `Mongkolka/couple-assist-request/` · **Branch:** `feat/assist-request`, cut from `feat/assist-integration` (which now equals main)
+- **Worktree:** `Mongkolka/couple-assist-request/` · **Branch:** `feat/assist-request`, cut from `feat/assist-integration` (which now equals main) (removed after merge)
 - **Started / updated:** 2026-11-27 / 2026-11-27
 - **Docs:** Tasks/_plans/Web-storage-profile-assist.md
 - **Depends on:** Web-profile-enhance (done, on main). API-assist-requests is paused and unmerged: this task is built against its contract (plan, "Data and API") and checked against a throwaway stub, so no in-app mock is shipped
@@ -15,8 +15,8 @@
 Profile has an 'Ask Mongkolka to help' card: send a request with a note, see its state (pending, approved until <date>, declined with reason, ended), cancel while pending, revoke while approved, and see recent help activity.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new)  - [ ] G4 run it
-- [ ] G5 code review  - [ ] G7 docs sync  - [ ] G8 PR message  - [ ] G11 changelog
+- [x] G1 scope  - [x] G2 static  - [x] G3 tests (new)  - [ ] G4 run it
+- [x] G5 code review  - [ ] G7 docs sync  - [x] G8 PR message  - [x] G11 changelog
 
 ## Done when
 - [x] States: none, pending, approved (expiry + Revoke), declined (reason), revoked/expired; loading, error
@@ -51,3 +51,11 @@ Merged to `main` (4b904a9) through `feat/assist-integration`, pushed and deploye
 - Open (not fixed): a link opened in a new tab from a help session may not carry the session and would use any couple login saved in that browser, with no banner (not verified in a browser); collaborators see Ask and Cancel and get a 403 (needs `member_role` from the API); the pending badge does not refresh by itself; browser history may keep the editor link (token lives at most 1 hour); `/?token=` on the sign-in page accepts any token (older than this feature).
 - G4 against the real API and sheet: not done. G9: owner approved merge and deploy in chat.
 - G10 rollback: `git revert -m 1 4b904a9`, push, `pnpm deploy:all`.
+
+## Status and what is left (2026-11-27)
+- Live: merged and deployed. Why still in `4-testing`: never run against the real API and Google Sheet.
+- Test with a test couple: send a request, accept it, Open editor, make a change, end the help as the couple, check the admin tab stops.
+- Owner: set a new `JWT_SECRET` on Render (not confirmed yet).
+- Render: one deploy built, then failed with "Port scan timeout, no open ports" (commit not recorded). The earlier version kept serving; the API starts normally in a local run of the same code. Retry with "Clear build cache & deploy" (not confirmed yet).
+- Known gap: collaborators see Ask and Cancel and get a "partners only" message; hiding them needs `member_role` on `GET /couple/api/assist`.
+- Gates open: G4 (stub only), G7.

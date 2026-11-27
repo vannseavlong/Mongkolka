@@ -5,7 +5,7 @@
 - **Owner:** SNLRLONG
 - **Tier:** T3 · auth, token issue, permissions middleware, audit trail (auto picker, see `PIPELINE.md`)
 - **Claimed by:** Claude (session), 2026-11-27
-- **Worktree:** `Mongkolka/api-assist-session/` · **Branch:** `feat/assist-session`, cut from `feat/assist-integration` (which now contains feat/assist-requests)
+- **Worktree:** `Mongkolka/api-assist-session/` · **Branch:** `feat/assist-session`, cut from `feat/assist-integration` (which now contains feat/assist-requests) (removed after merge)
 - **Started / updated:** 2026-11-27 / 2026-11-27
 - **Docs:** Tasks/_plans/Web-storage-profile-assist.md
 - **Depends on:** API-assist-requests (same module, so sequential)
@@ -15,9 +15,9 @@
 Admin can get a 1-hour editor token for an approved, live request. The token acts as the couple's partner member and is re-validated against the DB on every request. Sensitive routes reject it. Mutating requests are logged.
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new + edge cases)  - [ ] G4 run it
-- [ ] G5 code review (strict)  - [ ] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
-- [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
+- [x] G1 scope  - [x] G2 static  - [x] G3 tests (new + edge cases)  - [ ] G4 run it
+- [x] G5 code review (strict)  - [ ] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
+- [x] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [x] G11 changelog
 
 ## Done when
 - [x] `POST /admin/api/assist-requests/:id/session` returns `{ token, expires_at, editor_url }`; 409 unless live `approved`; writes an `open` log row
@@ -26,10 +26,10 @@ Admin can get a 1-hour editor token for an approved, live request. The token act
 - [x] Allow-list policy (replaces `blockWhenAssisted`) returns 403 on members, Drive connect/disconnect, password/email change, account deletion, assist routes
 - [x] Mutating assisted requests append to `assist_log` (method, path, admin, time; no bodies, no tokens)
 - [x] Tests: revoke cuts access on the next request; expiry cuts access; token for couple A cannot read couple B; non-assist tokens unchanged
-- [ ] Security result recorded here; secret/token never logged
+- [x] Security result recorded here; secret/token never logged
 - [ ] G10 release plan: rollback = unmount assist routes, tokens already issued die within 1 h
-- [ ] Root `CHANGELOG.md` entry added
-- [ ] Worktree and branch removed after merge
+- [x] Root `CHANGELOG.md` entry added
+- [x] Worktree and branch removed after merge
 
 ## Progress (2026-11-27)
 Built in `api-assist-session/` (branch `feat/assist-session`, from `feat/assist-integration` which now has feat/assist-requests merged), uncommitted.
@@ -49,3 +49,13 @@ Merged to `main` (b37c7a2) and pushed. Owner chose: API only, couple card stays 
 - Open: M1 (owner rotates `JWT_SECRET` on Render); an assisted admin can edit and delete guests, wishes, photos and website content including slug and publish; refused-path rows are bounded only by the 120/min limit; `/couple/api/session` still answers a revoked assist token with the account status.
 - G4 not run against the real API or sheet. G9: owner approved merge and deploy in chat.
 - G10 rollback: `git revert -m 1` of the merge and push. Tokens already issued die within 1 hour.
+
+## Status and what is left (2026-11-27)
+- Live: merged and deployed. Why still in `4-testing`: never run against the real API and Google Sheet.
+- Test with a test couple: send a request, accept it, Open editor, make a change, end the help as the couple, check the admin tab stops.
+- Owner: set a new `JWT_SECRET` on Render (not confirmed yet).
+- Render: one deploy built, then failed with "Port scan timeout, no open ports" (commit not recorded). The earlier version kept serving; the API starts normally in a local run of the same code. Retry with "Clear build cache & deploy" (not confirmed yet).
+- Owner decision: an assisted admin can edit and delete guests, wishes, photos and website content, including publish and slug. Change the allow-list in `assist.session.core.ts` if any should be blocked.
+- Open: no per-token revoke (revoking the request ends all its tokens); old password-login tokens stay valid until `JWT_SECRET` changes.
+- Docs: the action list in the `schemas/admin/assist_log.ts` comment lacks `view`, `blocked`, `reconciled`.
+- Gates open: G4, G6 (`/security-review` not run on the API diff), G7, G9, G10.

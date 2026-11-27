@@ -5,7 +5,7 @@
 - **Owner:** SNLRLONG
 - **Tier:** T3 · permissions, new admin-sheet tables, new public-facing endpoints (auto picker, see `PIPELINE.md`)
 - **Claimed by:** none
-- **Worktree:** `Mongkolka/api-assist-requests/` · **Branch:** `feat/assist-requests`
+- **Worktree:** `Mongkolka/api-assist-requests/` · **Branch:** `feat/assist-requests` (removed after merge)
 - **Started / updated:** 2026-11-27 / 2026-11-27
 - **Docs:** Tasks/_plans/Web-storage-profile-assist.md
 - **Depends on:** none
@@ -15,9 +15,9 @@
 Couples can create, cancel and revoke a help request; admins can list, accept and decline. Contract in the plan (`assist_requests`, `assist_log` tables, routes under `/couple/api/assist` and `/admin/api/assist-requests`).
 
 ## Gates
-- [ ] G1 scope  - [ ] G2 static  - [ ] G3 tests (new + edge cases)  - [ ] G4 run it
-- [ ] G5 code review (strict)  - [ ] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
-- [ ] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [ ] G11 changelog
+- [x] G1 scope  - [x] G2 static  - [x] G3 tests (new + edge cases)  - [ ] G4 run it
+- [x] G5 code review (strict)  - [ ] G6 security (OWASP + /security-review)  - [ ] G7 docs sync
+- [x] G8 PR message  - [ ] G9 human review  - [ ] G10 release plan  - [x] G11 changelog
 
 ## Done when
 - [x] Tables defined and synced (`npx lsdb sync --table assist_requests,assist_log`, 2026-11-27, admin sheet; read back OK, 0 rows)
@@ -27,9 +27,9 @@ Couples can create, cancel and revoke a help request; admins can list, accept an
 - [ ] Authorization tested: a couple cannot read or touch another couple's request; vendor/couple tokens get 403 on admin routes
 - [x] Layering config/controllers/models/modules/services/middlewares/utils respected; validation server side
 - [x] `Docs/backend-schema.md` updated
-- [ ] Security result recorded in this file (OWASP A01, A04, A07, A09)
-- [ ] Root `CHANGELOG.md` entry added
-- [ ] Worktree and branch removed after merge
+- [x] Security result recorded in this file (OWASP A01, A04, A07, A09)
+- [x] Root `CHANGELOG.md` entry added
+- [x] Worktree and branch removed after merge
 
 ## Progress (2026-11-27)
 Built in `api-assist-requests/` (branch `feat/assist-requests`, from `feat/assist-integration`), uncommitted.
@@ -77,3 +77,12 @@ Merged to `main` (b37c7a2) and pushed. Owner chose: API only, couple card stays 
 - Open: M1 (owner rotates `JWT_SECRET` on Render); an assisted admin can edit and delete guests, wishes, photos and website content including slug and publish; refused-path rows are bounded only by the 120/min limit; `/couple/api/session` still answers a revoked assist token with the account status.
 - G4 not run against the real API or sheet. G9: owner approved merge and deploy in chat.
 - G10 rollback: `git revert -m 1` of the merge and push. Tokens already issued die within 1 hour.
+
+## Status and what is left (2026-11-27)
+- Live: merged and deployed. Why still in `4-testing`: never run against the real API and Google Sheet.
+- Test with a test couple: send a request, accept it, Open editor, make a change, end the help as the couple, check the admin tab stops.
+- Owner: set a new `JWT_SECRET` on Render (not confirmed yet).
+- Render: one deploy built, then failed with "Port scan timeout, no open ports" (commit not recorded). The earlier version kept serving; the API starts normally in a local run of the same code. Retry with "Clear build cache & deploy" (not confirmed yet).
+- "Paused" above is history: the task was resumed, finished and shipped.
+- Open: authorization has no HTTP-level test; rate limiters and locks assume one API instance; `assist_log` and `assist_requests` grow without an archive job.
+- Gates open: G4, G6, G7, G9, G10.

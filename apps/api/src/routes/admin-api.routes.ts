@@ -11,6 +11,7 @@ import { statsRouter } from "../modules/stats/stats.routes.js";
 import { contactMessagesRouter } from "../modules/contact-messages/contact-messages.routes.js";
 import { sectionComponentsRouter } from "../modules/section-components/section-components.routes.js";
 import { platformSettingsRouter } from "../modules/platform-settings/platform-settings.routes.js";
+import { adminAssistRouter } from "../modules/assist/assist.routes.js";
 
 export const adminApiRouter = Router();
 
@@ -27,3 +28,4 @@ adminApiRouter.use(statsRouter);
 adminApiRouter.use(contactMessagesRouter);
 adminApiRouter.use(sectionComponentsRouter);
 adminApiRouter.use(platformSettingsRouter);
+adminApiRouter.use(adminAssistRouter);

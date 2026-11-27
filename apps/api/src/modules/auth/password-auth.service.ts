@@ -34,7 +34,7 @@ export const PasswordAuthService = {
       return { ok: false, error: "invalid_credentials" };
     }
 
-    const token = jwt.sign(user, env.JWT_SECRET);
+    const token = jwt.sign(user, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"] });
     return { ok: true, token };
   },
 };

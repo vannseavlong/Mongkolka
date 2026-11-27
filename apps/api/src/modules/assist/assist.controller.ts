@@ -2,7 +2,9 @@ import type { Response } from "express";
 import type { CoupleRequest } from "../../middlewares/couple-context.middleware.js";
 import type { AuthedRequest } from "../../middlewares/auth.middleware.js";
 import type { Outcome } from "./assist.core.js";
+import { env } from "../../config/env.js";
 import { AssistService } from "./assist.instance.js";
+import { AssistSession } from "./assist.session.instance.js";
 
 const STATUS = { invalid: 400, conflict: 409, not_found: 404, rate_limited: 429, forbidden: 403 } as const;
 
@@ -42,6 +44,17 @@ export const AdminAssistController = {
   },
   async accept(req: AuthedRequest, res: Response) {
     send(res, await AssistService.accept(userId(req), req.params.requestId as string));
+  },
+  /** The token is returned once and never logged. The editor URL carries it in the fragment, which browsers do not send to servers. */
+  async session(req: AuthedRequest, res: Response) {
+    const result = await AssistSession.openSession(userId(req), req.params.requestId as string);
+    res.setHeader("Cache-Control", "no-store");
+    if (!result.ok) {
+      res.status(STATUS[result.code]).json({ error: result.message });
+      return;
+    }
+    const base = env.COUPLE_FRONTEND_URL.replace(/\/$/, "");
+    res.json({ ...result.value, editor_url: `${base}/dashboard#assist=${encodeURIComponent(result.value.token)}` });
   },
   async revoke(req: AuthedRequest, res: Response) {
     send(res, await AssistService.adminRevoke(userId(req), req.params.requestId as string));

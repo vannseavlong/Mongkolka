@@ -42,6 +42,18 @@ export function createAssistService(model: AssistModelPort) {
       at: now.toISOString(),
     });
 
+  /**
+   * The missing audit row of an action that already happened. An accept or decline is credited to the admin and the
+   * time stored on the request. A cancel or revoke stores no actor, so it is written as `reconciled` with the time
+   * of the retry, which says only that an earlier change was recorded late and never credits the wrong person.
+   */
+  function repairLog(row: AssistRow, audit: string, retrier: string, role: "couple" | "admin", now: Date) {
+    if ((audit === "accepted" || audit === "declined") && row.decided_by) {
+      return log(row, row.decided_by, "admin", audit, row.decided_at ? new Date(row.decided_at) : now);
+    }
+    return log(row, retrier, role, "reconciled", now);
+  }
+
   /** Runs one transition under a per-request lock, writes the change and an audit row. */
   function transition(
     action: Action,
@@ -63,7 +75,7 @@ export function createAssistService(model: AssistModelPort) {
         // The change and its audit row are two sheet writes. If the second failed the first time, this retry
         // writes the missing row, so a finished action is never left without an audit entry.
         const logged = (await model.logByCouple(row.couple_id)).some((l) => l.request_id === requestId && l.action === audit);
-        if (!logged) await log(row, actorId, role, audit, now);
+        if (!logged) await repairLog(row, audit, actorId, role, now);
         return { ok: true, value: toPublic(row, now) };
       }
       if (action === "accept") {

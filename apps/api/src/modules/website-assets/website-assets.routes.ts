@@ -7,7 +7,7 @@ import { PlatformSettingsService } from "../platform-settings/platform-settings.
 
 /** Mounted under /couple/api. */
 export const websiteAssetsRouter = Router();
-websiteAssetsRouter.use("/website/assets", requireAuth(), requireRole("couple"), requireActiveCouple);
+websiteAssetsRouter.use("/website/assets", requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 websiteAssetsRouter.get("/website/assets/limits", WebsiteAssetsController.limits);
 websiteAssetsRouter.get("/website/assets", WebsiteAssetsController.list);
 websiteAssetsRouter.post(

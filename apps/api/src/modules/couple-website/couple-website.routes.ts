@@ -5,7 +5,7 @@ import { CoupleWebsiteController } from "./couple-website.controller.js";
 
 export const coupleWebsiteRouter = Router();
 
-coupleWebsiteRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleWebsiteRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleWebsiteRouter.get("/website/catalog", CoupleWebsiteController.getCatalog);
 coupleWebsiteRouter.get("/website/settings", CoupleWebsiteController.getSettings);
 coupleWebsiteRouter.patch("/website/slug", CoupleWebsiteController.updateSlug);

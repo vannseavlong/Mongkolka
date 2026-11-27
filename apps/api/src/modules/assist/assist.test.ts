@@ -247,6 +247,40 @@ describe("assist service", () => {
     assert.equal(logs.filter((l) => l.action === "accepted").length, 1, "and is not written twice");
   });
 
+  it("a repaired accept is credited to the admin who accepted, at the time stored on the request, not to the retrier", async () => {
+    const { model, logs } = memoryModel();
+    const s = createAssistService(model);
+    const made = await s.create("c1", "u1", NOTE, T0);
+    assert.ok(made.ok);
+    const real = model.appendLog;
+    model.appendLog = async () => {
+      throw new Error("sheets quota");
+    };
+    await assert.rejects(s.accept("admin1", made.value.request_id, later(1000)));
+    model.appendLog = real;
+    logs.length = 0;
+    assert.ok((await s.accept("admin2", made.value.request_id, later(60_000))).ok);
+    assert.equal(logs.length, 1);
+    assert.deepEqual([logs[0]!.action, logs[0]!.actor_id, logs[0]!.actor_role, logs[0]!.at], ["accepted", "admin1", "admin", later(1000).toISOString()]);
+  });
+
+  it("a repaired cancel or revoke is written as `reconciled`, never crediting a guess", async () => {
+    const { model, logs } = memoryModel();
+    const s = createAssistService(model);
+    const made = await s.create("c1", "u1", NOTE, T0);
+    assert.ok(made.ok);
+    await s.accept("admin1", made.value.request_id, T0);
+    const real = model.appendLog;
+    model.appendLog = async () => {
+      throw new Error("sheets quota");
+    };
+    await assert.rejects(s.revoke("c1", "u1", undefined, later(1000)));
+    model.appendLog = real;
+    logs.length = 0;
+    assert.ok((await s.adminRevoke("admin9", made.value.request_id, later(5000))).ok);
+    assert.deepEqual(logs.map((l) => l.action), ["reconciled"]);
+  });
+
   it("parallel calls on one request are serialised: one accept wins, one audit row", async () => {
     const { model, logs } = memoryModel();
     const s = createAssistService(model);

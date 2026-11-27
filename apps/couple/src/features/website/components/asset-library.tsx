@@ -63,6 +63,9 @@ interface AssetLibraryProps {
 
 const NARROW_GRID = "grid-cols-2 sm:grid-cols-3";
 
+/** The shared tab only tints the active tab with the card colour, which is hard to see on a card or in a dialog. */
+const TAB = "text-muted-foreground data-[state=active]:bg-primary data-[state=active]:font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm";
+
 /** The couple's image library: upload (drag-drop or picker), pick, delete, quota. */
 export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true, onSelectAll, gridClassName = NARROW_GRID, showDriveNotice = true }: AssetLibraryProps) {
   const { data, loading, error, refetch } = useApiQuery<{ assets: WebsiteAsset[] }>(ASSETS_KEY, LIST_CACHE);
@@ -115,8 +118,12 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="library">Library</TabsTrigger>
-          <TabsTrigger value="upload">{summary.active > 0 ? `Upload (${summary.active})` : "Upload"}</TabsTrigger>
+          <TabsTrigger value="library" className={TAB}>
+            Library
+          </TabsTrigger>
+          <TabsTrigger value="upload" className={TAB}>
+            {summary.active > 0 ? `Upload (${summary.active})` : "Upload"}
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="library" className="flex flex-col gap-3">
       {loading ? (

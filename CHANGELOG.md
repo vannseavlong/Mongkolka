@@ -130,14 +130,14 @@ Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admi
 
 ## 2026-11-28 · [Web] feat: Storage screen to connect Google Drive (couple portal)
 - Owner: SNLRLONG
-- Task: Tasks/3-in-progress/Web-couple-drive-connect.md (T-0020, still open: needs a real-account render check)
+- Task: Tasks/5-done/Web-couple-drive-connect.md (T-0020, closed 2026-11-27 by the owner; not run: needs a real-account render check)
 - Branch/PR: feat/couple-drive-connect merged to main (no PR)
 - What changed: [Web] new `/settings/storage` screen and sidebar item: connect, reconnect and disconnect Google Drive (confirmation explains Drive photos stop showing after disconnect), states for loading, error, no access, not available, not connected, connected, needs reconnect; toast for the `?drive=` result Google redirects back with; reconnect banner on Guestbook and the image library
 - Needs: API from the entry below deployed first; 360px width, real Google account run and code review not done
 
 ## 2026-11-28 · [API] feat: per-couple Google Drive storage through lsdb
 - Owner: SNLRLONG
-- Task: Tasks/3-in-progress/API-couple-drive-storage.md (T-0018, still open: needs a real-account run)
+- Task: Tasks/5-done/API-couple-drive-storage.md (T-0018, closed 2026-11-27 by the owner; not run: needs a real-account run)
 - Branch/PR: feat/couple-drive-storage merged to main (no PR)
 - What changed: [API] couples can connect their own Google Drive (`drive.file`); uploads then go to their Drive through lsdb `DriveStorageAdapter` and are served by a public `/media/:coupleId/:fileId` route (ETag, long cache, rate limit, images only). Refresh tokens encrypted at rest (`DRIVE_TOKEN_KEY`). `storageFor(coupleId)` falls back to the default driver on any Drive failure and flags `needs_reconnect` on a revoked grant. New `couple_drive_connections` admin table; `/couple/api/drive` status, connect, callback, disconnect. Guest photos now use `storageFor()` with key `couples/<id>/guest-photos/...`. Off unless `DRIVE_TOKEN_KEY` is set
 - Needs: `lsdb sync` (adds `couple_drive_connections`), set `DRIVE_TOKEN_KEY` (`openssl rand -base64 32`), `DRIVE_GOOGLE_REDIRECT_URI` and `PUBLIC_API_URL` on the API host, add the redirect URI to the Google OAuth client and enable `drive.file` on the consent screen, deploy API; disconnect-with-copy, load check and security review not done
@@ -337,6 +337,13 @@ Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admi
 - Branch/PR: feat/template-catalog-apply (merged to main with --no-ff, local, no PR)
 - What changed: templates get a unique `slug` and `description`; public `GET /public/api/site-templates/by-slug/:slug`; template slugs are reserved (couples cannot claim them, nor `www`/`api`/`admin`…); applying a template takes `mode` (`keep_content` or `reset_all`) and clears per-section styles and the site theme override; unknown or inactive template is now a 404
 - Needs: run schema sync for admin `site_templates` (`slug`, `description`); set slugs on existing template rows (seed values: gold-ink-cream, crimson-gold-silk, blush-gold-garden, white-black-mono); Admin app must send `slug` on create (see the Admin entry)
+
+## 2026-10-26 · [Web] feat(templates): Khmer Kbach template
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-khmer-kbach-template.md (T-0023, entry added 2026-11-27)
+- Branch/PR: committed on main (91e20ec, no branch)
+- What changed: Khmer ornament wedding template (arch gate, arch photo hero, story and details sections) with catalog seed rows
+- Needs: Khmer text, tablet and desktop never checked
 
 ## 2026-10-26 · [Web] fix(couple): responsive website builder, deep-link refresh fix
 - Owner: SNLRLONG

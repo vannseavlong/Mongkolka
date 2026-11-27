@@ -48,5 +48,11 @@ Not done: G4 run against a real Google account (needs `DRIVE_TOKEN_KEY`, redirec
 - [x] Media route (`/media/:coupleId/:fileId`): couple B cannot read A's file, 404 for unknown/malformed ids and non-images, ETag + immutable cache headers, per-IP rate limit (unit-tested core)
 - [ ] Load check: 50 concurrent image requests for one site stay under Drive rate limits thanks to caching
 - [ ] Release plan covers OAuth consent screen in production mode, key rotation, rollback to the default driver
-- [ ] Root `CHANGELOG.md` entry added
-- [ ] Worktree and branch removed after merge
+- [x] Root `CHANGELOG.md` entry added
+- [x] Worktree and branch removed after merge
+
+## Closed (2026-11-27)
+Moved to `5-done` on the owner's instruction with checks still open. Unticked boxes mean not run.
+- Merged to `main` (f29b694, later callback fix d051263). Worktree and branch removed.
+- Not done: run against a real Google account, 50-request load check, disconnect-with-copy (not built), code review (G5), security review (G6, it handles OAuth tokens), release plan (G10).
+- Drive stays off unless `DRIVE_TOKEN_KEY` and the related settings are set on Render (not checked).

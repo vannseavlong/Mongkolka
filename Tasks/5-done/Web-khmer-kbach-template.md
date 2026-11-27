@@ -17,7 +17,7 @@ A Khmer-ornament (ក្បាច់ខ្មែរ) wedding site template: ruby
 ## Gates
 - [x] G1 scope  - [x] G2 static (tsc; eslint has the existing missing-plugin error)  - [ ] G3 tests (none exist for templates)  - [x] G4 run it (gallery preview at 390px, English only)
 - [ ] G5 code review  - [ ] G6 n/a (no auth/data)  - [x] G7 docs sync
-- [ ] G8 commit  - [ ] G11 changelog
+- [ ] G8 commit  - [x] G11 changelog
 
 ## Done when
 - [ ] Template appears in Admin catalog / gallery and builder, works in preview and public site
@@ -28,3 +28,8 @@ A Khmer-ornament (ក្បាច់ខ្មែរ) wedding site template: ruby
 Seeded to the live admin sheet with `lsdb seed --upsert`: 1 site template, 4 component rows (upsert also touched the existing rows).
 ## Not verified
 Khmer language rendering, tablet/desktop visual pass, public site, builder with a real couple's photos.
+
+## Closed (2026-11-27)
+Moved to `5-done` on the owner's instruction with checks still open. Unticked boxes mean not run.
+- In `main` (91e20ec) and seeded to the live admin sheet. It never had a worktree or branch.
+- Not done: tests, Khmer rendering, tablet and desktop pass, public site, builder with real photos, code review (G5).

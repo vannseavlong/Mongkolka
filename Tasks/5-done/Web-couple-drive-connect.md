@@ -24,5 +24,10 @@ Portal screen to connect, see status of, and disconnect Google Drive; clear expl
 - [ ] Disconnect asks for confirmation and explains what happens to existing files
 - [ ] Reconnect banner appears in the asset library and guest photos page
 - [ ] Works at phone width; copy reviewed for non-technical couples
-- [ ] Root `CHANGELOG.md` entry added
-- [ ] Worktree and branch removed after merge
+- [x] Root `CHANGELOG.md` entry added
+- [x] Worktree and branch removed after merge
+
+## Closed (2026-11-27)
+Moved to `5-done` on the owner's instruction with checks still open. Unticked boxes mean not run.
+- Merged to `main` (46881bd). Worktree and branch removed.
+- Not done: check against a real Google account, phone-width check, recorded code review. The checklist above was never ticked.

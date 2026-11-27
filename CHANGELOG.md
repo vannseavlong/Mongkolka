@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] fix(couple): make the active tab clear in the image library
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-library-active-tab.md
+- Branch/PR: fix/library-active-tab merged to main (no PR)
+- What changed: the Library / Upload tabs of the image library (Storage page and the photo picker dialog) now show the active tab as a filled, bold tab; before, both tabs looked alike. The shared Tabs component is unchanged
+- Needs: none. Deployed to couple-mongkolka.web.app
+
 ## 2026-11-27 · [Web] feat(couple): storage page with image library and usage summary
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-storage-library.md

@@ -1,5 +1,6 @@
 # Web-hero-banners-and-pickers
 
+- **ID:** T-0070
 - **Repo:** apps/couple, apps/api, packages/templates, packages/ui
 - **Owner:** SNLRLONG
 - **Tier:** T2 · shared UI package and renderer, API content validation, new seed rows (auto picker)

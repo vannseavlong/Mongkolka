@@ -1,5 +1,6 @@
 # Web-storage-library
 
+- **ID:** T-0080
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new section on a screen, reuses shared AssetLibrary, no API change (auto picker, see `PIPELINE.md`)

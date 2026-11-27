@@ -1,5 +1,6 @@
 # Web-landing-revamp
 
+- **ID:** T-0075
 - **Repo:** apps/web
 - **Owner:** SNLRLONG
 - **Tier:** T1 · UI-only change inside apps/web landing components and web globals.css; no shared package, API or dependency change (auto picker, see `PIPELINE.md`)

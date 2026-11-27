@@ -1,5 +1,6 @@
 # Web-couple-assist-session
 
+- **ID:** T-0067
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T3 · auth token handling, session storage, permissions in the UI (auto picker, see `PIPELINE.md`)

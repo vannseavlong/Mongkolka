@@ -1,5 +1,6 @@
 # API-assist-session
 
+- **ID:** T-0062
 - **Repo:** apps/api
 - **Owner:** SNLRLONG
 - **Tier:** T3 · auth, token issue, permissions middleware, audit trail (auto picker, see `PIPELINE.md`)

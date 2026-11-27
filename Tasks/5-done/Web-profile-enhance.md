@@ -1,5 +1,6 @@
 # Web-profile-enhance
 
+- **ID:** T-0079
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · edits a screen with new image controls, reuses shared AssetPicker, no API change (auto picker, see `PIPELINE.md`)

@@ -1,5 +1,6 @@
 # Web-cover-sequence
 
+- **ID:** T-0069
 - **Repo:** packages/templates + apps/couple (+ check apps/web)
 - **Owner:** SNLRLONG
 - **Tier:** T2 · edits shared `SiteRenderer` used by builder and public site (auto picker, see `PIPELINE.md`)

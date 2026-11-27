@@ -1,5 +1,6 @@
 # Web-covenant-template
 
+- **ID:** T-0073
 - **Repo:** packages/templates, apps/web, apps/couple, apps/api (section key + seed)
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new template skin, new section key `video` (api enum, couple editor), new web sub-routes, new seed rows; no auth/payment. Security: user-entered YouTube URL is parsed to an id and embedded via youtube-nocookie only (checked in G6).

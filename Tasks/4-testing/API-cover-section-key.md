@@ -1,5 +1,6 @@
 # API-cover-section-key
 
+- **ID:** T-0063
 - **Repo:** apps/api + apps/admin + apps/couple + packages/templates (key list only)
 - **Owner:** SNLRLONG
 - **Tier:** T3 · sheet-db schema enum change, shared key list across 4 apps (auto picker, see `PIPELINE.md`)

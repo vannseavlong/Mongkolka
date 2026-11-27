@@ -1,5 +1,6 @@
 # Web-gallery-stack
 
+- **ID:** T-0074
 - **Repo:** packages/templates, apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · edits shared template renderer and a content field read by the public site (auto picker, see `PIPELINE.md`)

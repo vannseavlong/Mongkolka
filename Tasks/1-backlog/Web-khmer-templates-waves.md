@@ -1,5 +1,6 @@
 # Web-khmer-templates-waves (waves 2 to 6 of the Khmer e-invite templates)
 
+- **ID:** T-0060
 - **Repo:** packages/templates (+ apps/api seeds, apps/couple, apps/web for QA)
 - **Owner:** SNLRLONG
 - **Tier:** T2 per task, `Web-khqr-gift` is **T3** (payment data) · auto picker, see `PIPELINE.md`

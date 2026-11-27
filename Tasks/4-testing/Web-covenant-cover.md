@@ -1,5 +1,6 @@
 # Web-covenant-cover
 
+- **ID:** T-0068
 - **Repo:** packages/templates (covenant) + apps/api seeds
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new components, new catalog seed rows (auto picker, see `PIPELINE.md`)

@@ -1,5 +1,6 @@
 # Web-couple-assist-request
 
+- **ID:** T-0066
 - **Repo:** apps/couple
 - **Owner:** SNLRLONG
 - **Tier:** T2 · new card on the profile screen, calls new API (auto picker, see `PIPELINE.md`)

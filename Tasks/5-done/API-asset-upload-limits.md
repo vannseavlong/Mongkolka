@@ -1,5 +1,6 @@
 # Configurable image upload limits with WebP conversion
 
+- **ID:** T-0071
 - **Repo:** Mongkolka (apps/api, apps/admin, apps/couple)
 - **Owner:** SNLRLONG
 - **Tier:** T3 · project signals: new sheet-db schema (`platform_settings`), new admin and couple endpoints, upload path; picked after the work was built, so the gates below were not run in order

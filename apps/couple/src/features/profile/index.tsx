@@ -10,6 +10,7 @@ import { Form } from "@mongkolka/ui/form";
 import { Main } from "@mongkolka/ui/layout/main";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
+import { AssistCard } from "@/features/assist/components/assist-card";
 import { MembersSection } from "./components/members-section";
 import { ProfileNav } from "./components/profile-nav";
 import { ProfileSaveBar } from "./components/profile-save-bar";
@@ -80,6 +81,9 @@ export function Profile() {
               {/* Outside the form: its invite and remove buttons must not submit the profile. */}
               <div id="members" className="scroll-mt-20">
                 <MembersSection />
+              </div>
+              <div id="help" className="scroll-mt-20">
+                <AssistCard />
               </div>
             </div>
           </div>

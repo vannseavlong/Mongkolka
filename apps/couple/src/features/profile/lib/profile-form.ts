@@ -67,4 +67,5 @@ export const PROFILE_SECTIONS = [
   { id: "events", label: "Ceremony & reception" },
   { id: "venue", label: "Map & dress code" },
   { id: "members", label: "People with access" },
+  { id: "help", label: "Help from Mongkolka" },
 ] as const;

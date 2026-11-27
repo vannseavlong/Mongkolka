@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] fix(web): builder preview waits for the section to mount before scrolling
+- Owner: SNLRLONG
+- Task: none (ad hoc request)
+- Branch/PR: fix/preview-scroll-wait, merged to main (no PR)
+- What changed: the earlier gate fix did not work live, because sections only mount about a second after the gate opens. The preview now watches for the selected section to appear and scrolls to it, re-aligning for 2.5s while photos load. Verified live: Gallery picked with the gate shut scrolls to the Gallery after opening
+- Needs: none
+
 ## 2026-11-27 · [Web] fix(web): builder preview scrolls to the section once the opening gate opens
 - Owner: SNLRLONG
 - Task: none (ad hoc request)

@@ -2,12 +2,26 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(couple): ask Mongkolka for help, and admin help sessions
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-couple-assist-request.md, Tasks/4-testing/Web-couple-assist-session.md
+- Branch/PR: feat/assist-request, feat/assist-session-web via feat/assist-integration, merged to main (no PR)
+- What changed: Profile has a "Help from Mongkolka" card (ask, cancel, end help, recent activity). The couple app accepts an admin's editor link: token kept in that tab only, banner with time left and Exit, people and Drive actions hidden, ended screen when access is cut
+- Needs: deployed to couple-mongkolka.web.app. Not tested against the real API and sheet. Web (mongkolka.web.app) was also redeployed from main
+
+## 2026-11-27 · [Admin] feat(admin): help requests screen
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Admin-assist-requests.md
+- Branch/PR: feat/assist-requests-admin via feat/assist-integration, merged to main (no PR)
+- What changed: Help requests page with Pending, Approved and Closed tabs; accept, decline with reason, end access, open the couple's editor; pending count in the sidebar
+- Needs: deployed to admin-mongkolka.web.app. Not tested against the real API and sheet
+
 ## 2026-11-27 · [API] feat(api): assisted editing requests and editor session
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/API-assist-requests.md, Tasks/4-testing/API-assist-session.md
 - Branch/PR: feat/assist-requests, feat/assist-session via feat/assist-integration, merged to main (no PR)
 - What changed: couples can create, cancel and revoke a help request; admins can list, accept, decline, revoke and open a 1-hour editor token. Every assisted request is re-checked, limited to an allow-list and written to `assist_log`. Assisted tokens are refused by default outside the couple routes. Blank `JWT_EXPIRES_IN` now means 7 days
-- Needs: rotate `JWT_SECRET` on Render (old tokens never expire); confirm Render deployed this commit. No screen uses it yet: the couple card (feat/assist-request), admin screens and couple editing view are not merged or not built. Not tested against the real sheet
+- Needs: rotate `JWT_SECRET` on Render (old tokens never expire). Used by the admin and couple screens above. Render deploys main automatically. Not tested against the real sheet
 
 ## 2026-11-27 · [Web] feat(couple): image library without tabs, plus tile to upload
 - Owner: SNLRLONG

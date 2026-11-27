@@ -24,8 +24,8 @@ Profile has an 'Ask Mongkolka to help' card: send a request with a note, see its
 - [x] Activity list shows last 20 entries (time, what, 'Mongkolka admin')
 - [x] State derivation is a pure function with tests
 - [x] 360px check; mock removed before merge
-- [ ] Root `CHANGELOG.md` entry added
-- [ ] Worktree and branch removed after merge
+- [x] Root `CHANGELOG.md` entry added
+- [x] Worktree and branch removed after merge
 
 ## Progress (2026-11-27)
 Built in `couple-assist-request/` (branch `feat/assist-request`, from `feat/assist-integration`), uncommitted. New `features/assist/` (data/assist-api.ts, lib/assist-state.ts, lib/use-assist.ts, components: assist-card, ask-dialog, assist-activity) and a "Help from Mongkolka" section (card + side menu entry) in the profile page. Built against the contract in the plan, no in-app mock: `cancel` and `revoke` send the `request_id` (the API accepts it as optional).
@@ -41,3 +41,12 @@ Committed on branch `feat/assist-request`. G5 second pass after the fixes, G7, G
 
 ## Held (2026-11-27)
 Owner: do not merge until the admin Help requests screen exists, so couples cannot send requests nobody sees. The API it needs is on `main`. Activity wording for view, blocked and reconciled rows is uncommitted in `couple-assist-request/` (72/72 couple tests, `tsc` pass).
+
+## Shipped (2026-11-27)
+Merged to `main` (4b904a9) through `feat/assist-integration`, pushed and deployed. Worktrees and branches removed.
+- G2/G3 on merged `main`: `tsc` pass; couple 88/88, admin 13/13, API 304/304; production build pass (Google Fonts fetch failed on some attempts, retry passed).
+- G5: separate review agent, no blocker. Fixed: help card stayed stale until reload; header blur lost for all couples; section jumps hid under the banner.
+- G6: /security-review with a separate agent, no HIGH or MEDIUM finding.
+- Open (not fixed): a link opened in a new tab from a help session may not carry the session and would use any couple login saved in that browser, with no banner (not verified in a browser); collaborators see Ask and Cancel and get a 403 (needs `member_role` from the API); the pending badge does not refresh by itself; browser history may keep the editor link (token lives at most 1 hour); `/?token=` on the sign-in page accepts any token (older than this feature).
+- G4 against the real API and sheet: not done. G9: owner approved merge and deploy in chat.
+- G10 rollback: `git revert -m 1 4b904a9`, push, `pnpm deploy:all`.

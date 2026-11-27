@@ -3,6 +3,7 @@
 import { Fragment, useMemo, useState, type ComponentType, type ReactNode } from "react";
 import { resolveComponent, sectionRegistry } from "./registry";
 import { GuestProvider } from "./guest-context";
+import { KbachPage } from "./ornament/kbach/KbachPage";
 import { ChromeSection } from "./chrome/ChromeSection";
 import { SiteChrome } from "./chrome/SiteChrome";
 import type { ChromeConfig } from "./chrome/config";
@@ -154,6 +155,7 @@ function SiteRendererBody({
   onOpened,
   galleryHref,
   skipIntro,
+  coverPreview,
 }: SiteRendererProps) {
   const [openingDismissed, setOpeningDismissed] = useState(!!skipIntro);
   const orientation = useOrientation();
@@ -205,7 +207,14 @@ function SiteRendererBody({
     );
   }
 
-  return (
+  const pageTheme = resolveTheme(template.default_theme, themeOverride, null);
+  // Not in the builder canvas or thumbnails: a fixed layer would escape them.
+  const patterned = skin === "covenant" && !wrapSection && !coverPreview;
+  // The venue details beside the map are the same ones the details section shows.
+  const detailsSection = sections.find((s) => s.section_key === "details" && s.enabled);
+  const venueDetails = (detailsSection?.content ?? buildContent("details")) as DetailsContent | undefined;
+
+  const page = (
     <GuestProvider name={guestGreeting}>
       <SkinProvider skin={skin}>
       {rest.map((section) => {
@@ -245,7 +254,7 @@ function SiteRendererBody({
             })}
           </Fragment>
         ) : (
-          <Component key={section.section_id} couple={couple} theme={theme} content={content} {...extraProps?.(section.section_key)} />
+          <Component key={section.section_id} couple={couple} theme={theme} content={content} {...(section.section_key === "map" ? { details: venueDetails } : {})} {...extraProps?.(section.section_key)} />
         );
         const hasMorePhotos = isGallery && !!galleryHref && !ownGalleryButton && ((rawContent as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
         const node = hasMorePhotos ? (
@@ -269,11 +278,18 @@ function SiteRendererBody({
       {chrome.resolved && (
         <SiteChrome
           resolved={chrome.resolved}
-          theme={resolveTheme(template.default_theme, themeOverride, null)}
+          theme={pageTheme}
           sections={rest}
           music={chrome.music}
         />
       )}
     </GuestProvider>
+  );
+  return patterned ? (
+    <KbachPage ground={pageTheme.bg_color} accent={pageTheme.accent_color}>
+      {page}
+    </KbachPage>
+  ) : (
+    page
   );
 }

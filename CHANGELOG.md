@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(templates): Khmer background and venue card on Covenant
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-kbach-art.md, Tasks/4-testing/Web-kbach-backdrop.md
+- Branch/PR: feat/kbach-art, merged to main (no PR)
+- What changed: Covenant sites get a fixed diamond weave, gold flame-leaf corners and lotus borders; the map section shows a venue card (name, address, date, time, Maps button) beside the picture. Builder canvas and thumbnails show no pattern
+- Needs: web deployed; couple portal not redeployed. Not checked on an iPhone or in the builder preview; code review not run
+
 ## 2026-11-27 · [Web] feat(web): share preview per couple link, generated at build
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-share-previews.md

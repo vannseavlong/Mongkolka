@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { MapPin } from "lucide-react";
-import type { CoupleInfo, MapContent, Theme } from "../../types";
+import { CalendarDays, Clock, MapPin } from "lucide-react";
+import type { CoupleInfo, DetailsContent, MapContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 import { KHMER_BODY_FONT } from "../../chrome/fonts";
 import { goldStops, withAlpha } from "../../chrome/gold";
 import { COVENANT_CSS } from "./covenant-styles";
 import { covenantPalette } from "./palette";
-import { directionsUrl, mapImage, pickText } from "./text-logic";
+import { directionsUrl, mapImage, pickText, venueCard, type VenueCard } from "./text-logic";
 
 export interface CovenantMapProps {
   couple?: CoupleInfo;
@@ -16,6 +16,8 @@ export interface CovenantMapProps {
   content?: MapContent;
   /** The venue's maps link from the details (set by the site, not typed here). */
   mapUrl?: string;
+  /** Venue name, time and address for the card beside the map (set by the renderer). */
+  details?: DetailsContent;
 }
 
 /** The map picture: it keeps its own shape, fades in, and opens full size in a new tab when tapped. */
@@ -77,24 +79,55 @@ function Directions({ href, label, theme }: { href: string | null; label: string
   );
 }
 
-/** Paper: the picture on cream paper in a double gold frame, the caption underneath, then the directions button. */
-export function CovenantMapPaper({ theme, content, mapUrl }: CovenantMapProps) {
+/** Venue, date, time and the directions button, beside the map on wide screens and above it on phones. */
+function VenueInfo({ venue, href, label, theme }: { venue: VenueCard; href: string | null; label: string; theme: Theme }) {
+  const p = covenantPalette(theme);
+  const rows = [
+    { icon: MapPin, text: venue.address },
+    { icon: CalendarDays, text: venue.date },
+    { icon: Clock, text: venue.time },
+  ].filter((row) => row.text);
+  return (
+    <div className="flex min-w-0 flex-[1_1_240px] flex-col items-start justify-center gap-3 p-6 text-left" style={{ background: p.paper, borderRadius: 18, border: `1px solid ${withAlpha(theme.accent_color, 0.35)}` }}>
+      <h3 className="m-0 max-w-full break-words text-xl font-semibold" style={{ color: theme.accent_color }}>
+        {venue.name}
+      </h3>
+      <ul className="m-0 flex list-none flex-col gap-2 p-0 text-[15px]">
+        {rows.map(({ icon: Icon, text }) => (
+          <li key={text} className="flex items-start gap-3">
+            <Icon className="mt-1 size-4 shrink-0" style={{ color: theme.accent_color }} aria-hidden />
+            <span className="min-w-0 break-words">{text}</span>
+          </li>
+        ))}
+      </ul>
+      <Directions href={href} label={label} theme={theme} />
+    </div>
+  );
+}
+
+/** Paper: the picture on cream paper in a double gold frame with the venue card beside it, then the caption. */
+export function CovenantMapPaper({ couple, theme, content, mapUrl, details }: CovenantMapProps) {
   const m = useMap(content, mapUrl);
+  const { language } = useLanguage();
   if (!m.image && !m.href) return null;
+  const venue = venueCard(details, couple?.weddingDate, language);
   const g = goldStops(theme.accent_color);
   return (
     <Shell theme={theme} heading={m.heading}>
-      {m.image && (
-        <div className="mx-auto max-w-xl p-[4px]" style={{ borderRadius: 14, background: `linear-gradient(160deg, ${g.hi}, ${g.mid} 50%, ${g.lo})`, boxShadow: "0 24px 38px -24px rgba(70,40,30,.6)" }}>
-          <div className="overflow-hidden" style={{ borderRadius: 11, boxShadow: "inset 0 0 0 4px #fffaf0", backgroundColor: "#fffaf0", padding: 6 }}>
-            <div className="overflow-hidden" style={{ borderRadius: 8 }}>
-              <MapImage src={m.image} alt={m.alt} theme={theme} />
+      <div className={`mx-auto flex flex-wrap items-stretch justify-center gap-4 ${venue && m.image ? "max-w-5xl" : "max-w-xl"}`}>
+        {venue && <VenueInfo venue={venue} href={m.href} label={m.open} theme={theme} />}
+        {m.image && (
+          <div className="min-w-0 flex-[3_1_360px] self-center p-[4px]" style={{ borderRadius: 14, background: `linear-gradient(160deg, ${g.hi}, ${g.mid} 50%, ${g.lo})`, boxShadow: "0 24px 38px -24px rgba(70,40,30,.6)" }}>
+            <div className="overflow-hidden" style={{ borderRadius: 11, boxShadow: "inset 0 0 0 4px #fffaf0", backgroundColor: "#fffaf0", padding: 6 }}>
+              <div className="overflow-hidden" style={{ borderRadius: 8 }}>
+                <MapImage src={m.image} alt={m.alt} theme={theme} />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       {m.caption && <p className="m-0 mx-auto mt-4 max-w-md break-words text-[15px] leading-relaxed">{m.caption}</p>}
-      <Directions href={m.href} label={m.open} theme={theme} />
+      {!venue && <Directions href={m.href} label={m.open} theme={theme} />}
     </Shell>
   );
 }

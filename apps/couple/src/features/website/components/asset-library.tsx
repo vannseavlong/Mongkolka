@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
-import { AlertTriangle, Check, ImagePlus, Loader2, Trash2, X } from "lucide-react";
+import { AlertTriangle, Check, Loader2, Plus, Trash2, X } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@mongkolka/ui/alert";
 import {
   AlertDialog,
@@ -17,7 +17,6 @@ import {
 import { Button } from "@mongkolka/ui/button";
 import { Progress } from "@mongkolka/ui/progress";
 import { Skeleton } from "@mongkolka/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@mongkolka/ui/tabs";
 import { cn } from "@mongkolka/ui/utils";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
@@ -63,8 +62,6 @@ interface AssetLibraryProps {
 
 const NARROW_GRID = "grid-cols-2 sm:grid-cols-3";
 
-/** The shared tab only tints the active tab with the card colour, which is hard to see on a card or in a dialog. */
-const TAB = "text-muted-foreground data-[state=active]:bg-primary data-[state=active]:font-semibold data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm";
 
 /** The couple's image library: upload (drag-drop or picker), pick, delete, quota. */
 export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Select", allowDelete = true, onSelectAll, gridClassName = NARROW_GRID, showDriveNotice = true }: AssetLibraryProps) {
@@ -75,12 +72,11 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
   const limits = { ...DEFAULT_ASSET_LIMITS, ...limitsData?.limits };
   const { items: uploads, notes } = useUploadQueue();
   const [dragging, setDragging] = useState(false);
-  const [tab, setTab] = useState("library");
   const [shown, setShown] = useState(PAGE_SIZE);
   const [deleting, setDeleting] = useState<WebsiteAsset | null>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const chooseRef = useRef<HTMLButtonElement>(null);
+  const chooseRef = useRef<HTMLButtonElement>(null); // the + tile, where focus returns after a delete
 
   // Uploads keep running when this view closes; the floating dock takes over while it is gone.
   useEffect(() => registerLibraryView(), []);
@@ -116,143 +112,34 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
         </p>
       </div>
 
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="library" className={TAB}>
-            Library
-          </TabsTrigger>
-          <TabsTrigger value="upload" className={TAB}>
-            {summary.active > 0 ? `Upload (${summary.active})` : "Upload"}
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="library" className="flex flex-col gap-3">
-      {loading ? (
-        <div className={cn("grid gap-2", gridClassName)} aria-busy="true" aria-label="Loading images">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="aspect-square w-full rounded-md" />
-          ))}
-        </div>
-      ) : error ? (
-        <Alert variant="destructive">
-          <AlertTriangle />
-          <AlertTitle>Could not load your images</AlertTitle>
-          <AlertDescription>
-            <p>{error}</p>
-            <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => void refetch()}>
-              Try again
-            </Button>
-          </AlertDescription>
-        </Alert>
-      ) : assets.length === 0 ? (
-        <p className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
-          No images yet. Use the Upload tab to add your first photo.
-        </p>
-      ) : (
-        <ul className={cn("grid gap-2", gridClassName)} aria-label="Images">
-          {assets.slice(0, shown).map((asset, i) => {
-            const index = selected.indexOf(asset.url);
-            const isSelected = index !== -1;
-            const name = `image ${i + 1} of ${assets.length} (${formatBytes(asset.size_bytes)})`;
-            return (
-              <li key={asset.asset_id} className="group relative [contain-intrinsic-size:auto_9rem] [content-visibility:auto]">
-                <button
-                  type="button"
-                  aria-pressed={onPick ? isSelected : undefined}
-                  aria-label={onPick ? `${pickLabel}: ${name}` : name}
-                  onClick={() => onPick?.(asset)}
-                  className={cn(
-                    "block aspect-square w-full overflow-hidden rounded-md border bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                    onPick ? "cursor-pointer hover:border-foreground/40" : "cursor-default",
-                    isSelected && "border-primary ring-2 ring-primary/40",
-                  )}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={asset.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
-                </button>
-                {isSelected && (
-                  <span className="pointer-events-none absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-                    {numbered ? index + 1 : <Check className="size-3.5" aria-hidden />}
-                  </span>
-                )}
-                {allowDelete && (
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="secondary"
-                    aria-label={`Delete ${name}`}
-                    className="absolute top-1 right-1 size-7 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
-                    onClick={(e) => {
-                      openerRef.current = e.currentTarget;
-                      setDeleting(asset);
-                    }}
-                  >
-                    <Trash2 className="size-3.5" />
-                  </Button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      {assets.length > shown && (
-        <Button key={shown} ref={moreRef as never} type="button" size="sm" variant="outline" className="self-center" onClick={() => setShown((n) => n + PAGE_SIZE)}>
-          Show more ({assets.length - shown})
-        </Button>
-      )}
+      <input
+        ref={inputRef}
+        type="file"
+        multiple
+        accept={ASSET_ACCEPT}
+        className="sr-only"
+        tabIndex={-1}
+        aria-label="Choose images to upload"
+        onChange={(e) => {
+          if (!full && e.target.files) handleFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
 
-        </TabsContent>
-        <TabsContent value="upload" className="flex flex-col gap-3">
+      {/* The whole library accepts dropped files; the + tile does the same for a click or a tap. */}
       <div
         onDragOver={(e) => {
           e.preventDefault();
           setDragging(true);
         }}
-        onDragLeave={() => setDragging(false)}
+        onDragLeave={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setDragging(false)}
         onDrop={(e) => {
           e.preventDefault();
           setDragging(false);
           if (!full) handleFiles(e.dataTransfer.files);
         }}
-        className={cn(
-          "flex flex-col items-center gap-2 rounded-lg border-2 border-dashed p-4 text-center transition-colors",
-          dragging ? "border-primary bg-primary/5" : "border-border",
-        )}
+        className={cn("flex flex-col gap-3 rounded-lg transition-shadow", dragging && "ring-2 ring-primary ring-offset-4")}
       >
-        <ImagePlus className="size-6 text-muted-foreground" aria-hidden />
-        <p className="text-sm text-muted-foreground">Drag images here, or</p>
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          accept={ASSET_ACCEPT}
-          className="sr-only"
-          tabIndex={-1}
-          aria-label="Choose images to upload"
-          onChange={(e) => {
-            if (!full && e.target.files) handleFiles(e.target.files);
-            e.target.value = "";
-          }}
-        />
-        <Button
-          ref={chooseRef}
-          type="button"
-          size="sm"
-          variant="outline"
-          aria-disabled={full}
-          aria-describedby={full ? "asset-full-hint" : undefined}
-          className={ARIA_DISABLED}
-          onClick={() => !full && inputRef.current?.click()}
-        >
-          Choose images
-        </Button>
-        {full && (
-          <p id="asset-full-hint" className="text-xs text-destructive">
-            Your library is full ({limits.maxPerCouple} images). Delete some to upload more.
-          </p>
-        )}
-        <p className="text-xs text-muted-foreground">JPEG, PNG, WebP or GIF, up to {formatBytes(limits.maxBytes)} each. Large photos are resized and compressed before upload.</p>
-      </div>
-
       {notes.length > 0 && (
         <Alert variant="destructive">
           <AlertTriangle />
@@ -268,7 +155,7 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
       )}
 
       {uploads.length > 0 && (
-        <ul className="flex flex-col gap-2" aria-label="Uploads" aria-live="polite">
+        <ul className="flex max-h-72 flex-col gap-2 overflow-y-auto" aria-label="Uploads" aria-live="polite">
           <li className="flex flex-col gap-1 rounded-md bg-muted/50 p-2 text-sm">
             <span className="flex items-center justify-between gap-2">
               <span className="font-medium">
@@ -321,9 +208,105 @@ export function AssetLibrary({ selected = [], numbered, onPick, pickLabel = "Sel
           )}
         </ul>
       )}
-
-        </TabsContent>
-      </Tabs>
+      {loading ? (
+        <div className={cn("grid gap-2", gridClassName)} aria-busy="true" aria-label="Loading images">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="aspect-square w-full rounded-md" />
+          ))}
+        </div>
+      ) : error ? (
+        <Alert variant="destructive">
+          <AlertTriangle />
+          <AlertTitle>Could not load your images</AlertTitle>
+          <AlertDescription>
+            <p>{error}</p>
+            <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => void refetch()}>
+              Try again
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <ul className={cn("grid gap-2", gridClassName)} aria-label="Images">
+          <li>
+            <button
+              ref={chooseRef}
+              type="button"
+              aria-label="Add images"
+              aria-disabled={full}
+              aria-describedby={full ? "asset-full-hint" : "asset-upload-hint"}
+              onClick={() => !full && inputRef.current?.click()}
+              className={cn(
+                "flex aspect-square w-full flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                ARIA_DISABLED,
+              )}
+            >
+              <Plus className="size-7" aria-hidden />
+              <span className="text-xs font-medium">Add photos</span>
+            </button>
+          </li>
+          {assets.slice(0, shown).map((asset, i) => {
+            const index = selected.indexOf(asset.url);
+            const isSelected = index !== -1;
+            const name = `image ${i + 1} of ${assets.length} (${formatBytes(asset.size_bytes)})`;
+            return (
+              <li key={asset.asset_id} className="group relative [contain-intrinsic-size:auto_9rem] [content-visibility:auto]">
+                <button
+                  type="button"
+                  aria-pressed={onPick ? isSelected : undefined}
+                  aria-label={onPick ? `${pickLabel}: ${name}` : name}
+                  onClick={() => onPick?.(asset)}
+                  className={cn(
+                    "block aspect-square w-full overflow-hidden rounded-md border bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                    onPick ? "cursor-pointer hover:border-foreground/40" : "cursor-default",
+                    isSelected && "border-primary ring-2 ring-primary/40",
+                  )}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={asset.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+                </button>
+                {isSelected && (
+                  <span className="pointer-events-none absolute top-1 left-1 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                    {numbered ? index + 1 : <Check className="size-3.5" aria-hidden />}
+                  </span>
+                )}
+                {allowDelete && (
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="secondary"
+                    aria-label={`Delete ${name}`}
+                    className="absolute top-1 right-1 size-7 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
+                    onClick={(e) => {
+                      openerRef.current = e.currentTarget;
+                      setDeleting(asset);
+                    }}
+                  >
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {!loading && !error && assets.length === 0 && (
+        <p className="text-center text-sm text-muted-foreground">No images yet. Tap the + to add your first photo.</p>
+      )}
+      {assets.length > shown && (
+        <Button key={shown} ref={moreRef as never} type="button" size="sm" variant="outline" className="self-center" onClick={() => setShown((n) => n + PAGE_SIZE)}>
+          Show more ({assets.length - shown})
+        </Button>
+      )}
+        {full ? (
+          <p id="asset-full-hint" className="text-xs text-destructive">
+            Your library is full ({limits.maxPerCouple} images). Delete some to upload more.
+          </p>
+        ) : (
+          <p id="asset-upload-hint" className="text-xs text-muted-foreground">
+            Tap + or drag images here. JPEG, PNG, WebP or GIF, up to {formatBytes(limits.maxBytes)} each. Large photos are resized and compressed before upload.
+          </p>
+        )}
+      </div>
 
       <AlertDialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
         {deleting && (

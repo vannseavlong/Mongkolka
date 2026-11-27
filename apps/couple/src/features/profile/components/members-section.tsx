@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@mongkolka/ui/alert-dialog";
+import { useIsAssisting } from "@/features/assist/lib/use-assist-session";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { CoupleMember } from "../data/schema";
@@ -28,6 +29,7 @@ export function MembersSection() {
   const [memberToRemove, setMemberToRemove] = useState<CoupleMember | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
+  const assisting = useIsAssisting();
 
   async function removeMember() {
     if (!memberToRemove) return;
@@ -72,7 +74,7 @@ export function MembersSection() {
                   {member.member_role === "partner" ? "Partner" : "Collaborator"}
                 </Badge>
               </div>
-              {member.member_role === "collaborator" && (
+              {!assisting && member.member_role === "collaborator" && (
                 <Button variant="outline" size="sm" onClick={() => setMemberToRemove(member)}>
                   Remove
                 </Button>
@@ -81,23 +83,27 @@ export function MembersSection() {
           ))}
         </div>
 
-        <div className="flex items-end gap-2">
-          <div className="flex flex-1 flex-col gap-1.5">
-            <label htmlFor="invite-email" className="text-sm font-medium">
-              Invite partner
-            </label>
-            <Input
-              id="invite-email"
-              type="email"
-              placeholder="partner@example.com"
-              value={inviteEmail}
-              onChange={(e) => setInviteEmail(e.target.value)}
-            />
+        {assisting ? (
+          <p className="text-sm text-muted-foreground">Only the couple can invite or remove people.</p>
+        ) : (
+          <div className="flex items-end gap-2">
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label htmlFor="invite-email" className="text-sm font-medium">
+                Invite partner
+              </label>
+              <Input
+                id="invite-email"
+                type="email"
+                placeholder="partner@example.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <Button onClick={sendInvite} disabled={inviting || !inviteEmail.trim()}>
+              Send invite
+            </Button>
           </div>
-          <Button onClick={sendInvite} disabled={inviting || !inviteEmail.trim()}>
-            Send invite
-          </Button>
-        </div>
+        )}
       </CardContent>
 
       <AlertDialog open={!!memberToRemove} onOpenChange={(open) => !open && setMemberToRemove(null)}>

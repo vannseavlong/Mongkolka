@@ -1,5 +1,5 @@
 import { API_URL, ApiError } from "@/lib/api";
-import { clearToken, getToken } from "@/lib/auth";
+import { getToken, handleAuthFailure } from "@/lib/auth";
 import {
   DEFAULT_ASSET_LIMITS,
   type AssetLimits,
@@ -88,10 +88,7 @@ export function uploadAsset(
         /* non-JSON body */
       }
       if (xhr.status >= 200 && xhr.status < 300 && body.asset) return resolve(body.asset);
-      if (xhr.status === 401 && token) {
-        clearToken();
-        if (window.location.pathname !== "/") window.location.assign("/");
-      }
+      if (token) handleAuthFailure(xhr.status, body.error);
       reject(new ApiError(uploadErrorMessage(xhr.status, body.error, limits), xhr.status));
     };
     const form = new FormData();

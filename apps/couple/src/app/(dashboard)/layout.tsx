@@ -10,6 +10,9 @@ import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
 import { HeaderSlot } from "@/components/layout/header-slot";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { AssistBanner } from "@/features/assist/components/assist-banner";
+import { AssistEnded } from "@/features/assist/components/assist-ended";
+import { useAssistState } from "@/features/assist/lib/use-assist-session";
 import { getToken, clearToken } from "@/lib/auth";
 import { useApiQuery } from "@/lib/use-api-query";
 
@@ -45,9 +48,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // the JWT" reasoning on the server side).
   const { data, loading, error, errorStatus, refetch } = useApiQuery<SessionInfo>(token ? "/couple/api/session" : null);
   const hydrated = token !== undefined;
+  const assist = useAssistState();
+  const assistStatus = assist.status;
 
   useEffect(() => {
-    if (!hydrated) return;
+    // A help-session tab never redirects to sign-in: it shows its own ended screen.
+    if (!hydrated || assistStatus !== "none") return;
     if (!token) {
       router.replace("/");
       return;
@@ -59,12 +65,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       clearToken();
       router.replace("/");
     }
-  }, [hydrated, token, error, errorStatus, router]);
+  }, [hydrated, token, error, errorStatus, router, assistStatus]);
 
   function signOut() {
     clearToken();
     router.replace("/");
   }
+
+  if (assist.status === "ended") return <AssistEnded reason={assist.reason} />;
 
   if (!token || loading) return null;
 
@@ -131,12 +139,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         dedupingInterval: 5000,
       }}
     >
-      <SidebarProvider>
+      <SidebarProvider style={assist.status === "active" ? ({ "--assist-banner": "3rem" } as React.CSSProperties) : undefined}>
         <AppSidebar />
         <SidebarInset>
-          <Header fixed>
-            <HeaderSlot />
-          </Header>
+          {/* One sticky block, so the help banner and the header stay together at the top. */}
+          <div className="sticky top-0 z-50 bg-background">
+            <AssistBanner />
+            <Header fixed>
+              <HeaderSlot />
+            </Header>
+          </div>
           {children}
         </SidebarInset>
       </SidebarProvider>

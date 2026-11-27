@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(web): share preview per couple link, generated at build
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-share-previews.md
+- Branch/PR: feat/share-previews, merged to main (no PR)
+- What changed: `pnpm build` in web writes a page per couple listed in `apps/web/share-previews.txt` (or `SHARE_PREVIEW_SLUGS`) with their names, date and hero photo for Telegram, Facebook and X previews
+- Needs: list the published slugs, then build and deploy web. Not checked with a real couple or on a real platform; code and security review not run
+
 ## 2026-11-27 · [Web] feat(couple): ask Mongkolka for help, and admin help sessions
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-couple-assist-request.md, Tasks/4-testing/Web-couple-assist-session.md

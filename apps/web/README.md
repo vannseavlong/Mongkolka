@@ -32,3 +32,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Share previews for couple links
+
+X, Telegram and Facebook do not run JavaScript, so `pnpm build` writes `out/<slug>.html` with the couple's names, date and hero photo for each listed couple (`scripts/share-previews.mjs`).
+
+1. List the published slugs in `apps/web/share-previews.txt`, one per line (not in git), or set `SHARE_PREVIEW_SLUGS="a-b,c-d"`.
+2. Build with `pnpm --filter web build` (not through `turbo`, whose cache would skip the step), then deploy hosting.
+
+A preview changes only on the next build and deploy. This includes a new photo, and a site that was unpublished: remove its slug and redeploy. A listed couple that cannot be generated fails the build.

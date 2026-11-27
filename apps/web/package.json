@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "test:dev": "node --test scripts/dev-rewrite.test.mjs",
-    "test": "node --test scripts/dev-rewrite.test.mjs src/lib/*.test.ts src/components/*.test.ts",
-    "build": "next build",
+    "test": "node --test scripts/dev-rewrite.test.mjs scripts/share-preview-html.test.mjs src/lib/*.test.ts src/components/*.test.ts",
+    "build": "next build && node scripts/share-previews.mjs",
+    "share-previews": "node scripts/share-previews.mjs",
     "start": "next start",
     "lint": "eslint"
   },

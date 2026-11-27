@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(couple): storage page with image library and usage summary
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-storage-library.md
+- Branch/PR: feat/storage-library merged to main (no PR)
+- What changed: the Storage page shows summary tiles (images used of the limit, space used, where files are kept) and the couple's image library beside the Google Drive card, so photos can be uploaded and deleted there. Stacks on phones. The shared progress bar now exposes its value to screen readers
+- Needs: none. Deployed to couple-mongkolka.web.app
+
 ## 2026-11-27 · [Web] feat(couple): profile photos from the image library and sectioned layout
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-profile-enhance.md

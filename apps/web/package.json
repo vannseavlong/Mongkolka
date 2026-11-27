@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "test:dev": "node --test scripts/dev-rewrite.test.mjs",
-    "test": "node --test scripts/dev-rewrite.test.mjs src/lib/*.test.ts",
+    "test": "node --test scripts/dev-rewrite.test.mjs src/lib/*.test.ts src/components/*.test.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

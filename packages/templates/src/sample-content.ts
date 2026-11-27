@@ -78,7 +78,7 @@ export const SAMPLE_CONTENT: Partial<Record<SectionKey, unknown>> = {
       "We met on a rainy afternoon and haven't stopped talking since. This is where our story becomes yours to celebrate with us.",
   },
   gallery: { photos: SAMPLE_PHOTOS },
-  map: { imageUrl: "/templates/covenant/map-bong-vutha-handdrawn.webp" },
+  map: { imageUrl: "/templates/covenant/map-sample.svg" },
   note: {},
   video: { url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ", title: "Our story in moving pictures" },
   details: {

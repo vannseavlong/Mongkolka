@@ -5,6 +5,7 @@ import { ArrowRight, MapPin, Store } from "lucide-react";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import type { SiteTemplateSummary } from "@/app/templates/types";
 import type { VendorListItem } from "@/app/marketplace/types";
+import { TemplateThumb } from "@/app/templates/template-thumb";
 import { Categories } from "./categories";
 import { Reveal } from "./reveal";
 import { SectionHeading } from "./section-heading";
@@ -63,19 +64,8 @@ export function LivePreviews({
                     href={`/templates/${template.template_id}`}
                     className="group flex h-full flex-col overflow-hidden rounded-3xl border bg-card transition duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10"
                   >
-                    <div
-                      className="relative flex h-44 items-center justify-center sm:h-52"
-                      style={{ backgroundColor: template.default_theme.bg_color }}
-                    >
-                      <span
-                        className="text-6xl transition-transform duration-500 group-hover:scale-110"
-                        style={{
-                          color: template.default_theme.accent_color,
-                          fontFamily: template.default_theme.font_style,
-                        }}
-                      >
-                        Aa
-                      </span>
+                    <div className="relative">
+                      <TemplateThumb template={template} />
                       <span className="absolute right-3 bottom-3 rounded-full bg-card/90 px-3 py-1 text-xs font-medium opacity-0 shadow transition-opacity group-hover:opacity-100">
                         Preview
                       </span>

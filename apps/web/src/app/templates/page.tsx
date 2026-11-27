@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PageLoading, PageMessage } from "@/components/loading-state";
 import { useApi } from "@/lib/use-api";
+import { TemplateThumb } from "./template-thumb";
 import type { SiteTemplatesResponse } from "./types";
 
 // Full-page preview of a template at /templates/preview/<slug>; templates without a slug fall back
@@ -41,20 +42,7 @@ export default function TemplatesPage() {
                 href={previewHref(template)}
                 className="flex flex-col gap-4 rounded-xl border p-6 transition-colors hover:bg-accent"
               >
-                <div
-                  className="flex h-32 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: template.default_theme.bg_color }}
-                >
-                  <span
-                    className="text-lg"
-                    style={{
-                      color: template.default_theme.accent_color,
-                      fontFamily: template.default_theme.font_style,
-                    }}
-                  >
-                    Aa
-                  </span>
-                </div>
+                <TemplateThumb template={template} className="rounded-lg border" />
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex min-w-0 flex-col">
                     <h2 className="font-medium">{template.name}</h2>

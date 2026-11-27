@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(web): active nav link, live template card previews, own sample map
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-template-cards.md
+- Branch/PR: feat/web-template-cards merged to main (no PR)
+- What changed: Header marks the current page (desktop and mobile menu, `aria-current`). Template cards on /templates and the landing page show a lazy, scaled live preview of the template's first screen. Covenant sample map replaced by our own `map-sample.svg`; the real venue's hand-drawn map files are removed
+- Needs: not checked at 360px or on the Covenant preview page itself; Ink & Gold card can catch its cover mid-animation. Covenant sample hero photo and Vutha/Nita names look like a real couple and are unchanged
+
 ## 2026-11-27 · [Web] fix(web): gallery mix layouts form, all styles stackable, preview View all and scroll
 - Owner: SNLRLONG
 - Task: Tasks/5-done/Web-preview-see-all.md

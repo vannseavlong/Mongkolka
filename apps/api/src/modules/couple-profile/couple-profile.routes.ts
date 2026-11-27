@@ -5,6 +5,6 @@ import { CoupleProfileController } from "./couple-profile.controller.js";
 
 export const coupleProfileRouter = Router();
 
-coupleProfileRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleProfileRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleProfileRouter.get("/profile", CoupleProfileController.get);
 coupleProfileRouter.patch("/profile", CoupleProfileController.update);

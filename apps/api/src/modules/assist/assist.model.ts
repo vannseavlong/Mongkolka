@@ -43,6 +43,18 @@ export const AssistModel = {
     return (await adminContext().table("assist_log").findMany({ where: { couple_id: coupleId } })) as unknown as AssistLogRow[];
   },
 
+  findUser(userId: string) {
+    return adminContext().table("users").findOne({ where: { user_id: userId } });
+  },
+
+  async listMembers(coupleId: string) {
+    return (await adminContext().table("couple_members").findMany({ where: { couple_id: coupleId } })) as unknown as Array<{
+      user_id: string;
+      member_role?: string | null;
+      joined_at?: string | null;
+    }>;
+  },
+
   findCouple(coupleId: string) {
     return adminContext().table("couples").findOne({ where: { couple_id: coupleId } });
   },

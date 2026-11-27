@@ -19,7 +19,7 @@ publicGuestPhotosRouter.post(
 
 /** Mounted under /couple/api. */
 export const coupleGuestPhotosRouter = Router();
-coupleGuestPhotosRouter.use(requireAuth(), requireRole("couple"), requireActiveCouple);
+coupleGuestPhotosRouter.use(requireAuth({ allowAssist: true }), requireRole("couple"), requireActiveCouple);
 coupleGuestPhotosRouter.get("/photos", CoupleGuestPhotosController.list);
 coupleGuestPhotosRouter.post("/photos/bulk-delete", CoupleGuestPhotosController.removeMany);
 coupleGuestPhotosRouter.patch("/photos/:photoId", CoupleGuestPhotosController.setStatus);

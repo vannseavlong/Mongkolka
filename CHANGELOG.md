@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-27 · [Web] feat(couple): profile photos from the image library and sectioned layout
+- Owner: SNLRLONG
+- Task: Tasks/5-done/Web-profile-enhance.md
+- Branch/PR: feat/profile-enhance merged to main (no PR)
+- What changed: the couple Profile page lets couples pick or upload their cover and venue photos from the image library (no more pasting URLs), with previews and Remove. Page is split into section cards with a side menu on desktop, a loading skeleton and error states. Member invite and remove buttons no longer save the profile as a side effect
+- Needs: none. Deployed to couple-mongkolka.web.app
+
 ## 2026-11-27 · [Web] fix(web): builder preview waits for the section to mount before scrolling
 - Owner: SNLRLONG
 - Task: none (ad hoc request)

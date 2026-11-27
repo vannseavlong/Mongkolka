@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Heart, Menu } from "lucide-react";
 import { Button } from "@mongkolka/ui/button";
 import { COUPLE_URL, VENDOR_URL } from "@/lib/app-urls";
+import { NAV_LINKS } from "./nav-links";
+import { isActivePath } from "./nav-active";
 import {
   Sheet,
   SheetContent,
@@ -14,15 +17,9 @@ import {
 } from "@mongkolka/ui/sheet";
 
 
-const NAV_LINKS = [
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/templates", label: "Templates" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
-
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between border-b border-brand-line/60 bg-background/80 px-5 py-3.5 backdrop-blur-md sm:px-12">
@@ -33,8 +30,15 @@ export function SiteHeader() {
 
       <nav className="hidden items-center gap-1 md:flex">
         {NAV_LINKS.map((link) => (
-          <Button key={link.href} variant="ghost" asChild>
-            <Link href={link.href}>{link.label}</Link>
+          <Button
+            key={link.href}
+            variant="ghost"
+            asChild
+            className={isActivePath(pathname, link.href) ? "bg-brand-tint text-primary hover:bg-brand-tint" : undefined}
+          >
+            <Link href={link.href} aria-current={isActivePath(pathname, link.href) ? "page" : undefined}>
+              {link.label}
+            </Link>
           </Button>
         ))}
       </nav>
@@ -61,8 +65,16 @@ export function SiteHeader() {
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4">
             {NAV_LINKS.map((link) => (
-              <Button key={link.href} variant="ghost" className="justify-start" asChild onClick={() => setOpen(false)}>
-                <Link href={link.href}>{link.label}</Link>
+              <Button
+                key={link.href}
+                variant="ghost"
+                className={`justify-start ${isActivePath(pathname, link.href) ? "bg-brand-tint text-primary" : ""}`}
+                asChild
+                onClick={() => setOpen(false)}
+              >
+                <Link href={link.href} aria-current={isActivePath(pathname, link.href) ? "page" : undefined}>
+                  {link.label}
+                </Link>
               </Button>
             ))}
             <div className="my-2 border-t" />

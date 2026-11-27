@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { NAV_LINKS } from "./nav-links";
 import { COUPLE_URL, VENDOR_URL } from "@/lib/app-urls";
-
-const EXPLORE_LINKS = [
-  { href: "/marketplace", label: "Marketplace" },
-  { href: "/templates", label: "Templates" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
 
 export function SiteFooter() {
   return (
@@ -25,7 +19,7 @@ export function SiteFooter() {
 
         <nav aria-label="Explore" className="flex flex-col gap-2.5 text-sm">
           <span className="mb-1 text-xs tracking-[0.2em] text-brand-gold uppercase">Explore</span>
-          {EXPLORE_LINKS.map((link) => (
+          {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className="text-primary-foreground/75 hover:text-primary-foreground">
               {link.label}
             </Link>

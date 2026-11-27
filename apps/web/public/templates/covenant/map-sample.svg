@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1100" role="img" aria-label="Sample map to the venue">
+  <rect width="1000" height="1100" fill="#14120c"/>
+  <rect x="40" y="40" width="920" height="1020" rx="28" fill="#686040"/>
+  <rect x="62" y="62" width="876" height="976" rx="20" fill="none" stroke="#c0674a" stroke-width="2"/>
+  <text x="500" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#f6ecd2" letter-spacing="4">MAP TO THE VENUE</text>
+  <g fill="none" stroke="#524b30" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M130 180V1000" stroke-width="46"/>
+    <path d="M130 930H600L900 800" stroke-width="46"/>
+    <path d="M600 930V420L760 330" stroke-width="40"/>
+    <path d="M600 600H900" stroke-width="30"/>
+    <path d="M300 180V930" stroke-width="30"/>
+  </g>
+  <g fill="none" stroke="#f6ecd2" stroke-width="3" stroke-dasharray="14 8" opacity=".55">
+    <path d="M130 180V1000M130 930H600L900 800M600 930V420L760 330M600 600H900M300 180V930"/>
+  </g>
+  <rect x="680" y="690" width="150" height="110" rx="10" fill="#524b30" stroke="#f6ecd2" stroke-width="3"/>
+  <text x="755" y="752" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#f6ecd2">Park</text>
+  <rect x="330" y="360" width="190" height="120" rx="10" fill="#524b30" stroke="#f6ecd2" stroke-width="3"/>
+  <text x="425" y="428" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#f6ecd2">Market</text>
+  <path d="M600 930C600 780 540 700 560 560" fill="none" stroke="#e9a35c" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 22"/>
+  <circle cx="560" cy="500" r="58" fill="none" stroke="#c0674a" stroke-width="5"/>
+  <path d="M560 462l36 32h-12v34h-48v-34h-12z" fill="#f6ecd2"/>
+  <text x="640" y="494" font-family="Georgia, serif" font-size="30" font-weight="bold" fill="#e9a35c">Riverside Garden</text>
+  <text x="640" y="534" font-family="Georgia, serif" font-size="26" fill="#f6ecd2">Wedding venue</text>
+  <text x="165" y="985" font-family="Georgia, serif" font-size="26" fill="#f6ecd2">Riverside Ave</text>
+  <text x="640" y="905" font-family="Georgia, serif" font-size="24" fill="#f6ecd2" opacity=".85">Turn here</text>
+  <g transform="translate(820 230)" stroke="#f6ecd2" fill="#f6ecd2" font-family="Georgia, serif" font-size="24" text-anchor="middle">
+    <circle r="6"/><path d="M0 -50V50M-50 0H50" stroke-width="2"/><path d="M0 -50l8 24h-16z"/>
+    <text y="-62" stroke="none">N</text>
+  </g>
+</svg>

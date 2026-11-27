@@ -79,10 +79,10 @@ export function Profile() {
                 </form>
               </Form>
               {/* Outside the form: its invite and remove buttons must not submit the profile. */}
-              <div id="members" className="scroll-mt-20">
+              <div id="members" className="scroll-mt-[calc(5rem+var(--assist-banner,0px))]">
                 <MembersSection />
               </div>
-              <div id="help" className="scroll-mt-20">
+              <div id="help" className="scroll-mt-[calc(5rem+var(--assist-banner,0px))]">
                 <AssistCard />
               </div>
             </div>

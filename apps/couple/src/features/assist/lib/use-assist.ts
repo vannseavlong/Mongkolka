@@ -29,7 +29,9 @@ type Busy = "ask" | "cancel" | "revoke" | null;
 
 /** Logic layer: loads the help request and runs ask, cancel and revoke. No markup here. */
 export function useAssist() {
-  const { data, error, isLoading, mutate } = useSWR(ASSIST_KEY, fetchAssist);
+  // Read again each time the card is shown: an admin may have answered or looked around since. The dashboard's
+  // defaults would keep showing the first answer until a full reload.
+  const { data, error, isLoading, mutate } = useSWR(ASSIST_KEY, fetchAssist, { revalidateOnMount: true });
   const now = useNow();
   const [busy, setBusy] = useState<Busy>(null);
   const [actionError, setActionError] = useState<string | null>(null);

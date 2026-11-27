@@ -143,7 +143,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <AppSidebar />
         <SidebarInset>
           {/* One sticky block, so the help banner and the header stay together at the top. */}
-          <div className="sticky top-0 z-50 bg-background">
+          {/* `contents` outside a help session, so the header behaves (and blurs) exactly as before. */}
+          <div className={assist.status === "active" ? "sticky top-0 z-50 bg-background" : "contents"}>
             <AssistBanner />
             <Header fixed>
               <HeaderSlot />

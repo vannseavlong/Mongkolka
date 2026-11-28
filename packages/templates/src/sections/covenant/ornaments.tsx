@@ -1,73 +1,17 @@
-import { useId, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import type { Theme } from "../../types";
 import { MOUL_FONT } from "../../chrome/fonts";
 import { goldStops, mixHex, withAlpha } from "../../chrome/gold";
 import { DEFAULT_ICONS } from "../khmer/ornaments/icons";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
-import type { DividerProps, MediaFrameProps, OrnamentProps, SkinMedia, SkinOrnaments } from "../khmer/skin-ornament-types";
+import type { MediaFrameProps, SkinMedia, SkinOrnaments } from "../khmer/skin-ornament-types";
 import { PhotoBox } from "../skinned/gallery-media";
 import { buttonStyle, fieldStyle, mediaTones, noteStyle } from "../skinned/gallery-tones";
-import { Blossom, CROSS_PATH } from "./cross";
-import { KbachCrest } from "./kbach-crest";
+import { Blossom } from "./cross";
+import { CovenantCorner, CrossDivider, KbachCrest } from "./lai-ornaments";
 import { covenantPalette, PINK } from "./palette";
 
-const svgId = (prefix: string) => `${prefix}${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
 const SCRIPT = 'var(--font-script), "Great Vibes", cursive';
-
-function GoldDef({ id, color }: { id: string; color: string }) {
-  const { hi, mid, lo } = goldStops(color);
-  return (
-    <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stopColor={hi} />
-      <stop offset="0.5" stopColor={mid} />
-      <stop offset="1" stopColor={lo} />
-    </linearGradient>
-  );
-}
-
-/** Top-left card corner: a gold hairline that turns the corner, a leaf sprig and a blush blossom. */
-function CovenantCorner({ color, size = 60 }: OrnamentProps) {
-  const g = svgId("cvc");
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" aria-hidden focusable="false" style={{ display: "block", overflow: "visible" }}>
-      <defs>
-        <GoldDef id={g} color={color} />
-      </defs>
-      <g fill="none" stroke={`url(#${g})`} strokeLinecap="round">
-        <path d="M3 64C3 22 22 3 64 3" strokeWidth="1.5" />
-        <path d="M9 58C9 27 27 9 58 9" strokeWidth="0.7" opacity="0.7" />
-      </g>
-      <path d="M20 30C24 22 33 21 40 25C34 32 25 34 20 30Z" fill="#9db08a" opacity="0.8" />
-      <path d="M30 20C35 15 44 17 47 23C40 25 33 25 30 20Z" fill="#b3c4a0" opacity="0.85" />
-      <Blossom x={17} y={17} r={9} petal={PINK.petal} centre={goldStops(color).mid} />
-      <circle cx="3" cy="3" r="2.2" fill={`url(#${g})`} />
-    </svg>
-  );
-}
-
-/** Two fading gold rules around a small cross, with a blossom on each side. */
-function CrossDivider({ color, width = 220 }: DividerProps) {
-  const g = svgId("cvd");
-  const { mid } = goldStops(color);
-  return (
-    <svg width={width} height={(width * 36) / 240} viewBox="0 0 240 36" aria-hidden focusable="false" style={{ display: "block", margin: "0 auto", maxWidth: "100%", overflow: "visible" }}>
-      <defs>
-        <GoldDef id={g} color={color} />
-        <linearGradient id={`${g}l`} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor={mid} stopOpacity="0" />
-          <stop offset="1" stopColor={mid} />
-        </linearGradient>
-      </defs>
-      <path d="M6 18H92" stroke={`url(#${g}l)`} strokeWidth="1" />
-      <path d="M234 18H148" stroke={`url(#${g}l)`} strokeWidth="1" />
-      <Blossom x={100} y={18} r={7} petal={PINK.petal} centre={mid} />
-      <Blossom x={140} y={18} r={7} petal={PINK.petal} centre={mid} />
-      <g transform="translate(120 18) scale(0.17) translate(-50 -70)">
-        <path d={CROSS_PATH} fill={`url(#${g})`} />
-      </g>
-    </svg>
-  );
-}
 
 /** White paper with a faint blush wash and a gold hairline; glass if a couple recolours it dark. */
 function surface(theme: Theme): CSSProperties {

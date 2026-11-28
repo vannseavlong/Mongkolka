@@ -156,6 +156,7 @@ describe("new covenant sections render", () => {
         const html = render("map", id, language, { content: { imageUrl: "https://x.test/map.png" }, mapUrl: "https://maps.app.goo.gl/x" });
         assert.ok(html.includes("https://x.test/map.png"));
         assert.ok(html.includes('href="https://maps.app.goo.gl/x"'));
+        assert.ok(html.indexOf('href="https://maps.app.goo.gl/x"') > html.indexOf("https://x.test/map.png"), "directions sit below the map");
         assert.equal(render("map", id, language, {}), "");
       });
     }

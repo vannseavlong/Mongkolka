@@ -6,6 +6,8 @@ import type { CoupleInfo, DetailsContent, MapContent, Theme } from "../../types"
 import { useLanguage } from "../../i18n";
 import { KHMER_BODY_FONT } from "../../chrome/fonts";
 import { goldStops, withAlpha } from "../../chrome/gold";
+import { useSkinOrnaments } from "../khmer/skin-context";
+import { mediaFor } from "../skinned/gallery-media";
 import { COVENANT_CSS } from "./covenant-styles";
 import { covenantPalette } from "./palette";
 import { mapImage, mapPlace, pickText } from "./text-logic";
@@ -68,25 +70,27 @@ function useMap(content?: MapContent, details?: DetailsContent, mapUrl?: string)
   };
 }
 
-/** A pin and the place name, then the directions link, above the map picture. */
-function Place({ name, href, label, theme }: { name: string | null; href: string | null; label: string; theme: Theme }) {
-  if (!name && !href) return null;
+/** A pin and the place name on one line, above the map picture. A long name wraps beside the pin. */
+function Place({ name, theme }: { name: string | null; theme: Theme }) {
+  if (!name) return null;
   return (
-    <div className="mx-auto mb-7 flex max-w-xl flex-col items-center gap-2">
-      {name && (
-        <>
-          <MapPin className="size-7" style={{ color: theme.accent_color }} aria-hidden />
-          <h3 className="m-0 max-w-full break-words text-xl font-semibold" style={{ color: theme.accent_color }}>
-            {name}
-          </h3>
-        </>
-      )}
-      {href && (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 px-2 text-[15px] font-semibold underline underline-offset-4" style={{ color: theme.accent_color }}>
-          <Navigation className="size-4" aria-hidden />
-          {label}
-        </a>
-      )}
+    <h3 className="m-0 mx-auto mb-6 flex max-w-xl items-start justify-center gap-1.5 text-[15px] font-semibold leading-7" style={{ color: theme.accent_color }}>
+      <MapPin className="mt-1 size-5 shrink-0" aria-hidden />
+      <span className="min-w-0 break-words">{name}</span>
+    </h3>
+  );
+}
+
+/** The button under the map that opens the saved maps link. Nothing without a link: a guessed place could mislead guests. */
+function Directions({ href, label, theme }: { href: string | null; label: string; theme: Theme }) {
+  const media = mediaFor(useSkinOrnaments());
+  if (!href) return null;
+  return (
+    <div className="mt-8 flex justify-center">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="cv-link" style={{ ...media.button(theme), textDecoration: "none" }}>
+        <Navigation className="size-4" aria-hidden />
+        {label}
+      </a>
     </div>
   );
 }
@@ -98,7 +102,7 @@ export function CovenantMapPaper({ theme, content, mapUrl, details }: CovenantMa
   const g = goldStops(theme.accent_color);
   return (
     <Shell theme={theme} heading={m.heading}>
-      <Place name={m.name} href={m.href} label={m.open} theme={theme} />
+      <Place name={m.name} theme={theme} />
       {m.image && (
         <div className="mx-auto max-w-xl p-[4px]" style={{ borderRadius: 14, background: `linear-gradient(160deg, ${g.hi}, ${g.mid} 50%, ${g.lo})`, boxShadow: "0 24px 38px -24px rgba(70,40,30,.6)" }}>
           <div className="overflow-hidden" style={{ borderRadius: 11, boxShadow: "inset 0 0 0 4px #fffaf0", backgroundColor: "#fffaf0", padding: 6 }}>
@@ -109,6 +113,7 @@ export function CovenantMapPaper({ theme, content, mapUrl, details }: CovenantMa
         </div>
       )}
       {m.caption && <p className="m-0 mx-auto mt-4 max-w-md break-words text-[15px] leading-relaxed">{m.caption}</p>}
+      <Directions href={m.href} label={m.open} theme={theme} />
     </Shell>
   );
 }
@@ -119,7 +124,7 @@ export function CovenantMapPostcard({ theme, content, mapUrl, details }: Covenan
   if (!m.image && !m.name && !m.href) return null;
   return (
     <Shell theme={theme} heading={m.heading}>
-      <Place name={m.name} href={m.href} label={m.open} theme={theme} />
+      <Place name={m.name} theme={theme} />
       {m.image && (
         <div className="relative mx-auto max-w-xl" style={{ transform: "rotate(-1.2deg)" }}>
           <span aria-hidden className="absolute -top-3 left-8 z-10 h-6 w-20 -rotate-6" style={{ background: withAlpha(theme.accent_color, 0.28) }} />
@@ -134,6 +139,7 @@ export function CovenantMapPostcard({ theme, content, mapUrl, details }: Covenan
           </div>
         </div>
       )}
+      <Directions href={m.href} label={m.open} theme={theme} />
     </Shell>
   );
 }

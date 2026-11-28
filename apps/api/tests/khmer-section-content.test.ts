@@ -343,6 +343,11 @@ describe("map and note section content", () => {
     assert.deepEqual(validateSectionContent("map", { imageUrl: "", captionKh: "" }), {});
     assert.throws(() => validateSectionContent("map", { imageUrl: "javascript:alert(1)" }));
     assert.throws(() => validateSectionContent("map", { captionEn: "x".repeat(LIMITS.mapCaption + 1) }));
+    // The editor's place name and directions link must survive the save.
+    assert.deepEqual(validateSectionContent("map", { placeName: " Hall A ", mapUrl: " https://maps.app.goo.gl/x " }), { placeName: "Hall A", mapUrl: "https://maps.app.goo.gl/x" });
+    assert.throws(() => validateSectionContent("map", { mapUrl: "http://maps.example.com" }));
+    assert.throws(() => validateSectionContent("map", { mapUrl: "javascript:alert(1)" }));
+    assert.throws(() => validateSectionContent("map", { placeName: "x".repeat(LIMITS.mapPlace + 1) }));
   });
   it("keeps the note's title and message per language within the limits", () => {
     assert.deepEqual(validateSectionContent("note", { titleEn: " No alcohol ", bodyKh: "សូម", extra: true }), { titleEn: "No alcohol", bodyKh: "សូម" });

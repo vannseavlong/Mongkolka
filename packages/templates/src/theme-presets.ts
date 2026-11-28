@@ -1,31 +1,26 @@
+import type { DecorKey } from "./site-decor";
 import type { Theme } from "./types";
 
-/** font_style values the section components understand (anything else renders sans-serif). */
-export const FONT_STYLES = [
-  { value: "serif", label: "Serif" },
-  { value: "sans", label: "Sans" },
-] as const;
-
-export type FontStyle = (typeof FONT_STYLES)[number]["value"];
+export type ThemePresetKey = "bg_color" | "text_color" | "accent_color" | DecorKey;
 
 export interface ThemePreset {
   id: string;
   name: string;
-  theme: Theme & { font_style: FontStyle };
+  theme: Pick<Theme, ThemePresetKey>;
 }
 
-/** Named whole-site designs: colors, fonts and background (Classic Mono keeps the template's own). Text/bg and accent/bg are both >= 4.5:1 (WCAG AA); see contrastRatio(). */
+/** Named looks: colors and background, never fonts (see FONT_PRESETS). Classic Mono keeps the template's own background. Text/bg and accent/bg are both >= 4.5:1 (WCAG AA); see contrastRatio(). */
 export const THEME_PRESETS = [
-  { id: "ivory-gold", name: "Ivory & Gold", theme: { bg_color: "#fbf7ef", text_color: "#3a2f1f", accent_color: "#8f6a1c", font_style: "serif", font_kh_heading: "moul", font_kh_body: "battambang", font_en_heading: "cormorant", font_en_script: "great-vibes", pattern: "diamond", corners: "on" } },
-  { id: "blush-rose", name: "Blush Rose", theme: { bg_color: "#fdf1f2", text_color: "#4a2530", accent_color: "#b8456a", font_style: "serif", font_kh_heading: "moulpali", font_kh_body: "siemreap", font_en_heading: "playfair", font_en_script: "parisienne", pattern: "blossom", corners: "off" } },
-  { id: "sage-garden", name: "Sage Garden", theme: { bg_color: "#f3f6f0", text_color: "#26352b", accent_color: "#43694c", font_style: "serif", font_kh_heading: "moulpali", font_kh_body: "battambang", font_en_heading: "cormorant", font_en_script: "dancing", pattern: "blossom", corners: "off" } },
-  { id: "sky-linen", name: "Sky Linen", theme: { bg_color: "#f2f7fb", text_color: "#1f3347", accent_color: "#2f6a96", font_style: "sans", font_kh_heading: "koulen", font_kh_body: "kantumruy", font_en_heading: "playfair", font_en_script: "dancing", pattern: "lotus", corners: "off" } },
-  { id: "royal-navy", name: "Royal Navy", theme: { bg_color: "#14233a", text_color: "#f3ead6", accent_color: "#d4af37", font_style: "serif", font_kh_heading: "moul", font_kh_body: "siemreap", font_en_heading: "cinzel", font_en_script: "great-vibes", pattern: "diamond", corners: "on" } },
-  { id: "midnight-plum", name: "Midnight Plum", theme: { bg_color: "#2a1630", text_color: "#f6e9f3", accent_color: "#e0a0c8", font_style: "serif", font_kh_heading: "moul", font_kh_body: "battambang", font_en_heading: "playfair", font_en_script: "parisienne", pattern: "lotus", corners: "on" } },
-  { id: "terracotta", name: "Terracotta", theme: { bg_color: "#fbf1e8", text_color: "#4a2c1f", accent_color: "#a84a28", font_style: "sans", font_kh_heading: "koulen", font_kh_body: "kantumruy", font_en_heading: "cormorant", font_en_script: "dancing", pattern: "lotus", corners: "off" } },
-  { id: "lotus-pink", name: "Lotus Pink", theme: { bg_color: "#fff5f8", text_color: "#40202f", accent_color: "#b03a70", font_style: "sans", font_kh_heading: "moul", font_kh_body: "battambang", font_en_heading: "cinzel", font_en_script: "great-vibes", pattern: "diamond", corners: "on" } },
-  { id: "forest-night", name: "Forest Night", theme: { bg_color: "#10241c", text_color: "#e8f1e6", accent_color: "#8fcf9d", font_style: "sans", font_kh_heading: "moulpali", font_kh_body: "kantumruy", font_en_heading: "cormorant", font_en_script: "parisienne", pattern: "diamond", corners: "off" } },
-  { id: "classic-mono", name: "Classic Mono", theme: { bg_color: "#ffffff", text_color: "#1c1c1c", accent_color: "#555555", font_style: "serif" } },
+  { id: "ivory-gold", name: "Ivory & Gold", theme: { bg_color: "#fbf7ef", text_color: "#3a2f1f", accent_color: "#8f6a1c", pattern: "diamond", corners: "on" } },
+  { id: "blush-rose", name: "Blush Rose", theme: { bg_color: "#fdf1f2", text_color: "#4a2530", accent_color: "#b8456a", pattern: "blossom", corners: "off" } },
+  { id: "sage-garden", name: "Sage Garden", theme: { bg_color: "#f3f6f0", text_color: "#26352b", accent_color: "#43694c", pattern: "blossom", corners: "off" } },
+  { id: "sky-linen", name: "Sky Linen", theme: { bg_color: "#f2f7fb", text_color: "#1f3347", accent_color: "#2f6a96", pattern: "lotus", corners: "off" } },
+  { id: "royal-navy", name: "Royal Navy", theme: { bg_color: "#14233a", text_color: "#f3ead6", accent_color: "#d4af37", pattern: "diamond", corners: "on" } },
+  { id: "midnight-plum", name: "Midnight Plum", theme: { bg_color: "#2a1630", text_color: "#f6e9f3", accent_color: "#e0a0c8", pattern: "lotus", corners: "on" } },
+  { id: "terracotta", name: "Terracotta", theme: { bg_color: "#fbf1e8", text_color: "#4a2c1f", accent_color: "#a84a28", pattern: "lotus", corners: "off" } },
+  { id: "lotus-pink", name: "Lotus Pink", theme: { bg_color: "#fff5f8", text_color: "#40202f", accent_color: "#b03a70", pattern: "diamond", corners: "on" } },
+  { id: "forest-night", name: "Forest Night", theme: { bg_color: "#10241c", text_color: "#e8f1e6", accent_color: "#8fcf9d", pattern: "diamond", corners: "off" } },
+  { id: "classic-mono", name: "Classic Mono", theme: { bg_color: "#ffffff", text_color: "#1c1c1c", accent_color: "#555555" } },
 ] as const satisfies readonly ThemePreset[];
 
 function channel(v: number): number {

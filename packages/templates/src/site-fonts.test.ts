@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { FONT_ROLES, fontStack, siteFontVars } from "./site-fonts";
-import { THEME_PRESETS } from "./theme-presets";
+import { FONT_PRESETS } from "./font-presets";
 import { themeFont } from "./theme";
 import type { Theme } from "./types";
 
@@ -18,16 +18,18 @@ describe("site fonts", () => {
     const vars = siteFontVars({ ...theme, font_kh_heading: "koulen", font_kh_body: "siemreap" });
     assert.equal(vars["--font-moul"], 'var(--face-koulen, "Koulen"), "Koulen"');
     assert.equal(vars["--font-khmer"], vars["--font-battambang"]);
-    assert.equal(vars["--site-body"], 'var(--face-siemreap, "Siemreap"), "Siemreap", serif');
+    assert.equal(vars["--site-body"], '"Siemreap", serif');
     assert.equal(vars["--font-script"], undefined);
   });
 
-  it("only offers known faces in the design presets", () => {
-    for (const preset of THEME_PRESETS)
-      for (const role of FONT_ROLES) {
-        const id = (preset.theme as Theme)[role.key];
-        if (id) assert.ok(fontStack(role.key, id), `${preset.id} ${role.key}`);
-      }
+  it("leaves out the Arial stand-in for a face without Latin letters", () => {
+    assert.equal(fontStack("font_kh_body", "siemreap"), '"Siemreap"');
+    assert.equal(siteFontVars({ ...theme, font_kh_body: "siemreap" })["--font-battambang"], '"Siemreap"');
+  });
+
+  it("only offers known faces in the font presets", () => {
+    for (const preset of FONT_PRESETS)
+      for (const role of FONT_ROLES) assert.ok(fontStack(role.key, preset.fonts[role.key]), `${preset.id} ${role.key}`);
   });
 
   it("falls back to serif or sans for plain text", () => {

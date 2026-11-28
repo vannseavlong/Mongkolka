@@ -5,7 +5,8 @@
       "hosting": {
         "web": ["mongkolka"],
         "admin": ["admin-mongkolka"],
-        "couple": ["couple-mongkolka"]
+        "couple": ["couple-mongkolka"],
+        "vendor": ["vendor-mongkolka"]
       }
     }
   }

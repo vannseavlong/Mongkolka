@@ -14,7 +14,8 @@
     "deploy:web": "turbo run build --filter=web && firebase deploy --only hosting:web",
     "deploy:admin": "turbo run build --filter=admin && firebase deploy --only hosting:admin",
     "deploy:couple": "turbo run build --filter=couple && firebase deploy --only hosting:couple",
-    "deploy:all": "turbo run build --concurrency=1 --filter=web --filter=admin --filter=couple && firebase deploy --only hosting:web,hosting:admin,hosting:couple"
+    "deploy:vendor": "turbo run build --filter=vendor && firebase deploy --only hosting:vendor",
+    "deploy:all": "turbo run build --concurrency=1 --filter=web --filter=admin --filter=couple --filter=vendor && firebase deploy --only hosting:web,hosting:admin,hosting:couple,hosting:vendor"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

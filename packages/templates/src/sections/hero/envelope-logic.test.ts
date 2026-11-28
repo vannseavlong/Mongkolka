@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { ENVELOPE_STAGES as S, sequenceEnd, TYPE_ORDER, typeStart } from "./envelope-logic";
+import { ENVELOPE_STAGES as S, sequenceEnd, TYPE_ORDER, typeStart, sealBadge } from "./envelope-logic";
 
 describe("envelope storyboard", () => {
   it("runs the stages in order, each starting once the previous one has begun", () => {
@@ -44,5 +44,15 @@ describe("envelope layout css", () => {
       const rule = new RegExp(`\\${selector}\\{[^}]*position:absolute`).test(ENVELOPE_CSS);
       assert.ok(rule, `${selector} must be position:absolute`);
     }
+  });
+});
+
+describe("seal badge", () => {
+  it("falls back to the initials and the automatic colors", () => {
+    assert.deepEqual(sealBadge(undefined, "Vutha", "Sonita"), { text: "V&S", color: undefined, textColor: undefined });
+    assert.equal(sealBadge({ sealText: "  " }, "Vutha").text, "V");
+  });
+  it("uses the couple's own text and only plain colors", () => {
+    assert.deepEqual(sealBadge({ sealText: " វ&ស ", sealColor: "#B03A70", sealTextColor: "url(x)" }, "a", "b"), { text: "វ&ស", color: "#b03a70", textColor: undefined });
   });
 });

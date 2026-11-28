@@ -56,3 +56,13 @@ export function sealMonogram(first: string, second?: string): string {
   const b = initialOf(second);
   return a && b ? `${a}&${b}` : a || b;
 }
+
+export const SEAL_TEXT_MAX = 8;
+
+const color = (v: string | undefined): string | undefined => (v && /^#[0-9a-f]{6}$/i.test(v.trim()) ? v.trim().toLowerCase() : undefined);
+
+/** The seal badge: the couple's own text and colors, each falling back to automatic (`undefined` color). */
+export function sealBadge(content: { sealText?: string; sealColor?: string; sealTextColor?: string } | undefined, first: string, second?: string) {
+  const own = Array.from(content?.sealText?.trim() ?? "").slice(0, SEAL_TEXT_MAX).join("");
+  return { text: own || sealMonogram(first, second), color: color(content?.sealColor), textColor: color(content?.sealTextColor) };
+}

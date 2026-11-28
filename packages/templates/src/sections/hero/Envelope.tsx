@@ -6,8 +6,9 @@ import { styleKey } from "../../style-key";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { CINZEL_FONT, KHMER_BODY_FONT } from "../../chrome/fonts";
 import { goldStops, mixHex } from "../../chrome/gold";
+import { contrastRatio } from "../../theme-presets";
 import { hasKhmer } from "../covenant/intro-logic";
-import { sealMonogram } from "./envelope-logic";
+import { sealBadge } from "./envelope-logic";
 import { ENVELOPE_CSS, typeDelay } from "./envelope-styles";
 import { KHMER_DISPLAY_FONT, SCRIPT_FONT, useHeroText } from "./hero-text";
 
@@ -41,7 +42,7 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
     if (inView || reduce) setGo(true);
   }, [inView, reduce]);
 
-  const monogram = sealMonogram(first, second);
+  const seal = sealBadge(content, first, second);
   const g = goldStops(theme.accent_color);
   const a = theme.accent_color;
   const photo = content?.coverPhotoUrl;
@@ -72,6 +73,14 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
     "--cue": photo ? "#ffffff" : theme.text_color,
     "--seal-font": CINZEL_FONT,
   };
+
+  // A chosen seal color restyles only the seal; its letters stay readable (dark or white) unless the couple picks one.
+  const sealStops = seal.color ? goldStops(seal.color) : null;
+  const darkInk = sealStops ? mixHex(sealStops.lo, "#000000", 55) : "";
+  const sealVars = {
+    ...(sealStops && { "--foil": sealStops.mid, "--foil-hi": sealStops.hi, "--foil-lo": sealStops.lo, "--foil-ink": (contrastRatio(seal.color!, "#ffffff") ?? 0) > (contrastRatio(seal.color!, darkInk) ?? 0) ? "#ffffff" : darkInk }),
+    ...(seal.textColor && { "--foil-ink": seal.textColor }),
+  } as CSSProperties;
 
   const t = (i: number): Vars => ({ "--d": typeDelay(i) });
 
@@ -135,8 +144,8 @@ export function HeroEnvelope({ couple, theme, content }: HeroEnvelopeProps) {
           <i className="out" />
           <i className="in" />
         </div>
-        <div aria-hidden className="he2-seal" data-two={monogram.length > 1 ? "" : undefined}>
-          {monogram}
+        <div aria-hidden className="he2-seal" data-two={seal.text.length > 1 ? "" : undefined} data-long={Array.from(seal.text).length > 4 ? "" : undefined} style={sealVars}>
+          {seal.text}
         </div>
       </div>
 

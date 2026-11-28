@@ -46,6 +46,7 @@ export const LIMITS = {
   openingButton: 60,
   mapCaption: 200,
   mapPlace: 200,
+  sealText: 8,
   guestbookIntro: 300,
   noteTitle: 80,
   noteBody: 600,
@@ -323,10 +324,24 @@ export function validateImageUrl(value: unknown, field: string): string | undefi
 }
 
 /** The hero's own banners: one for tall screens, one for wide. The profile cover photo stays the fallback. */
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+/** Optional `#rrggbb`; anything else is rejected because the value reaches CSS on the public page. */
+function optColor(source: Obj, key: string, path: string): string | undefined {
+  const value = optString(source, key, 7, path);
+  if (value === undefined) return undefined;
+  if (!HEX_COLOR.test(value)) throw new Error(`${path}.${key} must be a color like #aabbcc`);
+  return value.toLowerCase();
+}
+
 function cleanHero(content: Obj): Obj {
   return compact({
     portraitUrl: validateImageUrl(content.portraitUrl, "content.portraitUrl"),
     landscapeUrl: validateImageUrl(content.landscapeUrl, "content.landscapeUrl"),
+    // The envelope style's seal badge; empty keeps it automatic.
+    sealText: optString(content, "sealText", LIMITS.sealText, "content"),
+    sealColor: optColor(content, "sealColor", "content"),
+    sealTextColor: optColor(content, "sealTextColor", "content"),
   });
 }
 

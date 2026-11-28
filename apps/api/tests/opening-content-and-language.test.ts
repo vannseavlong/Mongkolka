@@ -131,3 +131,11 @@ describe("section titles", () => {
     assert.throws(() => validateSectionTitle({ en: "x".repeat(SECTION_TITLE_MAX + 1) }), /at most/);
   });
 });
+
+describe("hero seal badge", () => {
+  it("keeps the badge text and colors, and rejects anything that is not a plain color", () => {
+    assert.deepEqual(validateSectionContent("hero", { sealText: " វ&ស ", sealColor: "#B03A70", sealTextColor: "" }), { sealText: "វ&ស", sealColor: "#b03a70" });
+    assert.throws(() => validateSectionContent("hero", { sealText: "x".repeat(9) }));
+    for (const sealColor of ["red", "#fff", "#aabbcc;background:url(x)"]) assert.throws(() => validateSectionContent("hero", { sealColor }), sealColor);
+  });
+});

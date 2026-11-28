@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { GuestsDialogs } from "./components/guests-dialogs";
 import { GuestsPrimaryButtons } from "./components/guests-primary-buttons";
@@ -33,16 +34,12 @@ export function Guests() {
 
   return (
     <GuestsProvider>
-      <Main>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Guests</h1>
-            <p className="text-muted-foreground">
-              {confirmed} confirmed of {guests.length} invited
-            </p>
-          </div>
-          <GuestsPrimaryButtons />
-        </div>
+      <PageHeader
+        title="Guests"
+        description={`${confirmed} confirmed of ${guests.length} invited`}
+        actions={<GuestsPrimaryButtons />}
+      />
+      <Main fluid>
         {(receivedCount > 0 || toConfirm > 0) && (
           <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-1 rounded-lg border bg-muted/40 px-4 py-3 text-sm">
             <span className="font-medium">Gifts</span>

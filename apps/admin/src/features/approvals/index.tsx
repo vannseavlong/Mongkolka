@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { User } from "@/features/users/data/schema";
 import { ApprovalsDialogs } from "./components/approvals-dialogs";
@@ -13,11 +14,8 @@ export function Approvals() {
 
   return (
     <ApprovalsProvider>
-      <Main>
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight">Approvals</h1>
-          <p className="text-muted-foreground">Couples and vendors waiting to be approved.</p>
-        </div>
+      <PageHeader title="Approvals" description="Couples and vendors waiting to be approved." />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <ApprovalsTable data={pending} />
       </Main>

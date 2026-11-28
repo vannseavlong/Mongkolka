@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { CouplesDialogs } from "./components/couples-dialogs";
 import { CouplesProvider } from "./components/couples-provider";
@@ -12,11 +13,8 @@ export function Couples() {
 
   return (
     <CouplesProvider>
-      <Main>
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold tracking-tight">Couples</h1>
-          <p className="text-muted-foreground">Every approved couple account.</p>
-        </div>
+      <PageHeader title="Couples" description="Every approved couple account." />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <CouplesTable data={data?.couples ?? []} />
       </Main>

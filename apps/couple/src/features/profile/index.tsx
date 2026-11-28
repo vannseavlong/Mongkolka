@@ -45,7 +45,7 @@ export function Profile() {
   return (
     <>
       <ProfileSaveBar formId={FORM_ID} dirty={isDirty} saving={isSubmitting} onDiscard={() => form.reset()} />
-      <Main>
+      <Main fluid>
         {loading && <ProfileSkeleton />}
 
         {!loading && !data && (
@@ -68,9 +68,6 @@ export function Profile() {
             <div className="flex min-w-0 max-w-3xl flex-1 flex-col gap-6">
               <Form {...form}>
                 <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-                  <p className="text-muted-foreground">
-                    This is what appears on your website and invitations. Changes go live when you save.
-                  </p>
                   <CoupleSection control={form.control} />
                   <PhotosSection control={form.control} />
                   <StorySection control={form.control} />

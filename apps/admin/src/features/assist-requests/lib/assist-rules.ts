@@ -1,30 +1,10 @@
 import type { AssistRequest, AssistStatus } from "../data/schema";
 
-export type Tab = "pending" | "approved" | "closed";
-
-export const TABS: Array<{ id: Tab; label: string; empty: string }> = [
-  { id: "pending", label: "Pending", empty: "No couples are waiting for help." },
-  { id: "approved", label: "Approved", empty: "You are not helping any couple right now." },
-  { id: "closed", label: "Closed", empty: "No closed requests yet." },
-];
-
-/** The API filters on one status. "Closed" covers four, so it reads everything and filters here. */
-export const apiStatusFor = (tab: Tab): AssistStatus | undefined => (tab === "closed" ? undefined : tab);
-
-const CLOSED: AssistStatus[] = ["declined", "revoked", "cancelled", "expired"];
-
 /** An approval can run out while the page is open, so "approved" is only believed until its expiry. Unreadable means expired. */
 export function currentStatus(r: Pick<AssistRequest, "status" | "expiresAt">, now: Date): AssistStatus {
   if (r.status !== "approved") return r.status;
   const end = r.expiresAt ? new Date(r.expiresAt).getTime() : NaN;
   return Number.isFinite(end) && end > now.getTime() ? "approved" : "expired";
-}
-
-export function inTab(r: Pick<AssistRequest, "status" | "expiresAt">, tab: Tab, now: Date): boolean {
-  const status = currentStatus(r, now);
-  // An approval that has just expired stays where the admin saw it, with its buttons gone.
-  if (tab === "approved") return r.status === "approved";
-  return tab === "closed" ? CLOSED.includes(status) : status === tab;
 }
 
 export const STATUS_LABEL: Record<AssistStatus, string> = {

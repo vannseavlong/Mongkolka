@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { MilestonesDialogs } from "./components/milestones-dialogs";
 import { MilestonesPrimaryButtons } from "./components/milestones-primary-buttons";
@@ -15,16 +16,12 @@ export function Milestones() {
 
   return (
     <MilestonesProvider>
-      <Main>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Milestones</h1>
-            <p className="text-muted-foreground">
-              {done} of {milestones.length} done
-            </p>
-          </div>
-          <MilestonesPrimaryButtons />
-        </div>
+      <PageHeader
+        title="Milestones"
+        description={`${done} of ${milestones.length} done`}
+        actions={<MilestonesPrimaryButtons />}
+      />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <MilestonesTimeline data={milestones} />
       </Main>

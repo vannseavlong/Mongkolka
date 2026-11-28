@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { SectionComponentsDialogs } from "./components/section-components-dialogs";
 import { SectionComponentsPrimaryButtons } from "./components/section-components-primary-buttons";
@@ -13,17 +14,12 @@ export function SectionComponents() {
 
   return (
     <SectionComponentsProvider>
-      <Main>
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Section Components</h1>
-            <p className="text-muted-foreground">
-              The interchangeable variants each website section can render, e.g. the four
-              &ldquo;opening&rdquo; entrance animations.
-            </p>
-          </div>
-          <SectionComponentsPrimaryButtons />
-        </div>
+      <PageHeader
+        title="Section Components"
+        description="The interchangeable variants each website section can render, e.g. the four “opening” entrance animations."
+        actions={<SectionComponentsPrimaryButtons />}
+      />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <SectionComponentsTable data={data?.components ?? []} />
       </Main>

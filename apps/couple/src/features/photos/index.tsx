@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { DriveReconnectBanner } from "@/features/storage/components/drive-reconnect-banner";
 import { PhotoGrid } from "./components/photo-grid";
@@ -29,57 +30,56 @@ export function Photos() {
   ];
 
   return (
-    <Main>
-      <div className="mb-5">
-        <h1 className="text-2xl font-bold tracking-tight">Guestbook</h1>
-        <p className="text-muted-foreground">Photos and wishes your guests share on your wedding website.</p>
-      </div>
+    <>
+      <PageHeader title="Guestbook" description="Photos and wishes your guests share on your wedding website." />
+      <Main fluid>
 
-      <DriveReconnectBanner />
+        <DriveReconnectBanner />
 
-      {profile.data && (
-        // keyed so the form re-seeds from the server value after a save/refetch
-        <PhotoSettingsCard key={JSON.stringify(profile.data.profile)} settings={profile.data.profile} />
-      )}
+        {profile.data && (
+          // keyed so the form re-seeds from the server value after a save/refetch
+          <PhotoSettingsCard key={JSON.stringify(profile.data.profile)} settings={profile.data.profile} />
+        )}
 
-      <div className="mt-8">
-        <div role="tablist" className="mb-4 flex gap-1 overflow-x-auto border-b">
-          {tabs.map((t) => (
-            <button
-              key={t.id}
-              role="tab"
-              aria-selected={tab === t.id}
-              onClick={() => setTab(t.id)}
-              className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition ${
-                tab === t.id
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-              <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{t.count}</span>
-              {t.pending > 0 && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
-                  {t.pending} to review
-                </span>
-              )}
-            </button>
-          ))}
+        <div className="mt-8">
+          <div role="tablist" className="mb-4 flex gap-1 overflow-x-auto border-b">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => setTab(t.id)}
+                className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition ${
+                  tab === t.id
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t.label}
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{t.count}</span>
+                {t.pending > 0 && (
+                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+                    {t.pending} to review
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {tab === "photos" && (
+            <>
+              {photos.error && <p className="text-destructive">{photos.error}</p>}
+              <PhotoGrid photos={photoList} onChanged={photos.refetch} />
+            </>
+          )}
+          {tab === "wishes" && (
+            <>
+              {wishes.error && <p className="text-destructive">{wishes.error}</p>}
+              <WishesList wishes={wishList} photoUrls={photoUrls} onChanged={wishes.refetch} />
+            </>
+          )}
         </div>
-
-        {tab === "photos" && (
-          <>
-            {photos.error && <p className="text-destructive">{photos.error}</p>}
-            <PhotoGrid photos={photoList} onChanged={photos.refetch} />
-          </>
-        )}
-        {tab === "wishes" && (
-          <>
-            {wishes.error && <p className="text-destructive">{wishes.error}</p>}
-            <WishesList wishes={wishList} photoUrls={photoUrls} onChanged={wishes.refetch} />
-          </>
-        )}
-      </div>
-    </Main>
+      </Main>
+    </>
   );
 }

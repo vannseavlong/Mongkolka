@@ -8,7 +8,7 @@ import { SidebarProvider, SidebarInset } from "@mongkolka/ui/sidebar";
 import { Header } from "@mongkolka/ui/layout/header";
 import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
-import { HeaderSlot } from "@/components/layout/header-slot";
+import { HeaderSlot } from "@mongkolka/ui/layout/page-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AssistBanner } from "@/features/assist/components/assist-banner";
 import { AssistEnded } from "@/features/assist/components/assist-ended";

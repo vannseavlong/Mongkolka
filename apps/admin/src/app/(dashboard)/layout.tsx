@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SWRConfig } from "swr";
 import { SidebarProvider, SidebarInset } from "@mongkolka/ui/sidebar";
 import { Header } from "@mongkolka/ui/layout/header";
+import { HeaderSlot } from "@mongkolka/ui/layout/page-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { getToken } from "@/lib/auth";
 
@@ -33,7 +34,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <Header fixed />
+          <Header fixed>
+            <HeaderSlot />
+          </Header>
           {children}
         </SidebarInset>
       </SidebarProvider>

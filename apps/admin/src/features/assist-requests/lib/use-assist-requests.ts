@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { mutate as mutateGlobal } from "swr";
 import useSWRInfinite from "swr/infinite";
 import { api, ApiError } from "@/lib/api";
 import { useApiQuery } from "@/lib/use-api-query";
 import { assistListPath } from "../data/assist-requests-api";
-import { toAssistRequest, type AssistPageDto } from "../data/schema";
-import { apiStatusFor, countLabel, inTab, type Tab } from "./assist-rules";
+import { toAssistRequest, type AssistPageDto, type AssistRequest } from "../data/schema";
+import { countLabel } from "./assist-rules";
+import { toRequestRow, type RequestRow } from "./request-rows";
 
 const PENDING_PATH = assistListPath({ status: "pending" });
 
@@ -27,32 +28,40 @@ export function useNow(intervalMs = 30_000): Date {
   return now;
 }
 
-export function useAssistRequests(tab: Tab, now: Date) {
+/** Every status, newest first, one page at a time. */
+export function useAssistRequests() {
   const { data, error, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite<AssistPageDto>(
     (index, previous: AssistPageDto | null) => {
       if (previous && !previous.next_cursor) return null;
-      return assistListPath({ status: apiStatusFor(tab), cursor: index === 0 ? null : previous?.next_cursor });
+      return assistListPath({ cursor: index === 0 ? null : previous?.next_cursor });
     },
     (path: string) => api.get<AssistPageDto>(path),
-    // The couple can cancel or revoke at any time, so a tab that is opened again is read again.
+    // The couple can cancel or revoke at any time, so a page that is opened again is read again.
     { revalidateOnMount: true },
   );
 
-  const pages = data ?? [];
-  const requests = pages
-    .flatMap((page) => page.requests)
-    .map(toAssistRequest)
-    .filter((r) => inTab(r, tab, now));
+  const requests = useMemo(() => (data ?? []).flatMap((page) => page.requests).map(toAssistRequest), [data]);
 
   return {
     requests,
     loading: isLoading,
-    loadingMore: !isLoading && isValidating && pages.length < size,
+    loadingMore: !isLoading && isValidating && (data?.length ?? 0) < size,
     error: error ? (error instanceof ApiError ? error.message : "Something went wrong") : null,
     forbidden: error instanceof ApiError && error.status === 403,
-    hasMore: Boolean(pages.at(-1)?.next_cursor),
+    hasMore: Boolean(data?.at(-1)?.next_cursor),
     loadMore: () => void setSize(size + 1),
     /** After any action: this list and the sidebar count. */
     refresh: () => Promise.all([mutate(), mutateGlobal(PENDING_PATH)]),
   };
+}
+
+/**
+ * Table rows. The array only changes when a row would look different, because a new array sends the table back to
+ * its first page and the clock ticks every 30 seconds.
+ */
+export function useRequestRows(requests: AssistRequest[], now: Date): RequestRow[] {
+  const rows = requests.map((r) => toRequestRow(r, now));
+  const key = JSON.stringify(rows);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` is the content of `rows`
+  return useMemo(() => rows, [key]);
 }

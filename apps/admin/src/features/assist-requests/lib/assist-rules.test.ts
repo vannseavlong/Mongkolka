@@ -1,8 +1,9 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { toAssistRequest } from "../data/schema";
-import { actionsFor, countLabel, currentStatus, inTab, isSafeEditorUrl, reasonError, timeLeft } from "./assist-rules";
+import { actionsFor, countLabel, currentStatus, isSafeEditorUrl, reasonError, timeLeft } from "./assist-rules";
 import { openInNewTab, type EditorTab } from "./open-editor";
+import { toRequestRow } from "./request-rows";
 
 const NOW = new Date("2026-11-27T10:00:00.000Z");
 const approved = (expiresAt: string | null) => ({ status: "approved" as const, expiresAt });
@@ -23,14 +24,6 @@ describe("status and actions", () => {
     for (const status of ["declined", "revoked", "cancelled", "expired"] as const) {
       assert.equal(actionsFor({ status, expiresAt: live.expiresAt }, NOW).openEditor, false);
     }
-  });
-  it("puts each status in its tab", () => {
-    for (const status of ["declined", "revoked", "cancelled", "expired"] as const) {
-      assert.equal(inTab({ status, expiresAt: null }, "closed", NOW), true);
-      assert.equal(inTab({ status, expiresAt: null }, "pending", NOW), false);
-    }
-    assert.equal(inTab(live, "closed", NOW), false);
-    assert.equal(inTab(approved("2026-11-26T00:00:00.000Z"), "approved", NOW), true);
   });
 });
 
@@ -112,5 +105,27 @@ describe("toAssistRequest", () => {
     assert.equal(mapped.id, "r1");
     assert.equal(mapped.coupleName, "A & B");
     assert.equal(mapped.requestedAt, NOW.toISOString());
+  });
+});
+
+describe("toRequestRow", () => {
+  const base = {
+    id: "r1", coupleName: "A & B", note: "help", requestedAt: NOW.toISOString(), decidedAt: null,
+    declineReason: null, expiresAt: "2026-12-01T10:00:00.000Z", revokedAt: null,
+  };
+  it("shows when live access ends and how long is left", () => {
+    const row = toRequestRow({ ...base, status: "approved" }, NOW);
+    assert.deepEqual([row.status, row.accessEndsAt, row.accessLeft], ["approved", base.expiresAt, "4 days left"]);
+  });
+  it("turns a run-out approval into expired, so the status filter finds it", () => {
+    const row = toRequestRow({ ...base, status: "approved" }, new Date("2026-12-02T00:00:00.000Z"));
+    assert.deepEqual([row.status, row.accessEndsAt, row.accessLeft], ["expired", base.expiresAt, ""]);
+  });
+  it("uses the revoke time for revoked access, and no date when access never started", () => {
+    const revokedAt = "2026-11-27T09:00:00.000Z";
+    assert.equal(toRequestRow({ ...base, status: "revoked", revokedAt }, NOW).accessEndsAt, revokedAt);
+    for (const status of ["pending", "declined", "cancelled"] as const) {
+      assert.equal(toRequestRow({ ...base, status }, NOW).accessEndsAt, null);
+    }
   });
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { ServicesDialogs } from "./components/services-dialogs";
 import { ServicesPrimaryButtons } from "./components/services-primary-buttons";
@@ -13,11 +14,8 @@ export function Services() {
 
   return (
     <ServicesProvider>
-      <Main>
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Services</h1>
-          <ServicesPrimaryButtons />
-        </div>
+      <PageHeader title="Services" actions={<ServicesPrimaryButtons />} />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <ServicesTable data={data?.services ?? []} />
       </Main>

@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@mongkolka/ui/card";
 import { Skeleton } from "@mongkolka/ui/skeleton";
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { VendorProfile } from "@/features/profile/data/schema";
 import type { PortfolioItem } from "@/features/portfolio/data/schema";
@@ -36,28 +37,27 @@ export function Overview() {
   ];
 
   return (
-    <Main>
-      <div className="flex flex-col gap-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            {profileLoading ? "Welcome" : `Welcome, ${profileData?.profile.business_name ?? "there"}`}
-          </h1>
-          <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your listing.</p>
+    <>
+      <PageHeader
+        title={profileLoading ? "Welcome" : `Welcome, ${profileData?.profile.business_name ?? "there"}`}
+        description="Here's what's happening with your listing."
+      />
+      <Main fluid>
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {stats.map((stat) => (
+              <Card key={stat.label}>
+                <CardHeader>
+                  <CardTitle className="text-sm font-normal text-muted-foreground">{stat.label}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {stat.loading ? <Skeleton className="h-8 w-16" /> : <p className="text-3xl font-medium">{stat.value ?? 0}</p>}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <Card key={stat.label}>
-              <CardHeader>
-                <CardTitle className="text-sm font-normal text-muted-foreground">{stat.label}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {stat.loading ? <Skeleton className="h-8 w-16" /> : <p className="text-3xl font-medium">{stat.value ?? 0}</p>}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </Main>
+      </Main>
+    </>
   );
 }

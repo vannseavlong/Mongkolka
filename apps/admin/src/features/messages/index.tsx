@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { MessagesDialogs } from "./components/messages-dialogs";
 import { MessagesProvider } from "./components/messages-provider";
@@ -14,16 +15,11 @@ export function Messages() {
 
   return (
     <MessagesProvider>
-      <Main>
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Messages</h1>
-            <p className="text-muted-foreground">
-              Submissions from the public Contact page.
-              {unreadCount > 0 && ` ${unreadCount} unread.`}
-            </p>
-          </div>
-        </div>
+      <PageHeader
+        title="Messages"
+        description={`Submissions from the public Contact page.${unreadCount > 0 ? ` ${unreadCount} unread.` : ""}`}
+      />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <MessagesTable data={messages} />
       </Main>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { PortfolioDialogs } from "./components/portfolio-dialogs";
 import { PortfolioGrid } from "./components/portfolio-grid";
@@ -13,11 +14,8 @@ export function Portfolio() {
 
   return (
     <PortfolioProvider>
-      <Main>
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Portfolio</h1>
-          <PortfolioPrimaryButtons />
-        </div>
+      <PageHeader title="Portfolio" actions={<PortfolioPrimaryButtons />} />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <PortfolioGrid data={data?.items ?? []} />
       </Main>

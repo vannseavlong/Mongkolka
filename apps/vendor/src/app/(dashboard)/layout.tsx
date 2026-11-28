@@ -6,6 +6,7 @@ import { SWRConfig } from "swr";
 import { Clock3, ShieldOff } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@mongkolka/ui/sidebar";
 import { Header } from "@mongkolka/ui/layout/header";
+import { HeaderSlot } from "@mongkolka/ui/layout/page-header";
 import { Badge } from "@mongkolka/ui/badge";
 import { Button } from "@mongkolka/ui/button";
 import { AppSidebar } from "@/components/layout/app-sidebar";
@@ -114,7 +115,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
-          <Header fixed />
+          <Header fixed>
+            <HeaderSlot />
+          </Header>
           {children}
         </SidebarInset>
       </SidebarProvider>

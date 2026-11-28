@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import { BudgetDialogs } from "./components/budget-dialogs";
 import { BudgetPrimaryButtons } from "./components/budget-primary-buttons";
@@ -16,16 +17,12 @@ export function Budget() {
 
   return (
     <BudgetProvider>
-      <Main>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Budget</h1>
-            <p className="text-muted-foreground">
-              ${totalSpent.toLocaleString()} spent of ${totalAllocated.toLocaleString()} allocated
-            </p>
-          </div>
-          <BudgetPrimaryButtons />
-        </div>
+      <PageHeader
+        title="Budget"
+        description={`$${totalSpent.toLocaleString()} spent of $${totalAllocated.toLocaleString()} allocated`}
+        actions={<BudgetPrimaryButtons />}
+      />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <BudgetTable data={categories} />
       </Main>

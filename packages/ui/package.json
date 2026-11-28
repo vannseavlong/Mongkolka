@@ -12,6 +12,7 @@
     "./layout/nav-group": "./src/components/layout/nav-group.tsx",
     "./layout/nav-types": "./src/components/layout/nav-types.ts",
     "./layout/header": "./src/components/layout/header.tsx",
+    "./layout/page-header": "./src/components/layout/page-header.tsx",
     "./layout/main": "./src/components/layout/main.tsx",
     "./layout/brand-mark": "./src/components/layout/brand-mark.tsx",
     "./hooks/use-dialog-state": "./src/hooks/use-dialog-state.ts",

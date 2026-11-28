@@ -1,6 +1,7 @@
 "use client";
 
 import { Main } from "@mongkolka/ui/layout/main";
+import { PageHeader } from "@mongkolka/ui/layout/page-header";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { BudgetCategory } from "@/features/budget/data/schema";
 import { ChecklistDialogs } from "./components/checklist-dialogs";
@@ -19,16 +20,12 @@ export function Checklist() {
 
   return (
     <ChecklistProvider>
-      <Main>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Checklist</h1>
-            <p className="text-muted-foreground">
-              {completed} of {items.length} tasks done
-            </p>
-          </div>
-          <ChecklistPrimaryButtons />
-        </div>
+      <PageHeader
+        title="Checklist"
+        description={`${completed} of ${items.length} tasks done`}
+        actions={<ChecklistPrimaryButtons />}
+      />
+      <Main fluid>
         {error && <p className="text-destructive">{error}</p>}
         <ChecklistTable data={items} categories={categoryData?.categories ?? []} />
       </Main>

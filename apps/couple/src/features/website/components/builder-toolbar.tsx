@@ -1,6 +1,6 @@
 "use client";
 
-import { HeaderContent } from "@/components/layout/header-slot";
+import { HeaderContent } from "@mongkolka/ui/layout/page-header";
 import type { WebsiteSettings } from "../data/schema";
 import { PublishPanel } from "./publish-panel";
 

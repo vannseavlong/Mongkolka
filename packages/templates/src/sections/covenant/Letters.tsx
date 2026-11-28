@@ -1,10 +1,11 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { CoupleInfo, LettersContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 import { KHMER_BODY_FONT, MOUL_FONT } from "../../chrome/fonts";
 import { goldStops, withAlpha } from "../../chrome/gold";
+import { LetterFrame, LetterLotus } from "./letter-frame";
 import { Blossom, Cross } from "./cross";
 import { COVENANT_CSS } from "./covenant-styles";
 import { hasKhmer } from "./intro-logic";
@@ -59,39 +60,42 @@ function Signature({ couple, theme }: { couple: CoupleInfo; theme: Theme }) {
 
 function useLetters(content?: LettersContent) {
   const { t, language } = useLanguage();
-  const view = letterView(content, language, t("covenant.letters.defaultThanks"));
+  const view = letterView(content, language, t("covenant.letters.defaultThanks"), t("covenant.letters.defaultApology"));
   return { t, view, heading: t("covenant.letters.heading"), apologyHeading: t("covenant.letters.apologyHeading") };
 }
 
-const hairline = (theme: Theme): CSSProperties => ({ border: `1px solid ${withAlpha(theme.accent_color, 0.4)}` });
+/** One letter: a Moul (or script) heading, the lotus, then the words, centred. */
+function Letter({ heading, items, theme }: { heading: string; items: string[]; theme: Theme }) {
+  const kh = hasKhmer(heading);
+  return (
+    <div className="text-center">
+      <h2 className="m-0 break-words" style={{ color: theme.accent_color, fontFamily: kh ? MOUL_FONT : SCRIPT, fontSize: kh ? "1.15rem" : "2.2rem", lineHeight: kh ? 2 : 1.2 }}>
+        {heading}
+      </h2>
+      <LetterLotus color={theme.accent_color} />
+      <div className="text-[15px] leading-loose">
+        <Paras items={items} />
+      </div>
+    </div>
+  );
+}
 
-/** Paper: stationery with faint ruled lines, a strip of tape, the letter, and the couple's signature. A second note sits below as a small card. */
-export function CovenantLettersPaper({ couple, theme, content }: CovenantLettersProps) {
+/** Paper: both letters on one card, like a printed invitation: the thank-you above the apology inside a notched double frame. */
+export function CovenantLettersPaper({ theme, content }: CovenantLettersProps) {
   const { view, heading, apologyHeading } = useLetters(content);
   const g = goldStops(theme.accent_color);
-  const ruled = `repeating-linear-gradient(180deg, transparent 0 31px, ${withAlpha(theme.accent_color, 0.12)} 31px 32px)`;
   return (
     <Shell theme={theme}>
-      <div className="relative mx-auto max-w-xl" style={{ transform: "rotate(-.6deg)" }}>
-        <span aria-hidden className="absolute -top-3 left-1/2 z-10 h-6 w-24 -translate-x-1/2 rotate-1" style={{ background: withAlpha(g.mid, 0.3) }} />
-        <article className="px-6 pb-8 pt-10 text-left sm:px-10" style={{ backgroundColor: "#fffdf8", backgroundImage: ruled, boxShadow: "0 24px 38px -22px rgba(70,40,40,.55)", ...hairline(theme), lineHeight: "32px", fontSize: 16 }}>
-          <h2 className="m-0 mb-4 text-center" style={{ color: theme.accent_color, fontFamily: SCRIPT, fontSize: "2.4rem", lineHeight: 1.2 }}>
-            {heading}
-          </h2>
-          <Paras items={view.thanks} />
-          <div className="text-right">
-            <Signature couple={couple} theme={theme} />
-          </div>
-        </article>
-      </div>
-      {view.apology.length > 0 && (
-        <div className="mx-auto mt-8 max-w-md rounded-2xl p-5 text-left text-[15px] leading-relaxed" style={{ backgroundColor: "#fff", ...hairline(theme) }}>
-          <p className="m-0 mb-2 text-sm font-semibold" style={{ color: theme.accent_color }}>
-            {apologyHeading}
-          </p>
-          <Paras items={view.apology} />
-        </div>
-      )}
+      <article className="mx-auto max-w-md p-3" style={{ backgroundColor: "#fffaf7", color: "#4a3238", borderRadius: 8, boxShadow: "0 24px 38px -22px rgba(70,40,40,.45)" }}>
+        <LetterFrame color={g.mid}>
+          <Letter theme={theme} heading={heading} items={view.thanks} />
+          {view.apology.length > 0 && (
+            <div className="mt-9">
+              <Letter theme={theme} heading={apologyHeading} items={view.apology} />
+            </div>
+          )}
+        </LetterFrame>
+      </article>
     </Shell>
   );
 }

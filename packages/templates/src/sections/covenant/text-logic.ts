@@ -16,14 +16,14 @@ export const paragraphs = (text: string): string[] => text.split(/\n{2,}/).map((
 export interface LetterView {
   /** The thank-you letter's paragraphs (the built-in thanks when the couple wrote none). */
   thanks: string[];
-  /** The couple's second note (apology) paragraphs, or none. */
+  /** The apology's paragraphs (the built-in apology when the couple wrote none). */
   apology: string[];
 }
 
-export function letterView(content: LettersContent | undefined, language: Language, builtInThanks: string): LetterView {
+export function letterView(content: LettersContent | undefined, language: Language, builtInThanks: string, builtInApology = ""): LetterView {
   return {
     thanks: paragraphs(pickText(content?.gratitudeKh, content?.gratitudeEn, language, builtInThanks)),
-    apology: paragraphs(pickText(content?.apologyKh, content?.apologyEn, language)),
+    apology: paragraphs(pickText(content?.apologyKh, content?.apologyEn, language, builtInApology)),
   };
 }
 

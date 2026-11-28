@@ -96,7 +96,7 @@ export const SectionPreview = memo(function SectionPreview({
               buildContent={() => content}
               guestGreeting="Guest"
               coverPreview
-              extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : {})}
+              extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {} } : sectionKey === "guestbook" ? { photosHref: "#", wishesHref: "#" } : {})}
             />
           </LanguageProvider>
         </div>

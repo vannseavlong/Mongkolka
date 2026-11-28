@@ -4,10 +4,11 @@ import { MOUL_FONT } from "../../chrome/fonts";
 import { goldStops, mixHex, withAlpha } from "../../chrome/gold";
 import { DEFAULT_ICONS } from "../khmer/ornaments/icons";
 import { foilTextGradient, isDarkColor } from "../khmer/foil";
-import type { CrestProps, DividerProps, MediaFrameProps, OrnamentProps, SkinMedia, SkinOrnaments } from "../khmer/skin-ornament-types";
+import type { DividerProps, MediaFrameProps, OrnamentProps, SkinMedia, SkinOrnaments } from "../khmer/skin-ornament-types";
 import { PhotoBox } from "../skinned/gallery-media";
 import { buttonStyle, fieldStyle, mediaTones, noteStyle } from "../skinned/gallery-tones";
 import { Blossom, CROSS_PATH } from "./cross";
+import { KbachCrest } from "./kbach-crest";
 import { covenantPalette, PINK } from "./palette";
 
 const svgId = (prefix: string) => `${prefix}${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
@@ -64,29 +65,6 @@ function CrossDivider({ color, width = 220 }: DividerProps) {
       <g transform="translate(120 18) scale(0.17) translate(-50 -70)">
         <path d={CROSS_PATH} fill={`url(#${g})`} />
       </g>
-    </svg>
-  );
-}
-
-/** A gold ring with the monogram and a blush wreath of blossoms below. */
-function CovenantCrest({ color, ground, label, size = 104 }: CrestProps) {
-  const g = svgId("cvk");
-  const { lo, mid } = goldStops(color);
-  const long = Array.from(label).length > 5;
-  return (
-    <svg width={size} height={size} viewBox="0 0 120 120" role="img" aria-label={label} style={{ display: "block", overflow: "visible" }}>
-      <defs>
-        <GoldDef id={g} color={color} />
-      </defs>
-      <circle cx="60" cy="64" r="42" fill={ground} stroke={`url(#${g})`} strokeWidth="2" />
-      <circle cx="60" cy="64" r="36.5" fill={withAlpha(PINK.blush, 0.55)} stroke={`url(#${g})`} strokeWidth="0.7" />
-      {[-60, -30, 30, 60].map((a) => {
-        const rad = ((a + 90) * Math.PI) / 180;
-        return <Blossom key={a} x={60 + Math.cos(rad) * 42} y={64 + Math.sin(rad) * 42} r={5} petal={PINK.petal} centre={mid} />;
-      })}
-      <text x="60" y={long ? 71 : 74} textAnchor="middle" fontSize={long ? 21 : 29} fill={`url(#${g})`} stroke={lo} strokeWidth="0.15" style={{ fontFamily: SCRIPT }}>
-        {label}
-      </text>
     </svg>
   );
 }
@@ -168,7 +146,7 @@ export const COVENANT_ORNAMENTS: SkinOrnaments = {
   id: "covenant",
   Corner: CovenantCorner,
   Divider: CrossDivider,
-  Crest: CovenantCrest,
+  Crest: KbachCrest,
   icons: DEFAULT_ICONS,
   corners: true,
   inset: 6,

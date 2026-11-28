@@ -24,7 +24,7 @@ import { resolveTheme } from "./theme";
 import { SiteFonts } from "./site-fonts";
 import { resolveDecor } from "./site-decor";
 import { StackPositionProvider, limitPhotos, stackSlices } from "./sections/gallery/gallery-stack";
-import type { CoupleInfo, CoverContent, DetailsContent, GalleryContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
+import type { InvitationContent, CoupleInfo, CoverContent, DetailsContent, GalleryContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
 /** Gallery styles that draw their own "show all" button (it links to the sub-page), so none is added under them. */
 const GALLERY_OWN_LINK: ReadonlySet<string> = new Set(["gallery_covenant", "gallery_flow_covenant", "gallery_spotlight_covenant", "gallery_polaroid_covenant"]);
@@ -222,6 +222,8 @@ function SiteRendererBody({
   // The venue details beside the map are the same ones the details section shows.
   const detailsSection = sections.find((s) => s.section_key === "details" && s.enabled);
   const venueDetails = (detailsSection?.content ?? buildContent("details")) as DetailsContent | undefined;
+  // The footer's badge repeats the monogram typed on the invitation.
+  const monogram = (sections.find((s) => s.section_key === "invitation")?.content as InvitationContent | undefined)?.monogram;
 
   const page = (
     <GuestProvider name={guestGreeting}>
@@ -263,7 +265,7 @@ function SiteRendererBody({
             })}
           </div>
         ) : (
-          <Component key={section.section_id} couple={couple} theme={theme} content={content} {...(section.section_key === "map" ? { details: venueDetails } : {})} {...extraProps?.(section.section_key)} />
+          <Component key={section.section_id} couple={couple} theme={theme} content={content} {...(section.section_key === "map" ? { details: venueDetails } : {})} {...(section.section_key === "footer" ? { monogram } : {})} {...extraProps?.(section.section_key)} />
         );
         const hasMorePhotos = isGallery && !!galleryHref && !ownGalleryButton && ((rawContent as { photos?: unknown[] } | null | undefined)?.photos?.length ?? 0) > 0;
         const node = hasMorePhotos ? (

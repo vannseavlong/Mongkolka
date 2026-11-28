@@ -53,7 +53,7 @@ export const COVENANT_CSS = `
 .cv-verse{position:relative;z-index:3;margin-top:-56px;padding:0 16px 56px;background:linear-gradient(180deg,transparent 0,transparent 56px,var(--cv-ground) 56px)}
 .cv-verse-card{position:relative;max-width:640px;margin:0 auto;padding:48px 24px 40px;border-radius:26px;text-align:center}
 .cv-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:0;padding:0;cursor:pointer;background:transparent}
-.cv-play-btn{display:flex;width:72px;height:72px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,var(--cv-hi),var(--cv-mid) 50%,var(--cv-lo));box-shadow:0 0 0 8px rgba(255,255,255,.35),0 16px 30px -10px rgba(0,0,0,.45);transition:transform .2s ease}
+.cv-play-btn{display:flex;width:52px;height:52px;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,var(--cv-hi),var(--cv-mid) 50%,var(--cv-lo));box-shadow:0 0 0 5px rgba(255,255,255,.35),0 12px 22px -10px rgba(0,0,0,.45);transition:transform .2s ease}
 .cv-play:hover .cv-play-btn{transform:scale(1.06)}
 .cv-play:focus-visible .cv-play-btn{outline:3px solid #fff;outline-offset:4px}
 .cv-link{display:inline-flex;min-height:48px;align-items:center;justify-content:center;gap:8px;padding:0 24px;border-radius:999px;text-decoration:none;font-weight:600;transition:transform .2s ease}

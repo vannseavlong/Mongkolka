@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): rose kbach badge, corners and divider
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-kbach-kit.md
+- Branch/PR: feat/kbach-kit, merged to main (no PR)
+- What changed: Covenant monogram badge, card corners and heading dividers redrawn in carved-leaf kbach, without flames; the heading divider keeps the cross
+- Needs: web and couple deploy. Code review not run
+
 ## 2026-11-28 · [Cross] feat(couple): letter ornament and closing note
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-letters-note.md

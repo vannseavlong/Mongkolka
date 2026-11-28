@@ -14,17 +14,17 @@ export interface ThemePreset {
   theme: Theme & { font_style: FontStyle };
 }
 
-/** Named whole-site palettes. Text/bg and accent/bg are both >= 4.5:1 (WCAG AA); see contrastRatio(). */
+/** Named whole-site designs: colors and fonts (Classic Mono keeps the template's fonts). Text/bg and accent/bg are both >= 4.5:1 (WCAG AA); see contrastRatio(). */
 export const THEME_PRESETS = [
-  { id: "ivory-gold", name: "Ivory & Gold", theme: { bg_color: "#fbf7ef", text_color: "#3a2f1f", accent_color: "#8f6a1c", font_style: "serif" } },
-  { id: "blush-rose", name: "Blush Rose", theme: { bg_color: "#fdf1f2", text_color: "#4a2530", accent_color: "#b8456a", font_style: "serif" } },
-  { id: "sage-garden", name: "Sage Garden", theme: { bg_color: "#f3f6f0", text_color: "#26352b", accent_color: "#43694c", font_style: "serif" } },
-  { id: "sky-linen", name: "Sky Linen", theme: { bg_color: "#f2f7fb", text_color: "#1f3347", accent_color: "#2f6a96", font_style: "sans" } },
-  { id: "royal-navy", name: "Royal Navy", theme: { bg_color: "#14233a", text_color: "#f3ead6", accent_color: "#d4af37", font_style: "serif" } },
-  { id: "midnight-plum", name: "Midnight Plum", theme: { bg_color: "#2a1630", text_color: "#f6e9f3", accent_color: "#e0a0c8", font_style: "serif" } },
-  { id: "terracotta", name: "Terracotta", theme: { bg_color: "#fbf1e8", text_color: "#4a2c1f", accent_color: "#a84a28", font_style: "sans" } },
-  { id: "lotus-pink", name: "Lotus Pink", theme: { bg_color: "#fff5f8", text_color: "#40202f", accent_color: "#b03a70", font_style: "sans" } },
-  { id: "forest-night", name: "Forest Night", theme: { bg_color: "#10241c", text_color: "#e8f1e6", accent_color: "#8fcf9d", font_style: "sans" } },
+  { id: "ivory-gold", name: "Ivory & Gold", theme: { bg_color: "#fbf7ef", text_color: "#3a2f1f", accent_color: "#8f6a1c", font_style: "serif", font_kh_heading: "moul", font_kh_body: "battambang", font_en_heading: "cormorant", font_en_script: "great-vibes" } },
+  { id: "blush-rose", name: "Blush Rose", theme: { bg_color: "#fdf1f2", text_color: "#4a2530", accent_color: "#b8456a", font_style: "serif", font_kh_heading: "moulpali", font_kh_body: "siemreap", font_en_heading: "playfair", font_en_script: "parisienne" } },
+  { id: "sage-garden", name: "Sage Garden", theme: { bg_color: "#f3f6f0", text_color: "#26352b", accent_color: "#43694c", font_style: "serif", font_kh_heading: "moulpali", font_kh_body: "battambang", font_en_heading: "cormorant", font_en_script: "dancing" } },
+  { id: "sky-linen", name: "Sky Linen", theme: { bg_color: "#f2f7fb", text_color: "#1f3347", accent_color: "#2f6a96", font_style: "sans", font_kh_heading: "koulen", font_kh_body: "kantumruy", font_en_heading: "playfair", font_en_script: "dancing" } },
+  { id: "royal-navy", name: "Royal Navy", theme: { bg_color: "#14233a", text_color: "#f3ead6", accent_color: "#d4af37", font_style: "serif", font_kh_heading: "moul", font_kh_body: "siemreap", font_en_heading: "cinzel", font_en_script: "great-vibes" } },
+  { id: "midnight-plum", name: "Midnight Plum", theme: { bg_color: "#2a1630", text_color: "#f6e9f3", accent_color: "#e0a0c8", font_style: "serif", font_kh_heading: "moul", font_kh_body: "battambang", font_en_heading: "playfair", font_en_script: "parisienne" } },
+  { id: "terracotta", name: "Terracotta", theme: { bg_color: "#fbf1e8", text_color: "#4a2c1f", accent_color: "#a84a28", font_style: "sans", font_kh_heading: "koulen", font_kh_body: "kantumruy", font_en_heading: "cormorant", font_en_script: "dancing" } },
+  { id: "lotus-pink", name: "Lotus Pink", theme: { bg_color: "#fff5f8", text_color: "#40202f", accent_color: "#b03a70", font_style: "sans", font_kh_heading: "moul", font_kh_body: "battambang", font_en_heading: "cinzel", font_en_script: "great-vibes" } },
+  { id: "forest-night", name: "Forest Night", theme: { bg_color: "#10241c", text_color: "#e8f1e6", accent_color: "#8fcf9d", font_style: "sans", font_kh_heading: "moulpali", font_kh_body: "kantumruy", font_en_heading: "cormorant", font_en_script: "parisienne" } },
   { id: "classic-mono", name: "Classic Mono", theme: { bg_color: "#ffffff", text_color: "#1c1c1c", accent_color: "#555555", font_style: "serif" } },
 ] as const satisfies readonly ThemePreset[];
 

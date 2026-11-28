@@ -29,6 +29,10 @@ export const themeSchema = z.object({
   text_color: z.string(),
   accent_color: z.string(),
   font_style: z.string(),
+  font_kh_heading: z.string().optional(),
+  font_kh_body: z.string().optional(),
+  font_en_heading: z.string().optional(),
+  font_en_script: z.string().optional(),
 });
 
 export type Theme = z.infer<typeof themeSchema>;

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { themeFont } from "../../theme";
 import type { StoryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -20,7 +21,7 @@ export function StorySplit({ theme, content }: StorySplitProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <div className="mx-auto grid max-w-4xl gap-8 sm:grid-cols-[1fr_2fr] sm:gap-12">

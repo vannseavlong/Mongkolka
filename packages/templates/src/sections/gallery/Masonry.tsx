@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { themeFont } from "../../theme";
 import type { GalleryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -28,7 +29,7 @@ export function GalleryMasonry({ theme, content, showHeading = true }: GalleryMa
           className="mb-8 text-center text-2xl font-medium"
           style={{
             color: theme.accent_color,
-            fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+            fontFamily: themeFont(theme),
           }}
         >
           {t("section.gallery.heading")}

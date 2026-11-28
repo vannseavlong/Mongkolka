@@ -1,3 +1,4 @@
+import { themeFont } from "../../theme";
 import type { CoupleInfo, FooterContent, Theme } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 import { useLanguage } from "../../i18n";
@@ -20,7 +21,7 @@ export function FooterClassic({ theme, couple, content }: FooterClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <div className="mx-auto max-w-xl [overflow-wrap:anywhere]">

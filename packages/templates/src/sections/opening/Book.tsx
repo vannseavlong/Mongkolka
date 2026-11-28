@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { BookHeart } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { OpeningProps } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 import { useLanguage } from "../../i18n";
@@ -40,7 +41,7 @@ export function Book({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
           className="flex h-full w-full flex-col items-center justify-center gap-4 px-6 text-center"
           style={{
             color: theme.bg_color,
-            fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+            fontFamily: themeFont(theme),
             backfaceVisibility: "hidden",
           }}
           animate={{ opacity: opening ? 0 : 1 }}

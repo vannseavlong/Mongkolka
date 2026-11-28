@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Heart } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 
@@ -21,7 +22,7 @@ export function HeroPolaroid({ couple, theme, content }: HeroPolaroidProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <motion.div

@@ -1,3 +1,4 @@
+import { themeFont } from "../../theme";
 import type { GalleryContent, Theme } from "../../types";
 
 export interface GalleryGridProps {
@@ -21,7 +22,7 @@ export function GalleryGrid({ theme, content, showHeading = true }: GalleryGridP
           className="mb-8 text-center text-2xl font-medium"
           style={{
             color: theme.accent_color,
-            fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+            fontFamily: themeFont(theme),
           }}
         >
           Gallery

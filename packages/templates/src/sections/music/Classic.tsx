@@ -1,4 +1,5 @@
 import { Music2 } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { MusicContent, Theme } from "../../types";
 
 export interface MusicClassicProps {
@@ -15,7 +16,7 @@ export function MusicClassic({ theme, content }: MusicClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <Music2 className="mx-auto mb-4 size-8" style={{ color: theme.accent_color }} />

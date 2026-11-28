@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Quote } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { StoryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -21,7 +22,7 @@ export function StoryLetter({ theme, content }: StoryLetterProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <motion.div

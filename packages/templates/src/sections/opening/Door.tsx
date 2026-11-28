@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Heart } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { OpeningProps } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 import { useLanguage } from "../../i18n";
@@ -48,7 +49,7 @@ export function Door({ couple, theme, guestGreeting, onOpen }: OpeningProps) {
       />
       <motion.div
         className="relative z-10 flex flex-col items-center gap-4 px-6 text-center"
-        style={{ color: theme.accent_color, fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif" }}
+        style={{ color: theme.accent_color, fontFamily: themeFont(theme) }}
         animate={{ opacity: opening ? 0 : 1 }}
         transition={{ duration: 0.4 }}
       >

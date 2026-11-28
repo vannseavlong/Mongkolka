@@ -3,3 +3,11 @@
 @import "@mongkolka/ui/theme.css";
 @source "../../../../packages/ui/src/components/**/*.{ts,tsx}";
 @source "../../../../packages/templates/src/**/*.{ts,tsx}";
+
+/* Names the couple's font choices use (packages/templates/src/site-fonts.tsx) for faces already loaded above. */
+body {
+  --face-moul: var(--font-moul);
+  --face-battambang: var(--font-battambang);
+  --face-cinzel: var(--font-cinzel);
+  --face-great-vibes: var(--font-script);
+}

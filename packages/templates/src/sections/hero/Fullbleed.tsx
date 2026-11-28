@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Heart } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 
@@ -14,7 +15,7 @@ export interface HeroFullbleedProps {
 /** Full-bleed cover photo with the names/date overlaid at the bottom behind a scrim. */
 export function HeroFullbleed({ couple, theme, content }: HeroFullbleedProps) {
   const date = formatWeddingDate(couple.weddingDate);
-  const fontFamily = theme.font_style === "serif" ? "serif" : "sans-serif";
+  const fontFamily = themeFont(theme);
 
   if (!content?.coverPhotoUrl) {
     // Graceful degrade: no photo yet, so render the same content centered on a

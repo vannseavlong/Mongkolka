@@ -20,6 +20,7 @@ import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
 import { resolveTheme } from "./theme";
+import { SiteFonts } from "./site-fonts";
 import { StackPositionProvider, limitPhotos, stackSlices } from "./sections/gallery/gallery-stack";
 import type { CoupleInfo, CoverContent, DetailsContent, GalleryContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
@@ -103,6 +104,14 @@ export interface SiteRendererProps {
  * LanguageProvider (the section components call useLanguage() internally).
  */
 export function SiteRenderer(props: SiteRendererProps) {
+  return (
+    <SiteFonts theme={resolveTheme(props.template.default_theme, props.themeOverride, null)}>
+      <SitePage {...props} />
+    </SiteFonts>
+  );
+}
+
+function SitePage(props: SiteRendererProps) {
   const { template, sections, themeOverride, couple, guestGreeting, onCoverRevealed, coverPreview } = props;
   // The cover plays first. The rest of the site (opening gate included) mounts only when it starts to
   // reveal, so nothing underneath animates before the guest can see it.

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import { themeFont } from "../../theme";
 import type { RsvpContent, Theme } from "../../types";
 import type { RsvpSubmission } from "./Classic";
 import { useLanguage } from "../../i18n";
@@ -37,7 +38,7 @@ export function RsvpMinimal({ theme, content, onSubmit }: RsvpMinimalProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-1 text-center text-xs font-medium uppercase tracking-[0.3em] opacity-80">

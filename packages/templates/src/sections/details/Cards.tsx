@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import { Church, PartyPopper, Shirt } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { DetailsContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -64,7 +65,7 @@ export function DetailsCards({ theme, content }: DetailsCardsProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-10 text-center text-2xl font-medium" style={{ color: theme.accent_color }}>

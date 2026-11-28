@@ -1,3 +1,4 @@
+import { themeFont } from "../../theme";
 import type { Theme, VerseContent } from "../../types";
 import { useLanguage } from "../../i18n";
 import { verseView } from "../../verse-view";
@@ -18,7 +19,7 @@ export function VerseClassic({ theme, content }: VerseClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <figure className="m-0">

@@ -3,6 +3,11 @@ export interface Theme {
   text_color: string;
   accent_color: string;
   font_style: string;
+  /** Chosen font ids (see site-fonts.tsx); missing keeps the template's own face. */
+  font_kh_heading?: string;
+  font_kh_body?: string;
+  font_en_heading?: string;
+  font_en_script?: string;
 }
 
 export type PartialTheme = Partial<Theme>;

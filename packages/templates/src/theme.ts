@@ -18,3 +18,8 @@ export function resolveTheme(
     ...(sectionOverride ?? {}),
   };
 }
+
+/** Font for sections that have no face of their own: the couple's choice, else plain serif / sans. */
+export function themeFont(theme: Theme): string {
+  return `var(--site-body, ${theme.font_style === "serif" ? "serif" : "sans-serif"})`;
+}

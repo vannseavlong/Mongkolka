@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { zoomProps } from "../../photo-zoom";
 import { Calendar, ImagePlus, MapPin, Share2, X } from "lucide-react";
 import { GraceSection, Cross, GoldDivider, Reveal, FoilText, gracePalette, nameFont, DISPLAY_FONT } from "./shared";
 import { GraceFormStyle, ERROR_COLOR, cardStyle, fieldStyle, formVars, primaryButtonStyle } from "./rsvp-ui";
@@ -33,6 +34,7 @@ function ArchPhoto({ theme, src, alt, aspect }: { theme: Theme; src: string; alt
             </div>
           ) : (
             <img
+              {...zoomProps}
               src={src}
               alt={alt}
               loading="lazy"

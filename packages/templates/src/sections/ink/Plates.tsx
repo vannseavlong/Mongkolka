@@ -1,6 +1,7 @@
 "use client";
 
 import { useIsFirstInStack } from "../gallery/gallery-stack";
+import { zoomProps } from "../../photo-zoom";
 import { motion } from "motion/react";
 import type { GalleryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
@@ -44,6 +45,7 @@ export function GalleryPlates({ theme, content }: GalleryPlatesProps) {
               <div className="group relative overflow-hidden p-2" style={{ border: `1px solid ${mix(foil, 70)}` }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
+                  {...zoomProps}
                   src={src}
                   alt={`${t("ink.plate")} ${toRoman(i + 1)}`}
                   className="aspect-[4/5] w-full object-cover grayscale-[35%] transition duration-700 group-hover:scale-105 group-hover:grayscale-0"

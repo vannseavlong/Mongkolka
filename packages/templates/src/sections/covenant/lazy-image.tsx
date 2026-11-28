@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { withAlpha } from "../../chrome/gold";
+import { zoomProps } from "../../photo-zoom";
 
 export interface LazyImageProps {
   src: string;
@@ -15,6 +16,8 @@ export interface LazyImageProps {
   /** Load now (the first screen) instead of when it nears the viewport. */
   eager?: boolean;
   onFail?: () => void;
+  /** Opens full screen when tapped (needs `PhotoZoom` above). */
+  zoom?: boolean;
   className?: string;
 }
 
@@ -23,7 +26,7 @@ export interface LazyImageProps {
  * it has decoded. Native `loading="lazy"` + `decoding="async"` do the lazy part (no library needed); the fade is a
  * CSS transition on opacity/transform/filter only. Photos already in the cache show at once, without the fade.
  */
-export function LazyImage({ src, alt, tint, ratio, fill, eager, onFail, className }: LazyImageProps) {
+export function LazyImage({ src, alt, tint, ratio, fill, eager, onFail, zoom, className }: LazyImageProps) {
   const ref = useRef<HTMLImageElement>(null);
   const [ready, setReady] = useState(false);
   const done = useCallback(() => setReady(true), []);
@@ -38,7 +41,7 @@ export function LazyImage({ src, alt, tint, ratio, fill, eager, onFail, classNam
   return (
     <span className={`cv-lazy ${fill ? "cv-lazy-fill" : ""} ${className ?? ""}`} data-ready={ready ? "" : undefined} style={style}>
       {/* eslint-disable-next-line @next/next/no-img-element -- user photos on arbitrary hosts */}
-      <img ref={ref} src={src} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" referrerPolicy="no-referrer" onLoad={done} onError={onFail} />
+      <img {...(zoom ? zoomProps : {})} ref={ref} src={src} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" referrerPolicy="no-referrer" onLoad={done} onError={onFail} />
     </span>
   );
 }

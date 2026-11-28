@@ -49,6 +49,9 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
   const imgRef = useRef<HTMLImageElement>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
   const [status, setStatus] = useState<Record<string, "ok" | "error">>({});
+  /** How far the finger has pulled the photo sideways, and which way the last move went (for the entrance). */
+  const [drag, setDrag] = useState(0);
+  const [from, setFrom] = useState<-1 | 0 | 1>(0);
   const src = photos[index] ?? "";
   const state = status[src];
   const mark = useCallback((u: string, v: "ok" | "error") => setStatus((prev) => (prev[u] === v ? prev : { ...prev, [u]: v })), []);
@@ -73,6 +76,7 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
   const go = useCallback(
     (delta: number) => {
       if (total < 2) return;
+      setFrom(delta > 0 ? 1 : -1);
       onIndex((index + delta + total) % total);
     },
     [index, total, onIndex],
@@ -146,6 +150,7 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
         backgroundImage: `linear-gradient(rgba(28,14,19,0.94), rgba(28,14,19,0.94))`,
         fontFamily: DISPLAY_FONT,
         touchAction: "pinch-zoom pan-y",
+        overflow: "hidden",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -154,12 +159,21 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
         const t0 = e.touches[0];
         touch.current = e.touches.length === 1 && t0 ? { x: t0.clientX, y: t0.clientY } : null;
       }}
+      onTouchMove={(e) => {
+        const start = touch.current;
+        const at = e.touches[0];
+        if (!start || !at || e.touches.length !== 1 || total < 2) return setDrag(0);
+        const dx = at.clientX - start.x;
+        setDrag(Math.abs(dx) > Math.abs(at.clientY - start.y) ? dx : 0);
+      }}
       onTouchCancel={() => {
         touch.current = null;
+        setDrag(0);
       }}
       onTouchEnd={(e) => {
         const start = touch.current;
         touch.current = null;
+        setDrag(0);
         const end = e.changedTouches[0];
         if (!start || !end) return;
         const dx = end.clientX - start.x;
@@ -167,7 +181,7 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
         if (Math.abs(dx) >= SWIPE_PX && Math.abs(dx) > 1.5 * Math.abs(dy)) go(dx < 0 ? 1 : -1);
       }}
     >
-      <style>{"@media (prefers-reduced-motion:no-preference){.grace-lb-img{animation:grace-lb-in .35s ease-out}}@keyframes grace-lb-in{from{opacity:0}to{opacity:1}}"}</style>
+      <style>{"@media (prefers-reduced-motion:no-preference){.grace-lb-img{animation:grace-lb-in .45s cubic-bezier(.2,1.35,.35,1)}}@keyframes grace-lb-in{from{opacity:0;transform:translateX(var(--lb-from,0px)) scale(.82)}to{opacity:1;transform:none}}"}</style>
       <button ref={closeRef} type="button" onClick={onClose} aria-label={labels.close} className={`${btn} absolute right-3 top-3 sm:right-5 sm:top-5`} style={btnStyle}>
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
           <path d="M6 6l12 12M18 6L6 18" />
@@ -196,6 +210,7 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
           alt={labels.alt(index + 1, total)}
           decoding="async"
           draggable={false}
+          referrerPolicy="no-referrer"
           onLoad={() => mark(src, "ok")}
           onError={() => mark(src, "error")}
           className="grace-lb-img max-h-full max-w-full select-none object-contain"
@@ -205,6 +220,10 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
             backgroundColor: state === "ok" ? "rgba(255,255,255,0.06)" : p.blush,
             minHeight: state === "ok" ? undefined : "12rem",
             minWidth: state === "ok" ? undefined : "12rem",
+            ["--lb-from" as string]: `${from * 90}px`,
+            translate: drag ? `${drag}px 0` : undefined,
+            rotate: drag ? `${drag / 40}deg` : undefined,
+            transition: drag ? "none" : "translate .25s ease, rotate .25s ease",
           }}
         />
       )}

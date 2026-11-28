@@ -3,6 +3,7 @@
 import type { GuestbookWallProps } from "../ink/Guestbook";
 import { useLanguage } from "../../i18n";
 import { withAlpha } from "../../chrome/gold";
+import { zoomProps } from "../../photo-zoom";
 import { useSkinOrnaments } from "../khmer/skin-context";
 import { mediaFor } from "../skinned/gallery-media";
 import { MediaSection } from "../skinned/gallery-section";
@@ -43,7 +44,7 @@ export function CovenantMemories({ theme, guestbook, photosHref, wishesHref }: C
             <li key={photo.photo_id}>
               <media.Frame theme={theme} index={i} variant="gallery" aspect="aspect-[4/5]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={photo.url} alt={photo.uploader_name ?? ""} loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
+                <img {...zoomProps} src={photo.url} alt={photo.uploader_name ?? ""} loading="lazy" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
               </media.Frame>
             </li>
           ))}

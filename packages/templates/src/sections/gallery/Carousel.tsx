@@ -1,11 +1,13 @@
 "use client";
 
-import { useRef } from "react";
-import { motion } from "motion/react";
+import { useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { themeFont } from "../../theme";
 import type { GalleryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
+import { zoomProps } from "../../photo-zoom";
+import { DECK_DEPTH, DECK_SWIPE_PX, deckOffset, deckPose } from "./deck";
 
 export interface GalleryCarouselProps {
   theme: Theme;
@@ -14,20 +16,25 @@ export interface GalleryCarouselProps {
   showHeading?: boolean;
 }
 
-/** A horizontal, scroll-snapped filmstrip of photos rather than a static grid. */
+/**
+ * A stacked deck: the front photo is large, its neighbours peek out from behind, and moving on makes the next one spring
+ * forward. Swipe or use the arrows; tap the front photo for the full-screen viewer.
+ */
 export function GalleryCarousel({ theme, content, showHeading = true }: GalleryCarouselProps) {
   const { t } = useLanguage();
-  const scrollerRef = useRef<HTMLDivElement>(null);
+  const still = useReducedMotion();
+  const [front, setFront] = useState(0);
+  const start = useRef<number | null>(null);
+  const swiped = useRef(false);
   const photos = content?.photos ?? [];
   if (photos.length === 0) return null;
 
-  const scrollByCard = (dir: 1 | -1) => {
-    scrollerRef.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
-  };
+  const current = Math.min(front, photos.length - 1);
+  const step = (dir: 1 | -1) => setFront((current + dir + photos.length) % photos.length);
 
   return (
     <section
-      className={showHeading ? "py-20" : "pb-12"}
+      className={showHeading ? "overflow-hidden py-20" : "overflow-hidden pb-12"}
       style={{ backgroundColor: theme.bg_color, color: theme.text_color }}
     >
       {showHeading && (
@@ -41,51 +48,73 @@ export function GalleryCarousel({ theme, content, showHeading = true }: GalleryC
           {t("section.gallery.heading")}
         </h2>
       )}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.6 }}
-        className="relative mx-auto max-w-4xl"
-      >
+      <div className="relative mx-auto max-w-4xl">
         <div
-          ref={scrollerRef}
-          className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-6 pb-4"
-          style={{ scrollbarWidth: "none" }}
+          className="relative mx-auto aspect-[4/5] w-[68%] max-w-80 select-none"
+          style={{ touchAction: "pan-y" }}
+          onPointerDown={(e) => {
+            start.current = e.clientX;
+            swiped.current = false;
+          }}
+          onPointerUp={(e) => {
+            const dx = start.current === null ? 0 : e.clientX - start.current;
+            start.current = null;
+            if (photos.length > 1 && Math.abs(dx) >= DECK_SWIPE_PX) {
+              swiped.current = true;
+              step(dx < 0 ? 1 : -1);
+            }
+          }}
+          onPointerCancel={() => (start.current = null)}
         >
-          {photos.map((url) => (
-            // Plain <img>, not next/image — see the note in sections/hero/Classic.tsx.
-            <img
-              key={url}
-              src={url}
-              alt=""
-              className="aspect-[4/5] w-64 shrink-0 snap-center rounded-lg object-cover sm:w-80"
-            />
-          ))}
+          {photos.map((url, i) => {
+            const offset = deckOffset(i, current, photos.length);
+            const { zIndex, ...pose } = deckPose(offset);
+            return (
+              <motion.div
+                key={url}
+                className="absolute inset-0 overflow-hidden rounded-2xl shadow-xl"
+                initial={false}
+                animate={pose}
+                transition={still ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 19, mass: 0.8 }}
+                style={{ zIndex, visibility: Math.abs(offset) > DECK_DEPTH ? "hidden" : "visible", border: `3px solid ${theme.bg_color}` }}
+                // A swipe, or a tap on a card behind, moves the deck instead of opening the viewer.
+                onClick={(e) => {
+                  if (swiped.current || offset !== 0) e.preventDefault();
+                  if (!swiped.current && offset !== 0) setFront(i);
+                }}
+              >
+                {/* Plain <img>, not next/image — see the note in sections/hero/Classic.tsx. */}
+                <img {...zoomProps} tabIndex={offset === 0 ? 0 : -1} src={url} alt="" loading="lazy" draggable={false} className="h-full w-full object-cover" />
+              </motion.div>
+            );
+          })}
         </div>
         {photos.length > 1 && (
-          <div className="mt-2 flex justify-center gap-3">
+          <div className="mt-6 flex items-center justify-center gap-4">
             <button
               type="button"
               aria-label="Previous"
-              onClick={() => scrollByCard(-1)}
-              className="rounded-full border p-2"
+              onClick={() => step(-1)}
+              className="grid size-11 place-items-center rounded-full border transition-transform active:scale-90"
               style={{ borderColor: theme.accent_color, color: theme.accent_color }}
             >
               <ChevronLeft className="size-4" />
             </button>
+            <span className="min-w-14 text-center text-sm tabular-nums" aria-live="polite">
+              {current + 1} / {photos.length}
+            </span>
             <button
               type="button"
               aria-label="Next"
-              onClick={() => scrollByCard(1)}
-              className="rounded-full border p-2"
+              onClick={() => step(1)}
+              className="grid size-11 place-items-center rounded-full border transition-transform active:scale-90"
               style={{ borderColor: theme.accent_color, color: theme.accent_color }}
             >
               <ChevronRight className="size-4" />
             </button>
           </div>
         )}
-      </motion.div>
+      </div>
     </section>
   );
 }

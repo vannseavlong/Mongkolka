@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { themeFont } from "../../theme";
 import type { GalleryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
+import { zoomProps } from "../../photo-zoom";
 
 export interface GalleryMasonryProps {
   theme: Theme;
@@ -38,14 +39,16 @@ export function GalleryMasonry({ theme, content, showHeading = true }: GalleryMa
       <div className="mx-auto max-w-4xl columns-2 gap-3 sm:columns-3">
         {photos.map((url, i) => (
           <motion.img
+            {...zoomProps}
             key={url}
             // Plain <img>, not next/image — see the note in sections/hero/Classic.tsx.
             src={url}
             alt=""
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 28, scale: 0.88 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            whileTap={{ scale: 0.97 }}
             viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: (i % 6) * 0.06 }}
+            transition={{ type: "spring", stiffness: 220, damping: 18, delay: (i % 6) * 0.07 }}
             className="mb-3 w-full break-inside-avoid rounded-md object-cover"
           />
         ))}

@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] fix(templates): seamless Covenant sections
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-seamless-sections.md
+- Branch/PR: fix/seamless-sections, merged to main (no PR)
+- What changed: Covenant sites no longer show the lotus border or the tint edge between sections
+- Needs: web deployed 2026-11-28. Not checked on a real phone
+
 ## 2026-11-28 · [Web] feat(templates): reception place line on the map section
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-map-place.md

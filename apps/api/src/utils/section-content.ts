@@ -44,6 +44,7 @@ export const LIMITS = {
   openingLine: 120,
   openingTitle: 60,
   openingButton: 60,
+  invitationNotice: 200,
   mapCaption: 200,
   mapPlace: 200,
   guestbookIntro: 300,
@@ -152,6 +153,10 @@ function cleanInvitation(content: Obj): Obj {
     startsAt: validateStartsAt(content.startsAt, "startsAt"),
     greetingKh: optString(content, "greetingKh", LIMITS.greeting, "content"),
     greetingEn: optString(content, "greetingEn", LIMITS.greeting, "content"),
+    // A short line under the time (e.g. no alcohol); `hideNotice` removes a template's built-in one.
+    noticeKh: optString(content, "noticeKh", LIMITS.invitationNotice, "content"),
+    noticeEn: optString(content, "noticeEn", LIMITS.invitationNotice, "content"),
+    hideNotice: content.hideNotice === true ? true : undefined,
   });
 }
 

@@ -364,3 +364,11 @@ describe("guestbook description", () => {
     assert.throws(() => validateSectionContent("guestbook", { introEn: 5 }));
   });
 });
+
+describe("invitation notice line", () => {
+  it("keeps the line and the hide flag, and enforces the limit", () => {
+    assert.deepEqual(validateSectionContent("invitation", { noticeKh: " គ្មានសុរា ", noticeEn: "", hideNotice: "yes" }), { noticeKh: "គ្មានសុរា" });
+    assert.deepEqual(validateSectionContent("invitation", { hideNotice: true }), { hideNotice: true });
+    assert.throws(() => validateSectionContent("invitation", { noticeEn: "x".repeat(LIMITS.invitationNotice + 1) }));
+  });
+});

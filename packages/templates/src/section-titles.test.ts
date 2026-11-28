@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LanguageProvider, TextOverridesProvider, useLanguage, type Language } from "./i18n";
-import { defaultSectionTitle, hasSectionTitle, SECTION_TITLE_KEYS, titleOverrides } from "./section-titles";
+import { defaultGuestbookIntro, defaultSectionTitle, hasSectionTitle, introOverrides, SECTION_TITLE_KEYS, titleOverrides } from "./section-titles";
 
 const section = (key: "story" | "gallery" | "hero", enabled: boolean, title?: { kh?: string; en?: string } | null) => ({ section_key: key, enabled, title });
 
@@ -46,5 +46,25 @@ describe("overridden wording", () => {
     assert.ok(render("en", overrides).includes("Our photos"));
     assert.ok(render("kh", overrides).includes("កម្រងរូបភាព"), "no Khmer title typed, so the built-in Khmer is kept");
     assert.ok(render("en").includes("Gallery"));
+  });
+});
+
+describe("guestbook description", () => {
+  const guestbook = (enabled: boolean, content: unknown) => [{ section_key: "guestbook" as const, enabled, content }];
+
+  it("replaces the description of every guestbook style, only for what the couple wrote", () => {
+    const out = introOverrides(guestbook(true, { introKh: " ជូនពរ ", introEn: " " }));
+    assert.deepEqual(out["grace.guestbook.subheading"], { kh: "ជូនពរ" });
+    assert.deepEqual(out["covenant.memories.intro"], { kh: "ជូនពរ" });
+    assert.deepEqual(out["guestbook.subheading"], { kh: "ជូនពរ" });
+  });
+
+  it("changes nothing when empty or switched off", () => {
+    assert.deepEqual(introOverrides(guestbook(true, null)), {});
+    assert.deepEqual(introOverrides(guestbook(false, { introEn: "x" })), {});
+  });
+
+  it("knows the built-in text of each style", () => {
+    for (const id of ["guestbook_wall", "guestbook_grace", "guestbook_skin", "guestbook_covenant"]) assert.ok(defaultGuestbookIntro("en", id) && defaultGuestbookIntro("kh", id), id);
   });
 });

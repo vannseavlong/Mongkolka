@@ -15,7 +15,7 @@ import { storyContentFor } from "./story-view";
 import { useLanguage } from "./i18n";
 import { heroContentFor } from "./hero-photo";
 import { TextOverridesProvider } from "./i18n";
-import { titleOverrides, type SectionTitle } from "./section-titles";
+import { introOverrides, titleOverrides, type SectionTitle } from "./section-titles";
 import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
@@ -124,10 +124,10 @@ function SitePage(props: SiteRendererProps) {
   const openingContent = sections.find((s) => s.section_key === "opening")?.content as OpeningContent | undefined;
   const introCouple = applyOpeningOverrides(couple, undefined, openingContent).couple;
 
-  // The couple's own section titles replace the template's headings wherever those are drawn.
-  const titleKey = JSON.stringify(sections.map((s) => [s.section_key, s.enabled, s.title]));
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by the titles' content so the provider value stays stable
-  const overrides = useMemo(() => titleOverrides(sections), [titleKey]);
+  // The couple's own section titles and guestbook description replace the template's wording wherever it is drawn.
+  const textKey = JSON.stringify(sections.map((s) => [s.section_key, s.enabled, s.title, s.section_key === "guestbook" ? s.content : null]));
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by the texts themselves so the provider value stays stable
+  const overrides = useMemo(() => ({ ...titleOverrides(sections), ...introOverrides(sections) }), [textKey]);
 
   return (
     <TextOverridesProvider overrides={overrides}>

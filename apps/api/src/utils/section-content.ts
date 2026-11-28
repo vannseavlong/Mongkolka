@@ -46,6 +46,7 @@ export const LIMITS = {
   openingButton: 60,
   mapCaption: 200,
   mapPlace: 200,
+  guestbookIntro: 300,
   noteTitle: 80,
   noteBody: 600,
 } as const;
@@ -360,6 +361,14 @@ function cleanMap(content: Obj): Obj {
   });
 }
 
+/** `guestbook` section: the couple's own line under the heading, per language. Empty keeps the template's wording. */
+function cleanGuestbook(content: Obj): Obj {
+  return compact({
+    introKh: optString(content, "introKh", LIMITS.guestbookIntro, "content"),
+    introEn: optString(content, "introEn", LIMITS.guestbookIntro, "content"),
+  });
+}
+
 /** `note` section: a short message to guests (title and body per language). Empty fields fall back to the built-in note. */
 function cleanNote(content: Obj): Obj {
   return compact({
@@ -395,6 +404,7 @@ export function validateSectionContent(sectionKey: string, content: unknown): un
   if (sectionKey === "verse") return cleanVerse(asObject(content, "content"));
   if (sectionKey === "cover") return cleanCover(asObject(content, "content"));
   if (sectionKey === "hero") return cleanHero(asObject(content, "content"));
+  if (sectionKey === "guestbook") return cleanGuestbook(asObject(content, "content"));
   if (!(KHMER_CONTENT_SECTIONS as readonly string[]).includes(sectionKey)) return content;
   const obj = asObject(content, "content");
   if (sectionKey === "invitation") return cleanInvitation(obj);

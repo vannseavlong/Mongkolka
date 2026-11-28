@@ -23,8 +23,6 @@ export interface InvitationView {
   timeKh: string;
   timeEn: string;
   startsAt: string | undefined;
-  /** The line under the time in the viewer's language, or "". */
-  notice: string;
   isEmpty: boolean;
 }
 
@@ -41,7 +39,6 @@ export function buildInvitationView(
   couple: Pick<CoupleInfo, "partner1Name" | "partner2Name">,
   viewer: Language,
   defaultGreeting: (lang: Language) => string,
-  builtInNotice: (lang: Language) => string = () => "",
 ): InvitationView {
   const c = content ?? {};
   const families: Record<Language, { groom: FamilyView | null; bride: FamilyView | null }> = {
@@ -61,10 +58,7 @@ export function buildInvitationView(
   const englishDate = parts ? englishDateLine(parts) : "";
   const looseGreeting = blocks.length === 0 ? (viewer === "kh" ? t(c.greetingKh) || t(c.greetingEn) : t(c.greetingEn) || t(c.greetingKh)) : "";
 
-  const ownNotice = t(viewer === "kh" ? c.noticeKh : c.noticeEn) || t(viewer === "kh" ? c.noticeEn : c.noticeKh);
-
   return {
-    notice: c.hideNotice ? "" : ownNotice || builtInNotice(viewer),
     monogram: t(c.monogram) || monogramOf(couple),
     blocks,
     looseGreeting,

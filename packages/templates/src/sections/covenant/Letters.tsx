@@ -5,7 +5,7 @@ import type { CoupleInfo, LettersContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 import { KHMER_BODY_FONT, MOUL_FONT } from "../../chrome/fonts";
 import { goldStops, withAlpha } from "../../chrome/gold";
-import { LetterFrame, LetterLotus } from "./letter-frame";
+import { LetterFrame, LetterOrnament } from "./letter-frame";
 import { Blossom, Cross } from "./cross";
 import { COVENANT_CSS } from "./covenant-styles";
 import { hasKhmer } from "./intro-logic";
@@ -60,7 +60,7 @@ function Signature({ couple, theme }: { couple: CoupleInfo; theme: Theme }) {
 
 function useLetters(content?: LettersContent) {
   const { t, language } = useLanguage();
-  const view = letterView(content, language, t("covenant.letters.defaultThanks"), t("covenant.letters.defaultApology"));
+  const view = letterView(content, language, t("covenant.letters.defaultThanks"), t("covenant.letters.defaultApology"), t("covenant.letters.defaultNote"));
   return { t, view, heading: t("covenant.letters.heading"), apologyHeading: t("covenant.letters.apologyHeading") };
 }
 
@@ -72,10 +72,23 @@ function Letter({ heading, items, theme }: { heading: string; items: string[]; t
       <h2 className="m-0 break-words" style={{ color: theme.accent_color, fontFamily: kh ? MOUL_FONT : SCRIPT, fontSize: kh ? "1.15rem" : "2.2rem", lineHeight: kh ? 2 : 1.2 }}>
         {heading}
       </h2>
-      <LetterLotus color={theme.accent_color} />
+      <LetterOrnament color={theme.accent_color} />
       <div className="text-[15px] leading-loose">
         <Paras items={items} />
       </div>
+    </div>
+  );
+}
+
+/** The closing note under the letters (e.g. no alcohol), set off by a short rule. */
+function ClosingNote({ text, color }: { text: string; color: string }) {
+  if (!text) return null;
+  return (
+    <div className="mt-8 text-center">
+      <span aria-hidden className="mx-auto mb-4 block h-px w-20" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
+      <p className="m-0 break-words text-[15px] font-semibold leading-loose" style={{ color }}>
+        {text}
+      </p>
     </div>
   );
 }
@@ -94,6 +107,7 @@ export function CovenantLettersPaper({ theme, content }: CovenantLettersProps) {
               <Letter theme={theme} heading={apologyHeading} items={view.apology} />
             </div>
           )}
+          <ClosingNote text={view.note} color={theme.accent_color} />
         </LetterFrame>
       </article>
     </Shell>
@@ -126,6 +140,7 @@ export function CovenantLettersArch({ couple, theme, content }: CovenantLettersP
               <Paras items={view.apology} />
             </div>
           )}
+          <ClosingNote text={view.note} color={theme.accent_color} />
           <svg aria-hidden className="mx-auto mt-6" width="96" height="24" viewBox="-48 -12 96 24">
             <Blossom x={-26} y={0} r={8} petal={PINK.petal} centre={theme.accent_color} />
             <Blossom x={0} y={0} r={10} petal={PINK.rose} centre={theme.accent_color} />
@@ -166,6 +181,7 @@ export function CovenantLettersScript({ couple, theme, content }: CovenantLetter
             <Paras items={view.apology} />
           </div>
         )}
+        <ClosingNote text={view.note} color={theme.accent_color} />
       </div>
     </Shell>
   );

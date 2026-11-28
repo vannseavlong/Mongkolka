@@ -94,6 +94,11 @@ describe("letters, note and map text", () => {
     assert.deepEqual(letterView(undefined, "en", "Thanks", "Sorry").apology, ["Sorry"]);
     assert.deepEqual(letterView({ apologyEn: "Mine" }, "en", "Thanks", "Sorry").apology, ["Mine"]);
   });
+  it("closes with the note: the couple's words, else the built-in one, unless hidden", () => {
+    assert.equal(letterView(undefined, "en", "T", "A", "Dry").note, "Dry");
+    assert.equal(letterView({ noteEn: "Mine" }, "kh", "T", "A", "Dry").note, "Mine");
+    assert.equal(letterView({ hideNote: true, noteEn: "Mine" }, "en", "T", "A", "Dry").note, "");
+  });
   it("shows the built-in thank-you and note when nothing is written", () => {
     assert.deepEqual(letterView(undefined, "en", "Thanks").thanks, ["Thanks"]);
     const n = noteView(undefined, "en", { title: "No alcohol", body: "Please." });

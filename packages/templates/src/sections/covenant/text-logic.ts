@@ -18,12 +18,15 @@ export interface LetterView {
   thanks: string[];
   /** The apology's paragraphs (the built-in apology when the couple wrote none). */
   apology: string[];
+  /** The closing note, or "" when hidden or there is none. */
+  note: string;
 }
 
-export function letterView(content: LettersContent | undefined, language: Language, builtInThanks: string, builtInApology = ""): LetterView {
+export function letterView(content: LettersContent | undefined, language: Language, builtInThanks: string, builtInApology = "", builtInNote = ""): LetterView {
   return {
     thanks: paragraphs(pickText(content?.gratitudeKh, content?.gratitudeEn, language, builtInThanks)),
     apology: paragraphs(pickText(content?.apologyKh, content?.apologyEn, language, builtInApology)),
+    note: content?.hideNote ? "" : pickText(content?.noteKh, content?.noteEn, language, builtInNote),
   };
 }
 

@@ -16,6 +16,7 @@ import { useLanguage } from "./i18n";
 import { heroContentFor } from "./hero-photo";
 import { TextOverridesProvider } from "./i18n";
 import { introOverrides, titleOverrides, type SectionTitle } from "./section-titles";
+import { PhotoZoom } from "./photo-zoom";
 import { applyOpeningOverrides } from "./opening-overrides";
 import { useOrientation } from "./use-orientation";
 import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
@@ -132,7 +133,7 @@ function SitePage(props: SiteRendererProps) {
   return (
     <TextOverridesProvider overrides={overrides}>
       <GalleryLinkProvider link={props.galleryHref ? { href: props.galleryHref, onOpen: props.onGalleryOpen } : null}>
-      {!holding && <SiteRendererBody {...props} />}
+      <PhotoZoom theme={resolveTheme(template.default_theme, themeOverride, null)}>{!holding && <SiteRendererBody {...props} />}</PhotoZoom>
       {cover && Cover && coverPhase !== "done" && (
         <Cover
           couple={introCouple}
@@ -250,7 +251,7 @@ function SiteRendererBody({
         const ownGalleryButton = isGallery && !stacked && GALLERY_OWN_LINK.has(section.component_id ?? template.default_components.gallery ?? "");
         const content = gallery && !ownGalleryButton ? { ...gallery, photos: capped } : rawContent;
         const piece = stacked ? (
-          <Fragment key={section.section_id}>
+          <div key={section.section_id} data-zoom-group style={{ display: "contents" }}>
             {slices.map((slice, i) => {
               const Layout = resolveComponent("gallery", slice.layout, undefined) as ComponentType<{ theme: Theme; content: GalleryContent; showHeading?: boolean }> | undefined;
               // maxPhotos 24: the slice is already the size the couple asked for, so a style's own cap must not shrink it again.
@@ -260,7 +261,7 @@ function SiteRendererBody({
                 </StackPositionProvider>
               ) : null;
             })}
-          </Fragment>
+          </div>
         ) : (
           <Component key={section.section_id} couple={couple} theme={theme} content={content} {...(section.section_key === "map" ? { details: venueDetails } : {})} {...extraProps?.(section.section_key)} />
         );

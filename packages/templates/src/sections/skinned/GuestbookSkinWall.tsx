@@ -6,6 +6,7 @@ import { useLanguage } from "../../i18n";
 import { useSkinOrnaments } from "../khmer/skin-context";
 import { mediaFor } from "./gallery-media";
 import { mediaTones } from "./gallery-tones";
+import { zoomProps } from "../../photo-zoom";
 import { aspectFor, buildWall, type WallItem } from "./guestbook-wall-logic";
 
 /** A guest photo in the skin's frame; if the image fails, the frame stays with a soft blank (no broken icon). */
@@ -18,6 +19,7 @@ function WallPhoto({ theme, src, alt, index, aspect }: { theme: Theme; src: stri
       {failed ? null : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          {...zoomProps}
           src={src}
           alt={alt}
           loading="lazy"

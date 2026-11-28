@@ -16,4 +16,5 @@ export type { SkinOrnaments, OrnamentProps, DividerProps, CrestProps, IconProps,
 export { CovenantWishesPage, CovenantPhotosPage, subRoute as guestSubRoute } from "./sections/covenant";
 export type { WallStatus } from "./sections/covenant";
 export * from "./section-titles";
+export { PhotoZoom } from "./photo-zoom";
 export { GalleryAllPage, GalleryMoreLink, GalleryLinkProvider, stepPhoto } from "./gallery-page";

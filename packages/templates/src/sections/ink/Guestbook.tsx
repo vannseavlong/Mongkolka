@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { zoomProps } from "../../photo-zoom";
 import { AnimatePresence, motion } from "motion/react";
 import { Calendar, Check, ImagePlus, MapPin, Share2, X } from "lucide-react";
 import type {
@@ -376,7 +377,7 @@ export function GuestbookWall({ couple, theme, guestbook, actions, onSubmit }: G
                     >
                       {p && (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.url} alt="" className="mb-3 w-full object-cover" loading="lazy" />
+                        <img {...zoomProps} src={p.url} alt="" className="mb-3 w-full object-cover" loading="lazy" />
                       )}
                       <p className="text-lg italic leading-relaxed">“{w.message}”</p>
                       <p className="mt-3 text-[11px] uppercase tracking-[0.3em]" style={{ color: foil, fontFamily: LABEL_FONT }}>
@@ -388,7 +389,7 @@ export function GuestbookWall({ couple, theme, guestbook, actions, onSubmit }: G
                 {loosePhotos.map((p) => (
                   <li key={p.photo_id} className="mb-5 break-inside-avoid p-2" style={{ border: `1px solid ${mix(foil, 60)}` }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.url} alt="" className="w-full object-cover" loading="lazy" />
+                    <img {...zoomProps} src={p.url} alt="" className="w-full object-cover" loading="lazy" />
                     {p.uploader_name && (
                       <p className="mt-2 text-[11px] uppercase tracking-[0.3em]" style={{ color: foil, fontFamily: LABEL_FONT }}>
                         {p.uploader_name}

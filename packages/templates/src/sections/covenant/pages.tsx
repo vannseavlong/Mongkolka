@@ -13,6 +13,7 @@ import { MediaSection } from "../skinned/gallery-section";
 import { SkinCard } from "../skinned/guestbook-card";
 import { useGuestbookForm } from "../skinned/guestbook-form";
 import { SkinGuestbookForm } from "../skinned/GuestbookSkinForm";
+import { PhotoZoom } from "../../photo-zoom";
 import { COVENANT_CSS } from "./covenant-styles";
 import { Cross } from "./cross";
 import { wishesWithWords } from "./memories-logic";
@@ -89,7 +90,7 @@ function WishesBody({ theme, data, status }: Pick<PageProps, "theme" | "data" | 
   if (status === "error") return <Notice>{t("covenant.loadFailed")}</Notice>;
   if (wishes.length === 0) return <Notice>{t("covenant.wishes.empty")}</Notice>;
   return (
-    <ul className="m-0 mx-auto max-w-5xl list-none columns-1 gap-5 p-0 pt-2 sm:columns-2 lg:columns-3">
+    <ul data-zoom-group className="m-0 mx-auto max-w-5xl list-none columns-1 gap-5 p-0 pt-2 sm:columns-2 lg:columns-3">
       {wishes.map((w, i) => (
         <li key={w.wish_id} className="mb-5 break-inside-avoid">
           <WishCard theme={theme} wish={w} photo={w.photo_id ? photos.get(w.photo_id) : undefined} index={i} />
@@ -105,20 +106,16 @@ function PhotoGrid({ theme, data }: Pick<PageProps, "theme" | "data">) {
   const photos = wallPhotos(data);
   const accent = theme.accent_color;
   return (
-    <ul className="m-0 mx-auto max-w-5xl list-none columns-2 gap-3 p-0 sm:columns-3 sm:gap-4 lg:columns-4">
+    <ul data-zoom-group className="m-0 mx-auto max-w-5xl list-none columns-2 gap-3 p-0 sm:columns-3 sm:gap-4 lg:columns-4">
       {photos.map((p, i) => (
         <li key={p.photo_id} className="mb-3 break-inside-avoid sm:mb-4">
-          <a
-            href={p.url}
-            target="_blank"
-            rel="noopener noreferrer"
+          <div
             className="cv-photo-card block"
-            aria-label={p.uploader_name ? `${t("grace.guestbook.photoBy")} ${p.uploader_name}` : t("grace.guestbook.photoBy")}
             style={{ borderRadius: 18, boxShadow: `0 0 0 1px ${withAlpha(accent, 0.45)}, 0 16px 28px -20px ${withAlpha(accent, 0.8)}` }}
           >
-            <LazyImage src={p.url} alt="" tint={accent} ratio={masonryRatio(i)} eager={i < 4} />
-            {p.uploader_name && <span className="cv-photo-name">{p.uploader_name}</span>}
-          </a>
+            <LazyImage zoom src={p.url} alt={p.uploader_name ? `${t("grace.guestbook.photoBy")} ${p.uploader_name}` : t("grace.guestbook.photoBy")} tint={accent} ratio={masonryRatio(i)} eager={i < 4} />
+            {p.uploader_name && <span className="cv-photo-name pointer-events-none">{p.uploader_name}</span>}
+          </div>
         </li>
       ))}
     </ul>
@@ -197,12 +194,14 @@ export function CovenantWallPage(props: PageProps & { initialTab?: WallTab | str
   return (
     <SkinProvider skin="covenant">
       <GuestProvider name={props.guestName}>
+        <PhotoZoom theme={props.theme}>
         <PageFrame theme={props.theme} couple={props.couple} title={t("covenant.wall.title")} intro={t("covenant.wall.intro")} backHref={props.backHref}>
           <Tabs theme={props.theme} tab={tab} onTab={setTab} data={props.data} />
           <div role="tabpanel" id="cv-wall-panel" aria-labelledby={`cv-tab-${tab}`}>
             {tab === "wishes" ? <WishesBody theme={props.theme} data={props.data} status={props.status} /> : <PhotosBody theme={props.theme} data={props.data} status={props.status} onSubmit={props.onSubmit} />}
           </div>
         </PageFrame>
+        </PhotoZoom>
       </GuestProvider>
     </SkinProvider>
   );

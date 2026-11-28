@@ -8,6 +8,7 @@ import { KHMER_BODY_FONT } from "../../chrome/fonts";
 import { goldStops, withAlpha } from "../../chrome/gold";
 import { useSkinOrnaments } from "../khmer/skin-context";
 import { mediaFor } from "../skinned/gallery-media";
+import { zoomProps } from "../../photo-zoom";
 import { COVENANT_CSS } from "./covenant-styles";
 import { covenantPalette } from "./palette";
 import { mapImage, mapPlace, pickText } from "./text-logic";
@@ -22,14 +23,15 @@ export interface CovenantMapProps {
   details?: DetailsContent;
 }
 
-/** The map picture: it keeps its own shape, fades in, and opens full size in a new tab when tapped. */
+/** The map picture: it keeps its own shape, fades in, and opens full screen when tapped. */
 function MapImage({ src, alt, theme }: { src: string; alt: string; theme: Theme }) {
   const { t } = useLanguage();
   const [ready, setReady] = useState(false);
   return (
-    <a href={src} target="_blank" rel="noopener noreferrer" aria-label={t("covenant.map.enlarge")} className="block" style={{ cursor: "zoom-in", background: withAlpha(theme.accent_color, 0.08) }}>
+    <span className="block" style={{ background: withAlpha(theme.accent_color, 0.08) }}>
       {/* eslint-disable-next-line @next/next/no-img-element -- the couple's own picture on any host */}
       <img
+        {...zoomProps}
         src={src}
         alt={alt}
         loading="lazy"
@@ -37,9 +39,10 @@ function MapImage({ src, alt, theme }: { src: string; alt: string; theme: Theme 
         referrerPolicy="no-referrer"
         onLoad={() => setReady(true)}
         className="block h-auto w-full"
-        style={{ minHeight: ready ? undefined : 240, opacity: ready ? 1 : 0, transform: ready ? "none" : "scale(1.02)", transition: "opacity .6s ease, transform .8s ease" }}
+        aria-label={t("covenant.map.enlarge")}
+        style={{ cursor: "zoom-in", minHeight: ready ? undefined : 240, opacity: ready ? 1 : 0, transform: ready ? "none" : "scale(1.02)", transition: "opacity .6s ease, transform .8s ease" }}
       />
-    </a>
+    </span>
   );
 }
 

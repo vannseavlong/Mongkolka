@@ -1,6 +1,7 @@
 "use client";
 
 import type { CoupleInfo, DetailsContent, Theme } from "../../types";
+import { zoomProps } from "../../photo-zoom";
 import { useLanguage, type TranslationKey } from "../../i18n";
 import { CINZEL_FONT } from "../../chrome/fonts";
 import { withAlpha } from "../../chrome/gold";
@@ -57,7 +58,7 @@ export function DetailsKhmer({ theme, content, headingKey = "khmer.details.headi
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={content.ceremonyVenue ?? content.receptionVenue ?? ""} loading="lazy" className="h-full w-full object-cover" />
+          <img {...zoomProps} src={image} alt={content.ceremonyVenue ?? content.receptionVenue ?? ""} loading="lazy" className="h-full w-full object-cover" />
         </div>
       )}
       {rows.length > 0 && (

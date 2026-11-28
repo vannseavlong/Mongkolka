@@ -25,7 +25,7 @@ export function WishCard({ theme, wish, photo, index }: { theme: Theme; wish: Gu
       className="cv-wish m-0 overflow-hidden text-left"
       style={{ backgroundColor: "#ffffff", color: "#3d2a31", borderRadius: 22, border: `1px solid ${withAlpha(accent, 0.35)}`, boxShadow: `0 18px 34px -24px ${withAlpha(accent, 0.8)}`, padding: 0 }}
     >
-      {photo && <LazyImage src={photo.url} alt="" tint={accent} ratio={index % 2 ? "4 / 3" : "1 / 1"} />}
+      {photo && <LazyImage zoom src={photo.url} alt="" tint={accent} ratio={index % 2 ? "4 / 3" : "1 / 1"} />}
       <div className="px-5 pb-5 pt-4">
         <span aria-hidden className="block select-none leading-none" style={{ color: withAlpha(accent, 0.5), fontFamily: "Georgia, serif", fontSize: 44, height: 28 }}>
           &ldquo;

@@ -2,6 +2,27 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): photo viewer and stacked carousel
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-photo-viewer.md
+- Branch/PR: feat/photo-viewer, merged to main (no PR)
+- What changed: content photos open full screen with swipe; the carousel is a stacked deck where the next photo springs forward; masonry photos spring in
+- Needs: web and couple deploy. Not checked on a real phone; code review not run
+
+## 2026-11-28 · [Cross] feat(couple): editable guestbook description
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-guestbook-intro.md
+- Branch/PR: feat/guestbook-intro, merged to main (no PR)
+- What changed: couples write the line under the guestbook heading in Khmer and English; the API limits it to 300 characters
+- Needs: API, web and couple deploy. Code and security review not run
+
+## 2026-11-28 · [Web] fix(templates): Khmer map button wording
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-map-button-khmer.md
+- Branch/PR: fix/map-button-khmer, merged to main (no PR)
+- What changed: the Khmer map button reads បើកទីតាំង
+- Needs: web and couple deploy
+
 ## 2026-11-28 · [API] fix(api): keep the map's directions link
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/API-map-link-save.md

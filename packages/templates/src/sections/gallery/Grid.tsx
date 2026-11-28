@@ -1,3 +1,4 @@
+import { zoomProps } from "../../photo-zoom";
 import { themeFont } from "../../theme";
 import type { GalleryContent, Theme } from "../../types";
 
@@ -31,7 +32,7 @@ export function GalleryGrid({ theme, content, showHeading = true }: GalleryGridP
       <div className="mx-auto grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3">
         {photos.map((url) => (
           // Plain <img>, not next/image — see the note in sections/hero/Classic.tsx.
-          <img key={url} src={url} alt="" className="aspect-square w-full rounded-md object-cover" />
+          <img {...zoomProps} key={url} src={url} alt="" className="aspect-square w-full rounded-md object-cover" />
         ))}
       </div>
     </section>

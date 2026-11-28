@@ -106,7 +106,7 @@ export const strings = {
     "covenant.note.defaultBody": "ដោយគោរពតាមជំនឿគ្រីស្ទបរិស័ទ ពិធីមង្គលការរបស់យើងមិនមានភេសជ្ជៈមានជាតិអាល់កុលទេ។ សូមអរគុណដែលរីករាយ និងយោគយល់ជាមួយយើង។",
     "covenant.map.heading": "ផែនទីទៅកាន់ទីកន្លែង",
     "covenant.map.alt": "ផែនទីគូរដៃទៅកាន់ទីកន្លែងមង្គលការ",
-    "covenant.map.open": "នាំផ្លូវទៅទីតាំង",
+    "covenant.map.open": "បើកទីតាំង",
     "covenant.map.enlarge": "បើកផែនទីទំហំពេញ",
     "covenant.back": "ត្រឡប់ទៅសំបុត្រអញ្ជើញ",
     "covenant.loadingWall": "កំពុងផ្ទុក",

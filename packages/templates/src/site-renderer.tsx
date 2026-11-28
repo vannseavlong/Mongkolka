@@ -21,6 +21,7 @@ import { useOrientation } from "./use-orientation";
 import { prefetchTargets, usePrefetchImages } from "./prefetch-images";
 import { resolveTheme } from "./theme";
 import { SiteFonts } from "./site-fonts";
+import { resolveDecor } from "./site-decor";
 import { StackPositionProvider, limitPhotos, stackSlices } from "./sections/gallery/gallery-stack";
 import type { CoupleInfo, CoverContent, DetailsContent, GalleryContent, OpeningContent, PartialTheme, SectionKey, Theme } from "./types";
 
@@ -217,8 +218,6 @@ function SiteRendererBody({
   }
 
   const pageTheme = resolveTheme(template.default_theme, themeOverride, null);
-  // Not in the builder canvas or thumbnails: a fixed layer would escape them.
-  const patterned = skin === "covenant" && !wrapSection && !coverPreview;
   // The venue details beside the map are the same ones the details section shows.
   const detailsSection = sections.find((s) => s.section_key === "details" && s.enabled);
   const venueDetails = (detailsSection?.content ?? buildContent("details")) as DetailsContent | undefined;
@@ -294,11 +293,11 @@ function SiteRendererBody({
       )}
     </GuestProvider>
   );
-  return patterned ? (
-    <KbachPage ground={pageTheme.bg_color} accent={pageTheme.accent_color}>
+  // Thumbnails stay plain: a fixed layer would escape the card. (The builder preview is its own iframe.)
+  if (coverPreview) return page;
+  return (
+    <KbachPage ground={pageTheme.bg_color} accent={pageTheme.accent_color} decor={resolveDecor(pageTheme, skin)} seamless={skin === "covenant"}>
       {page}
     </KbachPage>
-  ) : (
-    page
   );
 }

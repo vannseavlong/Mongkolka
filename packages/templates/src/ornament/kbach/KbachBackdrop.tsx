@@ -1,4 +1,12 @@
-import { DiamondWeave, FlameCorner } from "./motifs";
+import type { PatternId } from "../../site-decor";
+import { BlossomScatter, DiamondWeave, FlameCorner, LotusLattice } from "./motifs";
+
+/** Each pattern with the strength that keeps it quiet (`--kbach-lattice` overrides it). */
+const PATTERNS = {
+  diamond: { Motif: DiamondWeave, opacity: 0.07 },
+  lotus: { Motif: LotusLattice, opacity: 0.12 },
+  blossom: { Motif: BlossomScatter, opacity: 0.09 },
+} as const;
 
 /** The middle stays calm so cards and text read on a clean ground; the pattern shows towards the sides. */
 const EDGE_FADE = "radial-gradient(ellipse 55% 75% at 50% 50%, transparent 35%, #000 100%)";
@@ -15,18 +23,23 @@ const CORNER_Z = 55;
  * does not jump when a phone's toolbar hides. Strength is set with CSS variables. The pattern sits behind the
  * content and the corners in front of it; neither takes taps.
  */
-export function KbachBackdrop({ color, gold }: { color: string; gold: string }) {
+export function KbachBackdrop({ color, gold, pattern = "diamond", corners = true }: { color: string; gold: string; pattern?: PatternId | null; corners?: boolean }) {
   const corner = { position: "absolute", width: "clamp(76px, 16vw, 210px)", opacity: "var(--kbach-corner, 0.55)" } as const;
+  const chosen = pattern ? PATTERNS[pattern] : null;
   return (
     <>
-      <div aria-hidden style={{ ...LAYER, zIndex: -1 }}>
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(80% 45% at 50% 0%, rgba(255, 224, 170, var(--kbach-light, 0.22)), transparent 70%)" }} />
-        <DiamondWeave color={color} style={{ position: "absolute", inset: 0, opacity: "var(--kbach-lattice, 0.07)", maskImage: EDGE_FADE, WebkitMaskImage: EDGE_FADE }} />
-      </div>
-      <div aria-hidden style={{ ...LAYER, zIndex: CORNER_Z }}>
-        <FlameCorner color={gold} style={{ ...corner, left: 0, top: 0 }} />
-        <FlameCorner color={gold} style={{ ...corner, right: 0, bottom: 0, transform: "rotate(180deg)" }} />
-      </div>
+      {chosen && (
+        <div aria-hidden style={{ ...LAYER, zIndex: -1 }}>
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(80% 45% at 50% 0%, rgba(255, 224, 170, var(--kbach-light, 0.22)), transparent 70%)" }} />
+          <chosen.Motif color={color} style={{ position: "absolute", inset: 0, opacity: `var(--kbach-lattice, ${chosen.opacity})`, maskImage: EDGE_FADE, WebkitMaskImage: EDGE_FADE }} />
+        </div>
+      )}
+      {corners && (
+        <div aria-hidden style={{ ...LAYER, zIndex: CORNER_Z }}>
+          <FlameCorner color={gold} style={{ ...corner, left: 0, top: 0 }} />
+          <FlameCorner color={gold} style={{ ...corner, right: 0, bottom: 0, transform: "rotate(180deg)" }} />
+        </div>
+      )}
     </>
   );
 }

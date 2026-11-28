@@ -8,6 +8,9 @@ export interface Theme {
   font_kh_body?: string;
   font_en_heading?: string;
   font_en_script?: string;
+  /** Background pattern id and corner switch ("on" / "off"), see site-decor.ts; missing keeps the template's look. */
+  pattern?: string;
+  corners?: string;
 }
 
 export type PartialTheme = Partial<Theme>;

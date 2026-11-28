@@ -2,32 +2,38 @@
 
 import { useEffect } from "react";
 import { Check } from "lucide-react";
-import { FONT_KEYS, FONT_ROLES, FONT_STYLES, fontStack, sameColor, THEME_PRESETS } from "@mongkolka/templates";
+import { DECOR_KEYS, FONT_KEYS, FONT_ROLES, FONT_STYLES, fontStack, PATTERN_OPTIONS, resolveDecor, sameColor, THEME_PRESETS } from "@mongkolka/templates";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
 import { Button } from "@mongkolka/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@mongkolka/ui/form";
 import { Input } from "@mongkolka/ui/input";
+import { Switch } from "@mongkolka/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
 import { cn } from "@mongkolka/ui/utils";
 import { api, ApiError } from "@/lib/api";
 import type { Theme } from "../data/schema";
 import { ContrastNote } from "./contrast-note";
 
-const DESIGN_KEYS = ["bg_color", "text_color", "accent_color", "font_style", ...FONT_KEYS] as const;
+/** Optional choices: empty means "keep the template's own". */
+const CHOICE_KEYS = [...FONT_KEYS, ...DECOR_KEYS] as const;
+const DESIGN_KEYS = ["bg_color", "text_color", "accent_color", "font_style", ...CHOICE_KEYS] as const;
 /** Select cannot hold an empty value, so "template default" has its own. */
-const TEMPLATE_FONT = "default";
+const TEMPLATE_CHOICE = "default";
 
 export function ThemeEditor({
   theme,
   templateDefault,
+  skin,
   onPreview,
 }: {
   /** Resolved site theme (template default + saved override). */
   theme: Theme;
   /** The template's own theme, what "Reset to template" returns to. */
   templateDefault: Theme;
+  /** The template's skin, which decides what is decorated by default. */
+  skin: string | null | undefined;
   /** Fired on every field change, before Save — lets the caller reflect
    * in-progress edits in the live preview instead of the couple having to
    * save-and-wait to see a color take effect. */
@@ -61,7 +67,7 @@ export function ThemeEditor({
       for (const k of palette) override[k] = values[k];
     }
     if (values.font_style !== templateDefault.font_style) override.font_style = values.font_style;
-    for (const k of FONT_KEYS) if (values[k]) override[k] = values[k];
+    for (const k of CHOICE_KEYS) if (values[k]) override[k] = values[k];
     try {
       await api.patch("/couple/api/website/theme", { theme_override: override });
       toast.success("Design saved");
@@ -75,7 +81,7 @@ export function ThemeEditor({
   async function resetToTemplate() {
     try {
       await api.patch("/couple/api/website/theme", { theme_override: {} });
-      form.reset({ ...templateDefault, ...Object.fromEntries(FONT_KEYS.map((k) => [k, templateDefault[k] ?? ""])) });
+      form.reset({ ...templateDefault, ...Object.fromEntries(CHOICE_KEYS.map((k) => [k, templateDefault[k] ?? ""])) });
       toast.success("Design reset to the template");
       mutate("/couple/api/website/settings");
     } catch (err) {
@@ -89,7 +95,7 @@ export function ThemeEditor({
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 text-sm font-medium">Presets</legend>
-          <p className="text-xs text-muted-foreground">Colors and fonts together. Hover or focus a preset to preview it on the page. Click to use it, then Save.</p>
+          <p className="text-xs text-muted-foreground">Colors, fonts and background together. Hover or focus a preset to preview it on the page. Click to use it, then Save.</p>
           <div className="grid grid-cols-2 gap-2">
             {THEME_PRESETS.map((preset) => {
               const active = DESIGN_KEYS.every((k) => sameColor(current[k] ?? "", (preset.theme as Theme)[k] ?? ""));
@@ -198,14 +204,14 @@ export function ThemeEditor({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{role.label}</FormLabel>
-                  <Select value={field.value || TEMPLATE_FONT} onValueChange={(v) => field.onChange(v === TEMPLATE_FONT ? "" : v)}>
+                  <Select value={field.value || TEMPLATE_CHOICE} onValueChange={(v) => field.onChange(v === TEMPLATE_CHOICE ? "" : v)}>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={TEMPLATE_FONT}>Template default</SelectItem>
+                      <SelectItem value={TEMPLATE_CHOICE}>Template default</SelectItem>
                       {role.options.map((option) => (
                         <SelectItem key={option.id} value={option.id}>
                           {option.name} <span style={{ fontFamily: fontStack(role.key, option.id) ?? undefined }}>{role.sample}</span>
@@ -217,6 +223,45 @@ export function ThemeEditor({
               )}
             />
           ))}
+        </fieldset>
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-1 text-sm font-medium">Background</legend>
+          <FormField
+            control={form.control}
+            name="pattern"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pattern</FormLabel>
+                <Select value={field.value || TEMPLATE_CHOICE} onValueChange={(v) => field.onChange(v === TEMPLATE_CHOICE ? "" : v)}>
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={TEMPLATE_CHOICE}>Template default</SelectItem>
+                    {PATTERN_OPTIONS.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="corners"
+            render={({ field }) => (
+              <FormItem className="flex items-center justify-between gap-3">
+                <FormLabel>Gold corners</FormLabel>
+                <FormControl>
+                  <Switch checked={resolveDecor({ corners: field.value }, skin).corners} onCheckedChange={(on) => field.onChange(on ? "on" : "off")} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </fieldset>
         <ContrastNote theme={{ bg_color: current.bg_color, text_color: current.text_color, accent_color: current.accent_color }} />
         <div className="flex flex-wrap gap-2">

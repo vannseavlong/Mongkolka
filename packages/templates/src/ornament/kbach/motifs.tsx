@@ -43,6 +43,65 @@ export function DiamondWeave({ color, className, style, tile = 56 }: MotifProps 
   );
 }
 
+/** Outlined lotus blooms in offset rows. */
+export function LotusLattice({ color, className, style }: MotifProps) {
+  const id = useSvgId("kbl");
+  const bloom = (x: number, y: number) => (
+    <g key={`${x}-${y}`} transform={`translate(${x} ${y})`}>
+      <path d={petalPath(0, 10, 13, 24)} />
+      {[-42, 42].map((turn) => (
+        <path key={turn} d={petalPath(0, 10, 11, 19)} transform={`rotate(${turn} 0 10)`} />
+      ))}
+      <path d="M-14 13Q0 20 14 13" />
+    </g>
+  );
+  return (
+    <svg aria-hidden focusable="false" className={className} style={style} width="100%" height="100%">
+      <defs>
+        <pattern id={id} width="72" height="80" patternUnits="userSpaceOnUse">
+          <g fill="none" stroke={color} strokeWidth="1">
+            {bloom(36, 20)}
+            {bloom(0, 60)}
+            {bloom(72, 60)}
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
+    </svg>
+  );
+}
+
+/** Scattered blossoms and loose petals, still (the page already has its own moving petals). */
+export function BlossomScatter({ color, className, style }: MotifProps) {
+  const id = useSvgId("kbs");
+  const blossom = (x: number, y: number, size: number, turn: number) => (
+    <g transform={`translate(${x} ${y}) rotate(${turn})`}>
+      {[0, 72, 144, 216, 288].map((angle) => (
+        <path key={angle} d={petalPath(0, -2, size * 0.8, size)} transform={`rotate(${angle})`} />
+      ))}
+    </g>
+  );
+  const petal = (x: number, y: number, turn: number) => <path d={petalPath(0, 0, 6, 11)} transform={`translate(${x} ${y}) rotate(${turn})`} />;
+  return (
+    <svg aria-hidden focusable="false" className={className} style={style} width="100%" height="100%">
+      <defs>
+        <pattern id={id} width="168" height="176" patternUnits="userSpaceOnUse">
+          <g fill={color}>
+            {blossom(34, 34, 13, 8)}
+            {blossom(122, 108, 9, 40)}
+            {blossom(66, 142, 6, 20)}
+            {petal(98, 42, 55)}
+            {petal(24, 104, -35)}
+            {petal(146, 22, 130)}
+            {petal(130, 162, -70)}
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${id})`} />
+    </svg>
+  );
+}
+
 /** A border of lotus petals between two hairlines; `flip` hangs the petals from the top edge. */
 export function LotusBand({ color, className, style, flip = false }: MotifProps & { flip?: boolean }) {
   const id = useSvgId("kbb");

@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): background patterns and corners switch
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-style-patterns.md
+- Branch/PR: feat/style-patterns, merged to main (no PR)
+- What changed: the Design panel has a background pattern picker (None, Diamond weave, Lotus lattice, Falling blossom) and a gold corners switch, on all templates; presets set them too. Existing sites are unchanged until chosen
+- Needs: web and couple deployed 2026-11-28. Panel not checked signed in; code and security review not run
+
 ## 2026-11-28 · [Web] feat(templates): font choices in a Design panel
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-style-fonts.md

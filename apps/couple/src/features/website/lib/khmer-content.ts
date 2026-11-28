@@ -59,6 +59,9 @@ export interface InvitationFormValues {
   startsAt: string; // datetime-local, Cambodia time
   greetingKh: string;
   greetingEn: string;
+  noticeKh: string;
+  noticeEn: string;
+  hideNotice: boolean;
 }
 
 const PARTY_KEYS = ["nameKh", "nameEn", "fatherKh", "fatherEn", "motherKh", "motherEn"] as const;
@@ -88,6 +91,9 @@ export function invitationToForm(content: unknown): InvitationFormValues {
     startsAt: fromStartsAt(c.startsAt),
     greetingKh: str(c.greetingKh),
     greetingEn: str(c.greetingEn),
+    noticeKh: str(c.noticeKh),
+    noticeEn: str(c.noticeEn),
+    hideNotice: c.hideNotice === true,
   };
 }
 
@@ -101,6 +107,9 @@ export function invitationToContent(values: InvitationFormValues): InvitationCon
     startsAt: toStartsAt(values.startsAt),
     greetingKh: clean(values.greetingKh),
     greetingEn: clean(values.greetingEn),
+    noticeKh: clean(values.noticeKh),
+    noticeEn: clean(values.noticeEn),
+    hideNotice: values.hideNotice || undefined,
   };
 }
 

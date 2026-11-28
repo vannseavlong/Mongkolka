@@ -2,6 +2,41 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Cross] feat(couple): invitation date block and no-alcohol line
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-invitation-notice.md
+- Branch/PR: feat/invitation-notice, merged to main (no PR)
+- What changed: roomier date block; Covenant shows a no-alcohol line under the time, editable or hideable
+- Needs: API, web and couple deploy. Code and security review not run
+
+## 2026-11-28 · [Web] feat(templates): letters on one framed card
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-letters-card.md
+- Branch/PR: feat/letters-card, merged to main (no PR)
+- What changed: thank-you and apology show together in a framed card with built-in wording
+- Needs: web and couple deploy. Khmer and English wording need owner review; code review not run
+
+## 2026-11-28 · [Web] fix(couple): guestbook preview and buttons
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-guestbook-buttons.md
+- Branch/PR: fix/guestbook-buttons, merged to main (no PR)
+- What changed: the builder preview shows See all; the Skin Guestbook no longer has directions, calendar and share buttons
+- Needs: web and couple deploy. Code review not run
+
+## 2026-11-28 · [Cross] feat(couple): envelope seal badge settings
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-envelope-badge.md
+- Branch/PR: feat/envelope-badge, merged to main (no PR)
+- What changed: couples set the envelope seal's text and colours; empty stays automatic
+- Needs: API, web and couple deploy. Code and security review not run
+
+## 2026-11-28 · [Web] fix(templates): Back closes the photo viewer
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-viewer-back.md
+- Branch/PR: fix/viewer-back, merged to main (no PR)
+- What changed: the phone or browser Back closes a full-screen photo instead of leaving the site
+- Needs: web and couple deploy. Not checked on a real phone; code review not run
+
 ## 2026-11-28 · [Web] feat(templates): photo viewer and stacked carousel
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-photo-viewer.md

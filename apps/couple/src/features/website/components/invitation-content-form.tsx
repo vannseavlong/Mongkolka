@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { Label } from "@mongkolka/ui/label";
+import { Switch } from "@mongkolka/ui/switch";
+import { defaultText } from "@mongkolka/templates";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -28,6 +31,9 @@ const schema = z.object({
   startsAt: z.string(),
   greetingKh: z.string().max(600, "Max 600 characters"),
   greetingEn: z.string().max(600, "Max 600 characters"),
+  noticeKh: z.string().max(200, "Max 200 characters"),
+  noticeEn: z.string().max(200, "Max 200 characters"),
+  hideNotice: z.boolean(),
 });
 
 type PartyName = "groom" | "bride";
@@ -88,6 +94,12 @@ export function InvitationContentForm({ section, onSaved }: { section: WebsiteSe
         <TextRow control={form.control} name="startsAt" type="datetime-local" label="Event start (Cambodia time)" hint="The countdown counts down to this moment." />
         <TextRow control={form.control} name="greetingKh" label="Greeting (Khmer)" rows={3} />
         <TextRow control={form.control} name="greetingEn" label="Greeting (English)" rows={3} />
+        <TextRow control={form.control} name="noticeKh" label="Line under the time (Khmer)" placeholder={defaultText("khmer.invitation.notice", "kh")} hint="On the Covenant template an empty field shows the wording in grey." />
+        <TextRow control={form.control} name="noticeEn" label="Line under the time (English)" placeholder={defaultText("khmer.invitation.notice", "en")} />
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="invitation-hide-notice">Hide this line</Label>
+          <Switch id="invitation-hide-notice" checked={form.watch("hideNotice")} onCheckedChange={(on) => form.setValue("hideNotice", on, { shouldDirty: true })} />
+        </div>
         <DialogFooter>
           <Button type="submit" disabled={form.formState.isSubmitting}>
             Save invitation

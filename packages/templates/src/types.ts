@@ -115,6 +115,11 @@ export interface InvitationContent {
   startsAt?: string;
   greetingKh?: string;
   greetingEn?: string;
+  /** A short line under the time. Covenant has a built-in "no alcohol" line when empty. */
+  noticeKh?: string;
+  noticeEn?: string;
+  /** Show no line at all. */
+  hideNotice?: boolean;
 }
 
 /** Ritual/party icons the agenda can show. A fixed list so templates can ship one line-icon each. */

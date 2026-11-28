@@ -23,7 +23,7 @@ export const FONT_ROLES = [
     sample: "សូមគោរពអញ្ជើញ",
     options: [
       { id: "battambang", name: "Battambang" },
-      { id: "siemreap", name: "Siemreap" },
+      { id: "siemreap", name: "Siemreap", latin: false },
       { id: "kantumruy", name: "Kantumruy Pro" },
     ],
     vars: ["--font-battambang", "--font-khmer"],
@@ -58,7 +58,11 @@ export const FONT_KEYS: readonly FontKey[] = FONT_ROLES.map((role) => role.key);
 /** The CSS font stack for a chosen id, or null for "template default" and anything unknown. */
 export function fontStack(key: FontKey, id: string | null | undefined): string | null {
   const option = FONT_ROLES.find((role) => role.key === key)?.options.find((o) => o.id === id);
-  return option ? `var(--face-${option.id}, "${option.name}"), "${option.name}"` : null;
+  if (!option) return null;
+  // A face without Latin letters is named directly: next/font's variable also carries an Arial stand-in, which would
+  // draw the English text oversized instead of letting it reach the next font in the stack.
+  if ("latin" in option) return `"${option.name}"`;
+  return `var(--face-${option.id}, "${option.name}"), "${option.name}"`;
 }
 
 /** The CSS variables that apply a theme's font choices; empty when every role keeps the template default. */

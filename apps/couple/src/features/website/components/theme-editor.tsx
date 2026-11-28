@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Check } from "lucide-react";
-import { DECOR_KEYS, FONT_KEYS, FONT_ROLES, FONT_STYLES, fontStack, PATTERN_OPTIONS, resolveDecor, sameColor, THEME_PRESETS } from "@mongkolka/templates";
+import { DECOR_KEYS, FONT_KEYS, FONT_PRESETS, FONT_ROLES, FONT_STYLES, fontStack, PATTERN_OPTIONS, resolveDecor, sameColor, THEME_PRESETS } from "@mongkolka/templates";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
@@ -11,14 +10,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@mongkolka/ui
 import { Input } from "@mongkolka/ui/input";
 import { Switch } from "@mongkolka/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mongkolka/ui/select";
-import { cn } from "@mongkolka/ui/utils";
 import { api, ApiError } from "@/lib/api";
 import type { Theme } from "../data/schema";
+import { FONT_PRESET_KEYS, THEME_PRESET_KEYS, isPresetActive, presetPatch } from "../lib/design-presets";
 import { ContrastNote } from "./contrast-note";
+import { PresetGrid } from "./preset-grid";
 
 /** Optional choices: empty means "keep the template's own". */
 const CHOICE_KEYS = [...FONT_KEYS, ...DECOR_KEYS] as const;
-const DESIGN_KEYS = ["bg_color", "text_color", "accent_color", "font_style", ...CHOICE_KEYS] as const;
 /** Select cannot hold an empty value, so "template default" has its own. */
 const TEMPLATE_CHOICE = "default";
 
@@ -49,8 +48,16 @@ export function ThemeEditor({
     onPreview?.(form.getValues());
   }, [watched, form, onPreview]);
 
-  function applyPreset(preset: Theme) {
-    for (const key of DESIGN_KEYS) form.setValue(key, preset[key] ?? "", { shouldDirty: true });
+  function applyPreset(patch: Partial<Theme>) {
+    for (const [key, value] of Object.entries(patch)) form.setValue(key as keyof Theme, value, { shouldDirty: true });
+  }
+
+  function previewPreset(patch: Partial<Theme>) {
+    onPreview?.({ ...form.getValues(), ...patch });
+  }
+
+  function endPreview() {
+    onPreview?.(form.getValues());
   }
 
   // Drop the unsaved preview when the editor goes away (panel collapsed,
@@ -90,86 +97,149 @@ export function ThemeEditor({
   }
 
   const current = form.getValues();
+  const themePresets = THEME_PRESETS.map((preset) => ({
+    id: preset.id,
+    name: preset.name,
+    patch: presetPatch(THEME_PRESET_KEYS, preset.theme),
+    active: isPresetActive(THEME_PRESET_KEYS, preset.theme, current),
+  }));
+  // "Template default" clears every font choice, so a couple can get back without resetting colors.
+  const templateFonts = { font_style: templateDefault.font_style, ...Object.fromEntries(FONT_KEYS.map((k) => [k, templateDefault[k]])) };
+  const fontPresets = [{ id: "template", name: "Template default", fonts: templateFonts as Partial<Theme> }, ...FONT_PRESETS].map((preset) => ({
+    id: preset.id,
+    name: preset.name,
+    patch: presetPatch(FONT_PRESET_KEYS, preset.fonts),
+    active: isPresetActive(FONT_PRESET_KEYS, preset.fonts, current),
+  }));
+  const patchOf = (list: { id: string; patch: Partial<Theme> }[], id: string) => list.find((p) => p.id === id)?.patch ?? {};
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1 text-sm font-medium">Presets</legend>
-          <p className="text-xs text-muted-foreground">Colors, fonts and background together. Hover or focus a preset to preview it on the page. Click to use it, then Save.</p>
-          <div className="grid grid-cols-2 gap-2">
-            {THEME_PRESETS.map((preset) => {
-              const active = DESIGN_KEYS.every((k) => sameColor(current[k] ?? "", (preset.theme as Theme)[k] ?? ""));
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => applyPreset(preset.theme)}
-                  onMouseEnter={() => onPreview?.(preset.theme)}
-                  onFocus={() => onPreview?.(preset.theme)}
-                  onMouseLeave={() => onPreview?.(form.getValues())}
-                  onBlur={() => onPreview?.(form.getValues())}
-                  className={cn(
-                    "flex flex-col gap-1.5 rounded-md border p-2 text-left text-xs outline-none transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring",
-                    active && "border-primary ring-1 ring-primary",
-                  )}
-                >
-                  <span
-                    className="flex h-8 items-center justify-between rounded px-2"
-                    style={{ background: preset.theme.bg_color, color: preset.theme.text_color, fontFamily: fontStack("font_en_heading", (preset.theme as Theme).font_en_heading) ?? (preset.theme.font_style === "serif" ? "serif" : "sans-serif") }}
-                  >
-                    <span className="text-sm font-semibold">
-                      Aa <span style={{ fontFamily: fontStack("font_kh_heading", (preset.theme as Theme).font_kh_heading) ?? undefined }}>កខ</span>
-                    </span>
-                    <span className="size-3 rounded-full" style={{ background: preset.theme.accent_color }} />
-                  </span>
-                  <span className="flex items-center justify-between gap-1">
-                    <span className="truncate">{preset.name}</span>
-                    {active && <Check className="size-3 shrink-0" aria-label="Selected" />}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <legend className="mb-1 text-sm font-medium">Theme presets</legend>
+          <p className="text-xs text-muted-foreground">Colors and background. Your fonts stay. Hover or focus to preview, click to use, then Save.</p>
+          <PresetGrid
+            tiles={themePresets.map(({ id, name, active, patch }) => ({
+              id,
+              name,
+              active,
+              sample: (
+                <span className="flex h-8 items-center justify-between rounded border px-2" style={{ background: patch.bg_color, color: patch.text_color }}>
+                  <span className="text-sm font-semibold">Aa កខ</span>
+                  <span className="size-3 rounded-full" style={{ background: patch.accent_color }} />
+                </span>
+              ),
+            }))}
+            onPick={(id) => applyPreset(patchOf(themePresets, id))}
+            onPreview={(id) => previewPreset(patchOf(themePresets, id))}
+            onPreviewEnd={endPreview}
+          />
         </fieldset>
         <div className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="bg_color"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Background</FormLabel>
-                <FormControl>
-                  <Input type="color" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
+          <div className="grid grid-cols-3 gap-3">
+            <FormField
+              control={form.control}
+              name="bg_color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Background</FormLabel>
+                  <FormControl>
+                    <Input type="color" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="text_color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Text</FormLabel>
+                  <FormControl>
+                    <Input type="color" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="accent_color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Accent</FormLabel>
+                  <FormControl>
+                    <Input type="color" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <fieldset className="flex flex-col gap-3">
+            <legend className="mb-1 text-sm font-medium">Background</legend>
+            <FormField
+              control={form.control}
+              name="pattern"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pattern</FormLabel>
+                  <Select value={field.value || TEMPLATE_CHOICE} onValueChange={(v) => field.onChange(v === TEMPLATE_CHOICE ? "" : v)}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={TEMPLATE_CHOICE}>Template default</SelectItem>
+                      {PATTERN_OPTIONS.map((option) => (
+                        <SelectItem key={option.id} value={option.id}>
+                          {option.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="corners"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between gap-3">
+                  <FormLabel>Gold corners</FormLabel>
+                  <FormControl>
+                    <Switch checked={resolveDecor({ corners: field.value }, skin).corners} onCheckedChange={(on) => field.onChange(on ? "on" : "off")} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </fieldset>
+        </div>
+        <fieldset className="flex flex-col gap-2 border-t pt-4">
+          <legend className="mb-1 text-sm font-medium">Font presets</legend>
+          <p className="text-xs text-muted-foreground">Fonts only. Your colors and background stay.</p>
+          <PresetGrid
+            tiles={fontPresets.map(({ id, name, active, patch }) => {
+              const family = patch.font_style === "serif" ? "serif" : "sans-serif";
+              return {
+                id,
+                name,
+                active,
+                sample: (
+                  <span className="flex h-8 items-center justify-between gap-1 overflow-hidden rounded bg-muted px-2 text-sm" style={{ fontFamily: family }}>
+                    <span style={{ fontFamily: fontStack("font_en_heading", patch.font_en_heading) ?? undefined }}>Aa</span>
+                    <span style={{ fontFamily: fontStack("font_kh_heading", patch.font_kh_heading) ?? undefined }}>កខ</span>
+                    <span style={{ fontFamily: fontStack("font_en_script", patch.font_en_script) ?? undefined }}>Love</span>
+                  </span>
+                ),
+              };
+            })}
+            onPick={(id) => applyPreset(patchOf(fontPresets, id))}
+            onPreview={(id) => previewPreset(patchOf(fontPresets, id))}
+            onPreviewEnd={endPreview}
           />
-          <FormField
-            control={form.control}
-            name="text_color"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Text</FormLabel>
-                <FormControl>
-                  <Input type="color" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="accent_color"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Accent</FormLabel>
-                <FormControl>
-                  <Input type="color" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+        </fieldset>
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-1 text-sm font-medium">Each font</legend>
           <FormField
             control={form.control}
             name="font_style"
@@ -193,9 +263,6 @@ export function ThemeEditor({
               </FormItem>
             )}
           />
-        </div>
-        <fieldset className="flex flex-col gap-3">
-          <legend className="mb-1 text-sm font-medium">Fonts</legend>
           {FONT_ROLES.map((role) => (
             <FormField
               key={role.key}
@@ -224,45 +291,6 @@ export function ThemeEditor({
             />
           ))}
         </fieldset>
-        <fieldset className="flex flex-col gap-3">
-          <legend className="mb-1 text-sm font-medium">Background</legend>
-          <FormField
-            control={form.control}
-            name="pattern"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pattern</FormLabel>
-                <Select value={field.value || TEMPLATE_CHOICE} onValueChange={(v) => field.onChange(v === TEMPLATE_CHOICE ? "" : v)}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={TEMPLATE_CHOICE}>Template default</SelectItem>
-                    {PATTERN_OPTIONS.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="corners"
-            render={({ field }) => (
-              <FormItem className="flex items-center justify-between gap-3">
-                <FormLabel>Gold corners</FormLabel>
-                <FormControl>
-                  <Switch checked={resolveDecor({ corners: field.value }, skin).corners} onCheckedChange={(on) => field.onChange(on ? "on" : "off")} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </fieldset>
         <ContrastNote theme={{ bg_color: current.bg_color, text_color: current.text_color, accent_color: current.accent_color }} />
         <div className="flex flex-wrap gap-2">
           <Button type="submit" aria-disabled={form.formState.isSubmitting}
@@ -274,7 +302,6 @@ export function ThemeEditor({
           <Button type="button" variant="outline" onClick={resetToTemplate}>
             Reset to template
           </Button>
-        </div>
         </div>
       </form>
     </Form>

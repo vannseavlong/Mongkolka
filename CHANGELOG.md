@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): video autoplay on scroll
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-video-autoplay.md
+- Branch/PR: feat/video-autoplay, merged to main (no PR)
+- What changed: the video starts muted when a guest scrolls to it and pauses off screen; the play button is smaller. The YouTube player now loads on scroll, not only after a tap
+- Needs: web and couple deploy. Code and security review not run; not checked on a real phone
+
 ## 2026-11-28 · [Web] fix(templates): align names on the invitation
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-invitation-align.md

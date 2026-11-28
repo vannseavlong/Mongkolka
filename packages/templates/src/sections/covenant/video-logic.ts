@@ -28,6 +28,23 @@ export function youtubeId(url: string | undefined | null): string | null {
   return id && ID.test(id) ? id : null;
 }
 
-export const youtubeEmbedUrl = (id: string): string => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+export const YOUTUBE_PLAYER_ORIGIN = "https://www.youtube-nocookie.com";
+/** `muted` is required for a video that starts by itself: browsers refuse to autoplay with sound. */
+export const youtubeEmbedUrl = (id: string, muted = false): string => `${YOUTUBE_PLAYER_ORIGIN}/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1${muted ? "&mute=1" : ""}`;
+/** The postMessage body the embedded player understands (needs enablejsapi=1). */
+export const youtubeCommand = (func: "playVideo" | "pauseVideo"): string => JSON.stringify({ event: "command", func, args: [] });
+
+/** Share of the player that must be on screen before it starts. */
+export const AUTOPLAY_RATIO = 0.6;
+export type ScrollAction = "start" | "pause" | "resume" | null;
+
+/**
+ * What scrolling does to the player. It starts once, pauses when fully off screen, and resumes only what scrolling
+ * itself paused, so a video the guest paused by hand stays paused.
+ */
+export function scrollAction(ratio: number, started: boolean, pausedByScroll: boolean): ScrollAction {
+  if (ratio >= AUTOPLAY_RATIO) return !started ? "start" : pausedByScroll ? "resume" : null;
+  return ratio <= 0 && started && !pausedByScroll ? "pause" : null;
+}
 export const youtubeThumbUrl = (id: string): string => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 export const youtubeWatchUrl = (id: string): string => `https://www.youtube.com/watch?v=${id}`;

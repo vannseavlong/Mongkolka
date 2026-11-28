@@ -11,7 +11,7 @@ import { fitScale, guestLine, hasKhmer, petals, placeLine } from "./intro-logic"
 import { coupleNamesFor, joinNames } from "./names";
 import { memoriesView, subRoute } from "./memories-logic";
 import { nextHeroPhase, usablePhoto } from "./hero-logic";
-import { youtubeId } from "./video-logic";
+import { scrollAction, youtubeEmbedUrl, youtubeId } from "./video-logic";
 import { coverTagline } from "./cover-text";
 import { openingText } from "./opening-text";
 import { BUTTERFLIES, bloomCluster, butterflyEntry, DOVES, FLYERS, FOLIAGE_REGIONS, leafCluster, SPARKLES } from "./cover-logic";
@@ -222,5 +222,22 @@ describe("placeLine", () => {
     assert.equal(placeLine("Sensok City", "www.google.com/maps/dir//x"), "Sensok City");
     assert.equal(placeLine("Sensok City", "Phnom Penh"), "Sensok City · Phnom Penh");
     assert.equal(placeLine("", "  "), "");
+  });
+});
+
+describe("video autoplay", () => {
+  it("mutes only a video that starts by itself", () => {
+    assert.ok(youtubeEmbedUrl("aqz-KE-bpKQ", true).includes("mute=1"));
+    assert.ok(!youtubeEmbedUrl("aqz-KE-bpKQ").includes("mute=1"));
+  });
+
+  it("starts once mostly on screen, pauses off screen and resumes only its own pause", () => {
+    assert.equal(scrollAction(0.3, false, false), null);
+    assert.equal(scrollAction(0.6, false, false), "start");
+    assert.equal(scrollAction(0.3, true, false), null);
+    assert.equal(scrollAction(0, true, false), "pause");
+    assert.equal(scrollAction(0.8, true, true), "resume");
+    assert.equal(scrollAction(0.8, true, false), null, "a video paused by hand stays paused");
+    assert.equal(scrollAction(0, false, false), null);
   });
 });

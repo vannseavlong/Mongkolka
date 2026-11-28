@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApiQuery } from "@/lib/use-api-query";
 import type { CoupleProfile } from "@/features/profile/data/schema";
+import { skinFromComponents } from "@mongkolka/templates";
 import { BuilderToolbar } from "./components/builder-toolbar";
 import { TemplateDialog } from "./components/template-dialog";
 import { ThemeEditor } from "./components/theme-editor";
@@ -68,6 +69,7 @@ export function Website() {
                 <ThemeEditor
                   theme={{ ...selectedTemplate.default_theme, ...(settings?.theme_override ?? {}) }}
                   templateDefault={selectedTemplate.default_theme}
+                  skin={skinFromComponents(selectedTemplate.default_components)}
                   onPreview={setDraftTheme}
                 />
               }

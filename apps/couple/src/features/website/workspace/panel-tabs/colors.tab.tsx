@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FONT_STYLES, normalizeColor, resolveTheme, sameColor } from "@mongkolka/templates";
-import type { FontKey, PartialTheme, Theme } from "@mongkolka/templates";
+import type { DecorKey, FontKey, PartialTheme, Theme } from "@mongkolka/templates";
 
-/** Sections override colors and font_style only; the chosen fonts are site-wide. */
-type SectionKeyName = Exclude<keyof Theme, FontKey>;
+/** Sections override colors and font_style only; fonts and background are site-wide. */
+type SectionKeyName = Exclude<keyof Theme, FontKey | DecorKey>;
 import { Button } from "@mongkolka/ui/button";
 import { Input } from "@mongkolka/ui/input";
 import { Label } from "@mongkolka/ui/label";

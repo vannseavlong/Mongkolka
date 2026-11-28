@@ -45,6 +45,7 @@ export const LIMITS = {
   openingTitle: 60,
   openingButton: 60,
   mapCaption: 200,
+  mapPlace: 200,
   noteTitle: 80,
   noteBody: 600,
 } as const;
@@ -348,12 +349,14 @@ function cleanVerse(content: Obj): Obj {
   });
 }
 
-/** `map` section: the couple's own map picture (image URL, same rules as every uploaded image) and a short caption per language. */
+/** `map` section: the map picture (same rules as every uploaded image), a caption per language, the place name and an https directions link. */
 function cleanMap(content: Obj): Obj {
   return compact({
     imageUrl: validateImageUrl(content.imageUrl, "content.imageUrl"),
     captionKh: optString(content, "captionKh", LIMITS.mapCaption, "content"),
     captionEn: optString(content, "captionEn", LIMITS.mapCaption, "content"),
+    placeName: optString(content, "placeName", LIMITS.mapPlace, "content"),
+    mapUrl: validateHttpsUrl(content.mapUrl, "content.mapUrl"),
   });
 }
 

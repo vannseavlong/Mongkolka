@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [API] fix(api): keep the map's directions link
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/API-map-link-save.md
+- Branch/PR: fix/map-link-save, merged to main (no PR)
+- What changed: saving the map section now keeps the place name and directions link (https only) instead of dropping them
+- Needs: API deploy; couples must enter the link again. Code and security review not run
+
 ## 2026-11-28 · [Web] feat(templates): map directions button
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-map-directions.md

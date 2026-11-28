@@ -16,13 +16,15 @@ export interface FooterSkinProps {
   content?: FooterContent;
   /** Optional main-site URL for the credit link; supplied by the consuming app (this package stays env-free). */
   brandUrl?: string;
+  /** The invitation section's monogram, so both badges match (set by the renderer). Empty = initials. */
+  monogram?: string;
 }
 
 /**
  * The closing note on the active skin's own ground: its scene backdrop, crest with the couple's
  * monogram, names in the skin's heading style, its divider, then the date, message and hashtag.
  */
-export function FooterSkin({ theme, couple, content, brandUrl }: FooterSkinProps) {
+export function FooterSkin({ theme, couple, content, brandUrl, monogram }: FooterSkinProps) {
   const { t, language } = useLanguage();
   const sk = useSkinOrnaments();
   const ui = useSkinUi();
@@ -47,7 +49,7 @@ export function FooterSkin({ theme, couple, content, brandUrl }: FooterSkinProps
           <>
             {couple?.partner1Name ? (
               <div className="mx-auto w-fit" aria-hidden>
-                <sk.Crest color={theme.accent_color} ground={theme.bg_color} label={monogramOf(couple)} size={96} />
+                <sk.Crest color={theme.accent_color} ground={theme.bg_color} label={monogram?.trim() || monogramOf(couple)} size={96} />
               </div>
             ) : (
               <div className="mx-auto w-fit" aria-hidden>

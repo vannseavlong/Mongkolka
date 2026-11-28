@@ -12,7 +12,7 @@ import type { SectionKey, Theme } from "../../types";
 import { initialOf, sealMonogram } from "../hero/envelope-logic";
 import { activeColumn, columnRatios, homeLimit, inColumns } from "./gallery-logic";
 import { guestInitial, tabFor, wallCounts } from "./wall-logic";
-import { directionsUrl, letterView, mapImage, noteView, pickText, venueCard } from "./text-logic";
+import { directionsUrl, letterView, mapImage, mapPlace, noteView, pickText } from "./text-logic";
 import { openingTitle } from "./opening-text";
 
 const theme: Theme = { bg_color: "#fff3f6", text_color: "#4a2c35", accent_color: "#8a6418", font_style: "serif" };
@@ -162,12 +162,19 @@ describe("new covenant sections render", () => {
   }
 });
 
-describe("venue card beside the map", () => {
-  it("takes the ceremony first, drops a pasted map link as the address, and needs a venue name", () => {
-    const details = { ceremonyVenue: "Hall", ceremonyTime: "5:00pm", ceremonyAddress: "https://www.google.com/maps/x", receptionVenue: "Other" };
-    assert.deepEqual(venueCard(details, "2027-01-07T00:00:00.000Z", "en"), { name: "Hall", address: null, date: "January 7, 2027", time: "5:00pm" });
-    assert.equal(venueCard({ receptionVenue: "Other", receptionAddress: "St 1928" }, undefined, "en")?.address, "St 1928");
-    assert.equal(venueCard({ ceremonyTime: "5:00pm" }, undefined, "kh"), null);
-    assert.equal(venueCard(undefined, undefined, "kh"), null);
+describe("place line above the map", () => {
+  const details = { ceremonyVenue: "Church", receptionVenue: "Hall" };
+
+  it("names the reception first, then the ceremony, and keeps the details link", () => {
+    assert.deepEqual(mapPlace(undefined, details, "https://maps.app.goo.gl/d"), { name: "Hall", href: "https://maps.app.goo.gl/d" });
+    assert.equal(mapPlace(undefined, { ceremonyVenue: "Church", receptionVenue: "  " }, undefined).name, "Church");
+    assert.deepEqual(mapPlace(undefined, undefined, undefined), { name: null, href: null });
+  });
+
+  it("lets the map's own name and https link win, ignoring blank or unsafe values", () => {
+    const own = mapPlace({ placeName: " Garden ", mapUrl: "https://maps.app.goo.gl/m" }, details, "https://maps.app.goo.gl/d");
+    assert.deepEqual(own, { name: "Garden", href: "https://maps.app.goo.gl/m" });
+    const bad = mapPlace({ placeName: " ", mapUrl: "javascript:alert(1)" }, details, "https://maps.app.goo.gl/d");
+    assert.deepEqual(bad, { name: "Hall", href: "https://maps.app.goo.gl/d" });
   });
 });

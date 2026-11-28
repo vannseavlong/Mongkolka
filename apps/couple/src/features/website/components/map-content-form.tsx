@@ -21,17 +21,19 @@ const schema = z.object({
   imageUrl: z.string().max(2000).refine((v) => v.trim() === "" || /^https?:\/\//i.test(v.trim()), "Use an image link that starts with https://"),
   captionKh: z.string().max(200, "Max 200 characters"),
   captionEn: z.string().max(200, "Max 200 characters"),
+  placeName: z.string().max(200, "Max 200 characters"),
+  mapUrl: z.string().max(2000).refine((v) => v.trim() === "" || /^https:\/\//i.test(v.trim()), "Use a link that starts with https://"),
 });
 type Values = z.infer<typeof schema>;
 
 const str = (v: unknown) => (typeof v === "string" ? v : "");
 
-/** map — content: MapContent { imageUrl?, captionKh?, captionEn? } (see @mongkolka/templates). The directions button uses the map link from the Details section. */
+/** map — content: MapContent { imageUrl?, captionKh?, captionEn?, placeName?, mapUrl? } (see @mongkolka/templates). A blank place name or link falls back to the profile. */
 export function MapContentForm({ section, onSaved }: { section: WebsiteSection; onSaved: () => void }) {
   const content = asRecord(section.content);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { imageUrl: str(content.imageUrl), captionKh: str(content.captionKh), captionEn: str(content.captionEn) },
+    defaultValues: { imageUrl: str(content.imageUrl), captionKh: str(content.captionKh), captionEn: str(content.captionEn), placeName: str(content.placeName), mapUrl: str(content.mapUrl) },
   });
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLButtonElement>(null);
@@ -39,7 +41,7 @@ export function MapContentForm({ section, onSaved }: { section: WebsiteSection; 
 
   async function onSubmit(v: Values) {
     try {
-      await saveContent(section.section_id, { imageUrl: v.imageUrl.trim() || undefined, captionKh: v.captionKh.trim() || undefined, captionEn: v.captionEn.trim() || undefined });
+      await saveContent(section.section_id, { imageUrl: v.imageUrl.trim() || undefined, captionKh: v.captionKh.trim() || undefined, captionEn: v.captionEn.trim() || undefined, placeName: v.placeName.trim() || undefined, mapUrl: v.mapUrl.trim() || undefined });
       toast.success("Map updated");
       onSaved();
     } catch (err) {
@@ -50,7 +52,9 @@ export function MapContentForm({ section, onSaved }: { section: WebsiteSection; 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <p className="text-sm text-muted-foreground">Your own drawn map picture (about 1456 × 1470 works well). The &ldquo;Open in Maps&rdquo; button appears when the Details section has a map link.</p>
+        <p className="text-sm text-muted-foreground">Your own drawn map picture (about 1456 × 1470 works well).</p>
+        <TextRow control={form.control} name="placeName" label="Place name (optional)" hint="Shown with a pin above the map. Blank uses the reception venue from your profile." />
+        <TextRow control={form.control} name="mapUrl" label="Directions link (optional)" placeholder="https://maps.app.goo.gl/…" hint="Blank uses the map link from your profile." />
         <div className="flex flex-col gap-2">
           <Label htmlFor="map-image">Map picture</Label>
           {image && (

@@ -1,4 +1,3 @@
-import { formatWeddingDate, localizeDigits } from "../../format";
 import type { DetailsContent, LettersContent, MapContent, NoteContent } from "../../types";
 
 type Language = "en" | "kh";
@@ -55,29 +54,16 @@ export function directionsUrl(url: string | undefined | null): string | null {
   return /^https:\/\//i.test(u) ? u : null;
 }
 
-export interface VenueCard {
-  name: string;
-  address: string | null;
-  date: string | null;
-  time: string | null;
+export interface MapPlace {
+  name: string | null;
+  href: string | null;
 }
 
-/** A typed address worth showing; couples sometimes paste a map link there, which is not one. */
-const plainAddress = (value: string | undefined): string | null => {
-  const text = value?.trim();
-  return text && !/^(https?:\/\/|www\.|google\.)/i.test(text) ? text : null;
-};
-
-/** What the card beside the map says, from the details (ceremony first); null when there is no venue name. */
-export function venueCard(details: DetailsContent | undefined, weddingDate: string | undefined, language: Language): VenueCard | null {
-  const ceremony = !!details?.ceremonyVenue?.trim();
-  const name = (ceremony ? details?.ceremonyVenue : details?.receptionVenue)?.trim();
-  if (!name) return null;
-  const time = (ceremony ? details?.ceremonyTime : details?.receptionTime)?.trim();
-  return {
-    name,
-    address: plainAddress(ceremony ? details?.ceremonyAddress : details?.receptionAddress),
-    date: formatWeddingDate(weddingDate, language),
-    time: time ? localizeDigits(time, language) : null,
-  };
+/**
+ * The line above the map picture. What the couple typed on the map wins; otherwise the reception (the meal is what guests
+ * are invited to), then the ceremony venue, and the details map link.
+ */
+export function mapPlace(content: MapContent | undefined, details: DetailsContent | undefined, mapUrl: string | undefined): MapPlace {
+  const name = [content?.placeName, details?.receptionVenue, details?.ceremonyVenue].map((value) => value?.trim()).find(Boolean);
+  return { name: name ?? null, href: directionsUrl(content?.mapUrl) ?? directionsUrl(mapUrl) };
 }

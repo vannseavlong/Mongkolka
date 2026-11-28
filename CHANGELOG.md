@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): reception place line on the map section
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-map-place.md
+- Branch/PR: feat/map-place, merged to main (no PR)
+- What changed: the map section shows a pin, the reception venue (ceremony if none) and a Get directions link instead of the venue card; date, time and address no longer show there. The couple's Map form has optional Place name and Directions link
+- Needs: web and couple deployed 2026-11-28. Code and security review not run; Map form not checked signed in
+
 ## 2026-11-28 · [Admin][Web] feat(ui): page titles in the portal header, help requests table
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Admin-datatable-header.md

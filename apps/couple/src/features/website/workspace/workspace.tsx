@@ -168,7 +168,7 @@ export function Workspace({
           <Inspector
             tab={rightTab}
             onTabChange={setRightTab}
-            content={<ContentPanel section={selected} profile={profile} galleryLayouts={selected.section_key === "gallery" ? listStyleVariants(selected, components, template.default_components).variants.map((v) => ({ id: v.component_id, label: v.name })) : undefined} saveTitle={(title) => patchSection(selected.section_id, { title }, "Could not save the title")} />}
+            content={<ContentPanel section={selected} profile={profile} styleId={listStyleVariants(selected, components, template.default_components).currentId} galleryLayouts={selected.section_key === "gallery" ? listStyleVariants(selected, components, template.default_components).variants.map((v) => ({ id: v.component_id, label: v.name })) : undefined} saveTitle={(title) => patchSection(selected.section_id, { title }, "Could not save the title")} />}
             colors={colors}
           />
         </aside>

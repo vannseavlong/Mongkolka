@@ -356,3 +356,11 @@ describe("map and note section content", () => {
     assert.throws(() => validateSectionContent("note", { titleEn: 5 }));
   });
 });
+
+describe("guestbook description", () => {
+  it("keeps the two languages, drops the rest and enforces the limit", () => {
+    assert.deepEqual(validateSectionContent("guestbook", { introKh: " សួស្តី ", introEn: "", junk: 1 }), { introKh: "សួស្តី" });
+    assert.throws(() => validateSectionContent("guestbook", { introEn: "x".repeat(LIMITS.guestbookIntro + 1) }));
+    assert.throws(() => validateSectionContent("guestbook", { introEn: 5 }));
+  });
+});

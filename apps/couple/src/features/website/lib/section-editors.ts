@@ -20,6 +20,7 @@ export const CONTENT_EDITABLE_SECTIONS: WebsiteSectionKey[] = [
   "letters",
   "note",
   "map",
+  "guestbook",
 ];
 
 /** True when the builder has an Edit dialog for this section (content or profile backed). */

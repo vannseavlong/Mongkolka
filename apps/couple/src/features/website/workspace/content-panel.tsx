@@ -5,6 +5,7 @@ import type { WebsiteSection } from "../data/schema";
 import { SectionTitleFields } from "../components/section-title-fields";
 import { HeroBannerAssets } from "../components/hero-banner-assets";
 import { ProfileSectionForm } from "../components/profile-section-form";
+import { GuestbookContentForm } from "../components/guestbook-content-form";
 import { StoryContentForm } from "../components/story-content-form";
 import { SectionContentForm } from "../components/section-content-forms";
 import type { PreviewProfile } from "../lib/build-content";
@@ -18,6 +19,7 @@ export function ContentPanel({
   profile,
   saveTitle,
   galleryLayouts,
+  styleId,
 }: {
   section: WebsiteSection;
   profile: PreviewProfile;
@@ -25,6 +27,8 @@ export function ContentPanel({
   saveTitle: (title: { kh?: string; en?: string } | null) => Promise<boolean>;
   /** The styles a gallery can stack (the same list as the Style tab). */
   galleryLayouts?: { id: string; label: string }[];
+  /** The style drawing this section, saved or inherited from the template. */
+  styleId: string;
 }) {
   const name = sectionLabel(section.section_key);
   return (
@@ -47,6 +51,8 @@ export function ContentPanel({
           )}
           <ProfileSectionForm key={`profile-${section.section_id}`} sectionKey={section.section_key} profile={profile} onSaved={() => {}} />
         </>
+      ) : section.section_key === "guestbook" ? (
+        <GuestbookContentForm key={`guestbook-${section.section_id}`} section={section} styleId={styleId} onSaved={() => {}} />
       ) : section.section_key === "story" ? (
         <StoryContentForm key={`story-${section.section_id}`} section={section} profile={profile} onSaved={() => {}} />
       ) : (

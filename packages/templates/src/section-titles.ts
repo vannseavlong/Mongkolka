@@ -77,3 +77,31 @@ export function defaultSectionTitle(key: SectionKey, language: Language, compone
   }
   return "";
 }
+
+/** The guestbook's line under the heading, per template style. The couple's own text replaces whichever one is drawn. */
+const GUESTBOOK_INTRO_KEYS: Record<string, string> = {
+  guestbook_wall: "guestbook.subheading",
+  guestbook_grace: "grace.guestbook.subheading",
+  guestbook_skin: "grace.guestbook.subheading",
+  guestbook_covenant: "covenant.memories.intro",
+};
+
+/** Text overrides for the guestbook description the couple wrote (`content.introKh` / `introEn`). */
+export function introOverrides(sections: readonly { section_key: SectionKey; enabled: boolean; content?: unknown }[]): TextOverrides {
+  const out: TextOverrides = {};
+  for (const section of sections) {
+    if (section.section_key !== "guestbook" || !section.enabled) continue;
+    const content = (section.content ?? {}) as { introKh?: string; introEn?: string };
+    const kh = clean(content.introKh);
+    const en = clean(content.introEn);
+    if (!kh && !en) continue;
+    for (const key of Object.values(GUESTBOOK_INTRO_KEYS)) out[key] = { ...(kh && { kh }), ...(en && { en }) };
+  }
+  return out;
+}
+
+/** The template's own description for a guestbook style (what an empty field falls back to), or "" when unknown. */
+export function defaultGuestbookIntro(language: Language, componentId: string): string {
+  const key = GUESTBOOK_INTRO_KEYS[componentId];
+  return (key && defaultText(key, language)) || "";
+}

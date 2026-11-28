@@ -58,6 +58,10 @@ export interface HeroContent {
   portraitUrl?: string;
   /** Banner for wide screens (desktop, tablet on its side). */
   landscapeUrl?: string;
+  /** Envelope style: what the seal says and its colors (`#rrggbb`). Empty = initials in the theme's accent. */
+  sealText?: string;
+  sealColor?: string;
+  sealTextColor?: string;
 }
 
 export interface StoryContent {

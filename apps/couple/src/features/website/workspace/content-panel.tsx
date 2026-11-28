@@ -4,6 +4,7 @@ import { hasSectionTitle } from "@mongkolka/templates";
 import type { WebsiteSection } from "../data/schema";
 import { SectionTitleFields } from "../components/section-title-fields";
 import { HeroBannerAssets } from "../components/hero-banner-assets";
+import { SealBadgeForm } from "../components/seal-badge-form";
 import { ProfileSectionForm } from "../components/profile-section-form";
 import { GuestbookContentForm } from "../components/guestbook-content-form";
 import { StoryContentForm } from "../components/story-content-form";
@@ -49,6 +50,7 @@ export function ContentPanel({
               <HeroBannerAssets key={`banners-${section.section_id}`} section={section} profile={profile} />
             </section>
           )}
+          {section.section_key === "hero" && styleId === "hero_envelope" && <SealBadgeForm key={`seal-${section.section_id}`} section={section} />}
           <ProfileSectionForm key={`profile-${section.section_id}`} sectionKey={section.section_key} profile={profile} onSaved={() => {}} />
         </>
       ) : section.section_key === "guestbook" ? (

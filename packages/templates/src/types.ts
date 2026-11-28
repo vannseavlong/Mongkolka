@@ -154,11 +154,15 @@ export interface VideoContent {
   title?: string;
 }
 
-/** `map` section: the couple's own drawn map picture and an optional caption. The directions button uses the details map link. */
+/** `map` section: the couple's own drawn map picture and an optional caption, with the place name and directions link shown above it. */
 export interface MapContent {
   imageUrl?: string;
   captionKh?: string;
   captionEn?: string;
+  /** Blank uses the reception venue, then the ceremony venue. */
+  placeName?: string;
+  /** https link; blank uses the details map link. */
+  mapUrl?: string;
 }
 
 /** `note` section: a short message to guests (for example "no alcohol at this wedding"). Empty fields use the built-in note. */

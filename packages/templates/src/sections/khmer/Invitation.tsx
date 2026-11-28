@@ -21,17 +21,20 @@ const SCRIPT = 'var(--font-script), "Great Vibes", cursive';
 
 function Family({ family, lang, theme }: { family: FamilyView | null; lang: "en" | "kh"; theme: Theme }) {
   const sk = useSkinOrnaments();
-  if (!family) return <div />;
+  if (!family) return <div className="row-span-2" />;
   const label = textFor(lang, family.side === "groom" ? "khmer.invitation.son" : "khmer.invitation.daughter");
   return (
-    <div className="min-w-0 space-y-1.5 text-[13px] leading-relaxed sm:text-sm">
-      {family.parents.map((line) => (
-        <p key={line} className="m-0 break-words">
-          {line}
-        </p>
-      ))}
+    // Two rows shared with the other family (subgrid), so both names line up however many parents each side has.
+    <div className="row-span-2 grid min-w-0 grid-rows-subgrid text-[13px] leading-relaxed sm:text-sm">
+      <div className="space-y-1.5 self-center">
+        {family.parents.map((line) => (
+          <p key={line} className="m-0 break-words">
+            {line}
+          </p>
+        ))}
+      </div>
       {family.name && (
-        <>
+        <div className="space-y-1.5 self-start">
           <p className="m-0 pt-3 text-xs opacity-75">{label}</p>
           <p
             className="m-0 break-words"
@@ -46,7 +49,7 @@ function Family({ family, lang, theme }: { family: FamilyView | null; lang: "en"
           >
             {family.name}
           </p>
-        </>
+        </div>
       )}
     </div>
   );
@@ -56,9 +59,9 @@ function Block({ block, theme }: { block: InvitationBlock; theme: Theme }) {
   return (
     <div lang={block.lang === "kh" ? "km" : "en"}>
       <p className="m-0 mb-6 text-sm italic leading-loose opacity-90">{block.greeting}</p>
-      <div className="grid items-start gap-3" style={{ gridTemplateColumns: "minmax(0,1fr) auto minmax(0,1fr)" }}>
+      <div className="grid gap-x-3 gap-y-1.5" style={{ gridTemplateColumns: "minmax(0,1fr) auto minmax(0,1fr)" }}>
         <Family family={block.groom} lang={block.lang} theme={theme} />
-        <div aria-hidden className="mx-auto h-full w-px self-stretch" style={{ minHeight: 64, backgroundImage: `linear-gradient(180deg, transparent, ${withAlpha(theme.accent_color, 0.75)}, transparent)` }} />
+        <div aria-hidden className="row-span-2 mx-auto h-full w-px self-stretch" style={{ minHeight: 64, backgroundImage: `linear-gradient(180deg, transparent, ${withAlpha(theme.accent_color, 0.75)}, transparent)` }} />
         <Family family={block.bride} lang={block.lang} theme={theme} />
       </div>
     </div>

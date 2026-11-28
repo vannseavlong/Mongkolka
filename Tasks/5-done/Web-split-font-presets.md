@@ -23,7 +23,7 @@ In the Design panel a theme preset changes colours and background only; a font p
 - [ ] Hover preview and Save work for both
 - [ ] Checked at 360px
 - [x] Root `CHANGELOG.md` entry added
-- [ ] Worktree and branch removed after merge
+- [x] Worktree and branch removed after merge
 
 ## Progress 2026-11-28 (built, not committed)
 - Theme presets: colours, pattern, corners. New font presets: Template default, Classic Khmer, Elegant, Romantic, Garden, Modern (names need owner approval).
@@ -35,4 +35,7 @@ In the Design panel a theme preset changes colours and background only; a font p
 ## Merged (2026-11-28)
 - Owner checked the panel and the first fix locally (webpack dev) and asked to commit, merge, push and deploy. The final form of the fix was verified by rendering the production CSS in headless Chrome, not in the builder.
 - On merged `main`: templates 396/396, couple 91/91, web tests 14/14, couple and web builds pass (second attempt, Google Fonts download failed on the first).
-- Why in `4-testing`: live panel and live site not checked signed in, 360px not checked, G5 code review and G6 security not run. Worktree kept while the owner's dev server runs from it.
+- Why in `4-testing`: live panel and live site not checked signed in, 360px not checked, G5 code review and G6 security not run.
+
+## Closed (2026-11-28)
+Owner asked to close: worktree and branch removed, moved to `5-done`. Skipped G4 live/360px check, G5 code review, G6 security: not run.

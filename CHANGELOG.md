@@ -2,9 +2,16 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] fix(templates): align names on the invitation
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-invitation-align.md
+- Branch/PR: fix/invitation-align, merged to main (no PR)
+- What changed: on the Khmer invitation, son and daughter names stay level when one family lists fewer parents or none
+- Needs: web and couple deploy. Code review not run
+
 ## 2026-11-28 · [Web] feat(couple): separate theme and font presets
 - Owner: SNLRLONG
-- Task: Tasks/4-testing/Web-split-font-presets.md
+- Task: Tasks/5-done/Web-split-font-presets.md
 - Branch/PR: feat/split-font-presets, merged to main (no PR)
 - What changed: in Design, theme presets change colours and background only; new font presets change fonts only. English text no longer turns into oversized Arial when Siemreap is the Khmer text font
 - Needs: web and couple deploy. Code and security review not run

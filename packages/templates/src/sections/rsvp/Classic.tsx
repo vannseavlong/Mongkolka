@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { themeFont } from "../../theme";
 import type { RsvpContent, Theme } from "../../types";
 import { useGuest } from "../../guest-context";
 
@@ -30,7 +31,7 @@ export function RsvpClassic({ theme, content, onSubmit }: RsvpClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-2 text-center text-2xl font-medium" style={{ color: theme.accent_color }}>

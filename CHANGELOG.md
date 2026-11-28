@@ -2,6 +2,20 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): font choices in a Design panel
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-style-fonts.md
+- Branch/PR: feat/style-fonts, merged to main (no PR)
+- What changed: "Colors & palette" is now Design; presets set colours and fonts; separate pickers for Khmer heading, Khmer text, English heading and English script, on all templates. Existing sites are unchanged until a font is picked
+- Needs: web and couple deployed 2026-11-28. Panel not checked signed in; code and security review not run
+
+## 2026-11-28 · [Web] fix(templates): gold corners in front of the page
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-corners-front.md
+- Branch/PR: fix/corners-front, merged to main (no PR)
+- What changed: the Covenant gold corners sit above the content and bottom menu; taps pass through
+- Needs: web and couple deployed 2026-11-28. Not checked on a real phone
+
 ## 2026-11-28 · [Web] fix(templates): seamless Covenant sections
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-seamless-sections.md

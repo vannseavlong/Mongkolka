@@ -57,7 +57,8 @@ export function SectionColorPopover({
   async function save(values: Theme) {
     // Store only keys that differ from the saved site theme, same as the Colors tab.
     const diff: Partial<Theme> = {};
-    for (const k of Object.keys(values) as (keyof Theme)[]) {
+    // Sections override colors and font_style only; the chosen fonts are site-wide.
+    for (const k of ["bg_color", "text_color", "accent_color", "font_style"] as const) {
       if (k === "font_style" ? values[k] !== effectiveTheme[k] : !sameColor(values[k], effectiveTheme[k])) diff[k] = values[k];
     }
     const next = Object.keys(diff).length ? diff : null;

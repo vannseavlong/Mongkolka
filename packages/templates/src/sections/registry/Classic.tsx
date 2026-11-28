@@ -1,4 +1,5 @@
 import { Gift } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { RegistryContent, Theme } from "../../types";
 
 export interface RegistryClassicProps {
@@ -16,7 +17,7 @@ export function RegistryClassic({ theme, content }: RegistryClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <Gift className="mx-auto mb-4 size-8" style={{ color: theme.accent_color }} />

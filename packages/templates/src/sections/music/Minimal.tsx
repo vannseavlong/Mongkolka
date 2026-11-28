@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { Music4 } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { MusicContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -25,7 +26,7 @@ export function MusicMinimal({ theme, content }: MusicMinimalProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <a

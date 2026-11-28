@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { themeFont } from "../../theme";
 import type { Theme, TimelineContent } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -21,7 +22,7 @@ export function TimelineVerticalLine({ theme, content }: TimelineVerticalLinePro
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-12 text-center text-2xl font-medium" style={{ color: theme.accent_color }}>

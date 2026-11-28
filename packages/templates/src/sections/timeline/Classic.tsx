@@ -1,3 +1,4 @@
+import { themeFont } from "../../theme";
 import type { Theme, TimelineContent } from "../../types";
 
 export interface TimelineClassicProps {
@@ -15,7 +16,7 @@ export function TimelineClassic({ theme, content }: TimelineClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-10 text-center text-2xl font-medium" style={{ color: theme.accent_color }}>

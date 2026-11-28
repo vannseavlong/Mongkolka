@@ -21,7 +21,7 @@ const PANES: { value: Pane; label: string }[] = [
   { value: "preview", label: "Preview" },
   { value: "content", label: "Content" },
   { value: "style", label: "Style" },
-  { value: "colors", label: "Colors" },
+  { value: "colors", label: "Design" },
 ];
 
 /**

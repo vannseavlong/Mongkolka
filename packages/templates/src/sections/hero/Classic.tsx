@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { CoupleInfo, HeroContent, Theme } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 
@@ -19,7 +20,7 @@ export function HeroClassic({ couple, theme, content }: HeroClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       {content?.coverPhotoUrl && (

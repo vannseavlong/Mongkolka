@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { ArrowUpRight } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { RegistryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -26,7 +27,7 @@ export function RegistryList({ theme, content }: RegistryListProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-6 text-center text-2xl font-medium" style={{ color: theme.accent_color }}>

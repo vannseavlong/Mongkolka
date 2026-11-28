@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Mail } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { OpeningProps } from "../../types";
 import { formatCoupleNames, formatWeddingDate } from "../../format";
 import { useLanguage } from "../../i18n";
@@ -31,7 +32,7 @@ export function Envelope({ couple, theme, guestGreeting, onOpen }: OpeningProps)
           style={{
             backgroundColor: theme.bg_color,
             color: theme.text_color,
-            fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+            fontFamily: themeFont(theme),
           }}
           initial={{ y: 24, opacity: 0 }}
           animate={

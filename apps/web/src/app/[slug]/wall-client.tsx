@@ -9,6 +9,7 @@ import {
   LanguageToggle,
   resolveInitialLanguage,
   resolveTheme,
+  SiteFonts,
   type GuestbookData,
   type WallStatus,
 } from "@mongkolka/templates";
@@ -69,20 +70,22 @@ export function WallClient({ page }: { page: "wishes" | "photos" }) {
 
   return (
     <LanguageProvider initialLanguage={lang}>
-      <LanguageToggle theme={{ text_color: theme.text_color }} />
-      <Page
-        theme={theme}
-        couple={couple}
-        data={wall.data}
-        status={wall.status}
-        backHref={backHref}
-        guestName={guest}
-        onSubmit={async (input) => {
-          const result = await submitGuestbook(slug, input);
-          fetchGuestbook(slug).then((d) => setWall({ status: "ready", data: d })).catch(() => undefined);
-          return result;
-        }}
-      />
+      <SiteFonts theme={theme}>
+        <LanguageToggle theme={{ text_color: theme.text_color }} />
+        <Page
+          theme={theme}
+          couple={couple}
+          data={wall.data}
+          status={wall.status}
+          backHref={backHref}
+          guestName={guest}
+          onSubmit={async (input) => {
+            const result = await submitGuestbook(slug, input);
+            fetchGuestbook(slug).then((d) => setWall({ status: "ready", data: d })).catch(() => undefined);
+            return result;
+          }}
+        />
+      </SiteFonts>
     </LanguageProvider>
   );
 }

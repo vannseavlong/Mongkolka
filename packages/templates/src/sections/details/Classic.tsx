@@ -1,3 +1,4 @@
+import { themeFont } from "../../theme";
 import type { DetailsContent, Theme } from "../../types";
 
 export interface DetailsClassicProps {
@@ -38,7 +39,7 @@ export function DetailsClassic({ theme, content }: DetailsClassicProps) {
       style={{
         backgroundColor: theme.bg_color,
         color: theme.text_color,
-        fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+        fontFamily: themeFont(theme),
       }}
     >
       <h2 className="mb-8 text-center text-2xl font-medium" style={{ color: theme.accent_color }}>

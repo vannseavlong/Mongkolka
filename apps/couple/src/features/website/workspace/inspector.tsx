@@ -31,7 +31,7 @@ export function Inspector({
             Content
           </TabsTrigger>
           <TabsTrigger value="colors" className={ACTIVE_TAB}>
-            Colors &amp; palette
+            Design
           </TabsTrigger>
         </TabsList>
       </div>

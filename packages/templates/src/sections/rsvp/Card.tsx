@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import { themeFont } from "../../theme";
 import type { RsvpContent, Theme } from "../../types";
 import type { RsvpSubmission } from "./Classic";
 import { useLanguage } from "../../i18n";
@@ -21,7 +22,7 @@ export function RsvpCard({ theme, content, onSubmit }: RsvpCardProps) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [attending, setAttending] = useState(true);
-  const fontFamily = theme.font_style === "serif" ? "serif" : "sans-serif";
+  const fontFamily = themeFont(theme);
 
   return (
     <section className="px-6 py-20" style={{ backgroundColor: theme.bg_color, fontFamily }}>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Great_Vibes, Moul, Battambang, Cinzel, Fredoka, Noto_Serif_Khmer } from "next/font/google";
+import { Great_Vibes, Moul, Battambang, Cinzel, Fredoka, Noto_Serif_Khmer, Cormorant_Garamond, Moulpali, Koulen, Siemreap, Kantumruy_Pro, Playfair_Display, Dancing_Script, Parisienne } from "next/font/google";
 import { Toaster } from "@mongkolka/ui/sonner";
 import "./globals.css";
 
@@ -13,6 +13,16 @@ const moul = Moul({ subsets: ["khmer", "latin"], weight: "400", variable: "--fon
 const battambang = Battambang({ subsets: ["khmer", "latin"], weight: ["300", "400", "700"], variable: "--font-battambang", display: "swap", preload: false });
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-cinzel", display: "swap", preload: false });
 const rounded = Fredoka({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-rounded", display: "swap", preload: false });
+
+// Extra faces a couple can pick (packages/templates/src/site-fonts.tsx). preload off: only the chosen ones download.
+const moulpali = Moulpali({ subsets: ["khmer", "latin"], weight: "400", variable: "--face-moulpali", display: "swap", preload: false });
+const koulen = Koulen({ subsets: ["khmer", "latin"], weight: "400", variable: "--face-koulen", display: "swap", preload: false });
+const siemreap = Siemreap({ subsets: ["khmer"], weight: "400", variable: "--face-siemreap", display: "swap", preload: false });
+const kantumruy = Kantumruy_Pro({ subsets: ["khmer", "latin"], variable: "--face-kantumruy", display: "swap", preload: false });
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--face-playfair", display: "swap", preload: false });
+const dancing = Dancing_Script({ subsets: ["latin"], variable: "--face-dancing", display: "swap", preload: false });
+const parisienne = Parisienne({ subsets: ["latin"], weight: "400", variable: "--face-parisienne", display: "swap", preload: false });
+const cormorant = Cormorant_Garamond({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--face-cormorant", display: "swap", preload: false });
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -85,7 +95,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${script.variable} ${khmer.variable} ${moul.variable} ${battambang.variable} ${cinzel.variable} ${rounded.variable}`}>
+      <body className={`${script.variable} ${khmer.variable} ${moul.variable} ${battambang.variable} ${cinzel.variable} ${rounded.variable} ${moulpali.variable} ${koulen.variable} ${siemreap.variable} ${kantumruy.variable} ${playfair.variable} ${dancing.variable} ${parisienne.variable} ${cormorant.variable}`}>
         {themeStyle && <style>{themeStyle}</style>}
         {children}
         <Toaster />

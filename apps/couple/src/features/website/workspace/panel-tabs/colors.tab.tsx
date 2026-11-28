@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { FONT_STYLES, normalizeColor, resolveTheme, sameColor } from "@mongkolka/templates";
-import type { PartialTheme, Theme } from "@mongkolka/templates";
+import type { FontKey, PartialTheme, Theme } from "@mongkolka/templates";
+
+/** Sections override colors and font_style only; the chosen fonts are site-wide. */
+type SectionKeyName = Exclude<keyof Theme, FontKey>;
 import { Button } from "@mongkolka/ui/button";
 import { Input } from "@mongkolka/ui/input";
 import { Label } from "@mongkolka/ui/label";
@@ -34,10 +37,10 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
   const chain = useRef<Promise<unknown>>(Promise.resolve());
   const latest = useRef<{ value: PartialTheme | null } | null>(null);
   const [pending, setPending] = useState(0);
-  const [drafts, setDrafts] = useState<Partial<Theme>>({});
+  const [drafts, setDrafts] = useState<Partial<Record<SectionKeyName, string>>>({});
   // Keys edited but not yet committed (so blur after Enter does not save twice).
-  const dirty = useRef(new Set<keyof Theme>());
-  const timers = useRef<Partial<Record<keyof Theme, ReturnType<typeof setTimeout>>>>({});
+  const dirty = useRef(new Set<SectionKeyName>());
+  const timers = useRef<Partial<Record<SectionKeyName, ReturnType<typeof setTimeout>>>>({});
 
   useEffect(() => {
     const t = timers.current;
@@ -61,12 +64,12 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
       });
   }
 
-  function clearTimer(key: keyof Theme) {
+  function clearTimer(key: SectionKeyName) {
     clearTimeout(timers.current[key]);
     delete timers.current[key];
   }
 
-  function dropDraft(key: keyof Theme, onlyIfValue?: string) {
+  function dropDraft(key: SectionKeyName, onlyIfValue?: string) {
     setDrafts((d) => {
       if (d[key] === undefined || (onlyIfValue !== undefined && d[key] !== onlyIfValue)) return d;
       const rest = { ...d };
@@ -77,7 +80,7 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
 
   // Only keys that differ from the saved site theme are stored, so later
   // site-wide changes still flow through for untouched keys.
-  function commit(key: keyof Theme, value: string) {
+  function commit(key: SectionKeyName, value: string) {
     clearTimer(key);
     dirty.current.delete(key);
     const base = latest.current ? latest.current.value : override;
@@ -88,14 +91,14 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
     enqueue(Object.keys(next).length ? next : null, () => dropDraft(key, value));
   }
 
-  function edit(key: keyof Theme, value: string) {
+  function edit(key: SectionKeyName, value: string) {
     dirty.current.add(key);
     setDrafts((d) => ({ ...d, [key]: value }));
     clearTimer(key);
     timers.current[key] = setTimeout(() => commit(key, value), DEBOUNCE_MS);
   }
 
-  function cancel(key: keyof Theme) {
+  function cancel(key: SectionKeyName) {
     clearTimer(key);
     dirty.current.delete(key);
     dropDraft(key);
@@ -103,7 +106,7 @@ function ColorsPanel({ context }: { context: SectionPanelContext }) {
 
   function resetToSiteTheme() {
     if (!resettable) return;
-    (Object.keys(timers.current) as (keyof Theme)[]).forEach(clearTimer);
+    (Object.keys(timers.current) as (SectionKeyName)[]).forEach(clearTimer);
     dirty.current.clear();
     setDrafts({});
     enqueue(null, () => {}, "Section now uses the site theme");

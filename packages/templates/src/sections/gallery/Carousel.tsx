@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion } from "motion/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { themeFont } from "../../theme";
 import type { GalleryContent, Theme } from "../../types";
 import { useLanguage } from "../../i18n";
 
@@ -34,7 +35,7 @@ export function GalleryCarousel({ theme, content, showHeading = true }: GalleryC
           className="mb-8 px-6 text-center text-2xl font-medium"
           style={{
             color: theme.accent_color,
-            fontFamily: theme.font_style === "serif" ? "serif" : "sans-serif",
+            fontFamily: themeFont(theme),
           }}
         >
           {t("section.gallery.heading")}

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { Check } from "lucide-react";
-import { FONT_STYLES, sameColor, THEME_PRESETS } from "@mongkolka/templates";
+import { FONT_KEYS, FONT_ROLES, FONT_STYLES, fontStack, sameColor, THEME_PRESETS } from "@mongkolka/templates";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
@@ -15,7 +15,9 @@ import { api, ApiError } from "@/lib/api";
 import type { Theme } from "../data/schema";
 import { ContrastNote } from "./contrast-note";
 
-const COLOR_KEYS = ["bg_color", "text_color", "accent_color", "font_style"] as const;
+const DESIGN_KEYS = ["bg_color", "text_color", "accent_color", "font_style", ...FONT_KEYS] as const;
+/** Select cannot hold an empty value, so "template default" has its own. */
+const TEMPLATE_FONT = "default";
 
 export function ThemeEditor({
   theme,
@@ -42,7 +44,7 @@ export function ThemeEditor({
   }, [watched, form, onPreview]);
 
   function applyPreset(preset: Theme) {
-    for (const key of COLOR_KEYS) form.setValue(key, preset[key], { shouldDirty: true });
+    for (const key of DESIGN_KEYS) form.setValue(key, preset[key] ?? "", { shouldDirty: true });
   }
 
   // Drop the unsaved preview when the editor goes away (panel collapsed,
@@ -59,12 +61,13 @@ export function ThemeEditor({
       for (const k of palette) override[k] = values[k];
     }
     if (values.font_style !== templateDefault.font_style) override.font_style = values.font_style;
+    for (const k of FONT_KEYS) if (values[k]) override[k] = values[k];
     try {
       await api.patch("/couple/api/website/theme", { theme_override: override });
-      toast.success("Theme saved");
+      toast.success("Design saved");
       mutate("/couple/api/website/settings");
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to save theme");
+      toast.error(err instanceof ApiError ? err.message : "Failed to save the design");
     }
   }
 
@@ -72,11 +75,11 @@ export function ThemeEditor({
   async function resetToTemplate() {
     try {
       await api.patch("/couple/api/website/theme", { theme_override: {} });
-      form.reset(templateDefault);
-      toast.success("Colors reset to the template");
+      form.reset({ ...templateDefault, ...Object.fromEntries(FONT_KEYS.map((k) => [k, templateDefault[k] ?? ""])) });
+      toast.success("Design reset to the template");
       mutate("/couple/api/website/settings");
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to reset colors");
+      toast.error(err instanceof ApiError ? err.message : "Failed to reset the design");
     }
   }
 
@@ -85,11 +88,11 @@ export function ThemeEditor({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1 text-sm font-medium">Palettes</legend>
-          <p className="text-xs text-muted-foreground">Hover or focus a palette to preview it on the page. Click to use it, then Save.</p>
+          <legend className="mb-1 text-sm font-medium">Presets</legend>
+          <p className="text-xs text-muted-foreground">Colors and fonts together. Hover or focus a preset to preview it on the page. Click to use it, then Save.</p>
           <div className="grid grid-cols-2 gap-2">
             {THEME_PRESETS.map((preset) => {
-              const active = COLOR_KEYS.every((k) => sameColor(String(current[k]), preset.theme[k]));
+              const active = DESIGN_KEYS.every((k) => sameColor(current[k] ?? "", (preset.theme as Theme)[k] ?? ""));
               return (
                 <button
                   key={preset.id}
@@ -107,9 +110,11 @@ export function ThemeEditor({
                 >
                   <span
                     className="flex h-8 items-center justify-between rounded px-2"
-                    style={{ background: preset.theme.bg_color, color: preset.theme.text_color, fontFamily: preset.theme.font_style === "serif" ? "serif" : "sans-serif" }}
+                    style={{ background: preset.theme.bg_color, color: preset.theme.text_color, fontFamily: fontStack("font_en_heading", (preset.theme as Theme).font_en_heading) ?? (preset.theme.font_style === "serif" ? "serif" : "sans-serif") }}
                   >
-                    <span className="text-sm font-semibold">Aa</span>
+                    <span className="text-sm font-semibold">
+                      Aa <span style={{ fontFamily: fontStack("font_kh_heading", (preset.theme as Theme).font_kh_heading) ?? undefined }}>កខ</span>
+                    </span>
                     <span className="size-3 rounded-full" style={{ background: preset.theme.accent_color }} />
                   </span>
                   <span className="flex items-center justify-between gap-1">
@@ -183,13 +188,43 @@ export function ThemeEditor({
             )}
           />
         </div>
+        <fieldset className="flex flex-col gap-3">
+          <legend className="mb-1 text-sm font-medium">Fonts</legend>
+          {FONT_ROLES.map((role) => (
+            <FormField
+              key={role.key}
+              control={form.control}
+              name={role.key}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{role.label}</FormLabel>
+                  <Select value={field.value || TEMPLATE_FONT} onValueChange={(v) => field.onChange(v === TEMPLATE_FONT ? "" : v)}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={TEMPLATE_FONT}>Template default</SelectItem>
+                      {role.options.map((option) => (
+                        <SelectItem key={option.id} value={option.id}>
+                          {option.name} <span style={{ fontFamily: fontStack(role.key, option.id) ?? undefined }}>{role.sample}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          ))}
+        </fieldset>
         <ContrastNote theme={{ bg_color: current.bg_color, text_color: current.text_color, accent_color: current.accent_color }} />
         <div className="flex flex-wrap gap-2">
           <Button type="submit" aria-disabled={form.formState.isSubmitting}
             onClick={(e) => form.formState.isSubmitting && e.preventDefault()}
             className="w-fit aria-disabled:pointer-events-none aria-disabled:opacity-50"
           >
-            Save colors
+            Save design
           </Button>
           <Button type="button" variant="outline" onClick={resetToTemplate}>
             Reset to template

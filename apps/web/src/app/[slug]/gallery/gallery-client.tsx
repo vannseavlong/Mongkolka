@@ -7,6 +7,7 @@ import {
   LanguageToggle,
   resolveInitialLanguage,
   resolveTheme,
+  SiteFonts,
   skinFromComponents,
   SkinProvider,
   TextOverridesProvider,
@@ -49,7 +50,9 @@ export function GalleryClient() {
       <TextOverridesProvider overrides={titleOverrides(data.sections)}>
         <LanguageToggle theme={{ text_color: theme.text_color }} />
         <SkinProvider skin={skinFromComponents(data.template.default_components)}>
-          <GalleryAllPage theme={theme} couple={couple} photos={photos} backHref={`/${encodeURIComponent(slug)}${carryQuery(guest, lang)}`} onBack={() => markReturning(slug)} />
+          <SiteFonts theme={theme}>
+            <GalleryAllPage theme={theme} couple={couple} photos={photos} backHref={`/${encodeURIComponent(slug)}${carryQuery(guest, lang)}`} onBack={() => markReturning(slug)} />
+          </SiteFonts>
         </SkinProvider>
       </TextOverridesProvider>
     </LanguageProvider>

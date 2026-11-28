@@ -90,6 +90,10 @@ describe("letters, note and map text", () => {
     assert.equal(pickText("", "a", "kh"), "a");
     assert.equal(pickText("", " ", "en", "x"), "x");
   });
+  it("falls back to the built-in apology, and the couple's own words win", () => {
+    assert.deepEqual(letterView(undefined, "en", "Thanks", "Sorry").apology, ["Sorry"]);
+    assert.deepEqual(letterView({ apologyEn: "Mine" }, "en", "Thanks", "Sorry").apology, ["Mine"]);
+  });
   it("shows the built-in thank-you and note when nothing is written", () => {
     assert.deepEqual(letterView(undefined, "en", "Thanks").thanks, ["Thanks"]);
     const n = noteView(undefined, "en", { title: "No alcohol", body: "Please." });

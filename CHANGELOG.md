@@ -2,6 +2,20 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Admin][Web] feat(ui): page titles in the portal header, help requests table
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Admin-datatable-header.md
+- Branch/PR: feat/admin-datatable-header, merged to main (no PR)
+- What changed: admin, couple and vendor show each page title and its actions beside the sidebar toggle, at full width. Admin Help requests is a table with a status filter, couple search and a row action menu
+- Needs: admin, couple and vendor deployed 2026-11-28. Code review not run; live pages not checked
+
+## 2026-11-28 · [Web] feat(vendor): Firebase hosting, page kept on reload
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-vendor-firebase-hosting.md
+- Branch/PR: feat/vendor-firebase-hosting, merged to main (no PR)
+- What changed: vendor builds as a static site with a `vendor` hosting target and `deploy:vendor`; reloading a vendor page no longer jumps to Overview
+- Needs: deployed 2026-11-28. Code and security review not run; vendor sign-in on the live site not checked
+
 ## 2026-11-27 · [Web] feat(templates): Khmer background and venue card on Covenant
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-kbach-art.md, Tasks/4-testing/Web-kbach-backdrop.md

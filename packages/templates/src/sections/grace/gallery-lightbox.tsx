@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Theme } from "../../types";
 import { gracePalette, DISPLAY_FONT } from "./shared";
+import { useBackCloses } from "./use-back-closes";
 
 /** Replace {n} / {total} placeholders (pure). */
 export function fillTemplate(template: string, vars: Record<string, string | number>): string {
@@ -40,7 +41,7 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
   );
 }
 
-/** Modal photo viewer: dialog semantics, Esc, arrows, swipe, focus trap, scroll lock. Rendered in a portal. */
+/** Modal photo viewer: dialog semantics, Back and Esc close it, arrows, swipe, focus trap, scroll lock. Rendered in a portal. */
 export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken, labels }: GraceLightboxProps) {
   const p = gracePalette(theme);
   const total = photos.length;
@@ -81,6 +82,8 @@ export function GraceLightbox({ theme, photos, index, onIndex, onClose, onBroken
     },
     [index, total, onIndex],
   );
+
+  useBackCloses(onClose);
 
   // Scroll lock, restored on close; focus moves in.
   useEffect(() => {

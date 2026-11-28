@@ -2,6 +2,13 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Web] feat(templates): map directions button
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-map-directions.md
+- Branch/PR: feat/map-directions, merged to main (no PR)
+- What changed: on the map section the place name is smaller and beside its pin; "Get directions" is a button below the map, shown when a maps link is saved
+- Needs: web and couple deploy. Code review not run
+
 ## 2026-11-28 · [Web] feat(templates): video autoplay on scroll
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-video-autoplay.md

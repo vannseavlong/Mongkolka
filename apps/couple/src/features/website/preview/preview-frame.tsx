@@ -126,7 +126,12 @@ export function PreviewFrame() {
         onOpened={() => setOpened(true)}
         onCoverRevealed={() => setOpened(true)}
         galleryHref="#"
-        extraProps={(sectionKey) => (sectionKey === "rsvp" ? { onSubmit: async () => {}, wishOnly: wishOnly, onWish: async () => {} } : {})}
+        extraProps={(sectionKey) => {
+          if (sectionKey === "rsvp") return { onSubmit: async () => {}, wishOnly: wishOnly, onWish: async () => {} };
+          // The live site has a wishes page; without these links the preview would hide the "see all" buttons.
+          if (sectionKey === "guestbook") return { photosHref: "#", wishesHref: "#" };
+          return {};
+        }}
         wrapSection={(section, node) => (
           <div
             data-section-id={section.section_id}

@@ -74,7 +74,7 @@ describe("gallery_skin", () => {
 describe("guestbook_skin", () => {
   for (const { skin, theme } of SKINS) {
     for (const language of ["en", "kh"] as const) {
-      it(`${skin} (${language}): form fields, wall and actions`, () => {
+      it(`${skin} (${language}): form fields and wall`, () => {
         const html = render("guestbook", skin, theme, language);
         for (const id of ["sk-gb-name", "sk-gb-wish", "sk-gb-file"]) assert.ok(html.includes(`id="${id}"`), `${id} missing`);
         assert.ok(html.includes('type="submit"'));
@@ -82,7 +82,6 @@ describe("guestbook_skin", () => {
         // every approved photo from the sample wall is on the page, and so is a wish
         assert.equal((html.match(/<img/g) ?? []).length, SAMPLE_GUESTBOOK.photos.length);
         assert.ok(html.includes(SAMPLE_GUESTBOOK.wishes[0]!.name));
-        assert.ok(html.includes("min-h-12"), "action buttons are at least 48px tall");
         assert.ok(!html.includes("undefined"));
       });
     }
@@ -92,8 +91,9 @@ describe("guestbook_skin", () => {
     assert.ok(!html.includes("Be the first to share a moment."));
     assert.equal((html.match(/<img/g) ?? []).length, 0);
   });
-  it("shows directions when the couple has a maps link", () => {
-    const html = render("guestbook", "garden", SKINS[1]!.theme, "en", { actions: { mapsUrl: "https://maps.example/x" } });
-    assert.ok(html.includes("Get directions"));
+  it("has no directions, calendar or share row, and links to the full page when there is one", () => {
+    const html = render("guestbook", "garden", SKINS[1]!.theme, "en", { actions: { mapsUrl: "https://maps.example/x" }, wishesHref: "#wishes" });
+    for (const gone of ["Get directions", "Add to calendar", "Share the invitation", "Be part of the day"]) assert.ok(!html.includes(gone), gone);
+    assert.ok(html.includes('href="#wishes"'));
   });
 });

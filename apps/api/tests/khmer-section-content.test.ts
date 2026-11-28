@@ -365,10 +365,10 @@ describe("guestbook description", () => {
   });
 });
 
-describe("invitation notice line", () => {
-  it("keeps the line and the hide flag, and enforces the limit", () => {
-    assert.deepEqual(validateSectionContent("invitation", { noticeKh: " គ្មានសុរា ", noticeEn: "", hideNotice: "yes" }), { noticeKh: "គ្មានសុរា" });
-    assert.deepEqual(validateSectionContent("invitation", { hideNotice: true }), { hideNotice: true });
-    assert.throws(() => validateSectionContent("invitation", { noticeEn: "x".repeat(LIMITS.invitationNotice + 1) }));
+describe("letters closing note", () => {
+  it("keeps the note and the hide flag, and enforces the limit", () => {
+    assert.deepEqual(validateSectionContent("letters", { noteKh: " គ្មានសុរា ", noteEn: "", hideNote: "yes" }), { noteKh: "គ្មានសុរា" });
+    assert.deepEqual(validateSectionContent("letters", { hideNote: true }), { hideNote: true });
+    assert.throws(() => validateSectionContent("letters", { noteEn: "x".repeat(LIMITS.lettersNote + 1) }));
   });
 });

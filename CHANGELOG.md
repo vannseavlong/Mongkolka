@@ -2,6 +2,20 @@
 
 Merges to `main` across all projects, newest first. Tags: `[Web]`/`[API]`/`[Admin]`. Format and rules: `Tasks/README.md`.
 
+## 2026-11-28 · [Cross] feat(couple): letter ornament and closing note
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-letters-note.md
+- Branch/PR: feat/letters-note, merged to main (no PR)
+- What changed: redrawn kbach ornament; the no-alcohol line moves from the invitation to a note under the letters, editable and hideable
+- Needs: API, web and couple deploy. Code and security review not run
+
+## 2026-11-28 · [Web] feat(templates): kbach monogram badge
+- Owner: SNLRLONG
+- Task: Tasks/4-testing/Web-kbach-crest.md
+- Branch/PR: feat/kbach-crest, merged to main (no PR)
+- What changed: the Covenant monogram badge has Khmer kbach ornament; the footer shows the invitation's monogram
+- Needs: web and couple deploy. Artwork needs owner approval; code review not run
+
 ## 2026-11-28 · [Cross] feat(couple): invitation date block and no-alcohol line
 - Owner: SNLRLONG
 - Task: Tasks/4-testing/Web-invitation-notice.md

@@ -115,11 +115,6 @@ export interface InvitationContent {
   startsAt?: string;
   greetingKh?: string;
   greetingEn?: string;
-  /** A short line under the time. Covenant has a built-in "no alcohol" line when empty. */
-  noticeKh?: string;
-  noticeEn?: string;
-  /** Show no line at all. */
-  hideNotice?: boolean;
 }
 
 /** Ritual/party icons the agenda can show. A fixed list so templates can ship one line-icon each. */
@@ -162,6 +157,11 @@ export interface LettersContent {
   gratitudeEn?: string;
   apologyKh?: string;
   apologyEn?: string;
+  /** A closing note under the letters. Covenant has a built-in "no alcohol" note when empty. */
+  noteKh?: string;
+  noteEn?: string;
+  /** Show no note at all. */
+  hideNote?: boolean;
 }
 
 /** `video` section: one YouTube link. Only the 11-character id is ever used, so any youtube.com / youtu.be form works. */

@@ -76,14 +76,7 @@ function Block({ block, theme }: { block: InvitationBlock; theme: Theme }) {
 export function InvitationKhmer({ couple, theme, content }: InvitationKhmerProps) {
   const { t, language } = useLanguage();
   const sk = useSkinOrnaments();
-  const view = buildInvitationView(
-    content,
-    couple,
-    language,
-    (lang) => textFor(lang, "khmer.invitation.formal"),
-    // Only Covenant (the Christian template) says it by default; elsewhere the couple writes it.
-    (lang) => (sk.id === "covenant" ? textFor(lang, "khmer.invitation.notice") : ""),
-  );
+  const view = buildInvitationView(content, couple, language, (lang) => textFor(lang, "khmer.invitation.formal"));
   if (view.isEmpty) return null;
 
   const dateLine = { fontFamily: CINZEL_FONT, letterSpacing: "0.16em" } as const;
@@ -131,11 +124,6 @@ export function InvitationKhmer({ couple, theme, content }: InvitationKhmerProps
             )}
             {(view.timeEn || view.timeKh) && (
               <p className="m-0 text-[15px] leading-loose">{language === "kh" ? view.timeKh : view.timeEn}</p>
-            )}
-            {view.notice && (
-              <p className="m-0 break-words text-[15px] font-semibold leading-loose" style={{ color: theme.accent_color }} lang={language === "kh" ? "km" : "en"}>
-                {view.notice}
-              </p>
             )}
           </div>
         </div>
